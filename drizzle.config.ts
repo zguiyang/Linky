@@ -8,9 +8,9 @@ dotenv.config({
 
 export default defineConfig({
   dialect: 'postgresql',
-  schema: ['./shared/db/tables/index.ts'],
+  schema: ['./shared/tables/index.ts'],
   out: './drizzle',
   dbCredentials: {
-    url: process.env.DATABASE_URI || '',
+    url: process.env.NUXT_DATABASE_URI || '',
   },
 });
