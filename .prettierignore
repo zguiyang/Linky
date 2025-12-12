@@ -1,0 +1,77 @@
+# 依赖和构建产物
+node_modules/
+dist/
+build/
+.output/
+.nuxt/
+.git/
+
+# 日志文件
+*.log
+logs/
+
+# 环境配置文件
+.env*
+!.env.example
+
+# 数据库迁移文件
+drizzle/
+
+# 缓存
+.cache/
+.temp/
+.tmp/
+
+# 操作系统生成的文件
+.DS_Store
+Thumbs.db
+
+# IDE 配置文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 包管理器锁文件
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 测试覆盖率报告
+coverage/
+.nyc_output/
+
+# 自动生成的文件
+*.min.js
+*.min.css
+
+# 文档生成
+docs/api/
+
+# 特殊格式文件，可能不需要格式化
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 密钥和证书
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# 压缩文件
+*.zip
+*.tar.gz
+*.rar
+
+# 特殊目录
+public/
