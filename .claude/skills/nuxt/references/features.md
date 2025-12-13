@@ -1683,7 +1683,7 @@ It comes with several features we can use to measure performance of Nuxt apps:
 
 Chrome DevTools come with two useful tabs for measuring performance; `Performance` and `Lighthouse`.
 
-When you open the [Performance](https://developer.chrome.com/docs/devtools/performance/overview){rel="&#x22;nofollow&#x22;"} panel, it instantly shows your local \**Largest Contentful Paint (LCP)\*\* and \**Cumulative Layout Shift (CLS)\*\* scores (good, needs improvement, or bad).
+When you open the [Performance](https://developer.chrome.com/docs/devtools/performance/overview){rel="&#x22;nofollow&#x22;"} panel, it instantly shows your local \*\*Largest Contentful Paint (LCP)\*\* and \*\*Cumulative Layout Shift (CLS)\*\* scores (good, needs improvement, or bad).
 
 If you interact with the page, it also captures \*\*Interaction to Next Paint (INP)\*\*, giving you a full view of your Core Web Vitals based on your device and network.
 

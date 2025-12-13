@@ -1473,8 +1473,7 @@ Example 1 (vue):
   <UDrawer>
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #content>
-      <Placeholder class="h-48 m-4" /> </template
+    <template #content> <Placeholder class="h-48 m-4" /> </template
   ></UDrawer>
 </template>
 ```
@@ -1486,8 +1485,7 @@ Example 2 (vue):
   <UDrawer title="Drawer with title">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UDrawer>
 </template>
 ```
@@ -1499,8 +1497,7 @@ Example 3 (vue):
   <UDrawer title="Drawer with description" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UDrawer>
 </template>
 ```
@@ -1512,8 +1509,7 @@ Example 4 (vue):
   <UDrawer direction="right">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #content>
-      <Placeholder class="min-w-96 min-h-96 size-full m-4" /> </template
+    <template #content> <Placeholder class="min-w-96 min-h-96 size-full m-4" /> </template
   ></UDrawer>
 </template>
 ```
@@ -4183,8 +4179,7 @@ Example 1 (vue):
   <UCollapsible class="flex flex-col gap-2 w-48">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-down" block />
 
-    <template #content>
-      <Placeholder class="h-48" /> </template
+    <template #content> <Placeholder class="h-48" /> </template
   ></UCollapsible>
 </template>
 ```
@@ -4196,8 +4191,7 @@ Example 2 (vue):
   <UCollapsible :unmount-on-hide="false" class="flex flex-col gap-2 w-48">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-down" block />
 
-    <template #content>
-      <Placeholder class="h-48" /> </template
+    <template #content> <Placeholder class="h-48" /> </template
   ></UCollapsible>
 </template>
 ```
@@ -4209,8 +4203,7 @@ Example 3 (vue):
   <UCollapsible class="flex flex-col gap-2 w-48" disabled>
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-down" block />
 
-    <template #content>
-      <Placeholder class="h-48" /> </template
+    <template #content> <Placeholder class="h-48" /> </template
   ></UCollapsible>
 </template>
 ```
@@ -5528,7 +5521,9 @@ variant: subtle
 
 #footer
 ::::u-select
+
 ---
+
 items: - label: Gemini 2.5 Pro
 value: gemini-2.5-pro
 icon: i-simple-icons-googlegemini - label: GPT-4o
@@ -5542,7 +5537,9 @@ icon: i-simple-icons-openai
 modelValue: gpt-4o
 placeholder: Select a model
 variant: ghost
+
 ---
+
 ::::
 :::
 ::
@@ -8258,8 +8255,7 @@ Example 1 (vue):
   <USlideover>
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="h-full m-4" /> </template
+    <template #content> <Placeholder class="h-full m-4" /> </template
   ></USlideover>
 </template>
 ```
@@ -8271,8 +8267,7 @@ Example 2 (vue):
   <USlideover title="Slideover with title">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></USlideover>
 </template>
 ```
@@ -8284,8 +8279,7 @@ Example 3 (vue):
   <USlideover title="Slideover with description" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></USlideover>
 </template>
 ```
@@ -8297,8 +8291,7 @@ Example 4 (vue):
   <USlideover title="Slideover with close button">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></USlideover>
 </template>
 ```
@@ -9905,8 +9898,7 @@ Example 1 (vue):
   <UModal>
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="h-48 m-4" /> </template
+    <template #content> <Placeholder class="h-48 m-4" /> </template
   ></UModal>
 </template>
 ```
@@ -9918,8 +9910,7 @@ Example 2 (vue):
   <UModal title="Modal with title">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UModal>
 </template>
 ```
@@ -9931,8 +9922,7 @@ Example 3 (vue):
   <UModal title="Modal with description" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UModal>
 </template>
 ```
@@ -9944,8 +9934,7 @@ Example 4 (vue):
   <UModal title="Modal with close button">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UModal>
 </template>
 ```
@@ -11306,8 +11295,7 @@ Example 1 (vue):
   <UPopover>
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="size-48 m-4 inline-flex" /> </template
+    <template #content> <Placeholder class="size-48 m-4 inline-flex" /> </template
   ></UPopover>
 </template>
 ```
@@ -11319,8 +11307,7 @@ Example 2 (vue):
   <UPopover mode="hover">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="size-48 m-4 inline-flex" /> </template
+    <template #content> <Placeholder class="size-48 m-4 inline-flex" /> </template
   ></UPopover>
 </template>
 ```
@@ -11332,8 +11319,7 @@ Example 3 (vue):
   <UPopover mode="hover" :open-delay="500" :close-delay="300">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="size-48 m-4 inline-flex" /> </template
+    <template #content> <Placeholder class="size-48 m-4 inline-flex" /> </template
   ></UPopover>
 </template>
 ```
@@ -11345,8 +11331,7 @@ Example 4 (vue):
   <UPopover>
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="size-48 m-4 inline-flex" /> </template
+    <template #content> <Placeholder class="size-48 m-4 inline-flex" /> </template
   ></UPopover>
 </template>
 ```
