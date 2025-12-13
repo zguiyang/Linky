@@ -10819,8 +10819,7 @@ Use the `variant` prop to change the variant of the Card.
     <template #header>
       <Placeholder class="h-8" />
     </template>
-    <template #footer>
-      <Placeholder class="h-8" /> </template
+    <template #footer> <Placeholder class="h-8" /> </template
   ></UCard>
 </template>
 ```
@@ -12887,7 +12886,7 @@ Use the ChatMessages component with the `Chat` class from AI SDK v5 to display a
 
 Pass the `messages` prop alongside the `status` prop that will be used for the auto scroll and the indicator display.
 
-```vue [pages/[id\].vue] {2,7-11,24,28}
+```vue [pages/[id].vue] {2,7-11,24,28}
 <script setup lang="ts">
   import { Chat } from '@ai-sdk/vue';
   import { getTextFromMessage } from '@nuxt/ui/utils/ai';
@@ -13322,7 +13321,9 @@ variant: subtle
 
 #footer
 ::::u-select
+
 ---
+
 items: - label: Gemini 2.5 Pro
 value: gemini-2.5-pro
 icon: i-simple-icons-googlegemini - label: GPT-4o
@@ -13336,7 +13337,9 @@ icon: i-simple-icons-openai
 modelValue: gpt-4o
 placeholder: Select a model
 variant: ghost
+
 ---
+
 ::::
 :::
 ::
@@ -13381,7 +13384,7 @@ Use the ChatPrompt component with the `Chat` class from AI SDK v5 to display a c
 
 Pass the `input` prop alongside the `error` prop to disable the textarea when an error occurs.
 
-```vue [pages/[id\].vue] {2,5,13-17,34,36}
+```vue [pages/[id].vue] {2,5,13-17,34,36}
 <script setup lang="ts">
   import { Chat } from '@ai-sdk/vue';
   import { getTextFromMessage } from '@nuxt/ui/utils/ai';
@@ -13856,7 +13859,7 @@ Use the ChatPromptSubmit component with the `Chat` class from AI SDK v5 to displ
 
 Pass the `status` prop and listen to the `stop` and `reload` events to control the chat.
 
-```vue [pages/[id\].vue] {2,7-11,35}
+```vue [pages/[id].vue] {2,7-11,35}
 <script setup lang="ts">
   import { Chat } from '@ai-sdk/vue';
   import { getTextFromMessage } from '@nuxt/ui/utils/ai';
@@ -15410,8 +15413,7 @@ Then, use the `#content` slot to add the content displayed when the Collapsible 
   <UCollapsible class="flex flex-col gap-2 w-48">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-down" block />
 
-    <template #content>
-      <Placeholder class="h-48" /> </template
+    <template #content> <Placeholder class="h-48" /> </template
   ></UCollapsible>
 </template>
 ```
@@ -15425,8 +15427,7 @@ Use the `unmount-on-hide` prop to prevent the content from being unmounted when 
   <UCollapsible :unmount-on-hide="false" class="flex flex-col gap-2 w-48">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-down" block />
 
-    <template #content>
-      <Placeholder class="h-48" /> </template
+    <template #content> <Placeholder class="h-48" /> </template
   ></UCollapsible>
 </template>
 ```
@@ -15444,8 +15445,7 @@ Use the `disabled` prop to disable the Collapsible.
   <UCollapsible class="flex flex-col gap-2 w-48" disabled>
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-down" block />
 
-    <template #content>
-      <Placeholder class="h-48" /> </template
+    <template #content> <Placeholder class="h-48" /> </template
   ></UCollapsible>
 </template>
 ```
@@ -15726,8 +15726,7 @@ As the button is wrapped in a [ClientOnly](https://nuxt.com/docs/api/components/
 ```vue
 <template>
   <UColorModeButton>
-    <template #fallback>
-      <UButton loading variant="ghost" color="neutral" /> </template
+    <template #fallback> <UButton loading variant="ghost" color="neutral" /> </template
   ></UColorModeButton>
 </template>
 ```
@@ -19495,7 +19494,7 @@ Use the `prev-icon` and `next-icon` props to customize the buttons [Icon](https:
 
 Use the ContentSurround component in a page to display the prev and next links:
 
-```vue [pages/[...slug\].vue] {19}
+```vue [pages/[...slug].vue] {19}
 <script setup lang="ts">
   const route = useRoute();
 
@@ -19677,7 +19676,7 @@ Use the `highlight-color` prop to change the color of the border. It defaults to
 
 Use the ContentToc component in a page to display the Table of Contents:
 
-```vue [pages/[...slug\].vue] {22-24}
+```vue [pages/[...slug].vue] {22-24}
 <script setup lang="ts">
   const route = useRoute();
 
@@ -21188,8 +21187,7 @@ Use the `resizable` prop to make the panel resizable.
 ```vue
 <template>
   <UDashboardPanel resizable>
-    <template #body>
-      <Placeholder class="h-96" /> </template
+    <template #body> <Placeholder class="h-96" /> </template
   ></UDashboardPanel>
 </template>
 ```
@@ -21201,8 +21199,7 @@ Use the `min-size`, `max-size` and `default-size` props to customize the size of
 ```vue
 <template>
   <UDashboardPanel resizable :min-size="22" :default-size="35" :max-size="40">
-    <template #body>
-      <Placeholder class="h-96" /> </template
+    <template #body> <Placeholder class="h-96" /> </template
   ></UDashboardPanel>
 </template>
 ```
@@ -23044,8 +23041,7 @@ Then, use the `#content` slot to add the content displayed when the Drawer is op
   <UDrawer>
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #content>
-      <Placeholder class="h-48 m-4" /> </template
+    <template #content> <Placeholder class="h-48 m-4" /> </template
   ></UDrawer>
 </template>
 ```
@@ -23061,8 +23057,7 @@ Use the `title` prop to set the title of the Drawer's header.
   <UDrawer title="Drawer with title">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UDrawer>
 </template>
 ```
@@ -23076,8 +23071,7 @@ Use the `description` prop to set the description of the Drawer's header.
   <UDrawer title="Drawer with description" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UDrawer>
 </template>
 ```
@@ -23091,8 +23085,7 @@ Use the `direction` prop to control the direction of the Drawer. Defaults to `bo
   <UDrawer direction="right">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #content>
-      <Placeholder class="min-w-96 min-h-96 size-full m-4" /> </template
+    <template #content> <Placeholder class="min-w-96 min-h-96 size-full m-4" /> </template
   ></UDrawer>
 </template>
 ```
@@ -23106,8 +23099,7 @@ Use the `inset` prop to inset the Drawer from the edges.
   <UDrawer direction="right" inset>
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #content>
-      <Placeholder class="min-w-96 min-h-96 size-full m-4" /> </template
+    <template #content> <Placeholder class="min-w-96 min-h-96 size-full m-4" /> </template
   ></UDrawer>
 </template>
 ```
@@ -23121,8 +23113,7 @@ Use the `handle` prop to control whether the Drawer has a handle or not. Default
   <UDrawer :handle="false">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #content>
-      <Placeholder class="h-48 m-4" /> </template
+    <template #content> <Placeholder class="h-48 m-4" /> </template
   ></UDrawer>
 </template>
 ```
@@ -23136,8 +23127,7 @@ Use the `handle-only` prop to only allow the Drawer to be dragged by the handle.
   <UDrawer handle-only>
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #content>
-      <Placeholder class="h-48 m-4" /> </template
+    <template #content> <Placeholder class="h-48 m-4" /> </template
   ></UDrawer>
 </template>
 ```
@@ -23151,8 +23141,7 @@ Use the `overlay` prop to control whether the Drawer has an overlay or not. Defa
   <UDrawer :overlay="false">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #content>
-      <Placeholder class="h-48 m-4" /> </template
+    <template #content> <Placeholder class="h-48 m-4" /> </template
   ></UDrawer>
 </template>
 ```
@@ -23170,8 +23159,7 @@ When `modal` is set to `false`, the overlay is automatically disabled and outsid
   <UDrawer :modal="false">
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #content>
-      <Placeholder class="h-48 m-4" /> </template
+    <template #content> <Placeholder class="h-48 m-4" /> </template
   ></UDrawer>
 </template>
 ```
@@ -23219,8 +23207,7 @@ Use the `should-scale-background` prop to scale the background when the Drawer i
   <UDrawer should-scale-background set-background-color-on-scale>
     <UButton label="Open" color="neutral" variant="subtle" trailing-icon="i-lucide-chevron-up" />
 
-    <template #content>
-      <Placeholder class="h-48 m-4" /> </template
+    <template #content> <Placeholder class="h-48 m-4" /> </template
   ></UDrawer>
 </template>
 ```
@@ -29173,7 +29160,7 @@ You might want to replicate the code of your `app.vue` inside your `error.vue` f
 ::note
 You can read more about how to handle errors in the [Nuxt documentation](https://nuxt.com/docs/getting-started/error-handling#error-page){rel="nofollow"}, but when using `nuxt generate` it is recommended to add `fatal: true` inside your `createError` call to make sure the error page is displayed:
 
-```vue [pages/[...slug\].vue]
+```vue [pages/[...slug].vue]
 <script setup lang="ts">
   const route = useRoute();
 
@@ -31928,8 +31915,7 @@ You should still add the `title` prop to replace the default `aria-label` of the
 ```vue
 <template>
   <UHeader>
-    <template #title>
-      <Logo class="h-6 w-auto" /> </template
+    <template #title> <Logo class="h-6 w-auto" /> </template
   ></UHeader>
 </template>
 ```
@@ -38927,8 +38913,7 @@ Then, use the `#content` slot to add the content displayed when the Modal is ope
   <UModal>
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="h-48 m-4" /> </template
+    <template #content> <Placeholder class="h-48 m-4" /> </template
   ></UModal>
 </template>
 ```
@@ -38944,8 +38929,7 @@ Use the `title` prop to set the title of the Modal's header.
   <UModal title="Modal with title">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UModal>
 </template>
 ```
@@ -38959,8 +38943,7 @@ Use the `description` prop to set the description of the Modal's header.
   <UModal title="Modal with description" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UModal>
 </template>
 ```
@@ -38976,8 +38959,7 @@ You can pass any property from the [Button](https://ui.nuxt.com/docs/components/
   <UModal title="Modal with close button">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UModal>
 </template>
 ```
@@ -38995,8 +38977,7 @@ Use the `close-icon` prop to customize the close button [Icon](https://ui.nuxt.c
   <UModal title="Modal with close button" close-icon="i-lucide-arrow-right">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UModal>
 </template>
 ```
@@ -39036,8 +39017,7 @@ Use the `transition` prop to control whether the Modal is animated or not. Defau
   <UModal :transition="false" title="Modal without transition">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UModal>
 </template>
 ```
@@ -39051,8 +39031,7 @@ Use the `overlay` prop to control whether the Modal has an overlay or not. Defau
   <UModal :overlay="false" title="Modal without overlay">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UModal>
 </template>
 ```
@@ -39070,8 +39049,7 @@ When `modal` is set to `false`, the overlay is automatically disabled and outsid
   <UModal :modal="false" title="Modal interactive">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UModal>
 </template>
 ```
@@ -39093,8 +39071,7 @@ You can combine `modal: false` with `dismissible: false` to make the Modal's bac
   <UModal :dismissible="false" modal title="Modal non-dismissible">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-48" /> </template
+    <template #body> <Placeholder class="h-48" /> </template
   ></UModal>
 </template>
 ```
@@ -39112,8 +39089,7 @@ As the overlay is needed for scrolling, `modal: false` is not compatible and `ov
   <UModal scrollable overlay title="Modal scrollable">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></UModal>
 </template>
 ```
@@ -39131,8 +39107,7 @@ Use the `fullscreen` prop to make the Modal fullscreen.
   <UModal fullscreen title="Modal fullscreen">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></UModal>
 </template>
 ```
@@ -42172,7 +42147,7 @@ In this example, we use the `ContentNavigation` component to display the navigat
 
 Use the Page component in a page with the `right` slot to display a table of contents:
 
-```vue [pages/[...slug\].vue] {29-31}
+```vue [pages/[...slug].vue] {29-31}
 <script setup lang="ts">
   const route = useRoute();
 
@@ -42614,7 +42589,7 @@ While these examples use [Nuxt Content](https://content.nuxt.com){rel="nofollow"
 
 Use the PageBody component in a page to display the content of the page:
 
-```vue [pages/[...slug\].vue] {21-27}
+```vue [pages/[...slug].vue] {21-27}
 <script setup lang="ts">
   const route = useRoute();
 
@@ -44116,7 +44091,7 @@ While these examples use [Nuxt Content](https://content.nuxt.com){rel="nofollow"
 
 Use the PageHeader component in a page to display the header of the page:
 
-```vue [pages/[...slug\].vue] {19-24}
+```vue [pages/[...slug].vue] {19-24}
 <script setup lang="ts">
   const route = useRoute();
 
@@ -44526,7 +44501,7 @@ While these examples use [Nuxt Content](https://content.nuxt.com){rel="nofollow"
 
 Use the PageLinks component in the `bottom` slot of the ContentToc component to display a list of links below the table of contents.
 
-```vue [pages/[...slug\].vue] {48-52}
+```vue [pages/[...slug].vue] {48-52}
 <script setup lang="ts">
   import type { PageLink } from '@nuxt/ui';
 
@@ -46124,8 +46099,7 @@ Then, use the `#content` slot to add the content displayed when the Popover is o
   <UPopover>
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="size-48 m-4 inline-flex" /> </template
+    <template #content> <Placeholder class="size-48 m-4 inline-flex" /> </template
   ></UPopover>
 </template>
 ```
@@ -46139,8 +46113,7 @@ Use the `mode` prop to change the mode of the Popover. Defaults to `click`.
   <UPopover mode="hover">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="size-48 m-4 inline-flex" /> </template
+    <template #content> <Placeholder class="size-48 m-4 inline-flex" /> </template
   ></UPopover>
 </template>
 ```
@@ -46158,8 +46131,7 @@ When using the `hover` mode, you can use the `open-delay` and `close-delay` prop
   <UPopover mode="hover" :open-delay="500" :close-delay="300">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="size-48 m-4 inline-flex" /> </template
+    <template #content> <Placeholder class="size-48 m-4 inline-flex" /> </template
   ></UPopover>
 </template>
 ```
@@ -46173,8 +46145,7 @@ Use the `content` prop to control how the Popover content is rendered, like its 
   <UPopover>
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="size-48 m-4 inline-flex" /> </template
+    <template #content> <Placeholder class="size-48 m-4 inline-flex" /> </template
   ></UPopover>
 </template>
 ```
@@ -46188,8 +46159,7 @@ Use the `arrow` prop to display an arrow on the Popover.
   <UPopover arrow>
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="size-48 m-4 inline-flex" /> </template
+    <template #content> <Placeholder class="size-48 m-4 inline-flex" /> </template
   ></UPopover>
 </template>
 ```
@@ -46203,8 +46173,7 @@ Use the `modal` prop to control whether the Popover blocks interaction with outs
   <UPopover modal>
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="size-48 m-4 inline-flex" /> </template
+    <template #content> <Placeholder class="size-48 m-4 inline-flex" /> </template
   ></UPopover>
 </template>
 ```
@@ -51909,8 +51878,7 @@ Then, use the `#content` slot to add the content displayed when the Slideover is
   <USlideover>
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #content>
-      <Placeholder class="h-full m-4" /> </template
+    <template #content> <Placeholder class="h-full m-4" /> </template
   ></USlideover>
 </template>
 ```
@@ -51926,8 +51894,7 @@ Use the `title` prop to set the title of the Slideover's header.
   <USlideover title="Slideover with title">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></USlideover>
 </template>
 ```
@@ -51941,8 +51908,7 @@ Use the `description` prop to set the description of the Slideover's header.
   <USlideover title="Slideover with description" description="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></USlideover>
 </template>
 ```
@@ -51958,8 +51924,7 @@ You can pass any property from the [Button](https://ui.nuxt.com/docs/components/
   <USlideover title="Slideover with close button">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></USlideover>
 </template>
 ```
@@ -51977,8 +51942,7 @@ Use the `close-icon` prop to customize the close button [Icon](https://ui.nuxt.c
   <USlideover title="Slideover with close button" close-icon="i-lucide-arrow-right">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></USlideover>
 </template>
 ```
@@ -52018,8 +51982,7 @@ Use the `side` prop to set the side of the screen where the Slideover will slide
   <USlideover side="left" title="Slideover with side">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full min-h-48" /> </template
+    <template #body> <Placeholder class="h-full min-h-48" /> </template
   ></USlideover>
 </template>
 ```
@@ -52033,8 +51996,7 @@ Use the `transition` prop to control whether the Slideover is animated or not. D
   <USlideover :transition="false" title="Slideover without transition">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></USlideover>
 </template>
 ```
@@ -52048,8 +52010,7 @@ Use the `overlay` prop to control whether the Slideover has an overlay or not. D
   <USlideover :overlay="false" title="Slideover without overlay">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></USlideover>
 </template>
 ```
@@ -52067,8 +52028,7 @@ When `modal` is set to `false`, the overlay is automatically disabled and outsid
   <USlideover :modal="false" title="Slideover interactive">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></USlideover>
 </template>
 ```
@@ -52090,8 +52050,7 @@ You can combine `modal: false` with `dismissible: false` to make the Slideover's
   <USlideover :dismissible="false" modal title="Slideover non-dismissible">
     <UButton label="Open" color="neutral" variant="subtle" />
 
-    <template #body>
-      <Placeholder class="h-full" /> </template
+    <template #body> <Placeholder class="h-full" /> </template
   ></USlideover>
 </template>
 ```

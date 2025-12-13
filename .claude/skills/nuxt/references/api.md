@@ -3491,11 +3491,11 @@ error: Object as () => NuxtError
 -     'pages:extend'(pages) {
 
 *     'pages:resolved'(pages) {
-          const myPage = pages.find(page => page.path === '/')
-          myPage.meta ||= {}
-          myPage.meta.layout = 'overridden-layout'
-        }
-      }
+                const myPage = pages.find(page => page.path === '/')
+                myPage.meta ||= {}
+                myPage.meta.layout = 'overridden-layout'
+              }
+            }
   })
   ts [nuxt.config.ts] twoslash
   export default defineNuxtConfig({
@@ -4048,11 +4048,11 @@ error: Object as () => NuxtError
 -     'pages:extend'(pages) {
 
 *     'pages:resolved'(pages) {
-          const myPage = pages.find(page => page.path === '/')
-          myPage.meta ||= {}
-          myPage.meta.layout = 'overridden-layout'
-        }
-      }
+                const myPage = pages.find(page => page.path === '/')
+                myPage.meta ||= {}
+                myPage.meta.layout = 'overridden-layout'
+              }
+            }
   })
   ts [nuxt.config.ts] twoslash
   export default defineNuxtConfig({
