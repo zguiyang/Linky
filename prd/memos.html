@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>备忘录 - 书签管理器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#3b82f6',
+              secondary: '#64748b',
+              accent: '#10b981',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .memo-card {
+        transition: all 0.3s ease;
+      }
+      .memo-card:hover {
+        transform: translateY(-2px);
+      }
+      .editor-toolbar button {
+        transition: all 0.2s;
+      }
+      .editor-toolbar button:hover {
+        transform: scale(1.1);
+      }
+      .editor-toolbar button.active {
+        background-color: rgb(59 130 246);
+        color: white;
+      }
+      .pinned-memo {
+        border-left: 4px solid #f59e0b;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center space-x-3">
+            <i class="fas fa-bookmark text-primary text-2xl"></i>
+            <h1 class="text-xl font-bold">书签管理器</h1>
+          </div>
+          <div class="hidden md:flex items-center space-x-6">
+            <a href="index.html" class="text-gray-600 hover:text-primary">首页</a>
+            <a href="bookmarks.html" class="text-gray-600 hover:text-primary">书签</a>
+            <a href="search.html" class="text-gray-600 hover:text-primary">搜索</a>
+            <a href="memos.html" class="text-primary font-medium">备忘录</a>
+            <a href="categories.html" class="text-gray-600 hover:text-primary">分类</a>
+          </div>
+          <button class="md:hidden" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="container mx-auto px-4 py-8">
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- 侧边栏 -->
+        <aside class="lg:w-64 flex-shrink-0">
+          <!-- 搜索备忘录 -->
+          <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="relative">
+              <input
+                type="text"
+                placeholder="搜索备忘录..."
+                class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+          </div>
+
+          <!-- 备忘录分类 -->
+          <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <h3 class="font-semibold mb-4 flex items-center">
+              <i class="fas fa-folder mr-2 text-primary"></i>
+              分类
+            </h3>
+            <ul class="space-y-2">
+              <li>
+                <a href="#" class="flex items-center justify-between p-2 hover:bg-gray-100 rounded text-primary">
+                  <span class="flex items-center">
+                    <i class="fas fa-sticky-note mr-2"></i>
+                    全部备忘录
+                  </span>
+                  <span class="text-sm text-gray-500">8</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center justify-between p-2 hover:bg-gray-100 rounded">
+                  <span class="flex items-center">
+                    <i class="fas fa-thumbtack text-yellow-500 mr-2"></i>
+                    置顶
+                  </span>
+                  <span class="text-sm text-gray-500">3</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center justify-between p-2 hover:bg-gray-100 rounded">
+                  <span class="flex items-center">
+                    <i class="fas fa-star text-yellow-500 mr-2"></i>
+                    收藏
+                  </span>
+                  <span class="text-sm text-gray-500">5</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center justify-between p-2 hover:bg-gray-100 rounded">
+                  <span class="flex items-center">
+                    <i class="fas fa-bookmark text-blue-500 mr-2"></i>
+                    关联书签
+                  </span>
+                  <span class="text-sm text-gray-500">4</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 标签云 -->
+          <div class="bg-white rounded-lg shadow-md p-4">
+            <h3 class="font-semibold mb-4 flex items-center">
+              <i class="fas fa-tags mr-2 text-primary"></i>
+              标签
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">学习 (3)</span>
+              <span class="px-2 py-1 bg-green-100 text-green-600 text-xs rounded-full">工作 (2)</span>
+              <span class="px-2 py-1 bg-purple-100 text-purple-600 text-xs rounded-full">灵感 (2)</span>
+              <span class="px-2 py-1 bg-yellow-100 text-yellow-600 text-xs rounded-full">待办 (1)</span>
+            </div>
+          </div>
+        </aside>
+
+        <!-- 备忘录列表/编辑器 -->
+        <main class="flex-1">
+          <!-- 工具栏 -->
+          <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <h2 class="text-2xl font-bold">我的备忘录</h2>
+              <div class="flex items-center gap-3">
+                <button
+                  onclick="showNewMemoModal()"
+                  class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center">
+                  <i class="fas fa-plus mr-2"></i>
+                  新建备忘录
+                </button>
+                <div class="flex bg-gray-100 rounded-lg p-1">
+                  <button onclick="setViewMode('list')" id="listViewBtn" class="px-3 py-1 rounded bg-white shadow-sm">
+                    <i class="fas fa-list"></i>
+                  </button>
+                  <button onclick="setViewMode('grid')" id="gridViewBtn" class="px-3 py-1 rounded">
+                    <i class="fas fa-th-large"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 备忘录列表视图 -->
+          <div id="memosList" class="space-y-4">
+            <!-- 置顶备忘录 -->
+            <div class="memo-card bg-white rounded-lg shadow p-5 pinned-memo cursor-pointer">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="fas fa-thumbtack text-yellow-500"></i>
+                    <h3 class="font-semibold text-lg">项目启动清单</h3>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded">工作</span>
+                    <span class="px-2 py-1 bg-yellow-100 text-yellow-600 text-xs rounded">待办</span>
+                  </div>
+                  <div class="text-gray-600 mb-3 prose max-w-none">
+                    <h4>项目启动前准备事项</h4>
+                    <ul>
+                      <li>确定技术栈和框架</li>
+                      <li>搭建开发环境</li>
+                      <li>分配开发人员</li>
+                      <li>建立沟通机制</li>
+                    </ul>
+                  </div>
+                  <div class="flex items-center gap-4 text-xs text-gray-500">
+                    <span><i class="fas fa-bookmark mr-1"></i>关联: 无</span>
+                    <span><i class="fas fa-calendar mr-1"></i>2024-01-16</span>
+                    <span class="flex items-center gap-1"> <i class="fas fa-eye"></i> 23次查看 </span>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                  <button class="text-gray-400 hover:text-yellow-500">
+                    <i class="fas fa-star"></i>
+                  </button>
+                  <button class="text-gray-400 hover:text-primary">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 普通备忘录 -->
+            <div class="memo-card bg-white rounded-lg shadow p-5 cursor-pointer">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-2">
+                    <h3 class="font-semibold text-lg">面试准备</h3>
+                    <span class="px-2 py-1 bg-green-100 text-green-600 text-xs rounded">学习</span>
+                  </div>
+                  <div class="text-gray-600 mb-3 line-clamp-3">
+                    <p>技术面试重点：</p>
+                    <p>JavaScript基础：原型链、闭包、异步编程</p>
+                    <p>算法与数据结构：常见排序、树和图</p>
+                  </div>
+                  <div class="flex items-center gap-4 text-xs text-gray-500">
+                    <span><i class="fas fa-bookmark mr-1"></i>关联: Stack Overflow</span>
+                    <span><i class="fas fa-calendar mr-1"></i>2024-01-14</span>
+                    <span class="flex items-center gap-1"> <i class="fas fa-eye"></i> 15次查看 </span>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                  <button class="text-yellow-500">
+                    <i class="fas fa-star"></i>
+                  </button>
+                  <button class="text-gray-400 hover:text-primary">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="memo-card bg-white rounded-lg shadow p-5 cursor-pointer">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-2">
+                    <h3 class="font-semibold text-lg">设计系统文档</h3>
+                    <span class="px-2 py-1 bg-purple-100 text-purple-600 text-xs rounded">灵感</span>
+                  </div>
+                  <div class="text-gray-600 mb-3 line-clamp-3">
+                    <p>色彩规范：</p>
+                    <p>主色调：#3b82f6，辅助色：#10b981</p>
+                    <p>间距系统：基础间距8px</p>
+                  </div>
+                  <div class="flex items-center gap-4 text-xs text-gray-500">
+                    <span><i class="fas fa-bookmark mr-1"></i>关联: Figma, Dribbble</span>
+                    <span><i class="fas fa-calendar mr-1"></i>2024-01-13</span>
+                    <span class="flex items-center gap-1"> <i class="fas fa-eye"></i> 31次查看 </span>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                  <button class="text-gray-400 hover:text-yellow-500">
+                    <i class="fas fa-star"></i>
+                  </button>
+                  <button class="text-gray-400 hover:text-primary">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="memo-card bg-white rounded-lg shadow p-5 cursor-pointer">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-2">
+                    <h3 class="font-semibold text-lg">代码片段收集</h3>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded">学习</span>
+                  </div>
+                  <div class="text-gray-600 mb-3 line-clamp-3">
+                    <p>防抖函数、数组去重、日期格式化等常用代码片段...</p>
+                  </div>
+                  <div class="flex items-center gap-4 text-xs text-gray-500">
+                    <span><i class="fas fa-bookmark mr-1"></i>关联: GitHub, Stack Overflow</span>
+                    <span><i class="fas fa-calendar mr-1"></i>2024-01-11</span>
+                    <span class="flex items-center gap-1"> <i class="fas fa-eye"></i> 42次查看 </span>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                  <button class="text-yellow-500">
+                    <i class="fas fa-star"></i>
+                  </button>
+                  <button class="text-gray-400 hover:text-primary">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 编辑器视图（默认隐藏） -->
+          <div id="editorView" class="hidden">
+            <div class="bg-white rounded-lg shadow-lg">
+              <!-- 编辑器工具栏 -->
+              <div class="editor-toolbar border-b p-3 flex flex-wrap gap-2">
+                <div class="flex items-center gap-1 border-r pr-2">
+                  <button class="p-2 hover:bg-gray-100 rounded" onclick="formatText('bold')">
+                    <i class="fas fa-bold"></i>
+                  </button>
+                  <button class="p-2 hover:bg-gray-100 rounded" onclick="formatText('italic')">
+                    <i class="fas fa-italic"></i>
+                  </button>
+                  <button class="p-2 hover:bg-gray-100 rounded" onclick="formatText('underline')">
+                    <i class="fas fa-underline"></i>
+                  </button>
+                </div>
+                <div class="flex items-center gap-1 border-r pr-2">
+                  <button class="p-2 hover:bg-gray-100 rounded" onclick="formatHeading('h1')">H1</button>
+                  <button class="p-2 hover:bg-gray-100 rounded" onclick="formatHeading('h2')">H2</button>
+                  <button class="p-2 hover:bg-gray-100 rounded" onclick="formatHeading('h3')">H3</button>
+                </div>
+                <div class="flex items-center gap-1 border-r pr-2">
+                  <button class="p-2 hover:bg-gray-100 rounded" onclick="formatText('insertUnorderedList')">
+                    <i class="fas fa-list-ul"></i>
+                  </button>
+                  <button class="p-2 hover:bg-gray-100 rounded" onclick="formatText('insertOrderedList')">
+                    <i class="fas fa-list-ol"></i>
+                  </button>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button class="p-2 hover:bg-gray-100 rounded" onclick="insertLink()">
+                    <i class="fas fa-link"></i>
+                  </button>
+                  <button class="p-2 hover:bg-gray-100 rounded" onclick="insertCode()">
+                    <i class="fas fa-code"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 编辑器内容区 -->
+              <div class="p-4">
+                <input
+                  type="text"
+                  placeholder="输入标题..."
+                  class="w-full text-xl font-semibold mb-4 p-2 border-b-2 focus:outline-none focus:border-primary" />
+                <div
+                  contenteditable="true"
+                  class="min-h-[300px] p-3 border rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="开始输入内容..."></div>
+              </div>
+
+              <!-- 编辑器底部 -->
+              <div class="border-t p-4 flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                  <select class="border rounded px-3 py-2 text-sm">
+                    <option>选择分类</option>
+                    <option>工作</option>
+                    <option>学习</option>
+                    <option>灵感</option>
+                  </select>
+                  <input type="text" placeholder="添加标签..." class="border rounded px-3 py-2 text-sm" />
+                </div>
+                <div class="flex gap-2">
+                  <button onclick="cancelEdit()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">取消</button>
+                  <button onclick="saveMemo()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">
+                    保存
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- 新建备忘录模态框 -->
+    <div id="newMemoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
+        <h3 class="text-xl font-semibold mb-4">新建备忘录</h3>
+        <input
+          type="text"
+          placeholder="备忘录标题"
+          class="w-full mb-4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+        <div class="mb-4">
+          <textarea
+            placeholder="输入内容..."
+            rows="8"
+            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+        </div>
+        <div class="flex gap-4 mb-4">
+          <select class="flex-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+            <option>选择分类</option>
+            <option>工作</option>
+            <option>学习</option>
+            <option>灵感</option>
+          </select>
+          <input
+            type="text"
+            placeholder="标签（逗号分隔）"
+            class="flex-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        </div>
+        <div class="flex items-center gap-4 mb-4">
+          <label class="flex items-center">
+            <input type="checkbox" class="mr-2" />
+            <span>置顶此备忘录</span>
+          </label>
+          <label class="flex items-center">
+            <input type="checkbox" class="mr-2" />
+            <span>关联书签</span>
+          </label>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button onclick="hideNewMemoModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">取消</button>
+          <button onclick="createNewMemo()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">
+            创建
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 视图切换
+      function setViewMode(mode) {
+        const listViewBtn = document.getElementById('listViewBtn');
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const memosList = document.getElementById('memosList');
+
+        if (mode === 'grid') {
+          gridViewBtn.classList.add('bg-white', 'shadow-sm');
+          listViewBtn.classList.remove('bg-white', 'shadow-sm');
+          memosList.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+        } else {
+          listViewBtn.classList.add('bg-white', 'shadow-sm');
+          gridViewBtn.classList.remove('bg-white', 'shadow-sm');
+          memosList.className = 'space-y-4';
+        }
+      }
+
+      // 显示新建备忘录模态框
+      function showNewMemoModal() {
+        document.getElementById('newMemoModal').classList.remove('hidden');
+      }
+
+      function hideNewMemoModal() {
+        document.getElementById('newMemoModal').classList.add('hidden');
+      }
+
+      function createNewMemo() {
+        alert('备忘录创建成功！');
+        hideNewMemoModal();
+      }
+
+      // 编辑器功能
+      function formatText(command) {
+        document.execCommand(command, false, null);
+      }
+
+      function formatHeading(level) {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          const heading = document.createElement(level);
+          heading.textContent = range.toString();
+          range.deleteContents();
+          range.insertNode(heading);
+        }
+      }
+
+      function insertLink() {
+        const url = prompt('请输入链接地址：');
+        if (url) {
+          document.execCommand('createLink', false, url);
+        }
+      }
+
+      function insertCode() {
+        const code = prompt('请输入代码：');
+        if (code) {
+          document.execCommand('insertHTML', false, `<pre><code>${code}</code></pre>`);
+        }
+      }
+
+      function cancelEdit() {
+        document.getElementById('editorView').classList.add('hidden');
+        document.getElementById('memosList').classList.remove('hidden');
+      }
+
+      function saveMemo() {
+        alert('备忘录保存成功！');
+        cancelEdit();
+      }
+
+      // 点击备忘录卡片进入编辑模式
+      document.addEventListener('DOMContentLoaded', function () {
+        const memoCards = document.querySelectorAll('.memo-card');
+        memoCards.forEach(card => {
+          card.addEventListener('click', function (e) {
+            // 如果点击的是按钮，不进入编辑模式
+            if (e.target.closest('button')) return;
+
+            document.getElementById('memosList').classList.add('hidden');
+            document.getElementById('editorView').classList.remove('hidden');
+          });
+        });
+      });
+
+      // 移动端菜单
+      function toggleMobileMenu() {
+        alert('移动端菜单功能');
+      }
+    </script>
+  </body>
+</html>
