@@ -5,6 +5,8 @@ build/
 .output/
 .nuxt/
 .git/
+.claude/
+openspec/
 
 # 日志文件
 *.log
