@@ -1,5 +1,3 @@
-与用户的所有聊天、对话、文档都采用中文作为主语言
-
 <!-- OPENSPEC:START -->
 
 # OpenSpec Instructions
