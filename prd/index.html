@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>首页 - 书签管理器</title>
+    <title>Linky - 智能书签管理器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <script>
@@ -20,444 +20,1318 @@
       };
     </script>
     <style>
-      .feature-card {
+      .fade-in {
+        animation: fadeIn 0.3s ease-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .bookmark-card {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
-      .feature-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      .bookmark-card:hover {
+        transform: translateY(-4px);
       }
-      .hero-gradient {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      .tag-pill {
+        transition: all 0.2s;
       }
-      .stats-card {
-        backdrop-filter: blur(10px);
-        background: rgba(255, 255, 255, 0.9);
-      }
-      @keyframes float {
-        0%,
-        100% {
-          transform: translateY(0px);
-        }
-        50% {
-          transform: translateY(-20px);
-        }
-      }
-      .floating {
-        animation: float 3s ease-in-out infinite;
-      }
-      @keyframes pulse-ring {
-        0% {
-          transform: scale(0.8);
-          opacity: 1;
-        }
-        100% {
-          transform: scale(1.3);
-          opacity: 0;
-        }
-      }
-      .pulse {
-        animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      .tag-pill:hover {
+        transform: scale(1.05);
       }
     </style>
   </head>
   <body class="bg-gray-50">
-    <!-- 导航栏 -->
-    <nav class="bg-white shadow-lg sticky top-0 z-50">
-      <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center h-16">
-          <div class="flex items-center space-x-3">
-            <i class="fas fa-bookmark text-primary text-2xl"></i>
-            <h1 class="text-xl font-bold">书签管理器</h1>
-          </div>
-          <div class="hidden md:flex items-center space-x-6">
-            <a href="index.html" class="text-primary font-medium">首页</a>
-            <a href="bookmarks.html" class="text-gray-600 hover:text-primary">书签</a>
-            <a href="search.html" class="text-gray-600 hover:text-primary">搜索</a>
-            <a href="memos.html" class="text-gray-600 hover:text-primary">备忘录</a>
-            <a href="categories.html" class="text-gray-600 hover:text-primary">分类</a>
-          </div>
-          <button class="md:hidden" onclick="toggleMobileMenu()">
-            <i class="fas fa-bars text-xl"></i>
+    <!-- 三栏布局容器 -->
+    <div class="flex h-screen">
+      <!-- 第一栏：页面级导航 -->
+      <nav class="w-16 bg-white border-r border-gray-200 flex flex-col items-center py-4">
+        <!-- Logo -->
+        <div class="mb-8">
+          <i class="fas fa-bookmark text-primary text-2xl"></i>
+        </div>
+
+        <!-- 页面导航 -->
+        <div class="flex-1 flex flex-col items-center gap-4">
+          <a href="index.html" class="nav-item group relative p-3 rounded-lg bg-blue-50 text-primary">
+            <i class="fas fa-bookmark text-xl"></i>
+            <!-- Tooltip -->
+            <span
+              class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              书签
+            </span>
+          </a>
+          <a href="memos.html" class="nav-item group relative p-3 rounded-lg text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-sticky-note text-xl"></i>
+            <!-- Tooltip -->
+            <span
+              class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              备忘录
+            </span>
+          </a>
+          <button
+            onclick="openGlobalSearch()"
+            class="nav-item group relative p-3 rounded-lg text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-search text-xl"></i>
+            <!-- Tooltip -->
+            <span
+              class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              全局搜索
+            </span>
           </button>
         </div>
-      </div>
-    </nav>
 
-    <!-- Hero区域 -->
-    <section class="hero-gradient text-white py-20">
-      <div class="container mx-auto px-4">
-        <div class="flex flex-col md:flex-row items-center gap-12">
-          <div class="flex-1 text-center md:text-left">
-            <h2 class="text-4xl md:text-5xl font-bold mb-4 fade-in">管理您的知识宝藏</h2>
-            <p class="text-xl mb-8 text-blue-100 fade-in">
-              一个简洁高效的书签和备忘录管理工具，帮助您整理、查找和记录所有重要的网络资源
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start fade-in">
-              <a
-                href="bookmarks.html"
-                class="px-8 py-3 bg-white text-primary font-semibold rounded-lg hover:bg-gray-100 transition">
-                <i class="fas fa-rocket mr-2"></i>
-                开始使用
-              </a>
+        <!-- 底部工具 -->
+        <div class="flex flex-col items-center gap-4">
+          <button class="p-3 rounded-lg text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-cog text-xl"></i>
+          </button>
+          <button class="p-3 rounded-lg text-gray-600 hover:bg-gray-100">
+            <i class="fas fa-user text-xl"></i>
+          </button>
+        </div>
+      </nav>
+
+      <!-- 第二栏：页面内导航 -->
+      <aside class="w-80 bg-white shadow-md overflow-y-auto">
+        <!-- 分类树 -->
+        <div class="py-6 border-b border-gray-300 bg-gray-50/30">
+          <div class="px-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-semibold flex items-center text-gray-900">
+                <i class="fas fa-folder mr-2 text-primary"></i>
+                分类
+              </h3>
+              <div class="flex gap-1">
+                <button
+                  onclick="showAddCategoryModal()"
+                  class="p-1.5 text-gray-400 hover:text-primary hover:bg-gray-50 rounded transition-colors"
+                  title="新建分类">
+                  <i class="fas fa-plus text-sm"></i>
+                </button>
+                <button
+                  onclick="showManageCategoriesModal()"
+                  class="p-1.5 text-gray-400 hover:text-primary hover:bg-gray-50 rounded transition-colors"
+                  title="管理分类">
+                  <i class="fas fa-cog text-sm"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="px-6">
+            <ul class="space-y-1">
+              <li>
+                <div
+                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded transition-colors"
+                  oncontextmenu="showCategoryContextMenu(event, '全部书签')">
+                  <a href="#" class="flex items-center flex-1">
+                    <i class="fas fa-folder-open text-yellow-500 mr-2"></i>
+                    全部书签
+                  </a>
+                  <span class="text-sm text-gray-500">156</span>
+                </div>
+              </li>
+              <li>
+                <div
+                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded transition-colors"
+                  oncontextmenu="showCategoryContextMenu(event, '收藏夹')">
+                  <a href="#" class="flex items-center flex-1">
+                    <i class="fas fa-star text-yellow-500 mr-2"></i>
+                    收藏夹
+                  </a>
+                  <span class="text-sm text-gray-500">23</span>
+                </div>
+              </li>
+              <li>
+                <div
+                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded transition-colors"
+                  oncontextmenu="showCategoryContextMenu(event, '开发工具')">
+                  <a href="#" class="flex items-center flex-1">
+                    <i class="fas fa-code text-blue-500 mr-2"></i>
+                    开发工具
+                  </a>
+                  <span class="text-sm text-gray-500">45</span>
+                </div>
+              </li>
+              <li>
+                <div
+                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded transition-colors"
+                  oncontextmenu="showCategoryContextMenu(event, '设计资源')">
+                  <a href="#" class="flex items-center flex-1">
+                    <i class="fas fa-palette text-purple-500 mr-2"></i>
+                    设计资源
+                  </a>
+                  <span class="text-sm text-gray-500">28</span>
+                </div>
+              </li>
+              <li>
+                <div
+                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded transition-colors"
+                  oncontextmenu="showCategoryContextMenu(event, '学习资源')">
+                  <a href="#" class="flex items-center flex-1">
+                    <i class="fas fa-book text-green-500 mr-2"></i>
+                    学习资源
+                  </a>
+                  <span class="text-sm text-gray-500">38</span>
+                </div>
+              </li>
+              <li>
+                <div
+                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded transition-colors"
+                  oncontextmenu="showCategoryContextMenu(event, '效率工具')">
+                  <a href="#" class="flex items-center flex-1">
+                    <i class="fas fa-rocket text-red-500 mr-2"></i>
+                    效率工具
+                  </a>
+                  <span class="text-sm text-gray-500">21</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 标签管理 -->
+        <div class="py-6 border-b border-gray-300 bg-blue-50/20">
+          <div class="px-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-semibold flex items-center text-gray-900">
+                <i class="fas fa-tags mr-2 text-primary"></i>
+                热门标签
+              </h3>
               <button
-                onclick="scrollToFeatures()"
-                class="px-8 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-primary transition">
-                <i class="fas fa-play-circle mr-2"></i>
-                功能预览
+                onclick="showManageTagsModal()"
+                class="p-1.5 text-gray-400 hover:text-primary hover:bg-gray-50 rounded transition-colors"
+                title="管理标签">
+                <i class="fas fa-cog text-sm"></i>
               </button>
             </div>
           </div>
-          <div class="flex-1 relative">
-            <div class="floating">
-              <i class="fas fa-bookmark text-[200px] text-white/20"></i>
-            </div>
-            <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-              <div class="pulse absolute">
-                <i class="fas fa-star text-yellow-300 text-4xl"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 统计数据 -->
-    <section class="py-12 -mt-8">
-      <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div class="stats-card rounded-lg shadow-lg p-6 text-center">
-            <i class="fas fa-bookmark text-primary text-3xl mb-3"></i>
-            <p class="text-3xl font-bold">156</p>
-            <p class="text-gray-600">收藏的书签</p>
-          </div>
-          <div class="stats-card rounded-lg shadow-lg p-6 text-center">
-            <i class="fas fa-sticky-note text-yellow-500 text-3xl mb-3"></i>
-            <p class="text-3xl font-bold">28</p>
-            <p class="text-gray-600">备忘录笔记</p>
-          </div>
-          <div class="stats-card rounded-lg shadow-lg p-6 text-center">
-            <i class="fas fa-folder text-green-500 text-3xl mb-3"></i>
-            <p class="text-3xl font-bold">5</p>
-            <p class="text-gray-600">分类目录</p>
-          </div>
-          <div class="stats-card rounded-lg shadow-lg p-6 text-center">
-            <i class="fas fa-tags text-purple-500 text-3xl mb-3"></i>
-            <p class="text-3xl font-bold">42</p>
-            <p class="text-gray-600">标签总数</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 功能介绍 -->
-    <section id="features" class="py-16">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold mb-4">核心功能</h2>
-          <p class="text-gray-600 text-lg">强大的功能，简单的体验</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- 书签管理 -->
-          <div
-            class="feature-card bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
-            onclick="window.location.href='bookmarks.html'">
-            <div class="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-              <i class="fas fa-bookmark text-white text-6xl"></i>
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-semibold mb-2">书签管理</h3>
-              <p class="text-gray-600 mb-4">
-                快速保存、组织和访问您的网络书签。支持分类管理、标签系统，让书签井然有序。
-              </p>
-              <div class="flex items-center text-primary">
-                <span class="mr-2">立即体验</span>
-                <i class="fas fa-arrow-right"></i>
-              </div>
-            </div>
-          </div>
-
-          <!-- 智能搜索 -->
-          <div
-            class="feature-card bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
-            onclick="window.location.href='search.html'">
-            <div class="h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-              <i class="fas fa-search text-white text-6xl"></i>
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-semibold mb-2">智能搜索</h3>
-              <p class="text-gray-600 mb-4">强大的搜索引擎，支持关键词、标签、分类多维度筛选，快速定位所需内容。</p>
-              <div class="flex items-center text-primary">
-                <span class="mr-2">立即体验</span>
-                <i class="fas fa-arrow-right"></i>
-              </div>
-            </div>
-          </div>
-
-          <!-- 备忘录 -->
-          <div
-            class="feature-card bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
-            onclick="window.location.href='memos.html'">
-            <div class="h-48 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-              <i class="fas fa-sticky-note text-white text-6xl"></i>
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-semibold mb-2">备忘录</h3>
-              <p class="text-gray-600 mb-4">记录灵感和想法，支持富文本编辑，可与书签关联，构建知识网络。</p>
-              <div class="flex items-center text-primary">
-                <span class="mr-2">立即体验</span>
-                <i class="fas fa-arrow-right"></i>
-              </div>
-            </div>
-          </div>
-
-          <!-- 分类系统 -->
-          <div
-            class="feature-card bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer"
-            onclick="window.location.href='categories.html'">
-            <div class="h-48 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-              <i class="fas fa-folder text-white text-6xl"></i>
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-semibold mb-2">分类系统</h3>
-              <p class="text-gray-600 mb-4">灵活的分类管理，支持无限层级，自定义图标和颜色，打造专属知识体系。</p>
-              <div class="flex items-center text-primary">
-                <span class="mr-2">立即体验</span>
-                <i class="fas fa-arrow-right"></i>
-              </div>
-            </div>
-          </div>
-
-          <!-- 标签管理 -->
-          <div class="feature-card bg-white rounded-lg shadow-lg overflow-hidden">
-            <div class="h-48 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
-              <i class="fas fa-tags text-white text-6xl"></i>
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-semibold mb-2">标签系统</h3>
-              <p class="text-gray-600 mb-4">可视化标签云，灵活标记，让信息关联更自然，发现内容间的隐藏联系。</p>
-              <div class="flex flex-wrap gap-2">
-                <span class="px-2 py-1 bg-pink-100 text-pink-600 text-xs rounded-full">JavaScript</span>
-                <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">设计</span>
-                <span class="px-2 py-1 bg-green-100 text-green-600 text-xs rounded-full">+39</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 响应式设计 -->
-          <div class="feature-card bg-white rounded-lg shadow-lg overflow-hidden">
-            <div class="h-48 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
-              <i class="fas fa-mobile-alt text-white text-6xl"></i>
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-semibold mb-2">响应式设计</h3>
-              <p class="text-gray-600 mb-4">完美适配各种设备，手机、平板、桌面都有最佳体验，随时随地管理书签。</p>
-              <div class="flex gap-2">
-                <i class="fas fa-desktop text-gray-400"></i>
-                <i class="fas fa-tablet-alt text-gray-400"></i>
-                <i class="fas fa-mobile text-gray-400"></i>
-              </div>
+          <div class="px-6">
+            <div class="flex flex-wrap gap-2">
+              <span
+                class="tag-pill px-3 py-1 bg-blue-100 text-blue-600 text-xs rounded-full cursor-pointer hover:bg-blue-200 transition-colors"
+                >JavaScript</span
+              >
+              <span
+                class="tag-pill px-3 py-1 bg-green-100 text-green-600 text-xs rounded-full cursor-pointer hover:bg-green-200 transition-colors"
+                >设计</span
+              >
+              <span
+                class="tag-pill px-3 py-1 bg-purple-100 text-purple-600 text-xs rounded-full cursor-pointer hover:bg-purple-200 transition-colors"
+                >工具</span
+              >
+              <span
+                class="tag-pill px-3 py-1 bg-yellow-100 text-yellow-600 text-xs rounded-full cursor-pointer hover:bg-yellow-200 transition-colors"
+                >教程</span
+              >
+              <span
+                class="tag-pill px-3 py-1 bg-red-100 text-red-600 text-xs rounded-full cursor-pointer hover:bg-red-200 transition-colors"
+                >API</span
+              >
+              <span
+                class="tag-pill px-3 py-1 bg-indigo-100 text-indigo-600 text-xs rounded-full cursor-pointer hover:bg-indigo-200 transition-colors"
+                >框架</span
+              >
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- 最新动态 -->
-    <section class="py-16 bg-gray-100">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold mb-4">最近添加</h2>
-          <p class="text-gray-600 text-lg">最新收藏的书签和备忘录</p>
+        <!-- 添加书签按钮 -->
+        <div class="px-6 py-6">
+          <button
+            onclick="showAddBookmarkModal()"
+            class="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-blue-600 flex items-center justify-center transition-colors">
+            <i class="fas fa-plus mr-2"></i>
+            添加书签
+          </button>
         </div>
+      </aside>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- 最近书签 -->
-          <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="font-semibold text-lg mb-4 flex items-center">
-              <i class="fas fa-clock mr-2 text-primary"></i>
-              最近书签
-            </h3>
-            <div class="space-y-3">
-              <div class="flex items-center space-x-3">
-                <img
-                  src="https://images.unsplash.com/photo-1618404738559-9e7b15d4b318?w=50"
-                  alt="npm"
-                  class="w-12 h-12 rounded" />
-                <div class="flex-1">
-                  <p class="font-medium">npm</p>
-                  <p class="text-sm text-gray-500">JavaScript包管理器</p>
-                </div>
-                <span class="text-xs text-gray-400">2小时前</span>
+      <!-- 第三栏：主内容区域 -->
+      <main class="flex-1 bg-gray-50 overflow-y-auto">
+        <!-- 工具栏 -->
+        <div class="sticky top-0 bg-white px-6 py-4 z-10 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-bold">我的书签</h1>
+            <div class="flex items-center gap-4">
+              <!-- 视图切换 -->
+              <div class="flex bg-gray-100 rounded-lg p-1">
+                <button onclick="setViewMode('grid')" id="gridViewBtn" class="px-3 py-1 rounded bg-white shadow-sm">
+                  <i class="fas fa-th"></i>
+                </button>
+                <button onclick="setViewMode('list')" id="listViewBtn" class="px-3 py-1 rounded">
+                  <i class="fas fa-list"></i>
+                </button>
               </div>
-              <div class="flex items-center space-x-3">
-                <img
-                  src="https://images.unsplash.com/photo-1586953431220-5e1d3f6b27a4?w=50"
-                  alt="CodePen"
-                  class="w-12 h-12 rounded" />
-                <div class="flex-1">
-                  <p class="font-medium">CodePen</p>
-                  <p class="text-sm text-gray-500">在线代码编辑器</p>
-                </div>
-                <span class="text-xs text-gray-400">5小时前</span>
-              </div>
-              <div class="flex items-center space-x-3">
-                <img
-                  src="https://images.unsplash.com/photo-1504711434919-fab6f1d891e?w=50"
-                  alt="Awwwards"
-                  class="w-12 h-12 rounded" />
-                <div class="flex-1">
-                  <p class="font-medium">Awwwards</p>
-                  <p class="text-sm text-gray-500">网站设计大奖</p>
-                </div>
-                <span class="text-xs text-gray-400">昨天</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 最近备忘录 -->
-          <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="font-semibold text-lg mb-4 flex items-center">
-              <i class="fas fa-sticky-note mr-2 text-yellow-500"></i>
-              最近备忘录
-            </h3>
-            <div class="space-y-3">
-              <div class="border-l-4 border-yellow-400 pl-3">
-                <p class="font-medium">代码片段收集</p>
-                <p class="text-sm text-gray-600 line-clamp-2">防抖函数、数组去重、日期格式化等常用代码片段...</p>
-                <span class="text-xs text-gray-400">3小时前</span>
-              </div>
-              <div class="border-l-4 border-blue-400 pl-3">
-                <p class="font-medium">学习计划</p>
-                <p class="text-sm text-gray-600 line-clamp-2">深入学习Vue.js源码、学习TypeScript、掌握性能优化...</p>
-                <span class="text-xs text-gray-400">1天前</span>
-              </div>
-              <div class="border-l-4 border-green-400 pl-3">
-                <p class="font-medium">会议纪要</p>
-                <p class="text-sm text-gray-600 line-clamp-2">产品讨论会、新功能需求、用户反馈分析...</p>
-                <span class="text-xs text-gray-400">2天前</span>
-              </div>
+              <!-- 排序 -->
+              <select class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                <option>最近添加</option>
+                <option>最多访问</option>
+                <option>名称排序</option>
+              </select>
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- 页脚 -->
-    <footer class="bg-gray-800 text-white py-12">
-      <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h4 class="font-semibold mb-4">书签管理器</h4>
-            <p class="text-gray-400 text-sm">简洁高效的书签和备忘录管理工具，让知识管理变得轻松。</p>
-          </div>
-          <div>
-            <h4 class="font-semibold mb-4">快速链接</h4>
-            <ul class="space-y-2 text-gray-400 text-sm">
-              <li><a href="bookmarks.html" class="hover:text-white">书签管理</a></li>
-              <li><a href="search.html" class="hover:text-white">搜索功能</a></li>
-              <li><a href="memos.html" class="hover:text-white">备忘录</a></li>
-              <li><a href="categories.html" class="hover:text-white">分类管理</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-semibold mb-4">功能特色</h4>
-            <ul class="space-y-2 text-gray-400 text-sm">
-              <li>• 智能分类管理</li>
-              <li>• 快速搜索定位</li>
-              <li>• 标签系统</li>
-              <li>• 备忘录关联</li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="font-semibold mb-4">关于</h4>
-            <p class="text-gray-400 text-sm mb-4">这是一个高保真原型展示，使用 Tailwind CSS 构建。</p>
-            <div class="flex gap-3">
-              <i class="fab fa-github text-2xl hover:text-white cursor-pointer"></i>
-              <i class="fab fa-twitter text-2xl hover:text-white cursor-pointer"></i>
-              <i class="fab fa-dribbble text-2xl hover:text-white cursor-pointer"></i>
-            </div>
+        <!-- 书签内容 -->
+        <div class="p-6">
+          <!-- 书签网格 -->
+          <div id="bookmarksGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <!-- 书签卡片将通过JavaScript动态生成 -->
           </div>
         </div>
-        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>© 2024 书签管理器. 高保真原型演示.</p>
-        </div>
-      </div>
-    </footer>
-
-    <!-- 快速导航 -->
-    <div class="fixed bottom-6 right-6 flex flex-col gap-3">
-      <button
-        onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
-        class="w-12 h-12 bg-primary text-white rounded-full shadow-lg hover:bg-blue-600 flex items-center justify-center">
-        <i class="fas fa-arrow-up"></i>
-      </button>
-      <button
-        onclick="showQuickActions()"
-        class="w-12 h-12 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 flex items-center justify-center">
-        <i class="fas fa-plus"></i>
-      </button>
+      </main>
     </div>
 
-    <!-- 快速操作菜单 -->
-    <div id="quickActions" class="hidden fixed bottom-24 right-6 bg-white rounded-lg shadow-xl p-2 min-w-[200px]">
-      <a href="bookmarks.html" class="block px-4 py-2 hover:bg-gray-100 rounded">
-        <i class="fas fa-bookmark mr-2"></i>添加书签
-      </a>
-      <a href="memos.html" class="block px-4 py-2 hover:bg-gray-100 rounded">
-        <i class="fas fa-sticky-note mr-2"></i>新建备忘录
-      </a>
-      <a href="search.html" class="block px-4 py-2 hover:bg-gray-100 rounded">
-        <i class="fas fa-search mr-2"></i>快速搜索
-      </a>
+    <!-- 添加书签模态框 -->
+    <div
+      id="addBookmarkModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+        <h3 class="text-xl font-semibold mb-4">添加新书签</h3>
+        <form onsubmit="handleAddBookmark(event)">
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">标题</label>
+            <input
+              type="text"
+              required
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">URL</label>
+            <input
+              type="url"
+              required
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">描述</label>
+            <textarea
+              rows="3"
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">分类</label>
+            <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+              <option>开发工具</option>
+              <option>设计资源</option>
+              <option>学习资源</option>
+              <option>效率工具</option>
+              <option>其他</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">标签</label>
+            <input
+              type="text"
+              placeholder="用逗号分隔多个标签"
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+          </div>
+          <div class="flex justify-end gap-3">
+            <button type="button" onclick="hideAddBookmarkModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+              取消
+            </button>
+            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">添加</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 添加分类模态框 -->
+    <div
+      id="addCategoryModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+        <h3 class="text-xl font-semibold mb-4">新建分类</h3>
+        <form onsubmit="handleAddCategory(event)">
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">分类名称</label>
+            <input
+              type="text"
+              required
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="输入分类名称" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">父分类</label>
+            <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+              <option value="">无（顶级分类）</option>
+              <option value="开发工具">开发工具</option>
+              <option value="设计资源">设计资源</option>
+              <option value="学习资源">学习资源</option>
+              <option value="效率工具">效率工具</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">图标</label>
+            <div class="grid grid-cols-6 gap-2">
+              <button
+                type="button"
+                class="icon-option p-3 border rounded hover:bg-blue-50 hover:border-blue-500"
+                data-icon="fa-folder">
+                <i class="fas fa-folder text-gray-600"></i>
+              </button>
+              <button
+                type="button"
+                class="icon-option p-3 border rounded hover:bg-blue-50 hover:border-blue-500"
+                data-icon="fa-code">
+                <i class="fas fa-code text-blue-500"></i>
+              </button>
+              <button
+                type="button"
+                class="icon-option p-3 border rounded hover:bg-blue-50 hover:border-blue-500"
+                data-icon="fa-palette">
+                <i class="fas fa-palette text-purple-500"></i>
+              </button>
+              <button
+                type="button"
+                class="icon-option p-3 border rounded hover:bg-blue-50 hover:border-blue-500"
+                data-icon="fa-book">
+                <i class="fas fa-book text-green-500"></i>
+              </button>
+              <button
+                type="button"
+                class="icon-option p-3 border rounded hover:bg-blue-50 hover:border-blue-500"
+                data-icon="fa-rocket">
+                <i class="fas fa-rocket text-red-500"></i>
+              </button>
+              <button
+                type="button"
+                class="icon-option p-3 border rounded hover:bg-blue-50 hover:border-blue-500"
+                data-icon="fa-star">
+                <i class="fas fa-star text-yellow-500"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">颜色</label>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                class="color-option w-8 h-8 bg-blue-500 rounded-full border-2 border-gray-300"
+                data-color="text-blue-500"></button>
+              <button
+                type="button"
+                class="color-option w-8 h-8 bg-green-500 rounded-full border-2 border-gray-300"
+                data-color="text-green-500"></button>
+              <button
+                type="button"
+                class="color-option w-8 h-8 bg-purple-500 rounded-full border-2 border-gray-300"
+                data-color="text-purple-500"></button>
+              <button
+                type="button"
+                class="color-option w-8 h-8 bg-red-500 rounded-full border-2 border-gray-300"
+                data-color="text-red-500"></button>
+              <button
+                type="button"
+                class="color-option w-8 h-8 bg-yellow-500 rounded-full border-2 border-gray-300"
+                data-color="text-yellow-500"></button>
+              <button
+                type="button"
+                class="color-option w-8 h-8 bg-gray-500 rounded-full border-2 border-gray-300"
+                data-color="text-gray-500"></button>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3">
+            <button type="button" onclick="hideAddCategoryModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+              取消
+            </button>
+            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">创建</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 管理分类模态框 -->
+    <div
+      id="manageCategoriesModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+        <h3 class="text-xl font-semibold mb-4">管理分类</h3>
+        <div class="space-y-4">
+          <div class="border rounded-lg p-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <i class="fas fa-code text-blue-500"></i>
+                <div>
+                  <h4 class="font-medium">开发工具</h4>
+                  <p class="text-sm text-gray-500">45 个书签</p>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="editCategory('开发工具')" class="px-3 py-1 text-sm border rounded hover:bg-gray-50">
+                  <i class="fas fa-edit mr-1"></i>编辑
+                </button>
+                <button
+                  onclick="deleteCategory('开发工具')"
+                  class="px-3 py-1 text-sm text-red-600 border border-red-300 rounded hover:bg-red-50">
+                  <i class="fas fa-trash mr-1"></i>删除
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="border rounded-lg p-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <i class="fas fa-palette text-purple-500"></i>
+                <div>
+                  <h4 class="font-medium">设计资源</h4>
+                  <p class="text-sm text-gray-500">28 个书签</p>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="editCategory('设计资源')" class="px-3 py-1 text-sm border rounded hover:bg-gray-50">
+                  <i class="fas fa-edit mr-1"></i>编辑
+                </button>
+                <button
+                  onclick="deleteCategory('设计资源')"
+                  class="px-3 py-1 text-sm text-red-600 border border-red-300 rounded hover:bg-red-50">
+                  <i class="fas fa-trash mr-1"></i>删除
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="border rounded-lg p-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <i class="fas fa-book text-green-500"></i>
+                <div>
+                  <h4 class="font-medium">学习资源</h4>
+                  <p class="text-sm text-gray-500">38 个书签</p>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="editCategory('学习资源')" class="px-3 py-1 text-sm border rounded hover:bg-gray-50">
+                  <i class="fas fa-edit mr-1"></i>编辑
+                </button>
+                <button
+                  onclick="deleteCategory('学习资源')"
+                  class="px-3 py-1 text-sm text-red-600 border border-red-300 rounded hover:bg-red-50">
+                  <i class="fas fa-trash mr-1"></i>删除
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="border rounded-lg p-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <i class="fas fa-rocket text-red-500"></i>
+                <div>
+                  <h4 class="font-medium">效率工具</h4>
+                  <p class="text-sm text-gray-500">21 个书签</p>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="editCategory('效率工具')" class="px-3 py-1 text-sm border rounded hover:bg-gray-50">
+                  <i class="fas fa-edit mr-1"></i>编辑
+                </button>
+                <button
+                  onclick="deleteCategory('效率工具')"
+                  class="px-3 py-1 text-sm text-red-600 border border-red-300 rounded hover:bg-red-50">
+                  <i class="fas fa-trash mr-1"></i>删除
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end mt-6">
+          <button onclick="hideManageCategoriesModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+            关闭
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 管理标签模态框 -->
+    <div id="manageTagsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+        <h3 class="text-xl font-semibold mb-4">管理标签</h3>
+
+        <!-- 新建标签 -->
+        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+          <h4 class="font-medium mb-3">新建标签</h4>
+          <div class="flex gap-2">
+            <input
+              type="text"
+              id="newTagInput"
+              placeholder="输入标签名称"
+              class="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+            <button onclick="addNewTag()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">
+              <i class="fas fa-plus mr-2"></i>添加
+            </button>
+          </div>
+        </div>
+
+        <!-- 标签列表 -->
+        <div class="mb-4">
+          <h4 class="font-medium mb-3">所有标签</h4>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between p-3 border rounded-lg">
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">JavaScript</span>
+                <span class="text-sm text-gray-500">23 个书签</span>
+              </div>
+              <div class="flex gap-2">
+                <button class="p-1 text-gray-400 hover:text-blue-500 rounded">
+                  <i class="fas fa-edit text-sm"></i>
+                </button>
+                <button class="p-1 text-gray-400 hover:text-red-500 rounded">
+                  <i class="fas fa-trash text-sm"></i>
+                </button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between p-3 border rounded-lg">
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-green-100 text-green-600 text-xs rounded-full">设计</span>
+                <span class="text-sm text-gray-500">18 个书签</span>
+              </div>
+              <div class="flex gap-2">
+                <button class="p-1 text-gray-400 hover:text-blue-500 rounded">
+                  <i class="fas fa-edit text-sm"></i>
+                </button>
+                <button class="p-1 text-gray-400 hover:text-red-500 rounded">
+                  <i class="fas fa-trash text-sm"></i>
+                </button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between p-3 border rounded-lg">
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-purple-100 text-purple-600 text-xs rounded-full">工具</span>
+                <span class="text-sm text-gray-500">15 个书签</span>
+              </div>
+              <div class="flex gap-2">
+                <button class="p-1 text-gray-400 hover:text-blue-500 rounded">
+                  <i class="fas fa-edit text-sm"></i>
+                </button>
+                <button class="p-1 text-gray-400 hover:text-red-500 rounded">
+                  <i class="fas fa-trash text-sm"></i>
+                </button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between p-3 border rounded-lg">
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-yellow-100 text-yellow-600 text-xs rounded-full">教程</span>
+                <span class="text-sm text-gray-500">12 个书签</span>
+              </div>
+              <div class="flex gap-2">
+                <button class="p-1 text-gray-400 hover:text-blue-500 rounded">
+                  <i class="fas fa-edit text-sm"></i>
+                </button>
+                <button class="p-1 text-gray-400 hover:text-red-500 rounded">
+                  <i class="fas fa-trash text-sm"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button onclick="hideManageTagsModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 全局搜索对话框 -->
+    <div
+      id="globalSearchModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center pt-20 z-50">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
+        <div class="p-4">
+          <!-- 搜索输入框 -->
+          <div class="relative mb-4">
+            <input
+              id="globalSearchInput"
+              type="text"
+              placeholder="搜索书签、分类或备忘录..."
+              class="w-full pl-12 pr-12 py-3 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
+            <i class="fas fa-search absolute left-4 top-4 text-gray-400"></i>
+            <kbd class="absolute right-4 top-3.5 text-xs bg-gray-100 px-2 py-1 rounded">ESC</kbd>
+          </div>
+
+          <!-- 搜索结果区域 -->
+          <div id="searchResults" class="max-h-96 overflow-y-auto">
+            <!-- 搜索历史 -->
+            <div id="searchHistory" class="mb-4">
+              <h3 class="text-sm font-semibold text-gray-500 mb-2">搜索历史</h3>
+              <div class="flex flex-wrap gap-2">
+                <span
+                  class="search-history-item px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm cursor-pointer hover:bg-gray-200"
+                  >GitHub</span
+                >
+                <span
+                  class="search-history-item px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm cursor-pointer hover:bg-gray-200"
+                  >设计资源</span
+                >
+                <span
+                  class="search-history-item px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm cursor-pointer hover:bg-gray-200"
+                  >JavaScript</span
+                >
+              </div>
+            </div>
+
+            <!-- 搜索结果组 -->
+            <div id="searchResultsContent" class="hidden">
+              <!-- 书签结果 -->
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-500 mb-2"><i class="fas fa-bookmark mr-2"></i>书签</h3>
+                <div id="bookmarkResults" class="space-y-2"></div>
+              </div>
+
+              <!-- 分类结果 -->
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-500 mb-2"><i class="fas fa-folder mr-2"></i>分类</h3>
+                <div id="categoryResults" class="space-y-2"></div>
+              </div>
+
+              <!-- 备忘录结果 -->
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-500 mb-2"><i class="fas fa-sticky-note mr-2"></i>备忘录</h3>
+                <div id="memoResults" class="space-y-2"></div>
+              </div>
+            </div>
+
+            <!-- 无结果提示 -->
+            <div id="noResults" class="hidden text-center py-8 text-gray-500">
+              <i class="fas fa-search text-4xl mb-4 text-gray-300"></i>
+              <p>没有找到相关结果</p>
+            </div>
+          </div>
+
+          <!-- 底部快捷键提示 -->
+          <div class="flex justify-center gap-4 mt-4 text-xs text-gray-500">
+            <span><kbd class="bg-gray-100 px-2 py-1 rounded">↑↓</kbd> 导航</span>
+            <span><kbd class="bg-gray-100 px-2 py-1 rounded">Enter</kbd> 选择</span>
+            <span><kbd class="bg-gray-100 px-2 py-1 rounded">ESC</kbd> 关闭</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
-      // 滚动到功能区域
-      function scrollToFeatures() {
-        document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+      // 模拟数据
+      const mockBookmarks = [
+        {
+          id: 1,
+          title: 'GitHub',
+          url: 'https://github.com',
+          description: '全球最大的代码托管平台，开发者必备工具',
+          thumbnail: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400',
+          tags: ['开发', '代码', '开源'],
+          category: '开发工具',
+          visitCount: 156,
+          isFavorite: true,
+        },
+        {
+          id: 2,
+          title: 'Stack Overflow',
+          url: 'https://stackoverflow.com',
+          description: '程序员问答社区，解决技术问题的最佳平台',
+          thumbnail: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=400',
+          tags: ['问答', '社区', '学习'],
+          category: '学习资源',
+          visitCount: 89,
+          isFavorite: false,
+        },
+        {
+          id: 3,
+          title: 'Dribbble',
+          url: 'https://dribbble.com',
+          description: '设计师作品展示平台，获取灵感的重要来源',
+          thumbnail: 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=400',
+          tags: ['设计', '灵感', 'UI/UX'],
+          category: '设计资源',
+          visitCount: 67,
+          isFavorite: false,
+        },
+        {
+          id: 4,
+          title: 'Medium',
+          url: 'https://medium.com',
+          description: '高质量的内容发布平台，深度技术文章',
+          thumbnail: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400',
+          tags: ['阅读', '文章', '深度'],
+          category: '阅读资源',
+          visitCount: 234,
+          isFavorite: true,
+        },
+        {
+          id: 5,
+          title: 'Notion',
+          url: 'https://notion.so',
+          description: '全能的笔记和知识管理工具，组织个人和团队信息',
+          thumbnail: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=400',
+          tags: ['笔记', '工具', '效率'],
+          category: '效率工具',
+          visitCount: 178,
+          isFavorite: true,
+        },
+        {
+          id: 6,
+          title: 'Tailwind CSS',
+          url: 'https://tailwindcss.com',
+          description: '实用优先的CSS框架，快速构建美观界面',
+          thumbnail: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=400',
+          tags: ['CSS', '框架', '前端'],
+          category: '开发工具',
+          visitCount: 92,
+          isFavorite: false,
+        },
+      ];
+
+      // 渲染书签卡片
+      function renderBookmarks() {
+        const grid = document.getElementById('bookmarksGrid');
+        grid.innerHTML = mockBookmarks
+          .map(
+            bookmark => `
+                <div class="bookmark-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl fade-in">
+                    <div class="aspect-video bg-gray-200 relative">
+                        <img src="${bookmark.thumbnail}" alt="${bookmark.title}"
+                             class="w-full h-full object-cover"
+                             loading="lazy">
+                        ${bookmark.isFavorite ? '<i class="fas fa-star text-yellow-400 absolute top-2 right-2"></i>' : ''}
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg mb-1 truncate">${bookmark.title}</h3>
+                        <p class="text-gray-600 text-sm mb-3 line-clamp-2">${bookmark.description}</p>
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            ${bookmark.tags
+                              .map(
+                                tag => `
+                                <span class="tag-pill px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
+                                    ${tag}
+                                </span>
+                            `
+                              )
+                              .join('')}
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span class="flex items-center">
+                                <i class="fas fa-eye mr-1"></i>
+                                ${bookmark.visitCount}
+                            </span>
+                            <span class="flex items-center gap-2">
+                                <button class="hover:text-primary" onclick="editBookmark(${bookmark.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="hover:text-red-500" onclick="deleteBookmark(${bookmark.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `
+          )
+          .join('');
       }
 
-      // 快速操作菜单
-      function showQuickActions() {
-        const menu = document.getElementById('quickActions');
-        menu.classList.toggle('hidden');
+      // 模态框控制
+      function showAddBookmarkModal() {
+        document.getElementById('addBookmarkModal').classList.remove('hidden');
       }
 
-      // 点击页面其他地方关闭快速菜单
-      document.addEventListener('click', function (event) {
-        const quickBtn = event.target.closest('button[onclick="showQuickActions()"]');
-        const quickMenu = document.getElementById('quickActions');
+      function hideAddBookmarkModal() {
+        document.getElementById('addBookmarkModal').classList.add('hidden');
+      }
 
-        if (!quickBtn && !quickMenu.contains(event.target)) {
-          quickMenu.classList.add('hidden');
+      function handleAddBookmark(event) {
+        event.preventDefault();
+        // 模拟添加书签
+        alert('书签添加成功！');
+        hideAddBookmarkModal();
+      }
+
+      function editBookmark(id) {
+        alert('编辑书签功能（ID: ' + id + '）');
+      }
+
+      function deleteBookmark(id) {
+        if (confirm('确定要删除这个书签吗？')) {
+          alert('书签已删除！');
         }
-      });
+      }
 
-      // 添加滚动时的渐入效果
-      const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px',
-      };
+      // 视图模式切换
+      function setViewMode(mode) {
+        const gridBtn = document.getElementById('gridViewBtn');
+        const listBtn = document.getElementById('listViewBtn');
+        const grid = document.getElementById('bookmarksGrid');
 
-      const observer = new IntersectionObserver(function (entries) {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('fade-in');
-          }
-        });
-      }, observerOptions);
+        if (mode === 'grid') {
+          gridBtn.classList.add('bg-white', 'shadow-sm');
+          listBtn.classList.remove('bg-white', 'shadow-sm');
+          grid.className = 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6';
+        } else {
+          listBtn.classList.add('bg-white', 'shadow-sm');
+          gridBtn.classList.remove('bg-white', 'shadow-sm');
+          grid.className = 'space-y-4';
+        }
+      }
 
-      // 观察所有功能卡片
-      document.querySelectorAll('.feature-card').forEach(card => {
-        observer.observe(card);
+      // 初始化
+      document.addEventListener('DOMContentLoaded', function () {
+        renderBookmarks();
       });
 
       // 移动端菜单
       function toggleMobileMenu() {
+        // 简化版移动端菜单切换
         alert('移动端菜单功能');
       }
+
+      // 全局搜索功能
+      const globalSearchData = {
+        bookmarks: mockBookmarks,
+        categories: [
+          { id: 1, name: '开发工具', icon: 'fa-code', count: 45 },
+          { id: 2, name: '设计资源', icon: 'fa-palette', count: 28 },
+          { id: 3, name: '学习资源', icon: 'fa-book', count: 38 },
+          { id: 4, name: '效率工具', icon: 'fa-rocket', count: 21 },
+        ],
+        memos: [
+          { id: 1, title: '项目启动清单', content: '项目启动前准备事项', tags: ['工作', '待办'] },
+          { id: 2, title: '面试准备', content: 'JavaScript基础：原型链、闭包、异步编程', tags: ['学习'] },
+          { id: 3, title: '设计系统文档', content: '色彩规范：主色调#3b82f6', tags: ['灵感'] },
+        ],
+      };
+
+      let currentSearchIndex = 0;
+      let searchResults = [];
+
+      function openGlobalSearch() {
+        const modal = document.getElementById('globalSearchModal');
+        const input = document.getElementById('globalSearchInput');
+
+        modal.classList.remove('hidden');
+        setTimeout(() => input.focus(), 100);
+
+        // 绑定键盘事件
+        document.addEventListener('keydown', handleGlobalSearchKeydown);
+      }
+
+      function closeGlobalSearch() {
+        const modal = document.getElementById('globalSearchModal');
+        modal.classList.add('hidden');
+
+        // 清除搜索结果
+        document.getElementById('globalSearchInput').value = '';
+        document.getElementById('searchResultsContent').classList.add('hidden');
+        document.getElementById('searchHistory').classList.remove('hidden');
+        document.getElementById('noResults').classList.add('hidden');
+
+        // 移除键盘事件
+        document.removeEventListener('keydown', handleGlobalSearchKeydown);
+      }
+
+      function handleGlobalSearchKeydown(e) {
+        const modal = document.getElementById('globalSearchModal');
+
+        // ESC 关闭搜索
+        if (e.key === 'Escape') {
+          closeGlobalSearch();
+          return;
+        }
+
+        // Enter 选择结果
+        if (e.key === 'Enter' && searchResults.length > 0) {
+          const result = searchResults[currentSearchIndex];
+          if (result) {
+            handleSearchResultClick(result);
+          }
+          return;
+        }
+
+        // 上下箭头导航
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          navigateSearchResults(-1);
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          navigateSearchResults(1);
+        }
+      }
+
+      function navigateSearchResults(direction) {
+        const items = document.querySelectorAll('.search-result-item');
+
+        // 移除当前高亮
+        if (items[currentSearchIndex]) {
+          items[currentSearchIndex].classList.remove('bg-blue-50', 'border-l-4', 'border-blue-500');
+        }
+
+        // 计算新索引
+        currentSearchIndex += direction;
+        if (currentSearchIndex < 0) currentSearchIndex = items.length - 1;
+        if (currentSearchIndex >= items.length) currentSearchIndex = 0;
+
+        // 添加新高亮
+        if (items[currentSearchIndex]) {
+          items[currentSearchIndex].classList.add('bg-blue-50', 'border-l-4', 'border-blue-500');
+          items[currentSearchIndex].scrollIntoView({ block: 'nearest' });
+        }
+      }
+
+      function performGlobalSearch(query) {
+        if (!query.trim()) {
+          document.getElementById('searchResultsContent').classList.add('hidden');
+          document.getElementById('searchHistory').classList.remove('hidden');
+          return;
+        }
+
+        const lowerQuery = query.toLowerCase();
+        searchResults = [];
+
+        // 搜索书签
+        const bookmarkResults = globalSearchData.bookmarks
+          .filter(
+            bookmark =>
+              bookmark.title.toLowerCase().includes(lowerQuery) ||
+              bookmark.description.toLowerCase().includes(lowerQuery) ||
+              bookmark.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+          )
+          .slice(0, 3)
+          .map(bookmark => ({ ...bookmark, type: 'bookmark' }));
+
+        // 搜索分类
+        const categoryResults = globalSearchData.categories
+          .filter(category => category.name.toLowerCase().includes(lowerQuery))
+          .map(category => ({ ...category, type: 'category' }));
+
+        // 搜索备忘录
+        const memoResults = globalSearchData.memos
+          .filter(
+            memo =>
+              memo.title.toLowerCase().includes(lowerQuery) ||
+              memo.content.toLowerCase().includes(lowerQuery) ||
+              memo.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+          )
+          .slice(0, 3)
+          .map(memo => ({ ...memo, type: 'memo' }));
+
+        searchResults = [...bookmarkResults, ...categoryResults, ...memoResults];
+
+        // 显示搜索结果
+        displaySearchResults(bookmarkResults, categoryResults, memoResults);
+      }
+
+      function displaySearchResults(bookmarkResults, categoryResults, memoResults) {
+        document.getElementById('searchHistory').classList.add('hidden');
+
+        if (bookmarkResults.length === 0 && categoryResults.length === 0 && memoResults.length === 0) {
+          document.getElementById('searchResultsContent').classList.add('hidden');
+          document.getElementById('noResults').classList.remove('hidden');
+          return;
+        }
+
+        document.getElementById('searchResultsContent').classList.remove('hidden');
+        document.getElementById('noResults').classList.add('hidden');
+
+        // 渲染书签结果
+        const bookmarkResultsEl = document.getElementById('bookmarkResults');
+        if (bookmarkResults.length > 0) {
+          bookmarkResultsEl.innerHTML = bookmarkResults
+            .map(
+              bookmark => `
+              <div class="search-result-item p-3 hover:bg-gray-50 cursor-pointer rounded border-l-4 border-transparent transition-all"
+                   onclick="handleSearchResultClick(${JSON.stringify(bookmark).replace(/"/g, '&quot;')})">
+                <div class="flex items-start gap-3">
+                  <img src="${bookmark.thumbnail || 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=80'}"
+                       alt="${bookmark.title}"
+                       class="w-12 h-12 rounded object-cover flex-shrink-0"
+                       onerror="this.src='https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=80'">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <i class="fas fa-bookmark text-blue-500"></i>
+                      <span class="font-medium truncate">${bookmark.title}</span>
+                      ${bookmark.isFavorite ? '<i class="fas fa-star text-yellow-400 text-sm"></i>' : ''}
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1 line-clamp-2">${bookmark.description}</p>
+                    <div class="flex gap-2 mt-2">
+                      ${bookmark.tags.map(tag => `<span class="px-2 py-0.5 bg-blue-100 text-blue-600 text-xs rounded">${tag}</span>`).join('')}
+                    </div>
+                  </div>
+                  <div class="text-xs text-gray-500 flex-shrink-0">
+                    <div>${bookmark.visitCount} 次访问</div>
+                  </div>
+                </div>
+              </div>
+            `
+            )
+            .join('');
+        } else {
+          bookmarkResultsEl.innerHTML = '<p class="text-sm text-gray-500 p-3">无相关书签</p>';
+        }
+
+        // 渲染分类结果
+        const categoryResultsEl = document.getElementById('categoryResults');
+        if (categoryResults.length > 0) {
+          categoryResultsEl.innerHTML = categoryResults
+            .map(
+              category => `
+              <div class="search-result-item p-3 hover:bg-gray-50 cursor-pointer rounded border-l-4 border-transparent transition-all"
+                   onclick="handleSearchResultClick(${JSON.stringify(category).replace(/"/g, '&quot;')})">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <i class="fas ${category.icon} text-yellow-500"></i>
+                    <span class="font-medium">${category.name}</span>
+                  </div>
+                  <span class="text-sm text-gray-500">${category.count} 个书签</span>
+                </div>
+              </div>
+            `
+            )
+            .join('');
+        } else {
+          categoryResultsEl.innerHTML = '<p class="text-sm text-gray-500 p-3">无相关分类</p>';
+        }
+
+        // 渲染备忘录结果
+        const memoResultsEl = document.getElementById('memoResults');
+        if (memoResults.length > 0) {
+          memoResultsEl.innerHTML = memoResults
+            .map(
+              memo => `
+              <div class="search-result-item p-3 hover:bg-gray-50 cursor-pointer rounded border-l-4 border-transparent transition-all"
+                   onclick="handleSearchResultClick(${JSON.stringify(memo).replace(/"/g, '&quot;')})">
+                <div class="flex items-center gap-2 mb-1">
+                  <i class="fas fa-sticky-note text-green-500"></i>
+                  <span class="font-medium">${memo.title}</span>
+                </div>
+                <p class="text-sm text-gray-600">${memo.content}</p>
+                <div class="flex gap-2 mt-2">
+                  ${memo.tags.map(tag => `<span class="px-2 py-0.5 bg-green-100 text-green-600 text-xs rounded">${tag}</span>`).join('')}
+                </div>
+              </div>
+            `
+            )
+            .join('');
+        } else {
+          memoResultsEl.innerHTML = '<p class="text-sm text-gray-500 p-3">无相关备忘录</p>';
+        }
+
+        // 重置搜索索引
+        currentSearchIndex = 0;
+      }
+
+      function handleSearchResultClick(result) {
+        closeGlobalSearch();
+
+        switch (result.type) {
+          case 'bookmark':
+            // 打开书签
+            window.open(result.url, '_blank');
+            break;
+          case 'category':
+            // 筛选分类内容
+            filterByCategory(result.name);
+            break;
+          case 'memo':
+            // 跳转到备忘录页面（这里只是模拟）
+            alert(`打开备忘录：${result.title}`);
+            break;
+        }
+      }
+
+      // 根据分类筛选书签
+      function filterByCategory(categoryName) {
+        // 这里可以实现实际的筛选逻辑
+        // 比如更新书签列表，只显示该分类的书签
+        alert(`筛选分类：${categoryName}\n\n这里将显示该分类下的所有书签。`);
+
+        // 实际实现可以这样做：
+        // 1. 更新书签列表显示
+        // 2. 更新页面标题显示当前分类
+        // 3. 添加清除筛选的按钮
+      }
+
+      // 绑定搜索输入事件
+      document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('globalSearchInput');
+        if (searchInput) {
+          searchInput.addEventListener('input', function (e) {
+            performGlobalSearch(e.target.value);
+          });
+        }
+
+        // 搜索历史点击事件
+        document.querySelectorAll('.search-history-item').forEach(item => {
+          item.addEventListener('click', function () {
+            const query = this.textContent;
+            document.getElementById('globalSearchInput').value = query;
+            performGlobalSearch(query);
+          });
+        });
+
+        // 全局键盘快捷键 Cmd/Ctrl + K
+        document.addEventListener('keydown', function (e) {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            openGlobalSearch();
+          }
+        });
+      });
     </script>
+
+    <script>
+      // 分类和标签管理功能
+
+      // 分类管理
+      function showAddCategoryModal() {
+        document.getElementById('addCategoryModal').classList.remove('hidden');
+      }
+
+      function hideAddCategoryModal() {
+        document.getElementById('addCategoryModal').classList.add('hidden');
+      }
+
+      function showManageCategoriesModal() {
+        document.getElementById('manageCategoriesModal').classList.remove('hidden');
+      }
+
+      function hideManageCategoriesModal() {
+        document.getElementById('manageCategoriesModal').classList.add('hidden');
+      }
+
+      function handleAddCategory(event) {
+        event.preventDefault();
+        alert('分类创建成功！');
+        hideAddCategoryModal();
+      }
+
+      function editCategory(categoryName) {
+        // 这里可以打开编辑模态框或直接编辑
+        alert(`编辑分类：${categoryName}`);
+        hideManageCategoriesModal();
+      }
+
+      function deleteCategory(categoryName) {
+        if (confirm(`确定要删除分类"${categoryName}"吗？\n\n删除后该分类下的书签将移至"未分类"。`)) {
+          alert(`分类"${categoryName}"已删除！`);
+          hideManageCategoriesModal();
+        }
+      }
+
+      // 标签管理
+      function showManageTagsModal() {
+        document.getElementById('manageTagsModal').classList.remove('hidden');
+      }
+
+      function hideManageTagsModal() {
+        document.getElementById('manageTagsModal').classList.add('hidden');
+      }
+
+      function addNewTag() {
+        const input = document.getElementById('newTagInput');
+        const tagName = input.value.trim();
+
+        if (tagName) {
+          alert(`标签"${tagName}"已添加！`);
+          input.value = '';
+        }
+      }
+
+      // 图标和颜色选择
+      document.addEventListener('DOMContentLoaded', function () {
+        // 图标选择
+        document.querySelectorAll('.icon-option').forEach(button => {
+          button.addEventListener('click', function () {
+            document.querySelectorAll('.icon-option').forEach(btn => {
+              btn.classList.remove('border-blue-500', 'bg-blue-50');
+            });
+            this.classList.add('border-blue-500', 'bg-blue-50');
+          });
+        });
+
+        // 颜色选择
+        document.querySelectorAll('.color-option').forEach(button => {
+          button.addEventListener('click', function () {
+            document.querySelectorAll('.color-option').forEach(btn => {
+              btn.classList.remove('border-blue-500', 'ring-2', 'ring-blue-200');
+            });
+            this.classList.add('border-blue-500', 'ring-2', 'ring-blue-200');
+          });
+        });
+
+        // 标签点击筛选
+        document.querySelectorAll('.tag-pill').forEach(tag => {
+          tag.addEventListener('click', function () {
+            const tagName = this.textContent;
+            alert(`筛选标签：${tagName}\n\n这里将显示所有包含此标签的书签。`);
+          });
+        });
+
+        // 分类点击筛选
+        document.querySelectorAll('a[href="#"]').forEach(link => {
+          link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const categoryText = this.textContent.trim();
+            if (categoryText && !['全部书签', '收藏夹'].includes(categoryText)) {
+              alert(`筛选分类：${categoryText}\n\n这里将显示该分类下的所有书签。`);
+            }
+          });
+        });
+      });
+
+      // 右键菜单功能
+      let currentCategoryName = '';
+
+      function showCategoryContextMenu(event, categoryName) {
+        event.preventDefault();
+        currentCategoryName = categoryName;
+
+        const menu = document.getElementById('categoryContextMenu');
+        menu.style.left = event.pageX + 'px';
+        menu.style.top = event.pageY + 'px';
+        menu.classList.remove('hidden');
+
+        // 点击其他地方隐藏菜单
+        document.addEventListener('click', hideCategoryContextMenu);
+      }
+
+      function hideCategoryContextMenu() {
+        const menu = document.getElementById('categoryContextMenu');
+        menu.classList.add('hidden');
+        document.removeEventListener('click', hideCategoryContextMenu);
+      }
+
+      function editCategoryFromMenu() {
+        if (currentCategoryName && !['全部书签', '收藏夹'].includes(currentCategoryName)) {
+          editCategory(currentCategoryName);
+        }
+        hideCategoryContextMenu();
+      }
+
+      function deleteCategoryFromMenu() {
+        if (currentCategoryName && !['全部书签', '收藏夹'].includes(currentCategoryName)) {
+          deleteCategory(currentCategoryName);
+        }
+        hideCategoryContextMenu();
+      }
+    </script>
+
+    <!-- 右键菜单 -->
+    <div
+      id="categoryContextMenu"
+      class="hidden fixed bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 min-w-[120px]">
+      <button
+        onclick="editCategoryFromMenu()"
+        class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+        <i class="fas fa-edit text-blue-500"></i>
+        编辑分类
+      </button>
+      <button
+        onclick="deleteCategoryFromMenu()"
+        class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+        <i class="fas fa-trash text-red-500"></i>
+        删除分类
+      </button>
+    </div>
   </body>
 </html>
