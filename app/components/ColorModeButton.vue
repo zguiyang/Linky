@@ -13,14 +13,16 @@
 
 <template>
   <ClientOnly v-if="!colorMode?.forced">
-    <u-button
-      :icon="isDark ? 'i-lucide-moon' : 'i-lucide-sun'"
+    <UButton
+      :icon="isDark ? 'i-heroicons-moon' : 'i-heroicons-sun'"
       color="neutral"
       variant="ghost"
-      size="xl"
+      size="xs"
+      class="p-2.5"
+      :aria-label="`切换到${isDark ? '明亮' : '暗黑'}模式`"
       @click="isDark = !isDark" />
     <template #fallback>
-      <div class="size-8" />
+      <div class="w-8 h-8" />
     </template>
   </ClientOnly>
 </template>
