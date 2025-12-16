@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>备忘录 - 书签管理器</title>
+    <title>备忘录 - Linky</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <script>
@@ -11,223 +11,480 @@
         theme: {
           extend: {
             colors: {
-              primary: '#3b82f6',
-              secondary: '#64748b',
-              accent: '#10b981',
+              // 精致的灰度系统
+              gray: {
+                25: '#fcfcfc',
+                50: '#fafafa',
+                75: '#f8f8f8',
+                100: '#f5f5f5',
+                150: '#f2f2f2',
+                200: '#e5e5e5',
+                300: '#d4d4d4',
+                400: '#a3a3a3',
+                500: '#737373',
+                600: '#525252',
+                700: '#404040',
+                800: '#262626',
+                850: '#1f1f1f',
+                900: '#171717',
+                950: '#0a0a0a',
+              },
+              // 单一主题色
+              primary: {
+                50: '#f0f4ff',
+                100: '#e0edff',
+                200: '#c7ddff',
+                300: '#a4c7ff',
+                400: '#818dff',
+                500: '#0066cc', // 主色
+                600: '#0052a3', // hover
+                700: '#004294',
+              },
+            },
+            fontFamily: {
+              sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'system-ui', 'sans-serif'],
+            },
+            boxShadow: {
+              subtle: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+              card: '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
+              'card-hover': '0 4px 12px 0 rgba(0, 0, 0, 0.06), 0 2px 4px 0 rgba(0, 0, 0, 0.04)',
             },
           },
         },
       };
     </script>
     <style>
+      /* 引入 Inter 字体 */
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+      /* 基础重置 */
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          system-ui,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: #262626;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
       .memo-card {
-        transition: all 0.3s ease;
+        transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       }
       .memo-card:hover {
         transform: translateY(-2px);
+        box-shadow:
+          0 4px 12px 0 rgba(0, 0, 0, 0.06),
+          0 2px 4px 0 rgba(0, 0, 0, 0.04);
       }
       .editor-toolbar button {
-        transition: all 0.2s;
+        transition: all 0.15s;
       }
       .editor-toolbar button:hover {
-        transform: scale(1.1);
+        transform: scale(1.05);
       }
       .editor-toolbar button.active {
-        background-color: rgb(59 130 246);
+        background: #0066cc;
         color: white;
       }
       .pinned-memo {
-        border-left: 4px solid #f59e0b;
+        border-left: 3px solid #f59e0b;
+      }
+
+      /* 标签样式 */
+      .tag-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 500;
+        border-radius: 6px;
+        transition: all 0.15s;
+        cursor: pointer;
+        background: #f0f4ff;
+        color: #0066cc;
+        border: 0.5px solid #e0edff;
+      }
+
+      .tag-pill:hover {
+        background: #e0edff;
+      }
+
+      /* 模态框样式 */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .modal {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      .modal-header {
+        padding: 24px 24px 16px;
+        border-bottom: 1px solid #e5e5e5;
+      }
+
+      .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+      }
+
+      .modal-body {
+        padding: 24px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 8px;
+      }
+
+      .form-group input,
+      .form-group textarea,
+      .form-group select {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.15s;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #0066cc;
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+      }
+
+      .required {
+        color: #ef4444;
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .checkbox-group input[type='checkbox'] {
+        width: auto;
+      }
+
+      .modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #e5e5e5;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        background: #f9fafb;
+        border-radius: 0 0 12px 12px;
+      }
+
+      /* 按钮样式 */
+      .btn {
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+      }
+
+      .btn-primary {
+        background: #0066cc;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #0052a3;
+      }
+
+      .btn-secondary {
+        background: white;
+        color: #6b7280;
+        border: 1px solid #d1d5db;
+      }
+
+      .btn-secondary:hover {
+        background: #f3f4f6;
+        color: #374151;
       }
     </style>
   </head>
-  <body class="bg-gray-50">
+  <body class="bg-gray-50/30">
     <!-- 三栏布局容器 -->
     <div class="flex h-screen">
       <!-- 第一栏：页面级导航 -->
-      <nav class="w-16 bg-white border-r border-gray-200 flex flex-col items-center py-4">
+      <nav class="w-16 bg-white border-r border-gray-200/50 flex flex-col items-center py-6">
         <!-- Logo -->
-        <div class="mb-8">
-          <i class="fas fa-bookmark text-primary text-2xl"></i>
+        <div class="mb-10">
+          <i class="fas fa-bookmark text-primary-600 text-2xl"></i>
         </div>
 
         <!-- 页面导航 -->
-        <div class="flex-1 flex flex-col items-center gap-4">
-          <a href="index.html" class="nav-item group relative p-3 rounded-lg text-gray-600 hover:bg-gray-100">
+        <div class="flex-1 flex flex-col items-center gap-2">
+          <a
+            href="index.html"
+            class="nav-item group relative p-2.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700">
             <i class="fas fa-bookmark text-xl"></i>
             <!-- Tooltip -->
             <span
-              class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               书签
             </span>
           </a>
-          <a href="memos.html" class="nav-item group relative p-3 rounded-lg bg-blue-50 text-primary">
+          <a href="memos.html" class="nav-item group relative p-2.5 rounded-lg bg-primary-50 text-primary-600">
             <i class="fas fa-sticky-note text-xl"></i>
             <!-- Tooltip -->
             <span
-              class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               备忘录
             </span>
           </a>
           <button
             onclick="openGlobalSearch()"
-            class="nav-item group relative p-3 rounded-lg text-gray-600 hover:bg-gray-100">
+            class="nav-item group relative p-2.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700">
             <i class="fas fa-search text-xl"></i>
             <!-- Tooltip -->
             <span
-              class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               全局搜索
             </span>
           </button>
         </div>
 
         <!-- 底部工具 -->
-        <div class="flex flex-col items-center gap-4">
-          <button class="p-3 rounded-lg text-gray-600 hover:bg-gray-100">
+        <div class="flex flex-col items-center gap-2">
+          <button class="p-2.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700">
             <i class="fas fa-cog text-xl"></i>
           </button>
-          <button class="p-3 rounded-lg text-gray-600 hover:bg-gray-100">
+          <button class="p-2.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700">
             <i class="fas fa-user text-xl"></i>
           </button>
         </div>
       </nav>
 
       <!-- 第二栏：页面内导航 -->
-      <aside class="w-80 bg-white shadow-md overflow-y-auto">
-        <!-- 顶部暗线背景 -->
-        <div class="h-px bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300"></div>
-        <!-- 备忘录分类 -->
-        <div class="py-6 border-b border-gray-300 bg-gray-50/30">
+      <aside class="w-80 bg-white border-r border-gray-200/50 overflow-y-auto">
+        <!-- 分类树 -->
+        <div class="py-8 border-b border-gray-200/50">
           <div class="px-6">
-            <h3 class="font-semibold mb-4 flex items-center text-gray-900">
-              <i class="fas fa-folder mr-2 text-primary"></i>
-              分类
-            </h3>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-semibold text-sm text-gray-900">分类</h3>
+              <div class="flex gap-0.5">
+                <button
+                  onclick="showAddCategoryModal()"
+                  class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  title="新建分类">
+                  <i class="fas fa-plus text-xs"></i>
+                </button>
+                <button
+                  onclick="showManageCategoriesModal()"
+                  class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  title="管理分类">
+                  <i class="fas fa-cog text-xs"></i>
+                </button>
+              </div>
+            </div>
           </div>
           <div class="px-6">
-            <ul class="space-y-1">
+            <ul class="space-y-0.5">
               <li>
                 <div
-                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded text-primary transition-colors"
+                  class="category-item flex items-center justify-between p-2.5 rounded-lg hover:bg-gray-50 transition-colors"
                   oncontextmenu="showMemoCategoryContextMenu(event, '全部备忘录')">
                   <a href="#" class="flex items-center flex-1">
-                    <i class="fas fa-sticky-note mr-2"></i>
-                    全部备忘录
+                    <i class="fas fa-sticky-note text-amber-500 mr-2 text-sm"></i>
+                    <span class="text-sm text-gray-700">全部备忘录</span>
                   </a>
-                  <span class="text-sm text-gray-500">8</span>
+                  <span class="text-xs text-gray-500">8</span>
                 </div>
               </li>
               <li>
                 <div
-                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded transition-colors"
+                  class="category-item flex items-center justify-between p-2.5 rounded-lg hover:bg-gray-50 transition-colors"
                   oncontextmenu="showMemoCategoryContextMenu(event, '置顶')">
                   <a href="#" class="flex items-center flex-1">
-                    <i class="fas fa-thumbtack text-yellow-500 mr-2"></i>
-                    置顶
+                    <i class="fas fa-thumbtack text-amber-500 mr-2 text-sm"></i>
+                    <span class="text-sm text-gray-700">置顶</span>
                   </a>
-                  <span class="text-sm text-gray-500">3</span>
+                  <span class="text-xs text-gray-500">3</span>
                 </div>
               </li>
               <li>
                 <div
-                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded transition-colors"
+                  class="category-item flex items-center justify-between p-2.5 rounded-lg hover:bg-gray-50 transition-colors"
                   oncontextmenu="showMemoCategoryContextMenu(event, '工作备忘录')">
                   <a href="#" class="flex items-center flex-1">
-                    <i class="fas fa-briefcase text-blue-500 mr-2"></i>
-                    工作备忘录
+                    <i class="fas fa-briefcase text-primary-500 mr-2 text-sm"></i>
+                    <span class="text-sm text-gray-700">工作备忘录</span>
                   </a>
-                  <span class="text-sm text-gray-500">12</span>
+                  <span class="text-xs text-gray-500">12</span>
                 </div>
               </li>
               <li>
                 <div
-                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded transition-colors"
+                  class="category-item flex items-center justify-between p-2.5 rounded-lg hover:bg-gray-50 transition-colors"
                   oncontextmenu="showMemoCategoryContextMenu(event, '学习备忘录')">
                   <a href="#" class="flex items-center flex-1">
-                    <i class="fas fa-graduation-cap text-green-500 mr-2"></i>
-                    学习备忘录
+                    <i class="fas fa-graduation-cap text-emerald-600 mr-2 text-sm"></i>
+                    <span class="text-sm text-gray-700">学习备忘录</span>
                   </a>
-                  <span class="text-sm text-gray-500">8</span>
+                  <span class="text-xs text-gray-500">8</span>
                 </div>
               </li>
               <li>
                 <div
-                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded transition-colors"
+                  class="category-item flex items-center justify-between p-2.5 rounded-lg hover:bg-gray-50 transition-colors"
                   oncontextmenu="showMemoCategoryContextMenu(event, '收藏')">
                   <a href="#" class="flex items-center flex-1">
-                    <i class="fas fa-star text-yellow-500 mr-2"></i>
-                    收藏
+                    <i class="fas fa-star text-amber-500 mr-2 text-sm"></i>
+                    <span class="text-sm text-gray-700">收藏</span>
                   </a>
-                  <span class="text-sm text-gray-500">5</span>
+                  <span class="text-xs text-gray-500">5</span>
                 </div>
               </li>
               <li>
                 <div
-                  class="category-item flex items-center justify-between p-2 hover:bg-gray-50 rounded transition-colors"
+                  class="category-item flex items-center justify-between p-2.5 rounded-lg hover:bg-gray-50 transition-colors"
                   oncontextmenu="showMemoCategoryContextMenu(event, '关联书签')">
                   <a href="#" class="flex items-center flex-1">
-                    <i class="fas fa-bookmark text-purple-500 mr-2"></i>
-                    关联书签
+                    <i class="fas fa-bookmark text-purple-500 mr-2 text-sm"></i>
+                    <span class="text-sm text-gray-700">关联书签</span>
                   </a>
-                  <span class="text-sm text-gray-500">4</span>
+                  <span class="text-xs text-gray-500">4</span>
                 </div>
               </li>
             </ul>
           </div>
         </div>
 
-        <!-- 标签云 -->
-        <div class="py-6 bg-green-50/20">
+        <!-- 标签管理 -->
+        <div class="py-6 border-b border-gray-200/50">
           <div class="px-6">
-            <h3 class="font-semibold mb-4 flex items-center text-gray-900">
-              <i class="fas fa-tags mr-2 text-primary"></i>
-              标签
-            </h3>
-          </div>
-          <div class="px-6">
-            <div class="flex flex-wrap gap-2">
-              <span
-                class="px-3 py-1 bg-blue-100 text-blue-600 text-xs rounded-full cursor-pointer hover:bg-blue-200 transition-colors"
-                >学习 (3)</span
-              >
-              <span
-                class="px-3 py-1 bg-green-100 text-green-600 text-xs rounded-full cursor-pointer hover:bg-green-200 transition-colors"
-                >工作 (2)</span
-              >
-              <span
-                class="px-3 py-1 bg-purple-100 text-purple-600 text-xs rounded-full cursor-pointer hover:bg-purple-200 transition-colors"
-                >灵感 (2)</span
-              >
-              <span
-                class="px-3 py-1 bg-yellow-100 text-yellow-600 text-xs rounded-full cursor-pointer hover:bg-yellow-200 transition-colors"
-                >待办 (1)</span
-              >
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-semibold text-sm text-gray-900">热门标签</h3>
+              <button
+                onclick="showManageTagsModal()"
+                class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                title="管理标签">
+                <i class="fas fa-cog text-xs"></i>
+              </button>
             </div>
           </div>
+          <div class="px-6">
+            <div class="flex flex-wrap gap-1.5">
+              <span
+                class="px-3 py-1.5 bg-primary-50 text-primary-600 text-xs rounded-md cursor-pointer hover:bg-primary-100 transition-colors font-medium">
+                JavaScript
+              </span>
+              <span
+                class="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs rounded-md cursor-pointer hover:bg-gray-200 transition-colors font-medium">
+                设计
+              </span>
+              <span
+                class="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs rounded-md cursor-pointer hover:bg-gray-200 transition-colors font-medium">
+                工具
+              </span>
+              <span
+                class="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs rounded-md cursor-pointer hover:bg-gray-200 transition-colors font-medium">
+                教程
+              </span>
+              <span
+                class="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs rounded-md cursor-pointer hover:bg-gray-200 transition-colors font-medium">
+                API
+              </span>
+              <span
+                class="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs rounded-md cursor-pointer hover:bg-gray-200 transition-colors font-medium">
+                框架
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 新建备忘录按钮 -->
+        <div class="px-6 py-6">
+          <button
+            onclick="showAddMemoModal()"
+            class="w-full bg-primary-600 text-white py-2.5 px-4 rounded-lg hover:bg-primary-700 flex items-center justify-center transition-colors font-medium text-sm">
+            <i class="fas fa-plus mr-2 text-sm"></i>
+            新建备忘录
+          </button>
         </div>
       </aside>
 
       <!-- 第三栏：主内容区域 -->
-      <main class="flex-1 bg-gray-50 overflow-y-auto">
+      <main class="flex-1 bg-gray-50/30 overflow-y-auto">
         <!-- 工具栏 -->
-        <div class="sticky top-0 bg-white shadow-sm px-6 py-4 z-10">
+        <div class="sticky top-0 bg-white border-b border-gray-200/50 px-8 py-4 z-10">
           <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold">我的备忘录</h1>
+            <h1 class="text-2xl font-semibold text-gray-900">我的备忘录</h1>
             <div class="flex items-center gap-3">
-              <button
-                onclick="showNewMemoModal()"
-                class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center">
-                <i class="fas fa-plus mr-2"></i>
-                新建备忘录
-              </button>
-              <div class="flex bg-gray-100 rounded-lg p-1">
-                <button onclick="setViewMode('list')" id="listViewBtn" class="px-3 py-1 rounded bg-white shadow-sm">
-                  <i class="fas fa-list"></i>
+              <!-- 视图切换 -->
+              <div class="flex items-center bg-gray-100 rounded-lg p-0.5">
+                <button
+                  onclick="setViewMode('grid')"
+                  id="gridViewBtn"
+                  class="px-2.5 py-1.5 rounded-md text-gray-500 hover:text-gray-700 hover:bg-white/50 transition-colors">
+                  <i class="fas fa-th text-sm"></i>
                 </button>
-                <button onclick="setViewMode('grid')" id="gridViewBtn" class="px-3 py-1 rounded">
-                  <i class="fas fa-th-large"></i>
+                <button
+                  onclick="setViewMode('list')"
+                  id="listViewBtn"
+                  class="px-2.5 py-1.5 rounded-md bg-white shadow-sm text-gray-700 hover:bg-white transition-colors">
+                  <i class="fas fa-list text-sm"></i>
                 </button>
               </div>
+              <!-- 排序 -->
+              <select class="border border-gray-200/50 rounded-lg px-3 py-2 text-sm bg-white">
+                <option>最近更新</option>
+                <option>创建时间</option>
+                <option>标题排序</option>
+              </select>
+              <button onclick="showAddMemoModal()" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                新建备忘录
+              </button>
             </div>
           </div>
         </div>
@@ -235,7 +492,7 @@
         <!-- 备忘录内容 -->
         <div class="p-6">
           <!-- 备忘录列表视图 -->
-          <div id="memosList" class="space-y-4">
+          <div id="memosList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- 置顶备忘录 -->
             <div class="memo-card bg-white rounded-lg shadow p-5 pinned-memo cursor-pointer">
               <div class="flex items-start justify-between">
@@ -434,51 +691,6 @@
       </main>
     </div>
 
-    <!-- 新建备忘录模态框 -->
-    <div id="newMemoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
-        <h3 class="text-xl font-semibold mb-4">新建备忘录</h3>
-        <input
-          type="text"
-          placeholder="备忘录标题"
-          class="w-full mb-4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
-        <div class="mb-4">
-          <textarea
-            placeholder="输入内容..."
-            rows="8"
-            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
-        </div>
-        <div class="flex gap-4 mb-4">
-          <select class="flex-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-            <option>选择分类</option>
-            <option>工作</option>
-            <option>学习</option>
-            <option>灵感</option>
-          </select>
-          <input
-            type="text"
-            placeholder="标签（逗号分隔）"
-            class="flex-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-        </div>
-        <div class="flex items-center gap-4 mb-4">
-          <label class="flex items-center">
-            <input type="checkbox" class="mr-2" />
-            <span>置顶此备忘录</span>
-          </label>
-          <label class="flex items-center">
-            <input type="checkbox" class="mr-2" />
-            <span>关联书签</span>
-          </label>
-        </div>
-        <div class="flex justify-end gap-3">
-          <button onclick="hideNewMemoModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">取消</button>
-          <button onclick="createNewMemo()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">
-            创建
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- 全局搜索对话框 -->
     <div
       id="globalSearchModal"
@@ -563,28 +775,72 @@
         const memosList = document.getElementById('memosList');
 
         if (mode === 'grid') {
+          // 激活网格视图按钮
           gridViewBtn.classList.add('bg-white', 'shadow-sm');
-          listViewBtn.classList.remove('bg-white', 'shadow-sm');
+          gridViewBtn.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:bg-white/50');
+          gridViewBtn.classList.add('text-gray-700');
+
+          // 停用列表视图按钮
+          listViewBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-700');
+          listViewBtn.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:bg-white/50');
+
+          // 设置网格布局
           memosList.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
         } else {
+          // 激活列表视图按钮
           listViewBtn.classList.add('bg-white', 'shadow-sm');
-          gridViewBtn.classList.remove('bg-white', 'shadow-sm');
+          listViewBtn.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:bg-white/50');
+          listViewBtn.classList.add('text-gray-700');
+
+          // 停用网格视图按钮
+          gridViewBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-700');
+          gridViewBtn.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:bg-white/50');
+
+          // 设置列表布局
           memosList.className = 'space-y-4';
         }
       }
 
       // 显示新建备忘录模态框
-      function showNewMemoModal() {
-        document.getElementById('newMemoModal').classList.remove('hidden');
+      function showAddMemoModal() {
+        const modal = document.getElementById('addMemoModal');
+        modal.classList.remove('hidden');
+        // 点击背景关闭
+        modal.addEventListener('click', function (e) {
+          if (e.target === modal) {
+            hideAddMemoModal();
+          }
+        });
       }
 
-      function hideNewMemoModal() {
-        document.getElementById('newMemoModal').classList.add('hidden');
+      function hideAddMemoModal() {
+        document.getElementById('addMemoModal').classList.add('hidden');
       }
 
-      function createNewMemo() {
+      function showEditMemoModal(memo) {
+        document.getElementById('editMemoTitle').value = memo.title;
+        document.getElementById('editMemoContent').value = memo.content;
+        document.getElementById('editMemoCategory').value = memo.category || '';
+        document.getElementById('editMemoTags').value = memo.tags || '';
+        document.getElementById('editMemoPriority').value = memo.priority || 'medium';
+        document.getElementById('editPinMemo').checked = memo.pinned || false;
+        document.getElementById('editMemoModal').classList.remove('hidden');
+      }
+
+      function hideEditMemoModal() {
+        document.getElementById('editMemoModal').classList.add('hidden');
+      }
+
+      function handleAddMemo(event) {
+        event.preventDefault();
         alert('备忘录创建成功！');
-        hideNewMemoModal();
+        hideAddMemoModal();
+      }
+
+      function handleEditMemo(event) {
+        event.preventDefault();
+        alert('备忘录更新成功！');
+        hideEditMemoModal();
       }
 
       // 编辑器功能
@@ -1003,6 +1259,21 @@
         }
         hideMemoCategoryContextMenu();
       }
+
+      // 新建分类模态框
+      function showAddCategoryModal() {
+        alert('新建分类功能');
+      }
+
+      // 管理分类模态框
+      function showManageCategoriesModal() {
+        alert('管理分类功能');
+      }
+
+      // 管理标签模态框
+      function showManageTagsModal() {
+        alert('管理标签功能');
+      }
     </script>
 
     <!-- 右键菜单 -->
@@ -1021,6 +1292,118 @@
         <i class="fas fa-trash text-red-500"></i>
         删除分类
       </button>
+    </div>
+
+    <!-- 新建备忘录模态框 -->
+    <div id="addMemoModal" class="hidden modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="modal-title">新建备忘录</h3>
+        </div>
+        <form onsubmit="handleAddMemo(event)">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">标题 <span class="required">*</span></label>
+              <input type="text" required placeholder="输入备忘录标题" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">内容</label>
+              <textarea rows="5" placeholder="输入备忘录内容" required></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">分类</label>
+              <select>
+                <option value="">选择分类</option>
+                <option value="工作备忘录">工作备忘录</option>
+                <option value="学习备忘录">学习备忘录</option>
+                <option value="个人">个人</option>
+                <option value="创意">创意</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">标签</label>
+              <input type="text" placeholder="输入标签，用逗号分隔" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">优先级</label>
+              <select>
+                <option value="low">低</option>
+                <option value="medium">中</option>
+                <option value="high">高</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="pinMemo" />
+                <label for="pinMemo">置顶备忘录</label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" onclick="hideAddMemoModal()" class="btn btn-secondary">取消</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-plus"></i>
+              创建备忘录
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 编辑备忘录模态框 -->
+    <div id="editMemoModal" class="hidden modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="modal-title">编辑备忘录</h3>
+        </div>
+        <form onsubmit="handleEditMemo(event)">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">标题 <span class="required">*</span></label>
+              <input type="text" id="editMemoTitle" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">内容 <span class="required">*</span></label>
+              <textarea rows="5" id="editMemoContent" required></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">分类</label>
+              <select id="editMemoCategory">
+                <option value="">选择分类</option>
+                <option value="工作备忘录">工作备忘录</option>
+                <option value="学习备忘录">学习备忘录</option>
+                <option value="个人">个人</option>
+                <option value="创意">创意</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">标签</label>
+              <input type="text" id="editMemoTags" placeholder="输入标签，用逗号分隔" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">优先级</label>
+              <select id="editMemoPriority">
+                <option value="low">低</option>
+                <option value="medium">中</option>
+                <option value="high">高</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="editPinMemo" />
+                <label for="editPinMemo">置顶备忘录</label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" onclick="hideEditMemoModal()" class="btn btn-secondary">取消</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i>
+              保存更改
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </body>
 </html>
