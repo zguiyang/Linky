@@ -1,9 +1,9 @@
 <template>
   <!-- 主内容区 -->
-  <div class="p-8">
+  <div class="h-full flex flex-col">
     <!-- 工具栏 -->
-    <div class="sticky top-0 bg-background/95 px-8 py-4 z-10 -mx-8 backdrop-blur-sm">
-      <div class="flex items-center justify-between mb-6">
+    <div class="sticky top-0 bg-background border-b border-accented px-8 py-4 z-10 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-4">
           <h1 class="text-2xl font-semibold text-foreground">我的备忘录</h1>
           <UBadge color="neutral" variant="soft">{{ filteredMemos.length }} 个备忘录</UBadge>
@@ -59,101 +59,103 @@
     </div>
 
     <!-- 备忘录内容 -->
-    <!-- 卡片视图 -->
-    <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      <UCard
-        v-for="memo in filteredMemos"
-        :key="memo.id"
-        class="memo-card hover:shadow-default transition-all duration-200 cursor-pointer relative group"
-        :class="{ 'border-l-4 border-l-yellow-500 bg-yellow-50/10 dark:bg-yellow-900/10': memo.pinned }"
-        @click="selectMemo(memo)">
-        <div class="flex items-start gap-3">
-          <div v-if="memo.pinned" class="flex-shrink-0">
-            <UIcon name="i-heroicons-star" class="text-yellow-500 text-lg" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="font-semibold text-foreground mb-2 truncate">
-              {{ memo.title || '无标题备忘录' }}
-            </h3>
-            <p class="text-sm text-muted-foreground mb-3 line-clamp-3">
-              {{ memo.content }}
-            </p>
-            <div class="flex items-center justify-between">
-              <div class="flex flex-wrap gap-1">
-                <UBadge v-for="tag in memo.tags.slice(0, 3)" :key="tag" color="primary" variant="outline" size="xs">
-                  {{ tag }}
-                </UBadge>
-                <UBadge v-if="memo.tags.length > 3" color="neutral" variant="soft" size="xs">
-                  +{{ memo.tags.length - 3 }}
-                </UBadge>
-              </div>
-              <span class="text-xs text-muted-foreground">{{ formatDate(memo.updatedAt) }}</span>
+    <div class="flex-1 p-8 overflow-y-auto">
+      <!-- 卡片视图 -->
+      <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <UCard
+          v-for="memo in filteredMemos"
+          :key="memo.id"
+          class="memo-card hover:shadow-default transition-all duration-200 cursor-pointer relative group"
+          :class="{ 'border-l-4 border-l-yellow-500 bg-yellow-50/10 dark:bg-yellow-900/10': memo.pinned }"
+          @click="selectMemo(memo)">
+          <div class="flex items-start gap-3">
+            <div v-if="memo.pinned" class="flex-shrink-0">
+              <UIcon name="i-heroicons-star" class="text-yellow-500 text-lg" />
             </div>
-          </div>
-        </div>
-
-        <!-- 操作按钮 -->
-        <UButton
-          icon="i-heroicons-ellipsis-vertical"
-          variant="ghost"
-          color="neutral"
-          size="sm"
-          class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
-          @click.stop="showMemoMenu(memo, $event)" />
-      </UCard>
-    </div>
-
-    <!-- 列表视图 -->
-    <div v-else class="space-y-4">
-      <UCard
-        v-for="memo in filteredMemos"
-        :key="memo.id"
-        class="memo-card hover:shadow-sm transition-all duration-200 cursor-pointer group"
-        :class="{ 'border-l-4 border-l-yellow-500 bg-yellow-50/10 dark:bg-yellow-900/10': memo.pinned }"
-        @click="selectMemo(memo)">
-        <div class="flex items-center gap-4">
-          <div v-if="memo.pinned" class="flex-shrink-0">
-            <UIcon name="i-heroicons-star" class="text-yellow-500 text-lg" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <h3 class="font-semibold text-foreground">
+            <div class="flex-1 min-w-0">
+              <h3 class="font-semibold text-foreground mb-2 truncate">
                 {{ memo.title || '无标题备忘录' }}
               </h3>
-              <UBadge v-if="memo.category" color="neutral" variant="soft" size="xs">
-                {{ getCategoryName(memo.category) }}
-              </UBadge>
-            </div>
-            <p class="text-sm text-muted-foreground mb-2 line-clamp-2">
-              {{ memo.content }}
-            </p>
-            <div class="flex items-center gap-2">
-              <div class="flex flex-wrap gap-1">
-                <UBadge v-for="tag in memo.tags" :key="tag" color="primary" variant="outline" size="xs">
-                  {{ tag }}
-                </UBadge>
+              <p class="text-sm text-muted-foreground mb-3 line-clamp-3">
+                {{ memo.content }}
+              </p>
+              <div class="flex items-center justify-between">
+                <div class="flex flex-wrap gap-1">
+                  <UBadge v-for="tag in memo.tags.slice(0, 3)" :key="tag" color="primary" variant="outline" size="xs">
+                    {{ tag }}
+                  </UBadge>
+                  <UBadge v-if="memo.tags.length > 3" color="neutral" variant="soft" size="xs">
+                    +{{ memo.tags.length - 3 }}
+                  </UBadge>
+                </div>
+                <span class="text-xs text-muted-foreground">{{ formatDate(memo.updatedAt) }}</span>
               </div>
-              <span class="text-xs text-muted-foreground ml-auto">{{ formatDate(memo.updatedAt) }}</span>
             </div>
           </div>
+
+          <!-- 操作按钮 -->
           <UButton
             icon="i-heroicons-ellipsis-vertical"
             variant="ghost"
             color="neutral"
             size="sm"
-            class="opacity-0 group-hover:opacity-100 transition-opacity"
+            class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
             @click.stop="showMemoMenu(memo, $event)" />
-        </div>
-      </UCard>
-    </div>
+        </UCard>
+      </div>
 
-    <!-- 空状态 -->
-    <div
-      v-if="filteredMemos.length === 0"
-      class="flex flex-col items-center justify-center py-16 text-muted-foreground">
-      <UIcon name="i-heroicons-document-text" class="text-6xl mb-4" />
-      <p class="text-lg mb-2">暂无备忘录</p>
-      <p class="text-sm">开始创建您的第一个备忘录吧</p>
+      <!-- 列表视图 -->
+      <div v-else class="space-y-4">
+        <UCard
+          v-for="memo in filteredMemos"
+          :key="memo.id"
+          class="memo-card hover:shadow-sm transition-all duration-200 cursor-pointer group"
+          :class="{ 'border-l-4 border-l-yellow-500 bg-yellow-50/10 dark:bg-yellow-900/10': memo.pinned }"
+          @click="selectMemo(memo)">
+          <div class="flex items-center gap-4">
+            <div v-if="memo.pinned" class="flex-shrink-0">
+              <UIcon name="i-heroicons-star" class="text-yellow-500 text-lg" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h3 class="font-semibold text-foreground">
+                  {{ memo.title || '无标题备忘录' }}
+                </h3>
+                <UBadge v-if="memo.category" color="neutral" variant="soft" size="xs">
+                  {{ getCategoryName(memo.category) }}
+                </UBadge>
+              </div>
+              <p class="text-sm text-muted-foreground mb-2 line-clamp-2">
+                {{ memo.content }}
+              </p>
+              <div class="flex items-center gap-2">
+                <div class="flex flex-wrap gap-1">
+                  <UBadge v-for="tag in memo.tags" :key="tag" color="primary" variant="outline" size="xs">
+                    {{ tag }}
+                  </UBadge>
+                </div>
+                <span class="text-xs text-muted-foreground ml-auto">{{ formatDate(memo.updatedAt) }}</span>
+              </div>
+            </div>
+            <UButton
+              icon="i-heroicons-ellipsis-vertical"
+              variant="ghost"
+              color="neutral"
+              size="sm"
+              class="opacity-0 group-hover:opacity-100 transition-opacity"
+              @click.stop="showMemoMenu(memo, $event)" />
+          </div>
+        </UCard>
+      </div>
+
+      <!-- 空状态 -->
+      <div
+        v-if="filteredMemos.length === 0"
+        class="flex flex-col items-center justify-center py-16 text-muted-foreground">
+        <UIcon name="i-heroicons-document-text" class="text-6xl mb-4" />
+        <p class="text-lg mb-2">暂无备忘录</p>
+        <p class="text-sm">开始创建您的第一个备忘录吧</p>
+      </div>
     </div>
   </div>
 
