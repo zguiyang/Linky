@@ -1,9 +1,9 @@
 <template>
   <!-- 主内容区 -->
-  <div class="p-8">
+  <div class="h-full flex flex-col">
     <!-- 工具栏 -->
-    <div class="sticky top-0 bg-background/95 px-8 py-4 z-10 -mx-8 backdrop-blur-sm">
-      <div class="flex items-center justify-between mb-6">
+    <div class="sticky top-0 bg-background border-b border-accented px-8 py-4 z-10 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-4">
           <h1 class="text-2xl font-semibold text-foreground">
             {{ selectedCategory === 'all' ? '我的书签' : getCategoryName(selectedCategory) }}
@@ -40,87 +40,89 @@
     </div>
 
     <!-- 书签内容 -->
-    <!-- 卡片视图 -->
-    <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      <UCard
-        v-for="bookmark in filteredBookmarks"
-        :key="bookmark.id"
-        class="bookmark-card hover:shadow-default transition-all duration-200 cursor-pointer"
-        @click="openBookmark(bookmark)">
-        <div class="flex items-start gap-4">
-          <img
-            :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
-            :alt="bookmark.title"
-            class="w-12 h-12 rounded-lg flex-shrink-0"
-            @error="e => (e.target.src = '/favicon-default.png')" />
-          <div class="flex-1 min-w-0">
-            <h3 class="font-semibold text-foreground mb-1 truncate">{{ bookmark.title }}</h3>
-            <p class="text-sm text-muted-foreground mb-2 truncate">{{ bookmark.description }}</p>
-            <div class="flex items-center gap-2 mb-2">
-              <UBadge color="neutral" variant="soft" size="xs">{{ bookmark.category }}</UBadge>
-              <span class="text-xs text-muted-foreground">{{ bookmark.visitCount }} 次访问</span>
-            </div>
-            <div class="flex flex-wrap gap-1">
-              <UBadge v-for="tag in bookmark.tags" :key="tag" color="primary" variant="outline" size="xs">
-                {{ tag }}
-              </UBadge>
-            </div>
-          </div>
-          <UButton
-            icon="i-heroicons-ellipsis-vertical"
-            variant="ghost"
-            color="neutral"
-            size="sm"
-            @click.stop="showBookmarkMenu(bookmark, $event)" />
-        </div>
-      </UCard>
-    </div>
-
-    <!-- 列表视图 -->
-    <div v-else class="space-y-4">
-      <UCard
-        v-for="bookmark in filteredBookmarks"
-        :key="bookmark.id"
-        class="bookmark-card hover:shadow-sm transition-all duration-200 cursor-pointer"
-        @click="openBookmark(bookmark)">
-        <div class="flex items-center gap-4">
-          <img
-            :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
-            :alt="bookmark.title"
-            class="w-10 h-10 rounded flex-shrink-0"
-            @error="e => (e.target.src = '/favicon-default.png')" />
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <h3 class="font-semibold text-foreground">{{ bookmark.title }}</h3>
-              <UBadge color="neutral" variant="soft" size="xs">{{ bookmark.category }}</UBadge>
-            </div>
-            <p class="text-sm text-muted-foreground mb-2">{{ bookmark.url }}</p>
-            <div class="flex items-center gap-2">
+    <div class="flex-1 p-8 overflow-y-auto">
+      <!-- 卡片视图 -->
+      <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <UCard
+          v-for="bookmark in filteredBookmarks"
+          :key="bookmark.id"
+          class="bookmark-card hover:shadow-default transition-all duration-200 cursor-pointer"
+          @click="openBookmark(bookmark)">
+          <div class="flex items-start gap-4">
+            <img
+              :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
+              :alt="bookmark.title"
+              class="w-12 h-12 rounded-lg flex-shrink-0"
+              @error="e => (e.target.src = '/favicon-default.png')" />
+            <div class="flex-1 min-w-0">
+              <h3 class="font-semibold text-foreground mb-1 truncate">{{ bookmark.title }}</h3>
+              <p class="text-sm text-muted-foreground mb-2 truncate">{{ bookmark.description }}</p>
+              <div class="flex items-center gap-2 mb-2">
+                <UBadge color="neutral" variant="soft" size="xs">{{ bookmark.category }}</UBadge>
+                <span class="text-xs text-muted-foreground">{{ bookmark.visitCount }} 次访问</span>
+              </div>
               <div class="flex flex-wrap gap-1">
                 <UBadge v-for="tag in bookmark.tags" :key="tag" color="primary" variant="outline" size="xs">
                   {{ tag }}
                 </UBadge>
               </div>
-              <span class="text-xs text-muted-foreground ml-auto">{{ bookmark.visitCount }} 次访问</span>
             </div>
+            <UButton
+              icon="i-heroicons-ellipsis-vertical"
+              variant="ghost"
+              color="neutral"
+              size="sm"
+              @click.stop="showBookmarkMenu(bookmark, $event)" />
           </div>
-          <UButton
-            icon="i-heroicons-ellipsis-vertical"
-            variant="ghost"
-            color="neutral"
-            size="sm"
-            @click.stop="showBookmarkMenu(bookmark, $event)" />
-        </div>
-      </UCard>
-    </div>
+        </UCard>
+      </div>
 
-    <!-- 空状态 -->
-    <div
-      v-if="filteredBookmarks.length === 0"
-      class="flex flex-col items-center justify-center py-16 text-muted-foreground">
-      <UIcon name="i-heroicons-bookmark" class="text-6xl mb-4" />
-      <p class="text-lg mb-2">暂无书签</p>
-      <p class="text-sm">开始添加您的第一个书签吧</p>
+      <!-- 列表视图 -->
+      <div v-else class="space-y-4">
+        <UCard
+          v-for="bookmark in filteredBookmarks"
+          :key="bookmark.id"
+          class="bookmark-card hover:shadow-sm transition-all duration-200 cursor-pointer"
+          @click="openBookmark(bookmark)">
+          <div class="flex items-center gap-4">
+            <img
+              :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
+              :alt="bookmark.title"
+              class="w-10 h-10 rounded flex-shrink-0"
+              @error="e => (e.target.src = '/favicon-default.png')" />
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h3 class="font-semibold text-foreground">{{ bookmark.title }}</h3>
+                <UBadge color="neutral" variant="soft" size="xs">{{ bookmark.category }}</UBadge>
+              </div>
+              <p class="text-sm text-muted-foreground mb-2">{{ bookmark.url }}</p>
+              <div class="flex items-center gap-2">
+                <div class="flex flex-wrap gap-1">
+                  <UBadge v-for="tag in bookmark.tags" :key="tag" color="primary" variant="outline" size="xs">
+                    {{ tag }}
+                  </UBadge>
+                </div>
+                <span class="text-xs text-muted-foreground ml-auto">{{ bookmark.visitCount }} 次访问</span>
+              </div>
+            </div>
+            <UButton
+              icon="i-heroicons-ellipsis-vertical"
+              variant="ghost"
+              color="neutral"
+              size="sm"
+              @click.stop="showBookmarkMenu(bookmark, $event)" />
+          </div>
+        </UCard>
+      </div>
+
+      <!-- 空状态 -->
+      <div
+        v-if="filteredBookmarks.length === 0"
+        class="flex flex-col items-center justify-center py-16 text-muted-foreground">
+        <UIcon name="i-heroicons-bookmark" class="text-6xl mb-4" />
+        <p class="text-lg mb-2">暂无书签</p>
+        <p class="text-sm">开始添加您的第一个书签吧</p>
+      </div>
     </div>
   </div>
 
