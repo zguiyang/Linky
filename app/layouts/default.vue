@@ -1,49 +1,24 @@
 <template>
   <div class="flex h-screen bg-background">
     <!-- 第一栏：页面级导航 -->
-    <nav class="w-16 bg-elevated border-r border-default flex flex-col items-center py-6">
+    <nav class="w-16 bg-elevated border-r border-accented flex flex-col items-center py-6">
       <!-- Logo -->
       <div class="mb-10">
         <UIcon name="i-heroicons-bookmark" class="text-primary-600 text-2xl" />
       </div>
 
       <!-- 页面导航 -->
-      <div class="flex-1 flex flex-col items-center gap-2">
-        <div
-          class="group relative p-2.5 rounded-lg cursor-pointer transition-colors"
-          :class="
-            currentRoute.path === '/bookmarks'
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-          "
-          @click="navigateTo('/bookmarks')">
-          <UIcon name="i-heroicons-bookmark" class="text-xl" />
-          <UBadge color="neutral" variant="solid" class="absolute -top-1 -right-1 text-xs px-1.5"> 书签 </UBadge>
-        </div>
-
-        <div
-          class="group relative p-2.5 rounded-lg cursor-pointer transition-colors"
-          :class="
-            currentRoute.path === '/memos'
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-          "
-          @click="navigateTo('/memos')">
-          <UIcon name="i-heroicons-document-text" class="text-xl" />
-          <UBadge color="neutral" variant="solid" class="absolute -top-1 -right-1 text-xs px-1.5"> 备忘录 </UBadge>
-        </div>
-
-        <div
-          class="group relative p-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer transition-colors"
-          @click="openGlobalSearch">
-          <UIcon name="i-heroicons-magnifying-glass" class="text-xl" />
-          <UBadge
-            color="neutral"
-            variant="solid"
-            class="absolute -top-1 -right-1 text-xs px-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            搜索
-          </UBadge>
-        </div>
+      <div class="flex-1 flex flex-col items-center">
+        <UNavigationMenu
+          tooltip
+          collapsed
+          orientation="vertical"
+          :items="navigationItems"
+          :ui="{
+            link: 'p-2.5 rounded-lg font-medium mx-auto my-4',
+            linkLeadingIcon: 'text-xl flex-shrink-0',
+          }"
+          class="w-full" />
       </div>
 
       <!-- 底部工具 -->
@@ -62,9 +37,9 @@
     </nav>
 
     <!-- 第二栏：侧边栏（分类管理） -->
-    <aside class="w-80 bg-elevated border-r border-default overflow-y-auto">
+    <aside class="w-80 bg-elevated border-r border-accented overflow-y-auto">
       <!-- 分类树 -->
-      <div class="py-8 border-b border-default">
+      <div class="py-8 border-b border-accented">
         <div class="px-6">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-semibold text-sm text-foreground">分类</h3>
@@ -174,7 +149,7 @@
           v-for="result in searchResults"
           :key="result.type + result.id"
           class="flex items-center gap-3 p-3 rounded-lg hover:bg-muted cursor-pointer"
-          @click="handleSearchResultClick(result)">
+          @click="showGlobalSearchModal = false">
           <UIcon :name="result.icon" class="text-xl" />
           <div class="flex-1">
             <p class="font-medium">{{ result.title }}</p>
@@ -188,10 +163,46 @@
 </template>
 
 <script setup lang="ts">
+  import type { NavigationMenuItem } from '@nuxt/ui';
+
   const currentRoute = useRoute();
   const showGlobalSearchModal = ref(false);
   const globalSearchQuery = ref('');
   const searchResults = ref<any[]>([]);
+
+  // 导航菜单项
+  const navigationItems = ref<NavigationMenuItem[][]>([
+    [
+      {
+        label: '书签',
+        icon: 'i-heroicons-bookmark',
+        to: '/bookmarks',
+        tooltip: {
+          text: '书签',
+        },
+      },
+      {
+        label: '备忘录',
+        icon: 'i-heroicons-document-text',
+        to: '/memos',
+        tooltip: {
+          text: '备忘录',
+        },
+      },
+      {
+        label: '搜索',
+        icon: 'i-heroicons-magnifying-glass',
+        click: () => {
+          showGlobalSearchModal.value = true;
+          globalSearchQuery.value = '';
+          searchResults.value = [];
+        },
+        tooltip: {
+          text: '搜索',
+        },
+      },
+    ],
+  ]);
 
   // 共享的侧边栏数据
   const categories = ref([
@@ -220,12 +231,6 @@
   const showAddTagModal = ref(false);
 
   // 方法
-  const openGlobalSearch = () => {
-    showGlobalSearchModal.value = true;
-    globalSearchQuery.value = '';
-    searchResults.value = [];
-  };
-
   const handleGlobalSearch = () => {
     const query = globalSearchQuery.value.toLowerCase();
     if (!query) return;
@@ -239,10 +244,6 @@
         icon: 'i-heroicons-bookmark',
       },
     ];
-  };
-
-  const handleSearchResultClick = (result: any) => {
-    showGlobalSearchModal.value = false;
   };
 
   const selectCategory = (categoryId: string) => {
