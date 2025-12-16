@@ -13,6 +13,24 @@
           <!-- 搜索框 -->
           <UInput v-model="searchQuery" placeholder="搜索备忘录..." icon="i-heroicons-magnifying-glass" class="w-64" />
 
+          <!-- 视图切换 -->
+          <div class="flex items-center bg-muted rounded-lg p-0.5">
+            <UButton
+              :color="viewMode === 'grid' ? 'primary' : 'neutral'"
+              variant="ghost"
+              size="sm"
+              @click="setViewMode('grid')">
+              <UIcon name="i-heroicons-squares-2x2" />
+            </UButton>
+            <UButton
+              :color="viewMode === 'list' ? 'primary' : 'neutral'"
+              variant="ghost"
+              size="sm"
+              @click="setViewMode('list')">
+              <UIcon name="i-heroicons-list-bullet" />
+            </UButton>
+          </div>
+
           <!-- 排序 -->
           <USelectMenu v-model="sortBy" :options="sortOptions" placeholder="排序方式" />
         </div>
@@ -40,12 +58,13 @@
       </div>
     </div>
 
-    <!-- 备忘录网格 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <!-- 备忘录内容 -->
+    <!-- 卡片视图 -->
+    <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       <UCard
         v-for="memo in filteredMemos"
         :key="memo.id"
-        class="memo-card hover:shadow-default transition-all duration-200 cursor-pointer relative"
+        class="memo-card hover:shadow-default transition-all duration-200 cursor-pointer relative group"
         :class="{ 'border-l-4 border-l-yellow-500 bg-yellow-50/10 dark:bg-yellow-900/10': memo.pinned }"
         @click="selectMemo(memo)">
         <div class="flex items-start gap-3">
@@ -81,6 +100,50 @@
           size="sm"
           class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
           @click.stop="showMemoMenu(memo, $event)" />
+      </UCard>
+    </div>
+
+    <!-- 列表视图 -->
+    <div v-else class="space-y-4">
+      <UCard
+        v-for="memo in filteredMemos"
+        :key="memo.id"
+        class="memo-card hover:shadow-sm transition-all duration-200 cursor-pointer group"
+        :class="{ 'border-l-4 border-l-yellow-500 bg-yellow-50/10 dark:bg-yellow-900/10': memo.pinned }"
+        @click="selectMemo(memo)">
+        <div class="flex items-center gap-4">
+          <div v-if="memo.pinned" class="flex-shrink-0">
+            <UIcon name="i-heroicons-star" class="text-yellow-500 text-lg" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-semibold text-foreground">
+                {{ memo.title || '无标题备忘录' }}
+              </h3>
+              <UBadge v-if="memo.category" color="neutral" variant="soft" size="xs">
+                {{ getCategoryName(memo.category) }}
+              </UBadge>
+            </div>
+            <p class="text-sm text-muted-foreground mb-2 line-clamp-2">
+              {{ memo.content }}
+            </p>
+            <div class="flex items-center gap-2">
+              <div class="flex flex-wrap gap-1">
+                <UBadge v-for="tag in memo.tags" :key="tag" color="primary" variant="outline" size="xs">
+                  {{ tag }}
+                </UBadge>
+              </div>
+              <span class="text-xs text-muted-foreground ml-auto">{{ formatDate(memo.updatedAt) }}</span>
+            </div>
+          </div>
+          <UButton
+            icon="i-heroicons-ellipsis-vertical"
+            variant="ghost"
+            color="neutral"
+            size="sm"
+            class="opacity-0 group-hover:opacity-100 transition-opacity"
+            @click.stop="showMemoMenu(memo, $event)" />
+        </div>
       </UCard>
     </div>
 
@@ -235,6 +298,7 @@
 
   // 响应式数据
   const searchQuery = ref('');
+  const viewMode = ref<'grid' | 'list'>('grid');
   const viewFilter = ref<'all' | 'pinned'>('all');
   const selectedMemo = ref<any>(null);
   const showAddMemoModal = ref(false);
@@ -363,6 +427,10 @@
   ];
 
   // 方法
+  const setViewMode = (mode: 'grid' | 'list') => {
+    viewMode.value = mode;
+  };
+
   const selectMemo = (memo: any) => {
     selectedMemo.value = memo;
     showEditorModal.value = true;
@@ -431,6 +499,16 @@
   const saveMemo = () => {
     updateMemo();
     showEditorModal.value = false;
+  };
+
+  const getCategoryName = (categoryId: string) => {
+    const categoryMap: Record<string, string> = {
+      work: '工作',
+      study: '学习',
+      personal: '个人',
+      favorite: '收藏',
+    };
+    return categoryMap[categoryId] || '未分类';
   };
 
   const formatDate = (date: string) => {
