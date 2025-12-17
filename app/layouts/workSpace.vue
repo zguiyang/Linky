@@ -176,7 +176,7 @@
       {
         label: '书签',
         icon: 'i-heroicons-bookmark',
-        to: '/bookmarks',
+        to: '/workspace/bookmarks',
         tooltip: {
           text: '书签',
         },
@@ -184,7 +184,7 @@
       {
         label: '备忘录',
         icon: 'i-heroicons-document-text',
-        to: '/memos',
+        to: '/workspace/memos',
         tooltip: {
           text: '备忘录',
         },

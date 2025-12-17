@@ -295,7 +295,7 @@
 <script setup lang="ts">
   // 页面元信息
   definePageMeta({
-    layout: 'default',
+    layout: 'work-space',
   });
 
   // 响应式数据
