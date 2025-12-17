@@ -52,8 +52,7 @@
             <img
               :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
               :alt="bookmark.title"
-              class="w-12 h-12 rounded-lg flex-shrink-0"
-              @error="e => (e.target.src = '/favicon-default.png')" />
+              class="w-12 h-12 rounded-lg flex-shrink-0" />
             <div class="flex-1 min-w-0">
               <h3 class="font-semibold text-foreground mb-1 truncate">{{ bookmark.title }}</h3>
               <p class="text-sm text-muted-foreground mb-2 truncate">{{ bookmark.description }}</p>
@@ -88,8 +87,7 @@
             <img
               :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
               :alt="bookmark.title"
-              class="w-10 h-10 rounded flex-shrink-0"
-              @error="e => (e.target.src = '/favicon-default.png')" />
+              class="w-10 h-10 rounded flex-shrink-0" />
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 mb-1">
                 <h3 class="font-semibold text-foreground">{{ bookmark.title }}</h3>
@@ -168,7 +166,7 @@
 <script setup lang="ts">
   // 页面元信息
   definePageMeta({
-    layout: 'default',
+    layout: 'work-space',
   });
 
   // 响应式数据
