@@ -175,7 +175,7 @@
       } else if (deleteType.value === 'batch' && tableRef.value) {
         // Batch delete
         const selectedRows = tableRef.value.tableApi?.getSelectedRowModel().rows || [];
-        const selectedIds = selectedRows.map(row => row.original.id);
+        const selectedIds = selectedRows.map((row: any) => row.original.id);
 
         if (selectedIds.length === 0) return;
 
