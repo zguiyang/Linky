@@ -10,39 +10,17 @@
       <div class="toolbar-right">
         <!-- 搜索框 -->
         <div class="search-box">
-          <svg
-            class="search-icon"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg>
+          <UIcon name="i-heroicons-magnifying-glass" class="search-icon" />
           <input v-model="searchQuery" type="text" placeholder="搜索备忘录..." class="search-input" />
         </div>
 
         <!-- 视图切换 -->
         <div class="view-toggle">
           <button class="toggle-btn" :class="{ active: viewMode === 'grid' }" @click="setViewMode('grid')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-            </svg>
+            <UIcon name="i-heroicons-squares-2x2" class="toggle-icon" />
           </button>
           <button class="toggle-btn" :class="{ active: viewMode === 'list' }" @click="setViewMode('list')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="8" y1="6" x2="21" y2="6" />
-              <line x1="8" y1="12" x2="21" y2="12" />
-              <line x1="8" y1="18" x2="21" y2="18" />
-              <line x1="3" y1="6" x2="3.01" y2="6" />
-              <line x1="3" y1="12" x2="3.01" y2="12" />
-              <line x1="3" y1="18" x2="3.01" y2="18" />
-            </svg>
+            <UIcon name="i-heroicons-list-bullet" class="toggle-icon" />
           </button>
         </div>
 
@@ -59,9 +37,7 @@
     <div class="filter-bar">
       <button class="filter-chip" :class="{ active: viewFilter === 'all' }" @click="viewFilter = 'all'">全部</button>
       <button class="filter-chip" :class="{ active: viewFilter === 'pinned' }" @click="viewFilter = 'pinned'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="star-icon">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-        </svg>
+        <UIcon name="i-heroicons-star" class="star-icon solid" />
         已置顶
       </button>
     </div>
@@ -77,9 +53,7 @@
           :class="{ pinned: memo.pinned }"
           @click="selectMemo(memo)">
           <div v-if="memo.pinned" class="pin-indicator">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
+            <UIcon name="i-heroicons-star" class="pin-icon solid" />
           </div>
           <h3 class="memo-title">{{ memo.title || '无标题备忘录' }}</h3>
           <p class="memo-preview">{{ memo.content }}</p>
@@ -91,11 +65,7 @@
             <span class="memo-date">{{ formatDate(memo.updatedAt) }}</span>
           </div>
           <button class="memo-menu" @click.stop="showMemoMenu(memo, $event)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="1" />
-              <circle cx="19" cy="12" r="1" />
-              <circle cx="5" cy="12" r="1" />
-            </svg>
+            <UIcon name="i-heroicons-ellipsis-horizontal" class="menu-icon" />
           </button>
         </div>
       </div>
@@ -109,9 +79,7 @@
           :class="{ pinned: memo.pinned }"
           @click="selectMemo(memo)">
           <div v-if="memo.pinned" class="list-pin">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
+            <UIcon name="i-heroicons-star" class="list-pin-icon solid" />
           </div>
           <div class="list-content">
             <h3 class="list-title">{{ memo.title || '无标题备忘录' }}</h3>
@@ -124,11 +92,7 @@
             </div>
           </div>
           <button class="list-menu" @click.stop="showMemoMenu(memo, $event)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="1" />
-              <circle cx="19" cy="12" r="1" />
-              <circle cx="5" cy="12" r="1" />
-            </svg>
+            <UIcon name="i-heroicons-ellipsis-horizontal" class="menu-icon" />
           </button>
         </div>
       </div>
@@ -136,12 +100,7 @@
       <!-- 空状态 -->
       <div v-if="filteredMemos.length === 0" class="empty-state">
         <div class="empty-icon">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-          </svg>
+          <UIcon name="i-heroicons-document-text" class="empty-icon-inner" />
         </div>
         <p class="empty-title">暂无备忘录</p>
         <p class="empty-description">开始创建您的第一个备忘录吧</p>
@@ -160,10 +119,7 @@
               <div class="editor-title-group">
                 <h3 class="editor-title">{{ selectedMemo.title || '无标题备忘录' }}</h3>
                 <span class="editor-badge" :class="{ pinned: selectedMemo.pinned }">
-                  <svg v-if="selectedMemo.pinned" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
+                  <UIcon v-if="selectedMemo.pinned" name="i-heroicons-star" class="badge-icon solid" />
                   {{ selectedMemo.pinned ? '已置顶' : '未置顶' }}
                 </span>
               </div>
@@ -173,21 +129,13 @@
                   :class="{ active: selectedMemo.pinned }"
                   @click="togglePin"
                   :title="selectedMemo.pinned ? '取消置顶' : '置顶'">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path
-                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
+                  <UIcon name="i-heroicons-star" class="icon-btn-inner" />
                 </button>
                 <button class="icon-btn danger" @click="showDeleteModal = true" title="删除">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6" />
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                  </svg>
+                  <UIcon name="i-heroicons-trash" class="icon-btn-inner" />
                 </button>
                 <button class="close-btn" @click="showEditorModal = false">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
+                  <UIcon name="i-heroicons-x-mark" class="close-btn-icon" />
                 </button>
               </div>
             </div>
@@ -200,15 +148,7 @@
                   <span v-for="(tag, index) in selectedMemo.tags" :key="index" class="editor-tag">
                     {{ tag }}
                     <button type="button" class="tag-remove" @click="removeEditorTag(index)">
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12" />
-                      </svg>
+                      <UIcon name="i-heroicons-x-mark" class="tag-remove-icon" />
                     </button>
                   </span>
                   <input
@@ -247,9 +187,7 @@
             <div class="modal-header">
               <h3 class="modal-title">{{ editingMemo ? '编辑备忘录' : '新建备忘录' }}</h3>
               <button class="close-btn" @click="showAddMemoModal = false">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
+                <UIcon name="i-heroicons-x-mark" class="close-btn-icon" />
               </button>
             </div>
             <div class="modal-body">
@@ -271,15 +209,7 @@
                   <span v-for="(tag, index) in memoForm.tags" :key="index" class="tag-item">
                     {{ tag }}
                     <button type="button" class="tag-remove" @click="removeFormTag(index)">
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12" />
-                      </svg>
+                      <UIcon name="i-heroicons-x-mark" class="tag-remove-icon" />
                     </button>
                   </span>
                   <input
@@ -325,11 +255,7 @@
           <div class="modal-container danger-modal">
             <div class="modal-header">
               <div class="danger-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                  <line x1="12" y1="9" x2="12" y2="13" />
-                  <line x1="12" y1="17" x2="12.01" y2="17" />
-                </svg>
+                <UIcon name="i-heroicons-exclamation-triangle" class="danger-icon-inner" />
               </div>
               <div>
                 <h3 class="modal-title">删除备忘录</h3>
@@ -623,9 +549,9 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem 2rem;
-    background: rgba(10, 10, 15, 0.8);
+    background: var(--ws-glass-bg);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--ws-glass-border);
   }
 
   .toolbar-left {
@@ -637,7 +563,7 @@
   .page-title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: white;
+    color: var(--ws-text-primary);
     letter-spacing: -0.02em;
   }
 
@@ -645,10 +571,10 @@
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
     font-weight: 600;
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: var(--ws-primary-bg);
+    border: 1px solid var(--ws-primary-border);
     border-radius: 20px;
-    color: #a5b4fc;
+    color: var(--ws-primary-light);
   }
 
   .toolbar-right {
@@ -667,35 +593,37 @@
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(255, 255, 255, 0.4);
+    width: 18px;
+    height: 18px;
+    color: var(--ws-text-tertiary);
     pointer-events: none;
   }
 
   .search-input {
     width: 100%;
     padding: 0.625rem 1rem 0.625rem 2.75rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--ws-bg-input);
+    border: 1px solid var(--ws-border);
     border-radius: 10px;
     font-size: 0.875rem;
-    color: white;
+    color: var(--ws-text-primary);
     outline: none;
     transition: all 0.2s ease;
   }
 
   .search-input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ws-text-muted);
   }
 
   .search-input:focus {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(99, 102, 241, 0.5);
+    background: var(--ws-bg-input-focus);
+    border-color: var(--ws-border-focus);
   }
 
   .view-toggle {
     display: flex;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--ws-bg-input);
+    border: 1px solid var(--ws-border);
     border-radius: 10px;
     padding: 0.25rem;
   }
@@ -709,47 +637,56 @@
     background: transparent;
     border: none;
     border-radius: 8px;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--ws-text-tertiary);
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .toggle-btn:hover {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--ws-text-secondary);
   }
 
   .toggle-btn.active {
-    background: rgba(99, 102, 241, 0.2);
-    color: #a5b4fc;
+    background: var(--ws-primary-bg);
+    color: var(--ws-primary-light);
+  }
+
+  .toggle-icon {
+    width: 18px;
+    height: 18px;
   }
 
   .sort-select {
     padding: 0.625rem 1rem;
     padding-right: 2.5rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--ws-bg-input);
+    border: 1px solid var(--ws-border);
     border-radius: 10px;
     font-size: 0.875rem;
-    color: white;
+    color: var(--ws-text-primary);
     cursor: pointer;
     outline: none;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(100,100,100,0.5)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 1rem center;
     transition: all 0.2s ease;
   }
 
+  .dark .sort-select {
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  }
+
   .sort-select:hover {
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--ws-border);
   }
 
   .sort-select:focus {
-    border-color: rgba(99, 102, 241, 0.5);
+    border-color: var(--ws-border-focus);
   }
 
   .sort-select option {
-    background: #0f0f19;
+    background: var(--ws-bg-secondary);
   }
 
   /* ===== 筛选栏 ===== */
@@ -758,7 +695,7 @@
     align-items: center;
     gap: 0.75rem;
     padding: 1rem 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--ws-border-light);
   }
 
   .filter-chip {
@@ -766,35 +703,55 @@
     align-items: center;
     gap: 0.375rem;
     padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--ws-bg-input);
+    border: 1px solid var(--ws-border);
     border-radius: 20px;
     font-size: 0.8125rem;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--ws-text-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .filter-chip:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.8);
+    background: var(--ws-bg-overlay-hover);
+    border-color: var(--ws-border);
+    color: var(--ws-text-secondary);
   }
 
   .filter-chip.active {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.3);
-    color: #a5b4fc;
+    background: var(--ws-primary-bg-hover);
+    border-color: var(--ws-primary-border-active);
+    color: var(--ws-primary-light);
   }
 
   .filter-chip .star-icon {
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--ws-text-tertiary);
     transition: color 0.2s ease;
   }
 
   .filter-chip.active .star-icon {
-    color: #fbbf24;
+    color: var(--ws-gold);
+  }
+
+  .star-icon,
+  .pin-icon,
+  .list-pin-icon,
+  .badge-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .pin-icon,
+  .list-pin-icon,
+  .badge-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* 实心星星图标 */
+  .solid {
+    fill: currentColor;
   }
 
   /* ===== 内容区 ===== */
@@ -814,8 +771,8 @@
   .memo-card {
     position: relative;
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--ws-bg-overlay);
+    border: 1px solid var(--ws-border-light);
     border-radius: 16px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -829,7 +786,7 @@
     top: 0;
     bottom: 0;
     width: 3px;
-    background: linear-gradient(180deg, #6366f1 0%, #ec4899 100%);
+    background: linear-gradient(180deg, var(--ws-primary-start) 0%, var(--ws-primary-end) 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
@@ -839,28 +796,28 @@
   }
 
   .memo-card.pinned {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.05) 0%, rgba(245, 158, 11, 0.05) 100%);
-    border-color: rgba(251, 191, 36, 0.1);
+    background: linear-gradient(135deg, var(--ws-gold-bg) 0%, var(--ws-gold-bg) 100%);
+    border-color: var(--ws-gold-border);
   }
 
   .memo-card:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--ws-bg-overlay-hover);
+    border-color: var(--ws-border);
     transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--ws-shadow-card);
   }
 
   .pin-indicator {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    color: #fbbf24;
+    color: var(--ws-gold);
   }
 
   .memo-title {
     font-size: 1.0625rem;
     font-weight: 600;
-    color: white;
+    color: var(--ws-text-primary);
     margin-bottom: 0.75rem;
     padding-right: 1.5rem;
     overflow: hidden;
@@ -870,7 +827,7 @@
 
   .memo-preview {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--ws-text-secondary);
     line-height: 1.6;
     margin-bottom: 1.25rem;
     display: -webkit-box;
@@ -895,23 +852,23 @@
   .mini-tag {
     padding: 0.25rem 0.5rem;
     font-size: 0.6875rem;
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: var(--ws-primary-bg);
+    border: 1px solid var(--ws-primary-border);
     border-radius: 6px;
-    color: #a5b4fc;
+    color: var(--ws-primary-light);
   }
 
   .more-tags {
     padding: 0.25rem 0.5rem;
     font-size: 0.6875rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--ws-bg-input);
     border-radius: 6px;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--ws-text-tertiary);
   }
 
   .memo-date {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ws-text-muted);
   }
 
   .memo-menu {
@@ -926,7 +883,7 @@
     background: transparent;
     border: none;
     border-radius: 8px;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ws-text-muted);
     cursor: pointer;
     opacity: 0;
     transition: all 0.2s ease;
@@ -937,8 +894,13 @@
   }
 
   .memo-menu:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.7);
+    background: var(--ws-bg-overlay-hover);
+    color: var(--ws-text-secondary);
+  }
+
+  .menu-icon {
+    width: 16px;
+    height: 16px;
   }
 
   /* ===== 列表视图 ===== */
@@ -954,8 +916,8 @@
     align-items: flex-start;
     gap: 1rem;
     padding: 1.25rem;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--ws-bg-overlay);
+    border: 1px solid var(--ws-border-light);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -968,7 +930,7 @@
     top: 1rem;
     bottom: 1rem;
     width: 3px;
-    background: linear-gradient(180deg, #6366f1 0%, #ec4899 100%);
+    background: linear-gradient(180deg, var(--ws-primary-start) 0%, var(--ws-primary-end) 100%);
     border-radius: 0 2px 2px 0;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -979,19 +941,19 @@
   }
 
   .memo-list-item.pinned {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.05) 0%, rgba(245, 158, 11, 0.05) 100%);
-    border-color: rgba(251, 191, 36, 0.1);
+    background: linear-gradient(135deg, var(--ws-gold-bg) 0%, var(--ws-gold-bg) 100%);
+    border-color: var(--ws-gold-border);
   }
 
   .memo-list-item:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--ws-bg-overlay-hover);
+    border-color: var(--ws-border);
   }
 
   .list-pin {
     flex-shrink: 0;
     width: 24px;
-    color: #fbbf24;
+    color: var(--ws-gold);
   }
 
   .list-content {
@@ -1002,13 +964,13 @@
   .list-title {
     font-size: 1rem;
     font-weight: 600;
-    color: white;
+    color: var(--ws-text-primary);
     margin-bottom: 0.5rem;
   }
 
   .list-preview {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--ws-text-secondary);
     line-height: 1.6;
     margin-bottom: 0.75rem;
     display: -webkit-box;
@@ -1031,7 +993,7 @@
 
   .list-date {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ws-text-muted);
   }
 
   .list-menu {
@@ -1043,7 +1005,7 @@
     background: transparent;
     border: none;
     border-radius: 8px;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ws-text-muted);
     cursor: pointer;
     opacity: 0;
     transition: all 0.2s ease;
@@ -1055,8 +1017,8 @@
   }
 
   .list-menu:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.7);
+    background: var(--ws-bg-overlay-hover);
+    color: var(--ws-text-secondary);
   }
 
   /* ===== 空状态 ===== */
@@ -1076,26 +1038,31 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 1.5rem;
-    color: rgba(255, 255, 255, 0.2);
+    color: var(--ws-text-muted);
+  }
+
+  .empty-icon-inner {
+    width: 64px;
+    height: 64px;
   }
 
   .empty-title {
     font-size: 1.125rem;
     font-weight: 600;
-    color: white;
+    color: var(--ws-text-primary);
     margin-bottom: 0.5rem;
   }
 
   .empty-description {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--ws-text-tertiary);
   }
 
   /* ===== 模态框通用样式 ===== */
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--ws-modal-overlay);
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
@@ -1113,10 +1080,10 @@
   .modal-container {
     width: 100%;
     max-width: 540px;
-    background: rgba(15, 15, 25, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--ws-glass-bg-heavy);
+    border: 1px solid var(--ws-border);
     border-radius: 20px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--ws-shadow-modal);
     overflow: hidden;
   }
 
@@ -1133,7 +1100,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--ws-border-light);
   }
 
   .modal-header .danger-icon + div {
@@ -1144,12 +1111,12 @@
   .modal-title {
     font-size: 1.125rem;
     font-weight: 600;
-    color: white;
+    color: var(--ws-text-primary);
   }
 
   .modal-subtitle {
     font-size: 0.8125rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--ws-text-tertiary);
     margin-top: 0.25rem;
   }
 
@@ -1162,14 +1129,19 @@
     background: transparent;
     border: none;
     border-radius: 8px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--ws-text-tertiary);
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .close-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.8);
+    background: var(--ws-bg-overlay-hover);
+    color: var(--ws-text-secondary);
+  }
+
+  .close-btn-icon {
+    width: 20px;
+    height: 20px;
   }
 
   .modal-body {
@@ -1200,12 +1172,12 @@
     display: block;
     font-size: 0.8125rem;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--ws-text-secondary);
     margin-bottom: 0.5rem;
   }
 
   .required {
-    color: #f87171;
+    color: var(--ws-danger-light);
   }
 
   .form-input,
@@ -1213,25 +1185,25 @@
   .form-textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--ws-bg-input);
+    border: 1px solid var(--ws-border);
     border-radius: 10px;
     font-size: 0.9375rem;
-    color: white;
+    color: var(--ws-text-primary);
     outline: none;
     transition: all 0.2s ease;
   }
 
   .form-input::placeholder,
   .form-textarea::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ws-text-muted);
   }
 
   .form-input:focus,
   .form-select:focus,
   .form-textarea:focus {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(99, 102, 241, 0.5);
+    background: var(--ws-bg-input-focus);
+    border-color: var(--ws-border-focus);
   }
 
   .form-textarea {
@@ -1241,7 +1213,7 @@
   }
 
   .form-select option {
-    background: #0f0f19;
+    background: var(--ws-bg-secondary);
   }
 
   .checkbox-label {
@@ -1250,7 +1222,7 @@
     gap: 0.75rem;
     cursor: pointer;
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--ws-text-secondary);
   }
 
   .checkbox {
@@ -1264,14 +1236,14 @@
     flex-wrap: wrap;
     gap: 0.5rem;
     padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--ws-bg-input);
+    border: 1px solid var(--ws-border);
     border-radius: 10px;
     min-height: 46px;
   }
 
   .tags-input:focus-within {
-    border-color: rgba(99, 102, 241, 0.5);
+    border-color: var(--ws-border-focus);
   }
 
   .tag-item {
@@ -1279,11 +1251,11 @@
     align-items: center;
     gap: 0.375rem;
     padding: 0.375rem 0.625rem;
-    background: rgba(99, 102, 241, 0.15);
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    background: var(--ws-primary-bg-hover);
+    border: 1px solid var(--ws-primary-border-active);
     border-radius: 8px;
     font-size: 0.8125rem;
-    color: #a5b4fc;
+    color: var(--ws-primary-light);
   }
 
   .tag-remove {
@@ -1291,13 +1263,18 @@
     background: transparent;
     border: none;
     padding: 0;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--ws-text-tertiary);
     cursor: pointer;
     transition: color 0.2s ease;
   }
 
   .tag-remove:hover {
-    color: white;
+    color: var(--ws-text-primary);
+  }
+
+  .tag-remove-icon {
+    width: 10px;
+    height: 10px;
   }
 
   .tag-input-field {
@@ -1307,12 +1284,12 @@
     background: transparent;
     border: none;
     font-size: 0.9375rem;
-    color: white;
+    color: var(--ws-text-primary);
     outline: none;
   }
 
   .tag-input-field::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ws-text-muted);
   }
 
   .modal-footer {
@@ -1320,7 +1297,7 @@
     gap: 0.75rem;
     justify-content: flex-end;
     padding: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--ws-border-light);
   }
 
   .btn {
@@ -1334,29 +1311,29 @@
 
   .btn-outline {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--ws-border);
+    color: var(--ws-text-secondary);
   }
 
   .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.25);
+    background: var(--ws-bg-overlay-hover);
+    border-color: var(--ws-border);
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+    background: linear-gradient(135deg, var(--ws-primary-start) 0%, var(--ws-primary-end) 100%);
     border: none;
     color: white;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+    box-shadow: var(--ws-shadow-button);
   }
 
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+    box-shadow: var(--ws-shadow-button-hover);
   }
 
   .btn-danger {
-    background: #ef4444;
+    background: var(--ws-danger);
     border: none;
     color: white;
     box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
@@ -1373,7 +1350,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--ws-border-light);
   }
 
   .editor-title-group {
@@ -1385,7 +1362,7 @@
   .editor-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: white;
+    color: var(--ws-text-primary);
   }
 
   .editor-badge {
@@ -1395,16 +1372,16 @@
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--ws-bg-input);
+    border: 1px solid var(--ws-border);
     border-radius: 20px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--ws-text-tertiary);
   }
 
   .editor-badge.pinned {
-    background: rgba(251, 191, 36, 0.15);
-    border-color: rgba(251, 191, 36, 0.3);
-    color: #fbbf24;
+    background: var(--ws-gold-bg);
+    border-color: var(--ws-gold-border);
+    color: var(--ws-gold);
   }
 
   .editor-actions {
@@ -1422,24 +1399,34 @@
     background: transparent;
     border: none;
     border-radius: 10px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--ws-text-tertiary);
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .icon-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.8);
+    background: var(--ws-bg-overlay-hover);
+    color: var(--ws-text-secondary);
   }
 
   .icon-btn.active {
-    background: rgba(251, 191, 36, 0.1);
-    color: #fbbf24;
+    background: var(--ws-gold-bg);
+    color: var(--ws-gold);
   }
 
   .icon-btn.danger:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #f87171;
+    background: var(--ws-danger-bg-hover);
+    color: var(--ws-danger-light);
+  }
+
+  .icon-btn-inner {
+    width: 20px;
+    height: 20px;
+  }
+
+  .badge-icon {
+    width: 12px;
+    height: 12px;
   }
 
   .title-input-wrapper {
@@ -1453,18 +1440,18 @@
     font-weight: 700;
     background: transparent;
     border: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
+    border-bottom: 1px solid var(--ws-border);
+    color: var(--ws-text-primary);
     outline: none;
     transition: border-color 0.2s ease;
   }
 
   .title-input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ws-text-muted);
   }
 
   .title-input:focus {
-    border-color: rgba(99, 102, 241, 0.5);
+    border-color: var(--ws-border-focus);
   }
 
   .tags-wrapper {
@@ -1483,11 +1470,11 @@
     align-items: center;
     gap: 0.375rem;
     padding: 0.375rem 0.625rem;
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: var(--ws-primary-bg);
+    border: 1px solid var(--ws-primary-border);
     border-radius: 8px;
     font-size: 0.8125rem;
-    color: #a5b4fc;
+    color: var(--ws-primary-light);
   }
 
   .tag-input {
@@ -1497,12 +1484,12 @@
     background: transparent;
     border: none;
     font-size: 0.875rem;
-    color: white;
+    color: var(--ws-text-primary);
     outline: none;
   }
 
   .tag-input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ws-text-muted);
   }
 
   .content-wrapper {
@@ -1521,14 +1508,14 @@
     line-height: 1.8;
     background: transparent;
     border: none;
-    color: white;
+    color: var(--ws-text-primary);
     outline: none;
     resize: none;
     font-family: inherit;
   }
 
   .content-textarea::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ws-text-muted);
   }
 
   .content-footer {
@@ -1539,7 +1526,7 @@
 
   .char-count {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--ws-text-muted);
   }
 
   .editor-footer {
@@ -1547,12 +1534,12 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--ws-border-light);
   }
 
   .last-edited {
     font-size: 0.8125rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--ws-text-tertiary);
   }
 
   /* ===== 危险模态框 ===== */
@@ -1571,20 +1558,25 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--ws-danger-bg);
     border-radius: 12px;
-    color: #ef4444;
+    color: var(--ws-danger);
     flex-shrink: 0;
+  }
+
+  .danger-icon-inner {
+    width: 24px;
+    height: 24px;
   }
 
   .danger-text {
     font-size: 0.9375rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--ws-text-secondary);
     line-height: 1.6;
   }
 
   .danger-text strong {
-    color: white;
+    color: var(--ws-text-primary);
     font-weight: 600;
   }
 
@@ -1626,13 +1618,13 @@
   .memos-content::-webkit-scrollbar-thumb,
   .modal-body::-webkit-scrollbar-thumb,
   .editor-modal .editor-body::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--ws-border);
     border-radius: 3px;
   }
 
   .memos-content::-webkit-scrollbar-thumb:hover,
   .modal-body::-webkit-scrollbar-thumb:hover,
   .editor-modal .editor-body::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--ws-border);
   }
 </style>
