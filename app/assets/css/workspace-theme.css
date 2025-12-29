@@ -1,0 +1,138 @@
+/* ===== Workspace Theme Variables ===== */
+/* 支持亮色和暗色主题的 CSS 变量系统 */
+
+/* ===== 亮色主题 (默认) ===== */
+:root {
+  /* 主背景色 */
+  --ws-bg-primary: #ffffff;
+  --ws-bg-secondary: #f9fafb;
+  --ws-bg-tertiary: #f3f4f6;
+
+  /* 玻璃态背景 */
+  --ws-glass-bg: rgba(255, 255, 255, 0.8);
+  --ws-glass-bg-heavy: rgba(255, 255, 255, 0.95);
+  --ws-glass-border: rgba(0, 0, 0, 0.08);
+
+  /* 文字颜色 */
+  --ws-text-primary: #111827;
+  --ws-text-secondary: #6b7280;
+  --ws-text-tertiary: #9ca3af;
+  --ws-text-muted: #d1d5db;
+
+  /* 半透明背景（亮色主题下的卡片背景） */
+  --ws-bg-overlay: rgba(0, 0, 0, 0.02);
+  --ws-bg-overlay-hover: rgba(0, 0, 0, 0.04);
+  --ws-bg-input: rgba(0, 0, 0, 0.03);
+  --ws-bg-input-focus: rgba(0, 0, 0, 0.05);
+
+  /* 边框颜色 */
+  --ws-border: rgba(0, 0, 0, 0.08);
+  --ws-border-light: rgba(0, 0, 0, 0.05);
+  --ws-border-focus: rgba(99, 102, 241, 0.5);
+
+  /* 主色调 */
+  --ws-primary-start: #6366f1;
+  --ws-primary-end: #ec4899;
+  --ws-primary-light: #a5b4fc;
+  --ws-primary-bg: rgba(99, 102, 241, 0.1);
+  --ws-primary-bg-hover: rgba(99, 102, 241, 0.15);
+  --ws-primary-border: rgba(99, 102, 241, 0.2);
+  --ws-primary-border-active: rgba(99, 102, 241, 0.3);
+
+  /* 金色（置顶标记） */
+  --ws-gold: #fbbf24;
+  --ws-gold-bg: rgba(251, 191, 36, 0.15);
+  --ws-gold-bg-hover: rgba(251, 191, 36, 0.2);
+  --ws-gold-border: rgba(251, 191, 36, 0.3);
+
+  /* 危险色 */
+  --ws-danger: #ef4444;
+  --ws-danger-bg: rgba(239, 68, 68, 0.1);
+  --ws-danger-bg-hover: rgba(239, 68, 68, 0.2);
+  --ws-danger-light: #f87171;
+
+  /* 模态框遮罩 */
+  --ws-modal-overlay: rgba(0, 0, 0, 0.5);
+
+  /* 渐变球背景（亮色主题使用低透明度） */
+  --ws-orb-1: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+  --ws-orb-2: radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, transparent 70%);
+  --ws-orb-3: radial-gradient(circle, rgba(34, 211, 238, 0.08) 0%, transparent 70%);
+
+  /* 渐变球光晕 */
+  --ws-orb-glow: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+
+  /* 阴影 */
+  --ws-shadow-card: 0 20px 40px rgba(0, 0, 0, 0.08);
+  --ws-shadow-modal: 0 25px 50px rgba(0, 0, 0, 0.15);
+  --ws-shadow-button: 0 4px 20px rgba(99, 102, 241, 0.25);
+  --ws-shadow-button-hover: 0 8px 30px rgba(99, 102, 241, 0.35);
+}
+
+/* ===== 暗色主题 ===== */
+.dark {
+  /* 主背景色 */
+  --ws-bg-primary: #0a0a0f;
+  --ws-bg-secondary: #0f0f19;
+  --ws-bg-tertiary: #151520;
+
+  /* 玻璃态背景 */
+  --ws-glass-bg: rgba(15, 15, 25, 0.8);
+  --ws-glass-bg-heavy: rgba(15, 15, 25, 0.95);
+  --ws-glass-border: rgba(255, 255, 255, 0.05);
+
+  /* 文字颜色 */
+  --ws-text-primary: #ffffff;
+  --ws-text-secondary: rgba(255, 255, 255, 0.7);
+  --ws-text-tertiary: rgba(255, 255, 255, 0.5);
+  --ws-text-muted: rgba(255, 255, 255, 0.3);
+
+  /* 半透明背景（暗色主题下的卡片背景） */
+  --ws-bg-overlay: rgba(255, 255, 255, 0.02);
+  --ws-bg-overlay-hover: rgba(255, 255, 255, 0.04);
+  --ws-bg-input: rgba(255, 255, 255, 0.03);
+  --ws-bg-input-focus: rgba(255, 255, 255, 0.05);
+
+  /* 边框颜色 */
+  --ws-border: rgba(255, 255, 255, 0.08);
+  --ws-border-light: rgba(255, 255, 255, 0.03);
+  --ws-border-focus: rgba(99, 102, 241, 0.5);
+
+  /* 主色调保持不变 */
+  --ws-primary-start: #6366f1;
+  --ws-primary-end: #ec4899;
+  --ws-primary-light: #a5b4fc;
+  --ws-primary-bg: rgba(99, 102, 241, 0.1);
+  --ws-primary-bg-hover: rgba(99, 102, 241, 0.15);
+  --ws-primary-border: rgba(99, 102, 241, 0.2);
+  --ws-primary-border-active: rgba(99, 102, 241, 0.3);
+
+  /* 金色保持不变 */
+  --ws-gold: #fbbf24;
+  --ws-gold-bg: rgba(251, 191, 36, 0.15);
+  --ws-gold-bg-hover: rgba(251, 191, 36, 0.2);
+  --ws-gold-border: rgba(251, 191, 36, 0.3);
+
+  /* 危险色保持不变 */
+  --ws-danger: #ef4444;
+  --ws-danger-bg: rgba(239, 68, 68, 0.1);
+  --ws-danger-bg-hover: rgba(239, 68, 68, 0.2);
+  --ws-danger-light: #f87171;
+
+  /* 模态框遮罩 */
+  --ws-modal-overlay: rgba(0, 0, 0, 0.7);
+
+  /* 渐变球背景（暗色主题使用高透明度） */
+  --ws-orb-1: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%);
+  --ws-orb-2: radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, transparent 70%);
+  --ws-orb-3: radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, transparent 70%);
+
+  /* 渐变球光晕 */
+  --ws-orb-glow: radial-gradient(circle at center, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+
+  /* 阴影 */
+  --ws-shadow-card: 0 20px 40px rgba(0, 0, 0, 0.3);
+  --ws-shadow-modal: 0 25px 50px rgba(0, 0, 0, 0.5);
+  --ws-shadow-button: 0 4px 20px rgba(99, 102, 241, 0.3);
+  --ws-shadow-button-hover: 0 8px 30px rgba(99, 102, 241, 0.4);
+}
