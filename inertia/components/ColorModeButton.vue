@@ -1,41 +1,24 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { useColorMode } from '@vueuse/core'
 
-const isDark = ref(false)
+const colorMode = useColorMode()
 
-const toggleTheme = () => {
-  isDark.value = !isDark.value
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-  document.documentElement.classList.toggle('dark', isDark.value)
-}
-
-onMounted(() => {
-  const savedTheme = localStorage.getItem('theme')
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-
-  isDark.value = savedTheme ? savedTheme === 'dark' : prefersDark
-
-  if (isDark.value) {
-    document.documentElement.classList.add('dark')
+const isDark = computed({
+  get() {
+    return colorMode.value === 'dark'
+  },
+  set(_isDark: boolean) {
+    colorMode.preference = _isDark ? 'dark' : 'light'
   }
-
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (!localStorage.getItem('theme')) {
-      isDark.value = e.matches
-      document.documentElement.classList.toggle('dark', e.matches)
-    }
-  })
 })
 </script>
 
 <template>
   <UButton
-    :icon="isDark ? 'i-heroicons-moon' : 'i-heroicons-sun'"
-    color="neutral"
-    variant="ghost"
-    size="xs"
-    class="p-2.5"
-    :aria-label="`切换到${isDark ? '明亮' : '暗黑'}模式`"
-    @click="toggleTheme"
+    :icon="isDark ? 'i-lucide-moon' : 'i-lucide-sun'"
+    :color="color"
+    :variant="variant"
+    :aria-label="`Switch to ${isDark ? 'light' : 'dark'} mode`"
+    @click="isDark = !isDark"
   />
 </template>

@@ -126,14 +126,15 @@
         </div>
       </div>
 
-      <!-- 添加书签模态框 -->
-      <Teleport to="body">
-        <Transition name="modal">
-          <div
-            v-if="showAddBookmarkModal"
-            class="modal-overlay"
-            @click.self="showAddBookmarkModal = false"
-          >
+       <!-- 添加书签模态框 -->
+      <ClientOnly>
+        <Teleport to="body">
+          <Transition name="modal">
+            <div
+              v-if="showAddBookmarkModal"
+              class="modal-overlay"
+              @click.self="showAddBookmarkModal = false"
+            >
             <div class="modal-container">
               <div class="modal-header">
                 <h3 class="modal-title">添加新书签</h3>
@@ -207,12 +208,15 @@
           </div>
         </Transition>
       </Teleport>
+      </ClientOnly>
     </div>
   </WorkspaceLayout>
 </template>
 
 <script setup lang="ts">
 import WorkspaceLayout from '~/layouts/workspace.vue'
+import ClientOnly  from '~/components/ClientOnly.vue'
+
 import { computed, ref, onMounted } from 'vue'
 
 // 响应式数据
