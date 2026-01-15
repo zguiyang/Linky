@@ -188,7 +188,7 @@
                   <div class="tags-list">
                     <span v-for="(tag, index) in selectedMemo.tags" :key="index" class="editor-tag">
                       {{ tag }}
-                      <button type="button" class="tag-remove" @click="removeEditorTag(index)">
+                      <button type="button" class="tag-remove" @click="removeEditorTag(Number(index))">
                         <UIcon name="i-heroicons-x-mark" class="tag-remove-icon" />
                       </button>
                     </span>
