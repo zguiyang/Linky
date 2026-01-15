@@ -213,7 +213,6 @@
 
 <script setup lang="ts">
 import WorkspaceLayout from '~/layouts/workspace.vue'
-import { Link } from '@inertiajs/vue3'
 import { computed, ref, onMounted } from 'vue'
 
 // 响应式数据
@@ -554,6 +553,13 @@ onMounted(() => {
 }
 
 .dark .sort-select {
+  background: rgba(31, 41, 55, 1);
+  border-color: rgba(55, 65, 81, 1);
+  color: #f9fafb;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-9'/%3E%3C/svg%3E");
+}
+
+.dark .sort-select {
   background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-9'/%3E%3C/svg%3E");
 }
 
@@ -575,11 +581,6 @@ onMounted(() => {
 
 .dark .sort-select option {
   background: #1f2937;
-}
-
-.sort-select:focus {
-  background: rgba(255, 255, 255, 0.8);
-  border-color: #6366f1;
 }
 
 .dark .sort-select:focus {
@@ -614,6 +615,11 @@ onMounted(() => {
   overflow: hidden;
 }
 
+.dark .bookmark-card {
+  background: rgba(31, 41, 55, 1);
+  border-color: rgba(55, 65, 81, 1);
+}
+
 .bookmark-card::before {
   content: '';
   position: absolute;
@@ -628,6 +634,11 @@ onMounted(() => {
   border-color: rgba(209, 213, 219, 1);
   transform: translateY(-4px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.dark .bookmark-card:hover {
+  background: rgba(41, 47, 61, 1);
+  border-color: rgba(75, 85, 99, 1);
 }
 
 .bookmark-card:hover::before {
@@ -646,6 +657,11 @@ onMounted(() => {
   border: 1px solid rgba(229, 231, 235, 1);
   border-radius: 14px;
   overflow: hidden;
+}
+
+.dark .bookmark-favicon {
+  background: rgba(31, 41, 55, 1);
+  border-color: rgba(55, 65, 81, 1);
 }
 
 .bookmark-favicon img {
@@ -777,6 +793,11 @@ onMounted(() => {
   color: #6b7280;
 }
 
+.dark .bookmark-menu:hover {
+  background: rgba(41, 47, 61, 1);
+  color: #9ca3af;
+}
+
 .menu-icon {
   width: 16px;
   height: 16px;
@@ -800,6 +821,11 @@ onMounted(() => {
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.dark .bookmark-list-item {
+  background: rgba(31, 41, 55, 1);
+  border-color: rgba(55, 65, 81, 1);
 }
 
 .bookmark-list-item:hover {
@@ -1145,6 +1171,11 @@ onMounted(() => {
   border: 1px solid rgba(229, 231, 235, 1);
   border-radius: 10px;
   min-height: 46px;
+}
+
+.dark .tags-input {
+  background: rgba(31, 41, 55, 1);
+  border-color: rgba(55, 65, 81, 1);
 }
 
 .tags-input:focus-within {
