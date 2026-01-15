@@ -1,113 +1,3 @@
-<script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
-import ColorModeButton from '~/components/ColorModeButton.vue'
-
-const page = usePage()
-const currentRoute = computed(() => page.props.url)
-
-// 模态框状态
-const showGlobalSearchModal = ref(false)
-const globalSearchQuery = ref('')
-const searchResults = ref<any[]>([])
-
-// 导航菜单项
-const navigationItems = ref([
-  { label: '书签', icon: 'i-heroicons-bookmark', to: '/workspace/bookmarks' },
-  { label: '备忘录', icon: 'i-heroicons-document-text', to: '/workspace/memos' },
-])
-
-// Mock数据 - 分类
-const categories = ref([
-  { id: 'all', name: '全部', icon: 'i-heroicons-folder-open', count: 5 },
-  { id: 'dev', name: '开发工具', icon: 'i-heroicons-code-bracket', count: 3 },
-  { id: 'design', name: '设计资源', icon: 'i-heroicons-paint-brush', count: 1 },
-  { id: 'learning', name: '学习资源', icon: 'i-heroicons-academic-cap', count: 1 },
-])
-
-// Mock数据 - 标签
-const popularTags = ref([
-  { id: 'javascript', name: 'JavaScript', count: 2 },
-  { id: 'vue', name: 'Vue', count: 2 },
-  { id: 'css', name: 'CSS', count: 1 },
-  { id: 'tailwind', name: 'Tailwind', count: 1 },
-])
-
-// 状态管理
-const selectedCategory = ref('all')
-const selectedTags = ref<string[]>([])
-
-// 方法
-const handleGlobalSearch = () => {
-  const query = globalSearchQuery.value.toLowerCase()
-  if (!query) return
-
-  console.log('Mock: 搜索', query)
-  searchResults.value = [
-    {
-      type: 'bookmark',
-      id: 1,
-      title: 'Vue.js 官方文档',
-      description: 'https://vuejs.org',
-      icon: 'i-heroicons-bookmark',
-    },
-    {
-      type: 'memo',
-      id: 1,
-      title: '项目规划',
-      description: '这是一个关于项目规划的备忘录...',
-      icon: 'i-heroicons-document-text',
-    },
-  ]
-}
-
-const selectCategory = (categoryId: string) => {
-  selectedCategory.value = categoryId
-}
-
-const toggleTag = (tagId: string) => {
-  const index = selectedTags.value.indexOf(tagId)
-  if (index > -1) {
-    selectedTags.value.splice(index, 1)
-  } else {
-    selectedTags.value.push(tagId)
-  }
-}
-
-const getAddButtonText = () => {
-  if (currentRoute.value === '/workspace/bookmarks') {
-    return '添加书签'
-  } else if (currentRoute.value === '/workspace/memos') {
-    return '新建备忘录'
-  }
-  return '添加'
-}
-
-const handleAddAction = () => {
-  if (currentRoute.value === '/workspace/bookmarks') {
-    const event = new CustomEvent('add-bookmark')
-    window.dispatchEvent(event)
-  } else if (currentRoute.value === '/workspace/memos') {
-    const event = new CustomEvent('add-memo')
-    window.dispatchEvent(event)
-  }
-}
-
-const isActiveRoute = (path: string) => {
-  return currentRoute.value === path
-}
-
-// 暴露给子组件使用
-defineExpose({
-  categories,
-  popularTags,
-  selectedCategory,
-  selectedTags,
-  selectCategory,
-  toggleTag,
-})
-</script>
-
 <template>
   <div class="workspace-container">
     <!-- 动态背景层 -->
@@ -247,14 +137,15 @@ defineExpose({
       <slot />
     </main>
 
-    <!-- 全局搜索模态框 -->
-    <Teleport to="body">
-      <Transition name="modal">
-        <div
-          v-if="showGlobalSearchModal"
-          class="modal-overlay"
-          @click.self="showGlobalSearchModal = false"
-        >
+     <!-- 全局搜索模态框 -->
+    <ClientOnly>
+      <Teleport to="body">
+        <Transition name="modal">
+          <div
+            v-if="showGlobalSearchModal"
+            class="modal-overlay"
+            @click.self="showGlobalSearchModal = false"
+          >
           <div class="modal-container search-modal">
             <div class="modal-header">
               <div class="modal-title-group">
@@ -298,8 +189,121 @@ defineExpose({
         </div>
       </Transition>
     </Teleport>
+    </ClientOnly>
   </div>
 </template>
+
+
+<script setup lang="ts">
+import { Link, usePage } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
+import ColorModeButton from '~/components/ColorModeButton.vue'
+import ClientOnly from '~/components/ClientOnly.vue'
+
+const page = usePage()
+const currentRoute = computed(() => page.props.url)
+
+// 模态框状态
+const showGlobalSearchModal = ref(false)
+const globalSearchQuery = ref('')
+const searchResults = ref<any[]>([])
+
+// 导航菜单项
+const navigationItems = ref([
+  { label: '书签', icon: 'i-heroicons-bookmark', to: '/workspace/bookmarks' },
+  { label: '备忘录', icon: 'i-heroicons-document-text', to: '/workspace/memos' },
+])
+
+// Mock数据 - 分类
+const categories = ref([
+  { id: 'all', name: '全部', icon: 'i-heroicons-folder-open', count: 5 },
+  { id: 'dev', name: '开发工具', icon: 'i-heroicons-code-bracket', count: 3 },
+  { id: 'design', name: '设计资源', icon: 'i-heroicons-paint-brush', count: 1 },
+  { id: 'learning', name: '学习资源', icon: 'i-heroicons-academic-cap', count: 1 },
+])
+
+// Mock数据 - 标签
+const popularTags = ref([
+  { id: 'javascript', name: 'JavaScript', count: 2 },
+  { id: 'vue', name: 'Vue', count: 2 },
+  { id: 'css', name: 'CSS', count: 1 },
+  { id: 'tailwind', name: 'Tailwind', count: 1 },
+])
+
+// 状态管理
+const selectedCategory = ref('all')
+const selectedTags = ref<string[]>([])
+
+// 方法
+const handleGlobalSearch = () => {
+  const query = globalSearchQuery.value.toLowerCase()
+  if (!query) return
+
+  console.log('Mock: 搜索', query)
+  searchResults.value = [
+    {
+      type: 'bookmark',
+      id: 1,
+      title: 'Vue.js 官方文档',
+      description: 'https://vuejs.org',
+      icon: 'i-heroicons-bookmark',
+    },
+    {
+      type: 'memo',
+      id: 1,
+      title: '项目规划',
+      description: '这是一个关于项目规划的备忘录...',
+      icon: 'i-heroicons-document-text',
+    },
+  ]
+}
+
+const selectCategory = (categoryId: string) => {
+  selectedCategory.value = categoryId
+}
+
+const toggleTag = (tagId: string) => {
+  const index = selectedTags.value.indexOf(tagId)
+  if (index > -1) {
+    selectedTags.value.splice(index, 1)
+  } else {
+    selectedTags.value.push(tagId)
+  }
+}
+
+const getAddButtonText = () => {
+  if (currentRoute.value === '/workspace/bookmarks') {
+    return '添加书签'
+  } else if (currentRoute.value === '/workspace/memos') {
+    return '新建备忘录'
+  }
+  return '添加'
+}
+
+const handleAddAction = () => {
+  if (currentRoute.value === '/workspace/bookmarks') {
+    const event = new CustomEvent('add-bookmark')
+    window.dispatchEvent(event)
+  } else if (currentRoute.value === '/workspace/memos') {
+    const event = new CustomEvent('add-memo')
+    window.dispatchEvent(event)
+  }
+}
+
+const isActiveRoute = (path: string) => {
+  return currentRoute.value === path
+}
+
+// 暴露给子组件使用
+defineExpose({
+  categories,
+  popularTags,
+  selectedCategory,
+  selectedTags,
+  selectCategory,
+  toggleTag,
+})
+</script>
 
 <style scoped>
 /* ===== 全局布局 ===== */

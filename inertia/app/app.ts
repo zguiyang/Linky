@@ -2,7 +2,6 @@
 /// <reference path="../../config/inertia.ts" />
 
 import '../css/app.css'
-import ui from '@nuxt/ui/vue-plugin'
 import { createSSRApp, h } from 'vue'
 import type { DefineComponent } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
@@ -25,7 +24,6 @@ createInertiaApp({
   setup({ el, App, props, plugin }) {
     createSSRApp({ render: () => h(App, props) })
       .use(plugin)
-      .use(ui)
       .mount(el)
   },
 })

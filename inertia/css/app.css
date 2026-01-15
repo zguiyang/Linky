@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import "@nuxt/ui";
 
 /* 自定义主题变量 */
 @theme {
@@ -34,7 +35,8 @@
   --orb-glow: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
 
   /* 字体 */
-  --font-family-sans: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Public Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 /* 基础样式 */

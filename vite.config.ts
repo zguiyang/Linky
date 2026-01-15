@@ -12,6 +12,15 @@ export default defineConfig({
     vue(),
     ui({
       router: 'inertia',
+      colorMode: true,
+      dts: true,
+      autoImport: {
+        imports: ['vue', '@vueuse/core'],
+        dts: 'inertia/auto-imports.d.ts',
+      },
+      components: {
+        dts: 'inertia/components.d.ts',
+      },
     }),
     adonisjs({ entrypoints: ['inertia/app/app.ts'], reload: ['resources/views/**/*.edge'] }),
   ],

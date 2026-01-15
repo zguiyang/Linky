@@ -41,12 +41,18 @@ importers:
       '@nuxt/ui':
         specifier: ^4.3.0
         version: 4.3.0(@babel/parser@7.28.6)(@floating-ui/dom@1.7.4)(@inertiajs/vue3@2.3.9(vue@3.5.26(typescript@5.8.3)))(@tiptap/extension-drag-handle@3.15.3(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/extension-collaboration@3.15.3(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)(@tiptap/y-tiptap@3.0.1(prosemirror-model@1.25.4)(prosemirror-state@1.4.4)(prosemirror-view@1.41.5)(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29))(yjs@13.6.29))(@tiptap/extension-node-range@3.15.3(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0)(@tiptap/y-tiptap@3.0.1(prosemirror-model@1.25.4)(prosemirror-state@1.4.4)(prosemirror-view@1.41.5)(y-protocols@1.0.7(yjs@13.6.29))(yjs@13.6.29)))(@tiptap/extensions@3.15.3(@tiptap/core@3.13.0(@tiptap/pm@3.13.0))(@tiptap/pm@3.13.0))(axios@1.13.2)(change-case@5.4.4)(embla-carousel@8.6.0)(typescript@5.8.3)(vite@6.4.1(@types/node@22.19.6)(jiti@2.6.1)(lightningcss@1.30.2))(vue@3.5.26(typescript@5.8.3))
+      '@unhead/vue':
+        specifier: ^2.1.2
+        version: 2.1.2(vue@3.5.26(typescript@5.8.3))
       '@vinejs/vine':
         specifier: ^3.0.1
         version: 3.0.1
       '@vue/server-renderer':
         specifier: ^3.5.26
         version: 3.5.26(vue@3.5.26(typescript@5.8.3))
+      '@vueuse/core':
+        specifier: ^14.1.0
+        version: 14.1.0(vue@3.5.26(typescript@5.8.3))
       edge.js:
         specifier: ^6.2.1
         version: 6.4.0
@@ -117,6 +123,9 @@ importers:
       typescript:
         specifier: ~5.8.3
         version: 5.8.3
+      unplugin-auto-import:
+        specifier: ^21.0.0
+        version: 21.0.0(@nuxt/kit@4.2.2)(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.8.3)))
       vite:
         specifier: ^6.3.5
         version: 6.4.1(@types/node@22.19.6)(jiti@2.6.1)(lightningcss@1.30.2)
@@ -4078,6 +4087,18 @@ packages:
   unplugin-auto-import@20.3.0:
     resolution: {integrity: sha512-RcSEQiVv7g0mLMMXibYVKk8mpteKxvyffGuDKqZZiFr7Oq3PB1HwgHdK5O7H4AzbhzHoVKG0NnMnsk/1HIVYzQ==}
     engines: {node: '>=14'}
+    peerDependencies:
+      '@nuxt/kit': ^4.0.0
+      '@vueuse/core': '*'
+    peerDependenciesMeta:
+      '@nuxt/kit':
+        optional: true
+      '@vueuse/core':
+        optional: true
+
+  unplugin-auto-import@21.0.0:
+    resolution: {integrity: sha512-vWuC8SwqJmxZFYwPojhOhOXDb5xFhNNcEVb9K/RFkyk/3VnfaOjzitWN7v+8DEKpMjSsY2AEGXNgt6I0yQrhRQ==}
+    engines: {node: '>=20.19.0'}
     peerDependencies:
       '@nuxt/kit': ^4.0.0
       '@vueuse/core': '*'
@@ -8451,6 +8472,18 @@ snapshots:
   unpipe@1.0.0: {}
 
   unplugin-auto-import@20.3.0(@nuxt/kit@4.2.2)(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.8.3))):
+    dependencies:
+      local-pkg: 1.1.2
+      magic-string: 0.30.21
+      picomatch: 4.0.3
+      unimport: 5.6.0
+      unplugin: 2.3.11
+      unplugin-utils: 0.3.1
+    optionalDependencies:
+      '@nuxt/kit': 4.2.2
+      '@vueuse/core': 14.1.0(vue@3.5.26(typescript@5.8.3))
+
+  unplugin-auto-import@21.0.0(@nuxt/kit@4.2.2)(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.8.3))):
     dependencies:
       local-pkg: 1.1.2
       magic-string: 0.30.21

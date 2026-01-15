@@ -137,14 +137,15 @@
         </div>
       </div>
 
-      <!-- 编辑器模态框 -->
-      <Teleport to="body">
-        <Transition name="modal">
-          <div
-            v-if="showEditorModal && selectedMemo"
-            class="modal-overlay fullscreen"
-            @click.self="showEditorModal = false"
-          >
+       <!-- 编辑器模态框 -->
+      <ClientOnly>
+        <Teleport to="body">
+          <Transition name="modal">
+            <div
+              v-if="showEditorModal && selectedMemo"
+              class="modal-overlay fullscreen"
+              @click.self="showEditorModal = false"
+            >
             <div class="modal-container editor-modal">
               <div class="editor-header">
                 <div class="editor-title-group">
@@ -188,7 +189,11 @@
                   <div class="tags-list">
                     <span v-for="(tag, index) in selectedMemo.tags" :key="index" class="editor-tag">
                       {{ tag }}
-                      <button type="button" class="tag-remove" @click="removeEditorTag(Number(index))">
+                      <button
+                        type="button"
+                        class="tag-remove"
+                        @click="removeEditorTag(Number(index))"
+                      >
                         <UIcon name="i-heroicons-x-mark" class="tag-remove-icon" />
                       </button>
                     </span>
@@ -221,11 +226,13 @@
           </div>
         </Transition>
       </Teleport>
+      </ClientOnly>
 
-      <!-- 添加备忘录模态框 -->
-      <Teleport to="body">
-        <Transition name="modal">
-          <div v-if="showAddMemoModal" class="modal-overlay" @click.self="showAddMemoModal = false">
+       <!-- 添加备忘录模态框 -->
+      <ClientOnly> 
+        <Teleport to="body">
+          <Transition name="modal">
+            <div v-if="showAddMemoModal" class="modal-overlay" @click.self="showAddMemoModal = false">
             <div class="modal-container">
               <div class="modal-header">
                 <h3 class="modal-title">{{ editingMemo ? '编辑备忘录' : '新建备忘录' }}</h3>
@@ -299,11 +306,13 @@
           </div>
         </Transition>
       </Teleport>
+      </ClientOnly>
 
-      <!-- 删除确认模态框 -->
-      <Teleport to="body">
-        <Transition name="modal">
-          <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
+       <!-- 删除确认模态框 -->
+      <ClientOnly>
+        <Teleport to="body">
+          <Transition name="modal">
+            <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
             <div class="modal-container danger-modal">
               <div class="modal-header">
                 <div class="danger-icon">
@@ -328,12 +337,14 @@
           </div>
         </Transition>
       </Teleport>
+      </ClientOnly>
     </div>
   </WorkspaceLayout>
 </template>
 
 <script setup lang="ts">
 import WorkspaceLayout from '~/layouts/workspace.vue'
+import ClientOnly  from '~/components/ClientOnly.vue'
 import { computed, ref, onMounted } from 'vue'
 
 // 响应式数据
