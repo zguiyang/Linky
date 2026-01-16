@@ -1,5 +1,5 @@
 <template>
-  <WorkspaceLayout>
+  <workspace-layout>
     <div class="memos-page">
       <!-- 顶部工具栏 -->
       <div class="toolbar">
@@ -11,7 +11,7 @@
         <div class="toolbar-right">
           <!-- 搜索框 -->
           <div class="search-box">
-            <UIcon name="i-heroicons-magnifying-glass" class="search-icon" />
+            <u-icon name="i-heroicons-magnifying-glass" class="search-icon" />
             <input
               v-model="searchQuery"
               type="text"
@@ -27,14 +27,14 @@
               :class="{ active: viewMode === 'grid' }"
               @click="setViewMode('grid')"
             >
-              <UIcon name="i-heroicons-squares-2x2" class="toggle-icon" />
+              <u-icon name="i-heroicons-squares-2x2" class="toggle-icon" />
             </button>
             <button
               class="toggle-btn"
               :class="{ active: viewMode === 'list' }"
               @click="setViewMode('list')"
             >
-              <UIcon name="i-heroicons-list-bullet" class="toggle-icon" />
+              <u-icon name="i-heroicons-list-bullet" class="toggle-icon" />
             </button>
           </div>
 
@@ -61,7 +61,7 @@
           :class="{ active: viewFilter === 'pinned' }"
           @click="viewFilter = 'pinned'"
         >
-          <UIcon name="i-heroicons-star" class="star-icon solid" />
+          <u-icon name="i-heroicons-star" class="star-icon solid" />
           已置顶
         </button>
       </div>
@@ -78,7 +78,7 @@
             @click="selectMemo(memo)"
           >
             <div v-if="memo.pinned" class="pin-indicator">
-              <UIcon name="i-heroicons-star" class="pin-icon solid" />
+              <u-icon name="i-heroicons-star" class="pin-icon solid" />
             </div>
             <h3 class="memo-title">{{ memo.title || '无标题备忘录' }}</h3>
             <p class="memo-preview">{{ memo.content }}</p>
@@ -94,7 +94,7 @@
               <span class="memo-date">{{ formatDate(memo.updatedAt) }}</span>
             </div>
             <button class="memo-menu" @click.stop="showMemoMenu(memo, $event)">
-              <UIcon name="i-heroicons-ellipsis-horizontal" class="menu-icon" />
+              <u-icon name="i-heroicons-ellipsis-horizontal" class="menu-icon" />
             </button>
           </div>
         </div>
@@ -109,7 +109,7 @@
             @click="selectMemo(memo)"
           >
             <div v-if="memo.pinned" class="list-pin">
-              <UIcon name="i-heroicons-star" class="list-pin-icon solid" />
+              <u-icon name="i-heroicons-star" class="list-pin-icon solid" />
             </div>
             <div class="list-content">
               <h3 class="list-title">{{ memo.title || '无标题备忘录' }}</h3>
@@ -122,7 +122,7 @@
               </div>
             </div>
             <button class="list-menu" @click.stop="showMemoMenu(memo, $event)">
-              <UIcon name="i-heroicons-ellipsis-horizontal" class="menu-icon" />
+              <u-icon name="i-heroicons-ellipsis-horizontal" class="menu-icon" />
             </button>
           </div>
         </div>
@@ -130,221 +130,231 @@
         <!-- 空状态 -->
         <div v-if="filteredMemos.length === 0" class="empty-state">
           <div class="empty-icon">
-            <UIcon name="i-heroicons-document-text" class="empty-icon-inner" />
+            <u-icon name="i-heroicons-document-text" class="empty-icon-inner" />
           </div>
           <p class="empty-title">暂无备忘录</p>
           <p class="empty-description">开始创建您的第一个备忘录吧</p>
         </div>
       </div>
 
-       <!-- 编辑器模态框 -->
-      <ClientOnly>
-        <Teleport to="body">
-          <Transition name="modal">
+      <!-- 编辑器模态框 -->
+      <client-only>
+        <teleport to="body">
+          <transition name="modal">
             <div
               v-if="showEditorModal && selectedMemo"
               class="modal-overlay fullscreen"
               @click.self="showEditorModal = false"
             >
-            <div class="modal-container editor-modal">
-              <div class="editor-header">
-                <div class="editor-title-group">
-                  <h3 class="editor-title">{{ selectedMemo.title || '无标题备忘录' }}</h3>
-                  <span class="editor-badge" :class="{ pinned: selectedMemo.pinned }">
-                    <UIcon
-                      v-if="selectedMemo.pinned"
-                      name="i-heroicons-star"
-                      class="badge-icon solid"
+              <div class="modal-container editor-modal">
+                <div class="editor-header">
+                  <div class="editor-title-group">
+                    <h3 class="editor-title">{{ selectedMemo.title || '无标题备忘录' }}</h3>
+                    <span class="editor-badge" :class="{ pinned: selectedMemo.pinned }">
+                      <u-icon
+                        v-if="selectedMemo.pinned"
+                        name="i-heroicons-star"
+                        class="badge-icon solid"
+                      />
+                      {{ selectedMemo.pinned ? '已置顶' : '未置顶' }}
+                    </span>
+                  </div>
+                  <div class="editor-actions">
+                    <button
+                      class="icon-btn"
+                      :class="{ active: selectedMemo.pinned }"
+                      @click="togglePin"
+                      :title="selectedMemo.pinned ? '取消置顶' : '置顶'"
+                    >
+                      <u-icon name="i-heroicons-star" class="icon-btn-inner" />
+                    </button>
+                    <button class="icon-btn danger" @click="showDeleteModal = true" title="删除">
+                      <u-icon name="i-heroicons-trash" class="icon-btn-inner" />
+                    </button>
+                    <button class="close-btn" @click="showEditorModal = false">
+                      <u-icon name="i-heroicons-x-mark" class="close-btn-icon" />
+                    </button>
+                  </div>
+                </div>
+                <div class="editor-body">
+                  <div class="title-input-wrapper">
+                    <input
+                      v-model="selectedMemo.title"
+                      type="text"
+                      placeholder="备忘录标题..."
+                      class="title-input"
                     />
-                    {{ selectedMemo.pinned ? '已置顶' : '未置顶' }}
-                  </span>
-                </div>
-                <div class="editor-actions">
-                  <button
-                    class="icon-btn"
-                    :class="{ active: selectedMemo.pinned }"
-                    @click="togglePin"
-                    :title="selectedMemo.pinned ? '取消置顶' : '置顶'"
-                  >
-                    <UIcon name="i-heroicons-star" class="icon-btn-inner" />
-                  </button>
-                  <button class="icon-btn danger" @click="showDeleteModal = true" title="删除">
-                    <UIcon name="i-heroicons-trash" class="icon-btn-inner" />
-                  </button>
-                  <button class="close-btn" @click="showEditorModal = false">
-                    <UIcon name="i-heroicons-x-mark" class="close-btn-icon" />
-                  </button>
-                </div>
-              </div>
-              <div class="editor-body">
-                <div class="title-input-wrapper">
-                  <input
-                    v-model="selectedMemo.title"
-                    type="text"
-                    placeholder="备忘录标题..."
-                    class="title-input"
-                  />
-                </div>
-                <div class="tags-wrapper">
-                  <div class="tags-list">
-                    <span v-for="(tag, index) in selectedMemo.tags" :key="index" class="editor-tag">
-                      {{ tag }}
-                      <button
-                        type="button"
-                        class="tag-remove"
-                        @click="removeEditorTag(Number(index))"
+                  </div>
+                  <div class="tags-wrapper">
+                    <div class="tags-list">
+                      <span
+                        v-for="(tag, index) in selectedMemo.tags"
+                        :key="index"
+                        class="editor-tag"
                       >
-                        <UIcon name="i-heroicons-x-mark" class="tag-remove-icon" />
-                      </button>
-                    </span>
-                    <input
-                      v-model="editorTagInput"
-                      type="text"
-                      placeholder="添加标签..."
-                      class="tag-input"
-                      @keyup.enter="addEditorTag"
-                    />
+                        {{ tag }}
+                        <button
+                          type="button"
+                          class="tag-remove"
+                          @click="removeEditorTag(Number(index))"
+                        >
+                          <u-icon name="i-heroicons-x-mark" class="tag-remove-icon" />
+                        </button>
+                      </span>
+                      <input
+                        v-model="editorTagInput"
+                        type="text"
+                        placeholder="添加标签..."
+                        class="tag-input"
+                        @keyup.enter="addEditorTag"
+                      />
+                    </div>
+                  </div>
+                  <div class="content-wrapper">
+                    <textarea
+                      v-model="selectedMemo.content"
+                      placeholder="开始写作..."
+                      class="content-textarea"
+                      @input="updateMemo"
+                    ></textarea>
+                    <div class="content-footer">
+                      <span class="char-count">{{ selectedMemo.content.length }} 字</span>
+                    </div>
                   </div>
                 </div>
-                <div class="content-wrapper">
-                  <textarea
-                    v-model="selectedMemo.content"
-                    placeholder="开始写作..."
-                    class="content-textarea"
-                    @input="updateMemo"
-                  ></textarea>
-                  <div class="content-footer">
-                    <span class="char-count">{{ selectedMemo.content.length }} 字</span>
-                  </div>
+                <div class="editor-footer">
+                  <span class="last-edited"
+                    >最后更新：{{ formatDate(selectedMemo.updatedAt) }}</span
+                  >
+                  <button class="btn btn-primary" @click="saveMemo">保存</button>
                 </div>
-              </div>
-              <div class="editor-footer">
-                <span class="last-edited">最后更新：{{ formatDate(selectedMemo.updatedAt) }}</span>
-                <button class="btn btn-primary" @click="saveMemo">保存</button>
-              </div>
-            </div>
-          </div>
-        </Transition>
-      </Teleport>
-      </ClientOnly>
-
-       <!-- 添加备忘录模态框 -->
-      <ClientOnly> 
-        <Teleport to="body">
-          <Transition name="modal">
-            <div v-if="showAddMemoModal" class="modal-overlay" @click.self="showAddMemoModal = false">
-            <div class="modal-container">
-              <div class="modal-header">
-                <h3 class="modal-title">{{ editingMemo ? '编辑备忘录' : '新建备忘录' }}</h3>
-                <button class="close-btn" @click="showAddMemoModal = false">
-                  <UIcon name="i-heroicons-x-mark" class="close-btn-icon" />
-                </button>
-              </div>
-              <div class="modal-body">
-                <div class="form-group">
-                  <label class="form-label">标题</label>
-                  <input
-                    v-model="memoForm.title"
-                    type="text"
-                    placeholder="输入备忘录标题（可选）"
-                    class="form-input"
-                  />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">内容 <span class="required">*</span></label>
-                  <textarea
-                    v-model="memoForm.content"
-                    placeholder="输入备忘录内容"
-                    class="form-textarea"
-                    rows="6"
-                  ></textarea>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">标签</label>
-                  <div class="tags-input">
-                    <span v-for="(tag, index) in memoForm.tags" :key="index" class="tag-item">
-                      {{ tag }}
-                      <button type="button" class="tag-remove" @click="removeFormTag(index)">
-                        <UIcon name="i-heroicons-x-mark" class="tag-remove-icon" />
-                      </button>
-                    </span>
-                    <input
-                      v-model="formTagInput"
-                      type="text"
-                      placeholder="输入标签后按回车"
-                      class="tag-input-field"
-                      @keyup.enter="addFormTag"
-                    />
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label">分类</label>
-                    <select v-model="memoForm.category" class="form-select">
-                      <option value="">选择分类</option>
-                      <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">
-                        {{ cat.label }}
-                      </option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">置顶</label>
-                    <label class="checkbox-label">
-                      <input v-model="memoForm.pinned" type="checkbox" class="checkbox" />
-                      <span>将备忘录添加到置顶列表</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button class="btn btn-outline" @click="showAddMemoModal = false">取消</button>
-                <button class="btn btn-primary" @click="handleSaveMemo">
-                  {{ editingMemo ? '更新' : '创建' }}
-                </button>
               </div>
             </div>
-          </div>
-        </Transition>
-      </Teleport>
-      </ClientOnly>
+          </Transition>
+        </Teleport>
+      </client-only>
 
-       <!-- 删除确认模态框 -->
-      <ClientOnly>
-        <Teleport to="body">
-          <Transition name="modal">
+      <!-- 添加备忘录模态框 -->
+      <client-only>
+        <teleport to="body">
+          <transition name="modal">
+            <div
+              v-if="showAddMemoModal"
+              class="modal-overlay"
+              @click.self="showAddMemoModal = false"
+            >
+              <div class="modal-container">
+                <div class="modal-header">
+                  <h3 class="modal-title">{{ editingMemo ? '编辑备忘录' : '新建备忘录' }}</h3>
+                  <button class="close-btn" @click="showAddMemoModal = false">
+                    <u-icon name="i-heroicons-x-mark" class="close-btn-icon" />
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label class="form-label">标题</label>
+                    <input
+                      v-model="memoForm.title"
+                      type="text"
+                      placeholder="输入备忘录标题（可选）"
+                      class="form-input"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">内容 <span class="required">*</span></label>
+                    <textarea
+                      v-model="memoForm.content"
+                      placeholder="输入备忘录内容"
+                      class="form-textarea"
+                      rows="6"
+                    ></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">标签</label>
+                    <div class="tags-input">
+                      <span v-for="(tag, index) in memoForm.tags" :key="index" class="tag-item">
+                        {{ tag }}
+                        <button type="button" class="tag-remove" @click="removeFormTag(index)">
+                          <u-icon name="i-heroicons-x-mark" class="tag-remove-icon" />
+                        </button>
+                      </span>
+                      <input
+                        v-model="formTagInput"
+                        type="text"
+                        placeholder="输入标签后按回车"
+                        class="tag-input-field"
+                        @keyup.enter="addFormTag"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">分类</label>
+                      <select v-model="memoForm.category" class="form-select">
+                        <option value="">选择分类</option>
+                        <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">
+                          {{ cat.label }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">置顶</label>
+                      <label class="checkbox-label">
+                        <input v-model="memoForm.pinned" type="checkbox" class="checkbox" />
+                        <span>将备忘录添加到置顶列表</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-outline" @click="showAddMemoModal = false">取消</button>
+                  <button class="btn btn-primary" @click="handleSaveMemo">
+                    {{ editingMemo ? '更新' : '创建' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </Teleport>
+      </client-only>
+
+      <!-- 删除确认模态框 -->
+      <client-only>
+        <teleport to="body">
+          <transition name="modal">
             <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
-            <div class="modal-container danger-modal">
-              <div class="modal-header">
-                <div class="danger-icon">
-                  <UIcon name="i-heroicons-exclamation-triangle" class="danger-icon-inner" />
+              <div class="modal-container danger-modal">
+                <div class="modal-header">
+                  <div class="danger-icon">
+                    <u-icon name="i-heroicons-exclamation-triangle" class="danger-icon-inner" />
+                  </div>
+                  <div>
+                    <h3 class="modal-title">删除备忘录</h3>
+                    <p class="modal-subtitle">此操作无法撤销</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 class="modal-title">删除备忘录</h3>
-                  <p class="modal-subtitle">此操作无法撤销</p>
+                <div class="modal-body">
+                  <p class="danger-text">
+                    您确定要删除备忘录 "<strong>{{ selectedMemo?.title || '无标题备忘录' }}</strong
+                    >" 吗？
+                  </p>
                 </div>
-              </div>
-              <div class="modal-body">
-                <p class="danger-text">
-                  您确定要删除备忘录 "<strong>{{ selectedMemo?.title || '无标题备忘录' }}</strong
-                  >" 吗？
-                </p>
-              </div>
-              <div class="modal-footer">
-                <button class="btn btn-outline" @click="showDeleteModal = false">取消</button>
-                <button class="btn btn-danger" @click="confirmDelete">删除</button>
+                <div class="modal-footer">
+                  <button class="btn btn-outline" @click="showDeleteModal = false">取消</button>
+                  <button class="btn btn-danger" @click="confirmDelete">删除</button>
+                </div>
               </div>
             </div>
-          </div>
-        </Transition>
-      </Teleport>
-      </ClientOnly>
+          </Transition>
+        </Teleport>
+      </client-only>
     </div>
-  </WorkspaceLayout>
+  </workspace-layout>
 </template>
 
 <script setup lang="ts">
 import WorkspaceLayout from '~/layouts/workspace.vue'
-import ClientOnly  from '~/components/ClientOnly.vue'
+import ClientOnly from '~/components/ClientOnly.vue'
 import { computed, ref, onMounted } from 'vue'
 
 // 响应式数据

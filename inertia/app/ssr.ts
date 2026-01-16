@@ -5,12 +5,10 @@ import { createHead, renderSSRHead } from '@unhead/vue/server'
 import { createSSRApp, h, type DefineComponent } from 'vue'
 
 export default function render(page: any) {
-  const appName = import.meta.env.VITE_APP_NAME || 'AdonisJS x Nuxt UI'
   const head = createHead()
   return createInertiaApp({
     page,
     render: renderToString,
-    title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) => {
       const pages = import.meta.glob<DefineComponent>('../pages/**/*.vue', { eager: true })
       return pages[`../pages/${name}.vue`]

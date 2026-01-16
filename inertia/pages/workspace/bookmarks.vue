@@ -1,5 +1,5 @@
 <template>
-  <WorkspaceLayout>
+  <workspace-layout>
     <div class="bookmarks-page">
       <!-- 顶部工具栏 -->
       <div class="toolbar">
@@ -13,7 +13,7 @@
         <div class="toolbar-right">
           <!-- 搜索框 -->
           <div class="search-box">
-            <UIcon name="i-heroicons-magnifying-glass" class="search-icon" />
+            <u-icon name="i-heroicons-magnifying-glass" class="search-icon" />
             <input
               v-model="searchQuery"
               type="text"
@@ -29,14 +29,14 @@
               :class="{ active: viewMode === 'grid' }"
               @click="setViewMode('grid')"
             >
-              <UIcon name="i-heroicons-squares-2x2" class="toggle-icon" />
+              <u-icon name="i-heroicons-squares-2x2" class="toggle-icon" />
             </button>
             <button
               class="toggle-btn"
               :class="{ active: viewMode === 'list' }"
               @click="setViewMode('list')"
             >
-              <UIcon name="i-heroicons-list-bullet" class="toggle-icon" />
+              <u-icon name="i-heroicons-list-bullet" class="toggle-icon" />
             </button>
           </div>
 
@@ -78,7 +78,7 @@
               </div>
             </div>
             <button class="bookmark-menu" @click.stop="showBookmarkMenu(bookmark, $event)">
-              <UIcon name="i-heroicons-ellipsis-horizontal" class="menu-icon" />
+              <u-icon name="i-heroicons-ellipsis-horizontal" class="menu-icon" />
             </button>
           </div>
         </div>
@@ -111,7 +111,7 @@
               </div>
             </div>
             <button class="list-menu" @click.stop="showBookmarkMenu(bookmark, $event)">
-              <UIcon name="i-heroicons-ellipsis-horizontal" class="menu-icon" />
+              <u-icon name="i-heroicons-ellipsis-horizontal" class="menu-icon" />
             </button>
           </div>
         </div>
@@ -119,103 +119,105 @@
         <!-- 空状态 -->
         <div v-if="filteredBookmarks.length === 0" class="empty-state">
           <div class="empty-icon">
-            <UIcon name="i-heroicons-bookmark" class="empty-icon-inner" />
+            <u-icon name="i-heroicons-bookmark" class="empty-icon-inner" />
           </div>
           <p class="empty-title">暂无书签</p>
           <p class="empty-description">开始添加您的第一个书签吧</p>
         </div>
       </div>
 
-       <!-- 添加书签模态框 -->
-      <ClientOnly>
-        <Teleport to="body">
-          <Transition name="modal">
+      <!-- 添加书签模态框 -->
+      <client-only>
+        <teleport to="body">
+          <transition name="modal">
             <div
               v-if="showAddBookmarkModal"
               class="modal-overlay"
               @click.self="showAddBookmarkModal = false"
             >
-            <div class="modal-container">
-              <div class="modal-header">
-                <h3 class="modal-title">添加新书签</h3>
-                <button class="close-btn" @click="showAddBookmarkModal = false">
-                  <UIcon name="i-heroicons-x-mark" class="close-btn-icon" />
-                </button>
-              </div>
-              <div class="modal-body">
-                <div class="form-group">
-                  <label class="form-label">标题 <span class="required">*</span></label>
-                  <input
-                    v-model="newBookmark.title"
-                    type="text"
-                    placeholder="输入书签标题"
-                    class="form-input"
-                  />
+              <div class="modal-container">
+                <div class="modal-header">
+                  <h3 class="modal-title">添加新书签</h3>
+                  <button class="close-btn" @click="showAddBookmarkModal = false">
+                    <u-icon name="i-heroicons-x-mark" class="close-btn-icon" />
+                  </button>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">URL <span class="required">*</span></label>
-                  <input
-                    v-model="newBookmark.url"
-                    type="url"
-                    placeholder="https://example.com"
-                    class="form-input"
-                  />
-                </div>
-                <div class="form-group">
-                  <label class="form-label">描述</label>
-                  <textarea
-                    v-model="newBookmark.description"
-                    placeholder="添加简短描述（可选）"
-                    class="form-textarea"
-                    rows="3"
-                  ></textarea>
-                </div>
-                <div class="form-row">
+                <div class="modal-body">
                   <div class="form-group">
-                    <label class="form-label">分类</label>
-                    <select v-model="newBookmark.category" class="form-select">
-                      <option value="">选择分类</option>
-                      <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">
-                        {{ cat.label }}
-                      </option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">标签</label>
-                  <div class="tags-input">
-                    <span v-for="(tag, index) in newBookmark.tags" :key="index" class="tag-item">
-                      {{ tag }}
-                      <button type="button" class="tag-remove" @click="removeTag(index)">
-                        <UIcon name="i-heroicons-x-mark" class="tag-remove-icon" />
-                      </button>
-                    </span>
+                    <label class="form-label">标题 <span class="required">*</span></label>
                     <input
-                      v-model="tagInput"
+                      v-model="newBookmark.title"
                       type="text"
-                      placeholder="输入标签后按回车"
-                      class="tag-input-field"
-                      @keyup.enter="addTag"
+                      placeholder="输入书签标题"
+                      class="form-input"
                     />
                   </div>
+                  <div class="form-group">
+                    <label class="form-label">URL <span class="required">*</span></label>
+                    <input
+                      v-model="newBookmark.url"
+                      type="url"
+                      placeholder="https://example.com"
+                      class="form-input"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">描述</label>
+                    <textarea
+                      v-model="newBookmark.description"
+                      placeholder="添加简短描述（可选）"
+                      class="form-textarea"
+                      rows="3"
+                    ></textarea>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">分类</label>
+                      <select v-model="newBookmark.category" class="form-select">
+                        <option value="">选择分类</option>
+                        <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">
+                          {{ cat.label }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">标签</label>
+                    <div class="tags-input">
+                      <span v-for="(tag, index) in newBookmark.tags" :key="index" class="tag-item">
+                        {{ tag }}
+                        <button type="button" class="tag-remove" @click="removeTag(index)">
+                          <u-icon name="i-heroicons-x-mark" class="tag-remove-icon" />
+                        </button>
+                      </span>
+                      <input
+                        v-model="tagInput"
+                        type="text"
+                        placeholder="输入标签后按回车"
+                        class="tag-input-field"
+                        @keyup.enter="addTag"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-outline" @click="showAddBookmarkModal = false">
+                    取消
+                  </button>
+                  <button class="btn btn-primary" @click="handleAddBookmark">添加</button>
                 </div>
               </div>
-              <div class="modal-footer">
-                <button class="btn btn-outline" @click="showAddBookmarkModal = false">取消</button>
-                <button class="btn btn-primary" @click="handleAddBookmark">添加</button>
-              </div>
             </div>
-          </div>
-        </Transition>
-      </Teleport>
-      </ClientOnly>
+          </Transition>
+        </Teleport>
+      </client-only>
     </div>
-  </WorkspaceLayout>
+  </workspace-layout>
 </template>
 
 <script setup lang="ts">
 import WorkspaceLayout from '~/layouts/workspace.vue'
-import ClientOnly  from '~/components/ClientOnly.vue'
+import ClientOnly from '~/components/ClientOnly.vue'
 
 import { computed, ref, onMounted } from 'vue'
 

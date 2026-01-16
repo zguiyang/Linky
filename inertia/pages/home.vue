@@ -1,5 +1,5 @@
 <template>
-  <WorkspaceLayout>
+  <workspace-layout>
     <div class="home-page">
       <div class="container mx-auto px-12 py-16">
         <div class="text-center mb-16">
@@ -14,7 +14,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
           <Link href="/workspace/bookmarks" class="feature-card">
             <div class="card-icon">
-              <UIcon name="i-heroicons-bookmark" class="icon" />
+              <u-icon name="i-heroicons-bookmark" class="icon" />
             </div>
             <h3 class="card-title">书签管理</h3>
             <p class="card-description">高效管理您的网络书签，支持分类和标签</p>
@@ -22,7 +22,7 @@
 
           <Link href="/workspace/memos" class="feature-card">
             <div class="card-icon">
-              <UIcon name="i-heroicons-document-text" class="icon" />
+              <u-icon name="i-heroicons-document-text" class="icon" />
             </div>
             <h3 class="card-title">备忘录</h3>
             <p class="card-description">记录您的想法和灵感，随时随地访问</p>
@@ -30,7 +30,7 @@
 
           <Link href="/sign-in" class="feature-card">
             <div class="card-icon">
-              <UIcon name="i-heroicons-user" class="icon" />
+              <u-icon name="i-heroicons-user" class="icon" />
             </div>
             <h3 class="card-title">登录</h3>
             <p class="card-description">登录您的账户，同步您的数据</p>
@@ -38,7 +38,7 @@
         </div>
       </div>
     </div>
-  </WorkspaceLayout>
+  </workspace-layout>
 </template>
 
 <script setup lang="ts">
