@@ -81,10 +81,20 @@
             :class="{
               [pinnedMemoClass]: memo.pinned,
             }"
-            @click="selectMemo(memo)"
           >
-            <div v-if="memo.pinned" class="absolute top-4 right-4 text-[var(--color-warning-500)]">
+            <div v-if="memo.pinned" class="absolute top-3 left-3 text-[var(--color-warning-500)]">
               <u-icon name="i-heroicons-star" class="w-3.5 h-3.5 fill-current" />
+            </div>
+            <div class="absolute top-3 right-3 z-10">
+              <u-dropdown-menu :items="getMemoMenuItems(memo)" :content="{ align: 'end' }">
+                <u-button
+                  icon="i-heroicons-ellipsis-horizontal"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  @click.stop
+                />
+              </u-dropdown-menu>
             </div>
             <h3 class="text-[17px] font-semibold text-gray-900 dark:text-white mb-3 pr-6 truncate">
               {{ memo.title || '无标题备忘录' }}
@@ -110,13 +120,12 @@
                 formatDate(memo.updatedAt)
               }}</span>
             </div>
-            <u-button
-              icon="i-heroicons-ellipsis-horizontal"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              @click.stop="showMemoMenu(memo, $event)"
-            />
+            <div
+              class="absolute bottom-3 right-3 p-1 rounded-lg bg-gray-200/80 dark:bg-gray-700/80 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              @click.stop="openFullscreen(memo)"
+            >
+              <u-icon name="i-heroicons-arrows-pointing-out" class="w-4 h-4" />
+            </div>
           </div>
         </div>
 
@@ -128,7 +137,6 @@
             :class="{
               [pinnedMemoClass]: memo.pinned,
             }"
-            @click="selectMemo(memo)"
           >
             <div v-if="memo.pinned" class="shrink-0 w-6 text-[var(--color-warning-500)] mt-0.5">
               <u-icon name="i-heroicons-star" class="w-3.5 h-3.5 fill-current" />
@@ -154,13 +162,23 @@
                 }}</span>
               </div>
             </div>
-            <u-button
-              icon="i-heroicons-ellipsis-horizontal"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              @click.stop="showMemoMenu(memo, $event)"
-            />
+            <div class="absolute top-3 right-3 z-10">
+              <u-dropdown-menu :items="getMemoMenuItems(memo)" :content="{ align: 'end' }">
+                <u-button
+                  icon="i-heroicons-ellipsis-horizontal"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  @click.stop
+                />
+              </u-dropdown-menu>
+            </div>
+            <div
+              class="absolute bottom-2 right-2 p-1.5 rounded-md bg-gray-200/80 dark:bg-gray-700/80 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              @click.stop="openFullscreen(memo)"
+            >
+              <u-icon name="i-heroicons-arrows-pointing-out" class="w-4 h-4" />
+            </div>
           </div>
         </div>
 
@@ -311,6 +329,7 @@
 <script setup lang="ts">
 import WorkspaceLayout from '~/layouts/workspace.vue'
 import TagsInput from '~/components/TagsInput.vue'
+import type { DropdownMenuItem } from '@nuxt/ui'
 import { computed, ref } from 'vue'
 
 const searchQuery = ref('')
@@ -422,8 +441,33 @@ const selectMemo = (memo: any) => {
   showEditorModal.value = true
 }
 
-const showMemoMenu = (memo: any, _event: MouseEvent) => {
-  console.log('Mock: Show menu for memo:', memo)
+const openFullscreen = (memo: any) => {
+  selectedMemo.value = memo
+  showEditorModal.value = true
+}
+
+const getMemoMenuItems = (memo: any): DropdownMenuItem[][] => {
+  return [
+    [
+      {
+        label: '编辑',
+        icon: 'i-heroicons-pencil',
+        onSelect: () => {
+          selectedMemo.value = memo
+          showEditorModal.value = true
+        },
+      },
+      {
+        label: '删除',
+        icon: 'i-heroicons-trash',
+        color: 'error',
+        onSelect: () => {
+          selectedMemo.value = memo
+          showDeleteModal.value = true
+        },
+      },
+    ],
+  ]
 }
 
 const formatDate = (date: string) => {
