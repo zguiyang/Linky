@@ -21,6 +21,12 @@ export default defineConfig({
       components: {
         dts: 'inertia/components.d.ts',
       },
+      ui: {
+        icons: {
+          light: 'i-lucide-sun',
+          dark: 'i-lucide-moon',
+        },
+      },
     }),
     adonisjs({ entrypoints: ['inertia/app/app.ts'], reload: ['resources/views/**/*.edge'] }),
   ],
