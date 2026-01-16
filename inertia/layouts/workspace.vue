@@ -56,13 +56,14 @@
 
         <!-- 底部工具 -->
         <div class="nav-actions">
-          <button class="action-btn" @click="showGlobalSearchModal = true">
-            <u-icon name="i-heroicons-magnifying-glass" class="action-icon" />
-          </button>
-          <button class="action-btn">
-            <u-icon name="i-heroicons-cog-6-tooth" class="action-icon" />
-          </button>
-          <u-color-mode-button class="action-btn" />
+          <u-button
+            icon="i-heroicons-magnifying-glass"
+            color="neutral"
+            variant="ghost"
+            @click="showGlobalSearchModal = true"
+          />
+          <u-button icon="i-heroicons-cog-6-tooth" color="neutral" variant="ghost" />
+          <u-color-mode-button />
         </div>
       </nav>
 
@@ -73,9 +74,7 @@
           <div class="section-header">
             <h3 class="section-title">分类</h3>
             <div class="section-actions">
-              <button class="icon-btn">
-                <u-icon name="i-heroicons-plus" class="icon-btn-icon" />
-              </button>
+              <u-button icon="i-heroicons-plus" color="neutral" variant="ghost" size="xs" />
             </div>
           </div>
           <div class="category-list">
@@ -99,9 +98,7 @@
         <div class="sidebar-section">
           <div class="section-header">
             <h3 class="section-title">标签</h3>
-            <button class="icon-btn">
-              <u-icon name="i-heroicons-plus" class="icon-btn-icon" />
-            </button>
+            <u-button icon="i-heroicons-plus" color="neutral" variant="ghost" size="xs" />
           </div>
           <div class="tag-cloud">
             <span
@@ -118,10 +115,13 @@
 
         <!-- 添加按钮 -->
         <div class="sidebar-footer">
-          <button class="add-btn" @click="handleAddAction">
-            <u-icon name="i-heroicons-plus" class="add-btn-icon" />
-            <span>{{ getAddButtonText() }}</span>
-          </button>
+          <u-button
+            icon="i-heroicons-plus"
+            label="添加书签"
+            color="primary"
+            block
+            @click="handleAddAction"
+          />
         </div>
       </aside>
 
@@ -207,15 +207,6 @@ const toggleTag = (tagId: string) => {
   } else {
     selectedTags.value.push(tagId)
   }
-}
-
-const getAddButtonText = () => {
-  if (currentRoute.value === '/workspace/bookmarks') {
-    return '添加书签'
-  } else if (currentRoute.value === '/workspace/memos') {
-    return '新建备忘录'
-  }
-  return '添加'
 }
 
 const handleAddAction = () => {
@@ -380,36 +371,6 @@ defineExpose({
   padding: 0.75rem;
 }
 
-.action-btn {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 12px;
-  color: #9ca3af;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-  background: rgba(243, 244, 246, 1);
-  color: #6b7280;
-}
-
-.dark .action-btn:hover {
-  background: rgba(31, 41, 55, 1);
-  color: #9ca3af;
-}
-
-.action-icon {
-  width: 20px;
-  height: 20px;
-}
-
-/* ===== 侧边栏 ===== */
 .sidebar {
   position: relative;
   width: 280px;
@@ -471,35 +432,6 @@ defineExpose({
 .section-actions {
   display: flex;
   gap: 0.25rem;
-}
-
-.icon-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  color: #9ca3af;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.icon-btn:hover {
-  background: rgba(243, 244, 246, 1);
-  color: #6b7280;
-}
-
-.dark .icon-btn:hover {
-  background: rgba(31, 41, 55, 1);
-  color: #9ca3af;
-}
-
-.icon-btn-icon {
-  width: 16px;
-  height: 16px;
 }
 
 .category-list {
@@ -627,38 +559,6 @@ defineExpose({
 .sidebar-footer {
   margin-top: auto;
   padding: 1.5rem;
-}
-
-.add-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1rem;
-  background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
-  border: none;
-  border-radius: 12px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-
-.add-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
-}
-
-.add-btn:active {
-  transform: translateY(0);
-}
-
-.add-btn-icon {
-  width: 20px;
-  height: 20px;
 }
 
 /* ===== 主内容区 ===== */
