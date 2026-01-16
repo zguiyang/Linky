@@ -14,73 +14,53 @@
           >
         </div>
         <div class="flex items-center gap-4">
-          <div class="relative w-72">
-            <u-icon
-              name="i-heroicons-magnifying-glass"
-              class="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400"
-            />
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="搜索备忘录..."
-              class="w-full pl-11 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:bg-white dark:focus:bg-gray-800 focus:border-indigo-500 dark:focus:border-indigo-500 transition-all duration-200"
-            />
-          </div>
-          <div
-            class="flex items-center p-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl"
-          >
-            <button
-              class="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
-              :class="{ 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500': viewMode === 'grid' }"
+          <u-input
+            v-model="searchQuery"
+            icon="i-heroicons-magnifying-glass"
+            placeholder="搜索备忘录..."
+            size="md"
+          />
+          <u-button-group>
+            <u-button
+              :color="viewMode === 'grid' ? 'primary' : 'neutral'"
+              variant="ghost"
+              icon="i-heroicons-squares-2x2"
               @click="setViewMode('grid')"
-            >
-              <u-icon name="i-heroicons-squares-2x2" class="w-4.5 h-4.5" />
-            </button>
-            <button
-              class="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
-              :class="{ 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500': viewMode === 'list' }"
+            />
+            <u-button
+              :color="viewMode === 'list' ? 'primary' : 'neutral'"
+              variant="ghost"
+              icon="i-heroicons-list-bullet"
               @click="setViewMode('list')"
-            >
-              <u-icon name="i-heroicons-list-bullet" class="w-4.5 h-4.5" />
-            </button>
-          </div>
-          <select
-            v-model="sortBy"
-            class="px-4 py-2.5 pl-10 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white cursor-pointer outline-none appearance-none bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2712%27%20height%3D%2712%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27rgba%28100,100,100,0.5%29%27%20stroke-width%3D%272%27%3E%3Cpath%20d%3D%27M6%209l6%206%206-9%27/%3E%3C/svg%3E')] bg-no-repeat bg-[right_1rem_center] hover:border-gray-300 dark:hover:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-500 transition-all duration-200"
-          >
-            <option value="recent">最近更新</option>
-            <option value="oldest">最早创建</option>
-            <option value="name">标题排序</option>
-          </select>
+            />
+          </u-button-group>
+          <u-select v-model="sortBy" :items="sortOptions" placeholder="排序方式" size="md" />
         </div>
       </div>
 
       <div class="flex items-center gap-3 px-8 py-4 border-b border-gray-200 dark:border-gray-700">
-        <button
-          class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-          :class="{
-            'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400':
-              viewFilter === 'all',
-          }"
+        <u-button
+          :color="viewFilter === 'all' ? 'primary' : 'neutral'"
+          variant="soft"
+          size="sm"
           @click="viewFilter = 'all'"
         >
           全部
-        </button>
-        <button
-          class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-          :class="{
-            'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400':
-              viewFilter === 'pinned',
-          }"
+        </u-button>
+        <u-button
+          :color="viewFilter === 'pinned' ? 'primary' : 'neutral'"
+          variant="soft"
+          size="sm"
           @click="viewFilter = 'pinned'"
         >
-          <u-icon
-            name="i-heroicons-star"
-            class="w-4 h-4"
-            :class="{ 'text-amber-500 fill-current': viewFilter === 'pinned' }"
-          />
+          <template #leading>
+            <u-icon
+              name="i-heroicons-star"
+              :class="{ 'text-amber-500': viewFilter === 'pinned' }"
+            />
+          </template>
           已置顶
-        </button>
+        </u-button>
       </div>
 
       <div class="flex-1 p-8 overflow-y-auto">
@@ -123,12 +103,13 @@
               </div>
               <span class="text-xs text-gray-400">{{ formatDate(memo.updatedAt) }}</span>
             </div>
-            <button
-              class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-transparent border-none rounded-lg text-gray-400 cursor-pointer opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300"
+            <u-button
+              icon="i-heroicons-ellipsis-horizontal"
+              color="neutral"
+              variant="ghost"
+              size="sm"
               @click.stop="showMemoMenu(memo, $event)"
-            >
-              <u-icon name="i-heroicons-ellipsis-horizontal" class="w-4 h-4" />
-            </button>
+            />
           </div>
         </div>
 
@@ -165,12 +146,13 @@
                 <span class="text-xs text-gray-400">{{ formatDate(memo.updatedAt) }}</span>
               </div>
             </div>
-            <button
-              class="w-8 h-8 flex items-center justify-center bg-transparent border-none rounded-lg text-gray-400 cursor-pointer opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0"
+            <u-button
+              icon="i-heroicons-ellipsis-horizontal"
+              color="neutral"
+              variant="ghost"
+              size="sm"
               @click.stop="showMemoMenu(memo, $event)"
-            >
-              <u-icon name="i-heroicons-ellipsis-horizontal" class="w-4 h-4" />
-            </button>
+            />
           </div>
         </div>
 
@@ -202,31 +184,29 @@
             />
             {{ selectedMemo?.pinned ? '已置顶' : '未置顶' }}
           </span>
-          <div class="flex items-center gap-2 ml-auto">
-            <button
-              class="w-8 h-8 flex items-center justify-center bg-transparent border-none rounded-lg text-gray-400 cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300"
-              :class="{
-                'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500': selectedMemo?.pinned,
-              }"
-              :title="selectedMemo?.pinned ? '取消置顶' : '置顶'"
-              @click="togglePin"
-            >
-              <u-icon name="i-heroicons-star" class="w-4.5 h-4.5" />
-            </button>
-            <button
-              class="w-8 h-8 flex items-center justify-center bg-transparent border-none rounded-lg text-gray-400 cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500"
-              title="删除"
-              @click="showDeleteModal = true"
-            >
-              <u-icon name="i-heroicons-trash" class="w-4.5 h-4.5" />
-            </button>
-            <button
-              class="w-8 h-8 flex items-center justify-center bg-transparent border-none rounded-lg text-gray-400 cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300"
-              @click="showEditorModal = false"
-            >
-              <u-icon name="i-heroicons-x-mark" class="w-4 h-4" />
-            </button>
-          </div>
+          <u-button
+            :icon="selectedMemo?.pinned ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+            :color="selectedMemo?.pinned ? 'warning' : 'neutral'"
+            variant="ghost"
+            size="sm"
+            :title="selectedMemo?.pinned ? '取消置顶' : '置顶'"
+            @click="togglePin"
+          />
+          <u-button
+            icon="i-heroicons-trash"
+            color="error"
+            variant="ghost"
+            size="sm"
+            title="删除"
+            @click="showDeleteModal = true"
+          />
+          <u-button
+            icon="i-heroicons-x-mark"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            @click="showEditorModal = false"
+          />
         </template>
 
         <template #body>
@@ -266,28 +246,11 @@
           </u-form-field>
 
           <u-form-field label="分类" name="category">
-            <select
-              v-model="memoForm.category"
-              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-white cursor-pointer outline-none appearance-none"
-            >
-              <option value="">选择分类</option>
-              <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">
-                {{ cat.label }}
-              </option>
-            </select>
+            <u-select v-model="memoForm.category" :items="categoryOptions" placeholder="选择分类" />
           </u-form-field>
 
           <u-form-field label="置顶" name="pinned">
-            <label
-              class="inline-flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
-            >
-              <input
-                v-model="memoForm.pinned"
-                type="checkbox"
-                class="w-4.5 h-4.5 rounded border-gray-300 text-indigo-500 focus:ring-indigo-500 cursor-pointer"
-              />
-              <span>将备忘录添加到置顶列表</span>
-            </label>
+            <u-checkbox v-model="memoForm.pinned" label="将备忘录添加到置顶列表" />
           </u-form-field>
         </template>
 
@@ -409,6 +372,12 @@ const categoryOptions = [
   { label: '学习', value: 'study' },
   { label: '生活', value: 'life' },
   { label: '其他', value: 'other' },
+]
+
+const sortOptions = [
+  { label: '最近更新', value: 'recent' },
+  { label: '最早创建', value: 'oldest' },
+  { label: '标题排序', value: 'name' },
 ]
 
 const setViewMode = (mode: 'grid' | 'list') => {

@@ -15,44 +15,27 @@
           </span>
         </div>
         <div class="flex items-center gap-4">
-          <div class="relative w-72">
-            <u-icon
-              name="i-heroicons-magnifying-glass"
-              class="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400"
-            />
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="搜索书签..."
-              class="w-full pl-11 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:bg-white dark:focus:bg-gray-800 focus:border-indigo-500 dark:focus:border-indigo-500 transition-all duration-200"
-            />
-          </div>
-          <div
-            class="flex items-center p-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl"
-          >
-            <button
-              class="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
-              :class="{ 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500': viewMode === 'grid' }"
+          <u-input
+            v-model="searchQuery"
+            icon="i-heroicons-magnifying-glass"
+            placeholder="搜索书签..."
+            size="md"
+          />
+          <u-button-group>
+            <u-button
+              :color="viewMode === 'grid' ? 'primary' : 'neutral'"
+              variant="ghost"
+              icon="i-heroicons-squares-2x2"
               @click="setViewMode('grid')"
-            >
-              <u-icon name="i-heroicons-squares-2x2" class="w-4.5 h-4.5" />
-            </button>
-            <button
-              class="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
-              :class="{ 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500': viewMode === 'list' }"
+            />
+            <u-button
+              :color="viewMode === 'list' ? 'primary' : 'neutral'"
+              variant="ghost"
+              icon="i-heroicons-list-bullet"
               @click="setViewMode('list')"
-            >
-              <u-icon name="i-heroicons-list-bullet" class="w-4.5 h-4.5" />
-            </button>
-          </div>
-          <select
-            v-model="sortBy"
-            class="px-4 py-2.5 pl-10 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white cursor-pointer outline-none appearance-none bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2712%27%20height%3D%2712%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27rgba%28100,100,100,0.5%29%27%20stroke-width%3D%272%27%3E%3Cpath%20d%3D%27M6%209l6%206%206-9%27/%3E%3C/svg%3E')] bg-no-repeat bg-[right_1rem_center] hover:border-gray-300 dark:hover:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-500 transition-all duration-200"
-          >
-            <option value="recent">最近添加</option>
-            <option value="visits">最多访问</option>
-            <option value="name">名称排序</option>
-          </select>
+            />
+          </u-button-group>
+          <u-select v-model="sortBy" :items="sortOptions" placeholder="排序方式" size="md" />
         </div>
       </div>
 
@@ -102,12 +85,13 @@
                 >
               </div>
             </div>
-            <button
-              class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-transparent border-none rounded-lg text-gray-400 cursor-pointer opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300"
+            <u-button
+              icon="i-heroicons-ellipsis-horizontal"
+              color="neutral"
+              variant="ghost"
+              size="sm"
               @click.stop="showBookmarkMenu(bookmark, $event)"
-            >
-              <u-icon name="i-heroicons-ellipsis-horizontal" class="w-4 h-4" />
-            </button>
+            />
           </div>
         </div>
 
@@ -150,12 +134,13 @@
                 <span class="text-xs text-gray-400">{{ bookmark.visitCount }} 次访问</span>
               </div>
             </div>
-            <button
-              class="w-8 h-8 flex items-center justify-center bg-transparent border-none rounded-lg text-gray-400 cursor-pointer opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300"
+            <u-button
+              icon="i-heroicons-ellipsis-horizontal"
+              color="neutral"
+              variant="ghost"
+              size="sm"
               @click.stop="showBookmarkMenu(bookmark, $event)"
-            >
-              <u-icon name="i-heroicons-ellipsis-horizontal" class="w-4 h-4" />
-            </button>
+            />
           </div>
         </div>
 
@@ -215,20 +200,13 @@
               <div
                 class="flex flex-wrap gap-2 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg"
               >
-                <span
-                  v-for="(tag, index) in newBookmark.tags"
-                  :key="index"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg text-sm"
-                >
-                  {{ tag }}
-                  <button
-                    type="button"
-                    class="inline-flex items-center justify-center w-4 h-4 text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 cursor-pointer"
-                    @click="removeTag(index)"
-                  >
-                    <UIcon name="i-heroicons-x-mark" class="w-3.5 h-3.5" />
-                  </button>
-                </span>
+                <u-button
+                  icon="i-heroicons-x-mark"
+                  color="neutral"
+                  variant="ghost"
+                  size="xs"
+                  @click="removeTag(index)"
+                />
                 <UInput
                   v-model="tagInput"
                   type="text"
@@ -333,6 +311,12 @@ const categoryOptions = [
   { label: '学习资源', value: '学习资源' },
   { label: '效率工具', value: '效率工具' },
   { label: '其他', value: '其他' },
+]
+
+const sortOptions = [
+  { label: '最近添加', value: 'recent' },
+  { label: '最多访问', value: 'visits' },
+  { label: '名称排序', value: 'name' },
 ]
 
 const setViewMode = (mode: 'grid' | 'list') => {
