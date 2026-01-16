@@ -1,5 +1,5 @@
 <template>
-  <MarketingLayout>
+  <marketing-layout>
     <div class="min-h-screen">
       <u-page-hero
         headline="全新上线"
@@ -88,7 +88,7 @@
         </div>
       </section>
     </div>
-  </MarketingLayout>
+  </marketing-layout>
 </template>
 
 <script setup lang="ts">

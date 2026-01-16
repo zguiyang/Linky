@@ -1,38 +1,38 @@
 <template>
-  <AuthLayout>
+  <auth-layout>
     <div class="auth-container">
-      <UCard class="auth-card glass-heavy" variant="outline">
+      <u-card class="auth-card glass-heavy" variant="outline">
         <template #header>
           <h2 class="auth-title">系统注册</h2>
         </template>
-        <UForm @submit="onSubmit" class="auth-form">
-          <UFormField label="邮箱" name="email" size="lg">
-            <UInput
+        <u-form @submit="onSubmit" class="auth-form">
+          <u-form-field label="邮箱" name="email" size="lg">
+            <u-input
               v-model="state.email"
               placeholder="邮箱"
               type="email"
               class="w-full input-base"
             />
-          </UFormField>
-          <UFormField label="用户名" name="name" size="lg">
-            <UInput v-model="state.name" placeholder="用户名" class="w-full input-base" />
-          </UFormField>
-          <UFormField label="密码" name="password" size="lg">
-            <UInput
+          </u-form-field>
+          <u-form-field label="用户名" name="name" size="lg">
+            <u-input v-model="state.name" placeholder="用户名" class="w-full input-base" />
+          </u-form-field>
+          <u-form-field label="密码" name="password" size="lg">
+            <u-input
               v-model="state.password"
               placeholder="密码"
               type="password"
               class="w-full input-base"
             />
-          </UFormField>
-          <UButton type="submit" class="w-full btn btn-primary">注册</UButton>
+          </u-form-field>
+          <u-button type="submit" class="w-full btn btn-primary">注册</u-button>
           <div class="auth-footer">
             <Link href="/sign-in" class="auth-link">已有账号？去登录</Link>
           </div>
-        </UForm>
-      </UCard>
+        </u-form>
+      </u-card>
     </div>
-  </AuthLayout>
+  </auth-layout>
 </template>
 
 <script setup lang="ts">

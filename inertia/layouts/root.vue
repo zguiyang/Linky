@@ -1,13 +1,13 @@
 <template>
-  <UApp>
+  <u-app>
     <div class="root-container">
-      <AmbientBackground />
+      <ambient-background />
 
       <transition :name="transitionName" mode="out-in">
         <slot />
       </transition>
     </div>
-  </UApp>
+  </u-app>
 </template>
 
 <script setup lang="ts">

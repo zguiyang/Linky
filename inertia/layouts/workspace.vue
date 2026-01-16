@@ -1,5 +1,5 @@
 <template>
-  <RootLayout>
+  <root-layout>
     <div class="workspace-container">
       <!-- 第一栏：页面级导航 -->
       <nav class="nav-rail">
@@ -130,7 +130,7 @@
         <slot />
       </main>
     </div>
-  </RootLayout>
+  </root-layout>
 </template>
 
 <script setup lang="ts">
