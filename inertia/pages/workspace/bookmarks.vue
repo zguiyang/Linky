@@ -56,6 +56,17 @@
             class="group relative flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 before:absolute before:inset-0 before:bg-gradient-to-br before:from-[var(--color-primary-10)] before:to-[var(--color-primary-10)] before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100"
             @click="openBookmark(bookmark)"
           >
+            <div class="absolute top-3 right-3 z-10">
+              <u-dropdown-menu :items="getBookmarkMenuItems(bookmark)" :content="{ align: 'end' }">
+                <u-button
+                  icon="i-heroicons-ellipsis-horizontal"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  @click.stop
+                />
+              </u-dropdown-menu>
+            </div>
             <div
               class="relative w-14 h-14 flex items-center justify-center flex-shrink-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden"
             >
@@ -93,13 +104,6 @@
                 >
               </div>
             </div>
-            <u-button
-              icon="i-heroicons-ellipsis-horizontal"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              @click.stop="showBookmarkMenu(bookmark, $event)"
-            />
           </div>
         </div>
 
@@ -110,6 +114,17 @@
             class="group relative flex items-center gap-4 p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600"
             @click="openBookmark(bookmark)"
           >
+            <div class="absolute top-3 right-3 z-10">
+              <u-dropdown-menu :items="getBookmarkMenuItems(bookmark)" :content="{ align: 'end' }">
+                <u-button
+                  icon="i-heroicons-ellipsis-horizontal"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  @click.stop
+                />
+              </u-dropdown-menu>
+            </div>
             <div
               class="w-11 h-11 flex items-center justify-center flex-shrink-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
             >
@@ -146,13 +161,6 @@
                 >
               </div>
             </div>
-            <u-button
-              icon="i-heroicons-ellipsis-horizontal"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              @click.stop="showBookmarkMenu(bookmark, $event)"
-            />
           </div>
         </div>
 
@@ -238,6 +246,7 @@
 
 <script setup lang="ts">
 import WorkspaceLayout from '~/layouts/workspace.vue'
+import type { DropdownMenuItem } from '@nuxt/ui'
 
 import { computed, ref, onMounted } from 'vue'
 
@@ -337,8 +346,26 @@ const openBookmark = (bookmark: any) => {
   bookmark.visitCount++
 }
 
-const showBookmarkMenu = (bookmark: any, _event: MouseEvent) => {
-  console.log('Mock: Show menu for bookmark:', bookmark)
+const getBookmarkMenuItems = (bookmark: any): DropdownMenuItem[][] => {
+  return [
+    [
+      {
+        label: '编辑',
+        icon: 'i-heroicons-pencil',
+        onSelect: () => {
+          console.log('Mock: 编辑书签', bookmark)
+        },
+      },
+      {
+        label: '删除',
+        icon: 'i-heroicons-trash',
+        color: 'error',
+        onSelect: () => {
+          console.log('Mock: 删除书签', bookmark)
+        },
+      },
+    ],
+  ]
 }
 
 const getCategoryName = (categoryId: string) => {
