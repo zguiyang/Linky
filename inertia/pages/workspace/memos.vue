@@ -82,9 +82,6 @@
               [pinnedMemoClass]: memo.pinned,
             }"
           >
-            <div v-if="memo.pinned" class="absolute top-3 left-3 text-[var(--color-warning-500)]">
-              <u-icon name="i-heroicons-star" class="w-3.5 h-3.5 fill-current" />
-            </div>
             <div class="absolute top-3 right-3 z-10">
               <u-dropdown-menu :items="getMemoMenuItems(memo)" :content="{ align: 'end' }">
                 <u-button
@@ -96,9 +93,16 @@
                 />
               </u-dropdown-menu>
             </div>
-            <h3 class="text-[17px] font-semibold text-gray-900 dark:text-white mb-3 pr-6 truncate">
-              {{ memo.title || '无标题备忘录' }}
-            </h3>
+            <div class="flex items-center gap-1.5 mb-3">
+              <u-icon
+                v-if="memo.pinned"
+                name="i-heroicons-star"
+                class="w-4 h-4 text-warning-500 fill-current shrink-0 mt-0.5"
+              />
+              <h3 class="text-[17px] font-semibold text-gray-900 dark:text-white pr-6 truncate">
+                {{ memo.title || '无标题备忘录' }}
+              </h3>
+            </div>
             <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-5 line-clamp-3">
               {{ memo.content }}
             </p>
@@ -138,13 +142,17 @@
               [pinnedMemoClass]: memo.pinned,
             }"
           >
-            <div v-if="memo.pinned" class="shrink-0 w-6 text-[var(--color-warning-500)] mt-0.5">
-              <u-icon name="i-heroicons-star" class="w-3.5 h-3.5 fill-current" />
-            </div>
             <div class="flex-1 min-w-0">
-              <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-2">
-                {{ memo.title || '无标题备忘录' }}
-              </h3>
+              <div class="flex items-center gap-1.5 mb-2">
+                <u-icon
+                  v-if="memo.pinned"
+                  name="i-heroicons-star"
+                  class="w-4 h-4 text-warning-500 fill-current shrink-0 mt-0.5"
+                />
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                  {{ memo.title || '无标题备忘录' }}
+                </h3>
+              </div>
               <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-3 line-clamp-2">
                 {{ memo.content }}
               </p>
@@ -376,7 +384,7 @@ const memos = ref([
 ])
 
 const pinnedMemoClass = computed(() => {
-  return 'bg-gradient-to-br from-[var(--color-warning-50)] to-[var(--color-warning-50)] dark:from-[var(--color-warning-900)/60] dark:to-[var(--color-warning-900)/60] border-[var(--color-warning-200)] dark:border-[var(--color-warning-800)]'
+  return 'bg-warning-50 dark:bg-warning-900/40 border-warning-200 dark:border-warning-800'
 })
 
 const memoForm = ref({
