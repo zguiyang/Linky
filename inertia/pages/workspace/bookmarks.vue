@@ -171,138 +171,86 @@
         </div>
       </div>
 
-      <client-only>
-        <teleport to="body">
-          <transition name="modal">
-            <div
-              v-if="showAddBookmarkModal"
-              class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
-              @click.self="showAddBookmarkModal = false"
-            >
-              <div
-                class="w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden"
+      <u-modal v-model:open="showAddBookmarkModal" title="添加新书签">
+        <template #body>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                >标题 <span class="text-red-500">*</span></label
               >
-                <div
-                  class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700"
+              <u-input v-model="newBookmark.title" placeholder="输入书签标题" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                >URL <span class="text-red-500">*</span></label
+              >
+              <u-input v-model="newBookmark.url" type="url" placeholder="https://example.com" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                >描述</label
+              >
+              <u-textarea
+                v-model="newBookmark.description"
+                placeholder="添加简短描述（可选）"
+                :rows="3"
+              />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                  >分类</label
                 >
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">添加新书签</h3>
-                  <button
-                    class="w-8 h-8 flex items-center justify-center bg-transparent border-none rounded-lg text-gray-400 cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300"
-                    @click="showAddBookmarkModal = false"
-                  >
-                    <u-icon name="i-heroicons-x-mark" class="w-5 h-5" />
-                  </button>
-                </div>
-                <div class="p-6 space-y-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-                      >标题 <span class="text-red-500">*</span></label
-                    >
-                    <input
-                      v-model="newBookmark.title"
-                      type="text"
-                      placeholder="输入书签标题"
-                      class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-indigo-500 dark:focus:border-indigo-500 transition-all duration-200"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-                      >URL <span class="text-red-500">*</span></label
-                    >
-                    <input
-                      v-model="newBookmark.url"
-                      type="url"
-                      placeholder="https://example.com"
-                      class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-indigo-500 dark:focus:border-indigo-500 transition-all duration-200"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-                      >描述</label
-                    >
-                    <textarea
-                      v-model="newBookmark.description"
-                      placeholder="添加简短描述（可选）"
-                      class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-indigo-500 dark:focus:border-indigo-500 transition-all duration-200 resize-none"
-                      rows="3"
-                    ></textarea>
-                  </div>
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-                        >分类</label
-                      >
-                      <select
-                        v-model="newBookmark.category"
-                        class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-white cursor-pointer outline-none appearance-none"
-                      >
-                        <option value="">选择分类</option>
-                        <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">
-                          {{ cat.label }}
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-                      >标签</label
-                    >
-                    <div
-                      class="flex flex-wrap gap-2 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl"
-                    >
-                      <span
-                        v-for="(tag, index) in newBookmark.tags"
-                        :key="index"
-                        class="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg text-sm"
-                      >
-                        {{ tag }}
-                        <button
-                          type="button"
-                          class="inline-flex items-center justify-center w-4 h-4 text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300"
-                          @click="removeTag(index)"
-                        >
-                          <u-icon name="i-heroicons-x-mark" class="w-3.5 h-3.5" />
-                        </button>
-                      </span>
-                      <input
-                        v-model="tagInput"
-                        type="text"
-                        placeholder="输入标签后按回车"
-                        class="flex-1 min-w-[120px] px-2 py-1 bg-transparent border-none outline-none text-sm text-gray-900 dark:text-white placeholder-gray-400"
-                        @keyup.enter="addTag"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50"
-                >
-                  <button
-                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
-                    @click="showAddBookmarkModal = false"
-                  >
-                    取消
-                  </button>
-                  <button
-                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-500 border-none rounded-lg hover:bg-indigo-600 transition-all duration-200"
-                    @click="handleAddBookmark"
-                  >
-                    添加
-                  </button>
-                </div>
+                <u-select
+                  v-model="newBookmark.category"
+                  :items="categoryOptions"
+                  placeholder="选择分类"
+                />
               </div>
             </div>
-          </transition>
-        </teleport>
-      </client-only>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                >标签</label
+              >
+              <div
+                class="flex flex-wrap gap-2 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg"
+              >
+                <span
+                  v-for="(tag, index) in newBookmark.tags"
+                  :key="index"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg text-sm"
+                >
+                  {{ tag }}
+                  <button
+                    type="button"
+                    class="inline-flex items-center justify-center w-4 h-4 text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 cursor-pointer"
+                    @click="removeTag(index)"
+                  >
+                    <UIcon name="i-heroicons-x-mark" class="w-3.5 h-3.5" />
+                  </button>
+                </span>
+                <UInput
+                  v-model="tagInput"
+                  type="text"
+                  placeholder="输入标签后按回车"
+                  class="flex-1 min-w-[120px] bg-transparent border-none outline-none"
+                  @keyup.enter="addTag"
+                />
+              </div>
+            </div>
+          </div>
+        </template>
+        <template #footer="{ close }">
+          <u-button label="取消" color="neutral" variant="outline" @click="close" />
+          <u-button label="添加" color="primary" @click="handleAddBookmark(close)" />
+        </template>
+      </u-modal>
     </div>
   </workspace-layout>
 </template>
 
 <script setup lang="ts">
 import WorkspaceLayout from '~/layouts/workspace.vue'
-import ClientOnly from '~/components/ClientOnly.vue'
 
 import { computed, ref, onMounted } from 'vue'
 
@@ -412,7 +360,7 @@ const getCategoryName = (categoryId: string) => {
   return categoryMap[categoryId] || '未分类'
 }
 
-const handleAddBookmark = () => {
+const handleAddBookmark = (close?: () => void) => {
   console.log('Mock: 添加书签（仅演示，不实际保存）')
   if (!newBookmark.value.title || !newBookmark.value.url) {
     return
@@ -440,6 +388,8 @@ const handleAddBookmark = () => {
     category: '',
     tags: [],
   }
+
+  close?.()
 }
 
 const addTag = () => {
@@ -461,20 +411,3 @@ onMounted(() => {
   })
 })
 </script>
-
-<style scoped>
-.modal-enter-active,
-.modal-leave-active {
-  transition: all 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-from .modal-container,
-.modal-leave-to .modal-container {
-  transform: scale(0.95);
-}
-</style>
