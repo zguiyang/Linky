@@ -1,6 +1,6 @@
 <template>
   <root-layout>
-    <div class="auth-layout">
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <slot />
     </div>
   </root-layout>
@@ -9,17 +9,3 @@
 <script setup lang="ts">
 import RootLayout from '~/layouts/root.vue'
 </script>
-
-<style scoped>
-.auth-layout {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f9fafb;
-}
-
-.dark .auth-layout {
-  background-color: #111827;
-}
-</style>
