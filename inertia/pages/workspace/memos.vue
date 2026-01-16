@@ -20,26 +20,41 @@
             placeholder="搜索备忘录..."
             size="md"
           />
-          <u-field-group>
+          <div class="inline-flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
             <u-button
               :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
-              variant="ghost"
-              icon="i-heroicons-view-columns"
+              :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
+              size="sm"
               @click="setViewMode('masonry')"
-            />
+            >
+              <template #leading>
+                <u-icon name="i-heroicons-view-columns" class="w-4 h-4" />
+              </template>
+              瀑布流
+            </u-button>
             <u-button
               :color="viewMode === 'grid' ? 'primary' : 'neutral'"
-              variant="ghost"
-              icon="i-heroicons-squares-2x2"
+              :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
+              size="sm"
               @click="setViewMode('grid')"
-            />
+            >
+              <template #leading>
+                <u-icon name="i-heroicons-squares-2x2" class="w-4 h-4" />
+              </template>
+              网格
+            </u-button>
             <u-button
               :color="viewMode === 'list' ? 'primary' : 'neutral'"
-              variant="ghost"
-              icon="i-heroicons-list-bullet"
+              :variant="viewMode === 'list' ? 'solid' : 'ghost'"
+              size="sm"
               @click="setViewMode('list')"
-            />
-          </u-field-group>
+            >
+              <template #leading>
+                <u-icon name="i-heroicons-list-bullet" class="w-4 h-4" />
+              </template>
+              列表
+            </u-button>
+          </div>
           <u-select
             v-model="sortBy"
             :items="sortOptions"
