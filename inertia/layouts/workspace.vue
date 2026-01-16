@@ -1,11 +1,15 @@
 <template>
   <root-layout>
-    <div class="workspace-container">
+    <div class="flex h-screen relative overflow-hidden">
       <!-- 第一栏：页面级导航 -->
-      <nav class="nav-rail">
+      <nav
+        class="relative w-[72px] bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-6 z-10"
+      >
         <!-- Logo -->
-        <div class="nav-logo">
-          <div class="logo-icon">
+        <div class="mb-8">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-pink-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/30"
+          >
             <svg
               width="24"
               height="24"
@@ -39,23 +43,30 @@
         </div>
 
         <!-- 页面导航 -->
-        <div class="nav-items">
+        <div class="flex-1 flex flex-col gap-2 w-full px-3">
           <Link
             v-for="item in navigationItems"
             :key="item.to"
             :href="item.to"
-            class="nav-item"
-            :class="{ active: isActiveRoute(item.to) }"
+            class="relative flex items-center justify-center w-full h-12 rounded-xl text-gray-400 transition-all duration-300 ease-bezier(0.4, 0, 0.2, 1) no-underline cursor-pointer hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-400"
+            :class="{ 'bg-indigo-500/10 text-indigo-400': isActiveRoute(item.to) }"
           >
-            <div class="nav-item-inner">
-              <u-icon :name="item.icon" class="nav-icon" />
-              <span class="nav-tooltip">{{ item.label }}</span>
+            <div class="relative flex items-center justify-center">
+              <u-icon :name="item.icon" class="w-6 h-6" />
+              <span
+                class="absolute left-full ml-3 py-1.5 px-3 bg-white/95 dark:bg-gray-900/95 border border-gray-200 dark:border-gray-700 rounded-lg text-xs whitespace-nowrap opacity-0 pointer-events-none -translate-x-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0"
+                >{{ item.label }}</span
+              >
             </div>
+            <span
+              v-if="isActiveRoute(item.to)"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-gradient-to-b from-indigo-500 to-pink-500 rounded-r"
+            />
           </Link>
         </div>
 
         <!-- 底部工具 -->
-        <div class="nav-actions">
+        <div class="flex flex-col gap-2 p-3">
           <u-button
             icon="i-heroicons-magnifying-glass"
             color="neutral"
@@ -68,44 +79,63 @@
       </nav>
 
       <!-- 第二栏：侧边栏 -->
-      <aside class="sidebar">
+      <aside
+        class="relative w-[280px] bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-y-auto z-5 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent"
+      >
         <!-- 分类区域 -->
-        <div class="sidebar-section">
-          <div class="section-header">
-            <h3 class="section-title">分类</h3>
-            <div class="section-actions">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400">分类</h3>
+            <div class="flex gap-1">
               <u-button icon="i-heroicons-plus" color="neutral" variant="ghost" size="xs" />
             </div>
           </div>
-          <div class="category-list">
+          <div class="flex flex-col gap-1">
             <div
               v-for="category in categories"
               :key="category.id"
-              class="category-item"
-              :class="{ active: selectedCategory === category.id }"
+              class="flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+              :class="{ 'bg-indigo-500/10': selectedCategory === category.id }"
               @click="selectCategory(category.id)"
             >
-              <div class="category-icon" :class="category.id === 'all' ? 'icon-all' : ''">
-                <u-icon :name="category.icon" class="category-icon-inner" />
+              <div
+                class="w-8 h-8 flex items-center justify-center rounded-lg"
+                :class="
+                  category.id === 'all'
+                    ? 'bg-amber-500/10 text-amber-500'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+                "
+              >
+                <u-icon :name="category.icon" class="w-[18px] h-[18px]" />
               </div>
-              <span class="category-name">{{ category.name }}</span>
-              <span class="category-count">{{ category.count }}</span>
+              <span class="flex-1 text-sm font-medium text-gray-600 dark:text-gray-300">{{
+                category.name
+              }}</span>
+              <span
+                class="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded-full"
+                :class="{ 'bg-indigo-500/10 text-indigo-400': selectedCategory === category.id }"
+                >{{ category.count }}</span
+              >
             </div>
           </div>
         </div>
 
         <!-- 标签区域 -->
-        <div class="sidebar-section">
-          <div class="section-header">
-            <h3 class="section-title">标签</h3>
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400">标签</h3>
             <u-button icon="i-heroicons-plus" color="neutral" variant="ghost" size="xs" />
           </div>
-          <div class="tag-cloud">
+          <div class="flex flex-wrap gap-2">
             <span
               v-for="tag in popularTags"
               :key="tag.id"
-              class="tag-chip"
-              :class="{ active: selectedTags.includes(tag.id) }"
+              class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-gray-600 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+              :class="{
+                'bg-indigo-500/10 border-indigo-500/30 text-indigo-400': selectedTags.includes(
+                  tag.id
+                ),
+              }"
               @click="toggleTag(tag.id)"
             >
               {{ tag.name }}
@@ -114,7 +144,7 @@
         </div>
 
         <!-- 添加按钮 -->
-        <div class="sidebar-footer">
+        <div class="mt-auto p-6">
           <u-button
             icon="i-heroicons-plus"
             label="添加书签"
@@ -126,7 +156,9 @@
       </aside>
 
       <!-- 第三栏：主内容区域 -->
-      <main class="main-content">
+      <main
+        class="relative flex-1 overflow-y-auto z-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
+      >
         <slot />
       </main>
     </div>
@@ -141,18 +173,15 @@ import RootLayout from '~/layouts/root.vue'
 const page = usePage()
 const currentRoute = ref(page.props.url)
 
-// 模态框状态
 const showGlobalSearchModal = ref(false)
 const globalSearchQuery = ref('')
 const searchResults = ref<any[]>([])
 
-// 导航菜单项
 const navigationItems = ref([
   { label: '书签', icon: 'i-heroicons-bookmark', to: '/workspace/bookmarks' },
   { label: '备忘录', icon: 'i-heroicons-document-text', to: '/workspace/memos' },
 ])
 
-// Mock数据 - 分类
 const categories = ref([
   { id: 'all', name: '全部', icon: 'i-heroicons-folder-open', count: 5 },
   { id: 'dev', name: '开发工具', icon: 'i-heroicons-code-bracket', count: 3 },
@@ -160,7 +189,6 @@ const categories = ref([
   { id: 'learning', name: '学习资源', icon: 'i-heroicons-academic-cap', count: 1 },
 ])
 
-// Mock数据 - 标签
 const popularTags = ref([
   { id: 'javascript', name: 'JavaScript', count: 2 },
   { id: 'vue', name: 'Vue', count: 2 },
@@ -168,11 +196,9 @@ const popularTags = ref([
   { id: 'tailwind', name: 'Tailwind', count: 1 },
 ])
 
-// 状态管理
 const selectedCategory = ref('all')
 const selectedTags = ref<string[]>([])
 
-// 方法
 const handleGlobalSearch = () => {
   const query = globalSearchQuery.value.toLowerCase()
   if (!query) return
@@ -223,7 +249,6 @@ const isActiveRoute = (path: string) => {
   return currentRoute.value === path
 }
 
-// 暴露给子组件使用
 defineExpose({
   categories,
   popularTags,
@@ -233,356 +258,3 @@ defineExpose({
   toggleTag,
 })
 </script>
-
-<style scoped>
-/* ===== Workspace Layout ===== */
-.workspace-container {
-  display: flex;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-}
-
-.nav-rail {
-  position: relative;
-  width: 72px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(229, 231, 235, 1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.5rem 0;
-  z-index: 10;
-}
-
-.dark .nav-rail {
-  background: rgba(17, 24, 39, 0.7);
-  border-right-color: rgba(55, 65, 81, 1);
-}
-
-.nav-logo {
-  margin-bottom: 2rem;
-}
-
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
-}
-
-.nav-items {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0 0.75rem;
-}
-
-.nav-item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 48px;
-  border-radius: 12px;
-  color: #9ca3af;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.nav-item:hover {
-  background: rgba(243, 244, 246, 1);
-  color: #6b7280;
-}
-
-.dark .nav-item:hover {
-  background: rgba(31, 41, 55, 1);
-  color: #9ca3af;
-}
-
-.nav-item.active {
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
-}
-
-.nav-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 24px;
-  background: linear-gradient(180deg, #6366f1 0%, #ec4899 100%);
-  border-radius: 0 2px 2px 0;
-}
-
-.nav-item-inner {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.nav-icon {
-  width: 24px;
-  height: 24px;
-}
-
-.nav-tooltip {
-  position: absolute;
-  left: calc(100% + 12px);
-  padding: 0.375rem 0.75rem;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(229, 231, 235, 1);
-  border-radius: 8px;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(-8px);
-  transition: all 0.2s ease;
-}
-
-.dark .nav-tooltip {
-  background: rgba(17, 24, 39, 0.95);
-  border-color: rgba(55, 65, 81, 1);
-}
-
-.nav-item:hover .nav-tooltip {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.nav-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.75rem;
-}
-
-.sidebar {
-  position: relative;
-  width: 280px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(229, 231, 235, 1);
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  z-index: 5;
-}
-
-.dark .sidebar {
-  background: rgba(17, 24, 39, 0.7);
-  border-right-color: rgba(55, 65, 81, 1);
-}
-
-.sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-  background: rgba(229, 231, 235, 1);
-  border-radius: 3px;
-}
-
-.dark .sidebar::-webkit-scrollbar-thumb {
-  background: rgba(75, 85, 99, 1);
-}
-
-.sidebar-section {
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 1);
-}
-
-.dark .sidebar-section {
-  border-bottom-color: rgba(55, 65, 81, 1);
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.section-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #9ca3af;
-}
-
-.section-actions {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.category-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.category-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.category-item:hover {
-  background: rgba(249, 250, 251, 1);
-}
-
-.dark .category-item:hover {
-  background: rgba(31, 41, 55, 1);
-}
-
-.category-item.active {
-  background: rgba(99, 102, 241, 0.1);
-}
-
-.category-icon {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(249, 250, 251, 1);
-  border-radius: 8px;
-  color: #9ca3af;
-}
-
-.dark .category-icon {
-  background: rgba(31, 41, 55, 1);
-}
-
-.category-icon.icon-all {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
-}
-
-.category-icon-inner {
-  width: 18px;
-  height: 18px;
-}
-
-.category-name {
-  flex: 1;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #4b5563;
-}
-
-.dark .category-name {
-  color: #d1d5db;
-}
-
-.category-count {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #9ca3af;
-  background: rgba(249, 250, 251, 1);
-  padding: 0.125rem 0.5rem;
-  border-radius: 10px;
-}
-
-.dark .category-count {
-  background: rgba(31, 41, 55, 1);
-}
-
-.category-item.active .category-count {
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
-}
-
-.tag-cloud {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.tag-chip {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  background: rgba(249, 250, 251, 1);
-  border: 1px solid rgba(229, 231, 235, 1);
-  border-radius: 20px;
-  color: #4b5563;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.dark .tag-chip {
-  background: rgba(31, 41, 55, 1);
-  border-color: rgba(55, 65, 81, 1);
-  color: #d1d5db;
-}
-
-.tag-chip:hover {
-  background: rgba(243, 244, 246, 1);
-  border-color: rgba(209, 213, 219, 1);
-}
-
-.dark .tag-chip:hover {
-  background: rgba(41, 47, 61, 1);
-  border-color: rgba(75, 85, 99, 1);
-}
-
-.tag-chip.active {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.3);
-  color: #818cf8;
-}
-
-.sidebar-footer {
-  margin-top: auto;
-  padding: 1.5rem;
-}
-
-/* ===== 主内容区 ===== */
-.main-content {
-  position: relative;
-  flex: 1;
-  overflow-y: auto;
-  z-index: 1;
-}
-
-.main-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.main-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.main-content::-webkit-scrollbar-thumb {
-  background: rgba(209, 213, 219, 1);
-  border-radius: 4px;
-}
-
-.dark .main-content::-webkit-scrollbar-thumb {
-  background: rgba(75, 85, 99, 1);
-}
-</style>
