@@ -9,7 +9,7 @@
             {{ selectedCategory === 'all' ? '我的书签' : getCategoryName(selectedCategory) }}
           </h1>
           <span
-            class="px-3 py-1 text-xs font-semibold bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 rounded-full"
+            class="px-3 py-1 text-xs font-semibold bg-[var(--color-primary-50)] dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)] dark:border-[var(--color-primary-800)] text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-full"
           >
             {{ filteredBookmarks.length }} 个书签
           </span>
@@ -47,7 +47,7 @@
           <div
             v-for="bookmark in filteredBookmarks"
             :key="bookmark.id"
-            class="group relative flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 before:absolute before:inset-0 before:bg-gradient-to-br before:from-indigo-500/10 before:to-indigo-500/10 before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100"
+            class="group relative flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 before:absolute before:inset-0 before:bg-gradient-to-br before:from-[var(--color-primary-10)] before:to-[var(--color-primary-10)] before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100"
             @click="openBookmark(bookmark)"
           >
             <div
@@ -59,7 +59,7 @@
                 class="w-8 h-8 object-contain relative z-10"
               />
               <div
-                class="absolute inset-0 bg-[radial(circle,rgba(99,102,241,0.15)_0%,transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                class="absolute inset-0 bg-[radial(circle,var(--color-primary-10),rgba(0,0,0,0.7))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
               ></div>
             </div>
             <div class="flex-1 min-w-0 relative z-10">
@@ -80,7 +80,7 @@
                 <span
                   v-for="tag in bookmark.tags"
                   :key="tag"
-                  class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400 rounded-md"
+                  class="px-2 py-1 text-xs font-medium bg-[var(--color-primary-50)] dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)] dark:border-[var(--color-primary-800)] dark:opacity-50 text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-md"
                   >{{ tag }}</span
                 >
               </div>
@@ -127,7 +127,7 @@
                   <span
                     v-for="tag in bookmark.tags"
                     :key="tag"
-                    class="px-2 py-0.5 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400 rounded-sm"
+                    class="px-2 py-0.5 text-xs font-medium bg-[var(--color-primary-50)] dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)] dark:border-[var(--color-primary-800)] dark:opacity-50 text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-sm"
                     >{{ tag }}</span
                   >
                 </div>

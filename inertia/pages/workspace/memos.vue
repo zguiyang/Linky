@@ -9,7 +9,7 @@
             我的备忘录
           </h1>
           <span
-            class="px-3 py-1 text-xs font-semibold bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 rounded-full"
+            class="px-3 py-1 text-xs font-semibold bg-indigo-50 dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)] dark:border-[var(--color-primary-800)] text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-full"
             >{{ filteredMemos.length }} 个备忘录</span
           >
         </div>
@@ -73,12 +73,11 @@
             :key="memo.id"
             class="group relative p-6 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50"
             :class="{
-              'bg-gradient-to-br from-amber-50/50 to-amber-50/50 dark:from-amber-900/20 dark:to-amber-900/20 border-amber-200/50 dark:border-amber-800/50':
-                memo.pinned,
+              [pinnedMemoClass]: memo.pinned
             }"
             @click="selectMemo(memo)"
           >
-            <div v-if="memo.pinned" class="absolute top-4 right-4 text-amber-500">
+            <div v-if="memo.pinned" class="absolute top-4 right-4 text-[var(--color-warning-500)]">
               <u-icon name="i-heroicons-star" class="w-3.5 h-3.5 fill-current" />
             </div>
             <h3 class="text-[17px] font-semibold text-gray-900 dark:text-white mb-3 pr-6 truncate">
@@ -92,7 +91,7 @@
                 <span
                   v-for="tag in memo.tags.slice(0, 3)"
                   :key="tag"
-                  class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400 rounded-md"
+                  class="px-2 py-1 text-xs font-medium bg-[var(--color-primary-50)] dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)]/50 dark:border-[var(--color-primary-800)]/50 text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-md"
                   >{{ tag }}</span
                 >
                 <span
@@ -119,12 +118,11 @@
             :key="memo.id"
             class="group relative flex items-start gap-4 p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600"
             :class="{
-              'bg-gradient-to-br from-amber-50/50 to-amber-50/50 dark:from-amber-900/20 dark:to-amber-900/20 border-amber-200/50 dark:border-amber-800/50':
-                memo.pinned,
+              [pinnedMemoClass]: memo.pinned,
             }"
             @click="selectMemo(memo)"
           >
-            <div v-if="memo.pinned" class="shrink-0 w-6 text-amber-500 mt-0.5">
+            <div v-if="memo.pinned" class="shrink-0 w-6 text-[var(--color-warning-500)] mt-0.5">
               <u-icon name="i-heroicons-star" class="w-3.5 h-3.5 fill-current" />
             </div>
             <div class="flex-1 min-w-0">
@@ -139,7 +137,7 @@
                   <span
                     v-for="tag in memo.tags"
                     :key="tag"
-                    class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400 rounded-md"
+                    class="px-2 py-1 text-xs font-medium bg-[var(--color-primary-50)] dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)]/50 dark:border-[var(--color-primary-800)]/50 text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-md"
                     >{{ tag }}</span
                   >
                 </div>
@@ -326,6 +324,10 @@ const memos = ref([
     updatedAt: '2024-12-05',
   },
 ])
+
+const pinnedMemoClass = computed(() => {
+  return 'bg-gradient-to-br from-[var(--color-warning-50)] to-[var(--color-warning-50)] dark:from-[var(--color-warning-900)] dark:to-[var(--color-warning-900)] border-[var(--color-warning-200)] dark:border-[var(--color-warning-800)]'
+})
 
 const memoForm = ref({
   title: '',
