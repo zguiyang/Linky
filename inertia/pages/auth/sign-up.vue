@@ -1,35 +1,44 @@
 <template>
-  <div class="auth-page">
+  <AuthLayout>
     <div class="auth-container">
-      <UCard class="auth-card" variant="outline">
+      <UCard class="auth-card glass-heavy" variant="outline">
         <template #header>
           <h2 class="auth-title">系统注册</h2>
         </template>
-
         <UForm @submit="onSubmit" class="auth-form">
           <UFormField label="邮箱" name="email" size="lg">
-            <UInput v-model="state.email" placeholder="邮箱" type="email" class="w-full" />
+            <UInput
+              v-model="state.email"
+              placeholder="邮箱"
+              type="email"
+              class="w-full input-base"
+            />
           </UFormField>
           <UFormField label="用户名" name="name" size="lg">
-            <UInput v-model="state.name" placeholder="用户名" class="w-full" />
+            <UInput v-model="state.name" placeholder="用户名" class="w-full input-base" />
           </UFormField>
           <UFormField label="密码" name="password" size="lg">
-            <UInput v-model="state.password" placeholder="密码" type="password" class="w-full" />
+            <UInput
+              v-model="state.password"
+              placeholder="密码"
+              type="password"
+              class="w-full input-base"
+            />
           </UFormField>
-
-          <UButton type="submit" class="w-full">注册</UButton>
+          <UButton type="submit" class="w-full btn btn-primary">注册</UButton>
           <div class="auth-footer">
             <Link href="/sign-in" class="auth-link">已有账号？去登录</Link>
           </div>
         </UForm>
       </UCard>
     </div>
-  </div>
+  </AuthLayout>
 </template>
 
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3'
 import { reactive } from 'vue'
+import AuthLayout from '~/layouts/auth.vue'
 
 const state = reactive({
   email: '',
@@ -45,18 +54,6 @@ const onSubmit = () => {
 </script>
 
 <style scoped>
-.auth-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f9fafb;
-}
-
-.dark .auth-page {
-  background: #111827;
-}
-
 .auth-container {
   width: 100%;
   max-width: 400px;
@@ -65,7 +62,7 @@ const onSubmit = () => {
 
 .auth-card {
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(40px);
   border: 1px solid rgba(229, 231, 235, 1);
 }
 
@@ -75,7 +72,7 @@ const onSubmit = () => {
 }
 
 .auth-title {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   text-align: center;
   color: #111827;
@@ -97,14 +94,14 @@ const onSubmit = () => {
 }
 
 .auth-link {
-  color: #6366f1;
+  color: #818cf8;
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .auth-link:hover {
-  color: #4f46e5;
+  color: #6366f1;
   text-decoration: underline;
 }
 </style>
