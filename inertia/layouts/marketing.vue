@@ -1,9 +1,9 @@
 <template>
-  <RootLayout>
+  <root-layout>
     <div class="marketing-layout">
       <slot />
     </div>
-  </RootLayout>
+  </root-layout>
 </template>
 
 <script setup lang="ts">

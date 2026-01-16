@@ -1,5 +1,5 @@
 <template>
-  <WorkspaceLayout>
+  <workspace-layout>
     <div class="bookmarks-page">
       <!-- 顶部工具栏 -->
       <div class="toolbar">
@@ -212,7 +212,7 @@
         </Teleport>
       </client-only>
     </div>
-  </WorkspaceLayout>
+  </workspace-layout>
 </template>
 
 <script setup lang="ts">
