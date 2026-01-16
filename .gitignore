@@ -29,6 +29,6 @@ auto-imports.d.ts
 components.d.ts
 
 # ai generated files
-.opencode
+.opencode/
 openspec/
 AGENTS.md
