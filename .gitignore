@@ -31,3 +31,4 @@ components.d.ts
 # ai generated files
 .opencode
 openspec/
+AGENTS.md
