@@ -3,7 +3,7 @@
     <div class="flex h-screen relative overflow-hidden">
       <!-- 第一栏：页面级导航 -->
       <nav
-        class="relative w-[72px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-6 z-10"
+        class="relative w-[72px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-6 z-0"
       >
         <!-- Logo -->
         <div class="mb-8">
@@ -72,7 +72,7 @@
 
       <!-- 第二栏：侧边栏 -->
       <aside
-        class="relative w-[280px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-y-auto z-5 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent"
+        class="relative w-[280px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-y-auto z-0 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent"
       >
         <!-- 分类区域 -->
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -159,7 +159,7 @@
 
       <!-- 第三栏：主内容区域 -->
       <main
-        class="relative flex-1 overflow-y-auto z-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
+        class="relative flex-1 overflow-y-auto z-0 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
       >
         <slot />
       </main>
