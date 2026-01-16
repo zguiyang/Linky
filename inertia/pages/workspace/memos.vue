@@ -384,7 +384,7 @@ const memos = ref([
 ])
 
 const pinnedMemoClass = computed(() => {
-  return 'bg-warning-50 dark:bg-warning-900/40 border-warning-200 dark:border-warning-800'
+  return 'bg-warning-100 dark:bg-warning-900/40 border-warning-300 dark:border-warning-800'
 })
 
 const memoForm = ref({
