@@ -1,3 +1,25 @@
+<!-- OPENSPEC:START -->
+
+# OpenSpec 说明
+
+本文档为在此项目中工作的 AI 编码助手提供指导。
+
+当请求涉及以下情况时，必须打开 `@/openspec/AGENTS.md`：
+
+- 涉及规划或提案（如 proposal、spec、change、plan 等词汇）
+- 引入新功能、重大变更、架构调整或重大性能/安全改进
+- 表述模糊，需要在编码前获取权威规范
+
+使用 `@/openspec/AGENTS.md` 了解：
+
+- 如何创建和应用变更提案
+- 规范格式和约定
+- 项目结构和指南
+
+保留此托管块，以便 'openspec update' 可以刷新说明。
+
+<!-- OPENSPEC:END -->
+
 # AGENTS.md
 
 本文档为在此代码库中工作的 AI 编码助手提供指导。
@@ -84,20 +106,20 @@ node ace make:migration <name>     # 创建迁移
 
 ## 边界规则
 
-### ✅ Always do
+### ✅ 必须做
 
 - 优先使用 `node ace make:*` 命令创建文件，然后手动修改
 - 修改数据库结构前先创建迁移文件
 - 提交前运行 `npm run lint` 和 `npm run typecheck`
 - 所有 AdonisJS 开发遵循 adonisjs skill 指导
 
-### ⚠️ Ask first
+### ⚠️ 需要先询问
 
 - 修改认证方式或添加新的认证提供者
 - 添加新依赖或更新框架版本
 - 数据库重大结构变更（影响现有数据）
 
-### 🚫 Never do
+### 🚫 禁止做
 
 - 提交 secrets（密钥、密码等）到代码仓库
 - 修改 `node_modules/` 或 `vendor/` 目录
