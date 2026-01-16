@@ -35,7 +35,13 @@
               @click="setViewMode('list')"
             />
           </u-field-group>
-          <u-select v-model="sortBy" :items="sortOptions" placeholder="排序方式" size="md" />
+          <u-select
+            v-model="sortBy"
+            :items="sortOptions"
+            placeholder="排序方式"
+            :popper="{ strategy: 'fixed' }"
+            size="md"
+          />
         </div>
       </div>
 
@@ -198,6 +204,7 @@
                   v-model="newBookmark.category"
                   :items="categoryOptions"
                   placeholder="选择分类"
+                  :popper="{ strategy: 'fixed' }"
                 />
               </div>
             </div>

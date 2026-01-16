@@ -34,7 +34,13 @@
               @click="setViewMode('list')"
             />
           </u-field-group>
-          <u-select v-model="sortBy" :items="sortOptions" placeholder="排序方式" size="md" />
+          <u-select
+            v-model="sortBy"
+            :items="sortOptions"
+            placeholder="排序方式"
+            :popper="{ strategy: 'fixed' }"
+            size="md"
+          />
         </div>
       </div>
 
@@ -250,7 +256,12 @@
           </u-form-field>
 
           <u-form-field label="分类" name="category">
-            <u-select v-model="memoForm.category" :items="categoryOptions" placeholder="选择分类" />
+            <u-select
+              v-model="memoForm.category"
+              :items="categoryOptions"
+              placeholder="选择分类"
+              :popper="{ strategy: 'fixed' }"
+            />
           </u-form-field>
 
           <u-form-field label="置顶" name="pinned">
