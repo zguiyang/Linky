@@ -24,7 +24,7 @@
             <u-button
               :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
               variant="ghost"
-              icon="i-heroicons-square-2x2"
+              icon="i-heroicons-view-columns"
               @click="setViewMode('masonry')"
             />
             <u-button
