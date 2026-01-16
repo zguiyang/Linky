@@ -22,7 +22,11 @@
             <u-input v-model="state.password" placeholder="密码" type="password" class="w-full" />
           </u-form-field>
 
-          <u-button type="submit" block class="bg-indigo-500 hover:bg-indigo-600 text-white">
+          <u-button
+            type="submit"
+            block
+            class="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-white"
+          >
             注册
           </u-button>
         </u-form>
@@ -30,7 +34,7 @@
         <div class="text-center mt-4">
           <Link
             href="/sign-in"
-            class="text-indigo-400 font-medium transition-all duration-200 ease hover:text-indigo-500 hover:underline"
+            class="text-[var(--color-primary-400)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-500)] hover:underline"
           >
             已有账号？去登录
           </Link>

@@ -87,15 +87,15 @@
               v-for="category in categories"
               :key="category.id"
               class="flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50"
-              :class="{ 'bg-indigo-500/10': selectedCategory === category.id }"
+              :class="{ 'bg-[var(--color-primary-10)]': selectedCategory === category.id }"
               @click="selectCategory(category.id)"
             >
               <div
                 class="w-8 h-8 flex items-center justify-center rounded-lg"
                 :class="
                   category.id === 'all'
-                    ? 'bg-amber-500/10 text-amber-500'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+                    ? 'bg-[var(--color-warning-10)] text-[var(--color-warning-500)]'
+                    : 'bg-[var(--color-gray-100)] dark:bg-[var(--color-gray-800)] text-[var(--color-gray-400)]'
                 "
               >
                 <u-icon :name="category.icon" class="w-[18px] h-[18px]" />
@@ -105,7 +105,10 @@
               }}</span>
               <span
                 class="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded-full"
-                :class="{ 'bg-indigo-500/10 text-indigo-400': selectedCategory === category.id }"
+                :class="{
+                  'bg-[var(--color-primary-10)] text-[var(--color-primary-400)]':
+                    selectedCategory === category.id,
+                }"
                 >{{ category.count }}</span
               >
             </div>
@@ -124,9 +127,8 @@
               :key="tag.id"
               class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-gray-600 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
               :class="{
-                'bg-indigo-500/10 border-indigo-500/30 text-indigo-400': selectedTags.includes(
-                  tag.id
-                ),
+                'bg-[var(--color-primary-10)] border-[var(--color-primary-20)] text-[var(--color-primary-400)]':
+                  selectedTags.includes(tag.id),
               }"
               @click="toggleTag(tag.id)"
             >

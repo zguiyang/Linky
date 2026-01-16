@@ -11,7 +11,7 @@
         ]"
         :ui="{ container: 'flex flex-col lg:grid py-32 sm:py-40 lg:py-48 gap-16 sm:gap-y-24' }"
       />
-      
+
       <u-page-section
         id="features"
         headline="功能特性"
@@ -46,7 +46,7 @@
         ]"
         :ui="{ container: 'flex flex-col lg:grid py-20 sm:py-24 lg:py-32 gap-8 sm:gap-16' }"
       />
-      
+
       <section class="cta-section">
         <div class="container">
           <div class="cta-card">
@@ -112,15 +112,14 @@ import MarketingLayout from '~/layouts/marketing.vue'
   padding: 48px;
   position: relative;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--color-glass-bg);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(229, 231, 235, 1);
   border-radius: 24px;
 }
 
 .dark .cta-card {
-  background: rgba(17, 24, 39, 0.7);
-  border-color: rgba(55, 65, 81, 1);
+  background: var(--dark-color-glass-bg);
 }
 
 .cta-content {
@@ -137,24 +136,24 @@ import MarketingLayout from '~/layouts/marketing.vue'
   font-size: 3rem;
   font-weight: 700;
   font-family: 'Outfit', sans-serif;
-  color: #111827;
+  color: var(--color-gray-900);
   line-height: 1.2;
   margin-bottom: 16px;
 }
 
 .dark .cta-title {
-  color: #f9fafb;
+  color: var(--color-gray-50);
 }
 
 .cta-description {
   font-size: 1.125rem;
-  color: #64748b;
+  color: var(--color-gray-500);
   line-height: 1.7;
   margin-bottom: 28px;
 }
 
 .dark .cta-description {
-  color: #9ca3af;
+  color: var(--color-gray-400);
 }
 
 .cta-buttons {

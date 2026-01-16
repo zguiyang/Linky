@@ -73,6 +73,12 @@
   --color-amber-800: #92400e;
   --color-amber-900: #78350f;
   --color-amber-950: #451a03;
+
+  /* Transparency Variants for Common Use Cases */
+  --color-primary-10: rgba(99, 102, 241, 0.1);
+  --color-primary-20: rgba(99, 102, 241, 0.2);
+  --color-warning-10: rgba(245, 158, 11, 0.1);
+  --color-warning-20: rgba(245, 158, 11, 0.2);
 }
 
 /* Global Styles */
