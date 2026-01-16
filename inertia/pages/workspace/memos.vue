@@ -178,45 +178,53 @@
         </div>
       </div>
 
+      <!-- TODO: Fix UModal accessibility warnings (DialogTitle/DialogDescription) -->
       <u-modal v-model:open="showEditorModal" title="编辑备忘录">
-        <template #header>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ selectedMemo?.title || '无标题备忘录' }}
-          </h3>
-          <span
-            class="ml-4 px-3 py-1 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 rounded-full"
-            :class="{ 'opacity-50': !selectedMemo?.pinned }"
-          >
-            <u-icon
-              v-if="selectedMemo?.pinned"
-              name="i-heroicons-star"
-              class="w-3.5 h-3.5 mr-1 inline fill-current"
+        <template #title>
+          <span class="sr-only">编辑备忘录</span>
+        </template>
+        <template #header="{ close }">
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
+              {{ selectedMemo?.title || '无标题备忘录' }}
+            </h3>
+            <span
+              class="shrink-0 px-3 py-1 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 rounded-full"
+              :class="{ 'opacity-50': !selectedMemo?.pinned }"
+            >
+              <u-icon
+                v-if="selectedMemo?.pinned"
+                name="i-heroicons-star"
+                class="w-3.5 h-3.5 mr-1 inline fill-current"
+              />
+              {{ selectedMemo?.pinned ? '已置顶' : '未置顶' }}
+            </span>
+          </div>
+          <div class="flex items-center gap-1">
+            <u-button
+              :icon="selectedMemo?.pinned ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+              :color="selectedMemo?.pinned ? 'warning' : 'neutral'"
+              variant="ghost"
+              size="sm"
+              :title="selectedMemo?.pinned ? '取消置顶' : '置顶'"
+              @click="togglePin"
             />
-            {{ selectedMemo?.pinned ? '已置顶' : '未置顶' }}
-          </span>
-          <u-button
-            :icon="selectedMemo?.pinned ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-            :color="selectedMemo?.pinned ? 'warning' : 'neutral'"
-            variant="ghost"
-            size="sm"
-            :title="selectedMemo?.pinned ? '取消置顶' : '置顶'"
-            @click="togglePin"
-          />
-          <u-button
-            icon="i-heroicons-trash"
-            color="error"
-            variant="ghost"
-            size="sm"
-            title="删除"
-            @click="showDeleteModal = true"
-          />
-          <u-button
-            icon="i-heroicons-x-mark"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            @click="showEditorModal = false"
-          />
+            <u-button
+              icon="i-heroicons-trash"
+              color="error"
+              variant="ghost"
+              size="sm"
+              title="删除"
+              @click="showDeleteModal = true"
+            />
+            <u-button
+              icon="i-heroicons-x-mark"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              @click="close"
+            />
+          </div>
         </template>
 
         <template #body>
@@ -242,7 +250,10 @@
       </u-modal>
 
       <u-modal v-model:open="showAddMemoModal" title="新建备忘录">
-        <template #body>
+        <template #title>
+          <span class="sr-only">新建备忘录</span>
+        </template>
+        <template #body="{ close }">
           <u-form-field label="标题" name="title">
             <u-input v-model="memoForm.title" placeholder="输入备忘录标题（可选）" />
           </u-form-field>
@@ -276,7 +287,10 @@
       </u-modal>
 
       <u-modal v-model:open="showDeleteModal" title="删除备忘录">
-        <template #body>
+        <template #title>
+          <span class="sr-only">删除备忘录</span>
+        </template>
+        <template #body="{ close }">
           <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed text-center">
             您确定要删除备忘录 "<strong class="text-gray-900 dark:text-white">{{
               selectedMemo?.title || '无标题备忘录'
