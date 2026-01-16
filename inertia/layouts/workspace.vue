@@ -43,26 +43,18 @@
         </div>
 
         <!-- 页面导航 -->
-        <div class="flex-1 flex flex-col gap-2 w-full px-3">
-          <Link
-            v-for="item in navigationItems"
-            :key="item.to"
-            :href="item.to"
-            class="relative flex items-center justify-center w-full h-12 rounded-xl text-gray-400 transition-all duration-300 ease-bezier(0.4, 0, 0.2, 1) no-underline cursor-pointer hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-400"
-            :class="{ 'bg-indigo-500/10 text-indigo-400': isActiveRoute(item.to) }"
-          >
-            <div class="relative flex items-center justify-center">
-              <u-icon :name="item.icon" class="w-6 h-6" />
-              <span
-                class="absolute left-full ml-3 py-1.5 px-3 bg-white/95 dark:bg-gray-900/95 border border-gray-200 dark:border-gray-700 rounded-lg text-xs whitespace-nowrap opacity-0 pointer-events-none -translate-x-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0"
-                >{{ item.label }}</span
-              >
-            </div>
-            <span
-              v-if="isActiveRoute(item.to)"
-              class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-gradient-to-b from-indigo-500 to-pink-500 rounded-r"
-            />
-          </Link>
+        <div class="flex-1 w-full">
+          <u-navigation-menu
+            :items="navigationItems"
+            orientation="vertical"
+            collapsed
+            :tooltip="{ content: { side: 'right' } }"
+            :popover="false"
+            :ui="{
+              link: 'w-full h-12 rounded-xl flex items-center justify-center data-[state=active]:bg-primary/10',
+              linkLeadingIcon: 'w-6 h-6 data-[state=active]:text-primary',
+            }"
+          />
         </div>
 
         <!-- 底部工具 -->
@@ -166,9 +158,10 @@
 </template>
 
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3'
+import { usePage } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import RootLayout from '~/layouts/root.vue'
+import type { NavigationMenuItem } from '@nuxt/ui'
 
 const page = usePage()
 const currentRoute = ref(page.props.url)
@@ -177,7 +170,7 @@ const showGlobalSearchModal = ref(false)
 const globalSearchQuery = ref('')
 const searchResults = ref<any[]>([])
 
-const navigationItems = ref([
+const navigationItems = ref<NavigationMenuItem[]>([
   { label: '书签', icon: 'i-heroicons-bookmark', to: '/workspace/bookmarks' },
   { label: '备忘录', icon: 'i-heroicons-document-text', to: '/workspace/memos' },
 ])
@@ -243,10 +236,6 @@ const handleAddAction = () => {
     const event = new CustomEvent('add-memo')
     window.dispatchEvent(event)
   }
-}
-
-const isActiveRoute = (path: string) => {
-  return currentRoute.value === path
 }
 
 defineExpose({
