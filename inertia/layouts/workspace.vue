@@ -55,7 +55,7 @@
           :class="{ active: isActiveRoute(item.to) }"
         >
           <div class="nav-item-inner">
-            <UIcon :name="item.icon" class="nav-icon" />
+            <u-icon :name="item.icon" class="nav-icon" />
             <span class="nav-tooltip">{{ item.label }}</span>
           </div>
         </Link>
@@ -64,12 +64,12 @@
       <!-- 底部工具 -->
       <div class="nav-actions">
         <button class="action-btn" @click="showGlobalSearchModal = true">
-          <UIcon name="i-heroicons-magnifying-glass" class="action-icon" />
+          <u-icon name="i-heroicons-magnifying-glass" class="action-icon" />
         </button>
         <button class="action-btn">
-          <UIcon name="i-heroicons-cog-6-tooth" class="action-icon" />
+          <u-icon name="i-heroicons-cog-6-tooth" class="action-icon" />
         </button>
-        <UColorModeButton class="action-btn" />
+        <u-color-mode-button class="action-btn" />
       </div>
     </nav>
 
@@ -81,7 +81,7 @@
           <h3 class="section-title">分类</h3>
           <div class="section-actions">
             <button class="icon-btn">
-              <UIcon name="i-heroicons-plus" class="icon-btn-icon" />
+              <u-icon name="i-heroicons-plus" class="icon-btn-icon" />
             </button>
           </div>
         </div>
@@ -94,7 +94,7 @@
             @click="selectCategory(category.id)"
           >
             <div class="category-icon" :class="category.id === 'all' ? 'icon-all' : ''">
-              <UIcon :name="category.icon" class="category-icon-inner" />
+              <u-icon :name="category.icon" class="category-icon-inner" />
             </div>
             <span class="category-name">{{ category.name }}</span>
             <span class="category-count">{{ category.count }}</span>
@@ -107,7 +107,7 @@
         <div class="section-header">
           <h3 class="section-title">标签</h3>
           <button class="icon-btn">
-            <UIcon name="i-heroicons-plus" class="icon-btn-icon" />
+            <u-icon name="i-heroicons-plus" class="icon-btn-icon" />
           </button>
         </div>
         <div class="tag-cloud">
@@ -126,7 +126,7 @@
       <!-- 添加按钮 -->
       <div class="sidebar-footer">
         <button class="add-btn" @click="handleAddAction">
-          <UIcon name="i-heroicons-plus" class="add-btn-icon" />
+          <u-icon name="i-heroicons-plus" class="add-btn-icon" />
           <span>{{ getAddButtonText() }}</span>
         </button>
       </div>
@@ -139,8 +139,8 @@
 
     <!-- 全局搜索模态框 -->
     <ClientOnly>
-      <Teleport to="body">
-        <Transition name="modal">
+      <teleport to="body">
+        <transition name="modal">
           <div
             v-if="showGlobalSearchModal"
             class="modal-overlay"
@@ -149,16 +149,16 @@
             <div class="modal-container search-modal">
               <div class="modal-header">
                 <div class="modal-title-group">
-                  <UIcon name="i-heroicons-magnifying-glass" class="modal-title-icon" />
+                  <u-icon name="i-heroicons-magnifying-glass" class="modal-title-icon" />
                   <h3>全局搜索</h3>
                 </div>
                 <button class="close-btn" @click="showGlobalSearchModal = false">
-                  <UIcon name="i-heroicons-x-mark" class="close-btn-icon" />
+                  <u-icon name="i-heroicons-x-mark" class="close-btn-icon" />
                 </button>
               </div>
               <div class="modal-body">
                 <div class="search-input-wrapper">
-                  <UIcon name="i-heroicons-magnifying-glass" class="search-icon" />
+                  <u-icon name="i-heroicons-magnifying-glass" class="search-icon" />
                   <input
                     v-model="globalSearchQuery"
                     type="text"
@@ -175,7 +175,7 @@
                     @click="showGlobalSearchModal = false"
                   >
                     <div class="result-icon">
-                      <UIcon :name="result.icon" class="result-icon-inner" />
+                      <u-icon :name="result.icon" class="result-icon-inner" />
                     </div>
                     <div class="result-content">
                       <p class="result-title">{{ result.title }}</p>
