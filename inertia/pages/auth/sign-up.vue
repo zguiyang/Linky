@@ -34,7 +34,7 @@
         <div class="text-center mt-4">
           <Link
             href="/sign-in"
-            class="text-[var(--color-primary-400)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-500)] hover:underline"
+            class="text-[var(--color-primary-500)] dark:text-[var(--color-primary-300)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-primary-200)] hover:underline"
           >
             已有账号？去登录
           </Link>

@@ -2,14 +2,14 @@
   <workspace-layout>
     <div class="h-full flex flex-col">
       <div
-        class="sticky top-0 z-10 flex items-center justify-between px-8 py-6 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700"
+        class="sticky top-0 z-10 flex items-center justify-between px-8 py-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700"
       >
         <div class="flex items-center gap-4">
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
             {{ selectedCategory === 'all' ? '我的书签' : getCategoryName(selectedCategory) }}
           </h1>
           <span
-            class="px-3 py-1 text-xs font-semibold bg-[var(--color-primary-50)] dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)] dark:border-[var(--color-primary-800)] text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-full"
+            class="px-3 py-1 text-xs font-semibold bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-full"
           >
             {{ filteredBookmarks.length }} 个书签
           </span>
@@ -71,16 +71,18 @@
               </p>
               <div class="flex items-center gap-3 mb-3">
                 <span
-                  class="px-2.5 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300"
+                  class="px-2.5 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded-md text-gray-700 dark:text-gray-200"
                   >{{ bookmark.category }}</span
                 >
-                <span class="text-xs text-gray-400">{{ bookmark.visitCount }} 次访问</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400"
+                  >{{ bookmark.visitCount }} 次访问</span
+                >
               </div>
               <div class="flex flex-wrap gap-1.5">
                 <span
                   v-for="tag in bookmark.tags"
                   :key="tag"
-                  class="px-2 py-1 text-xs font-medium bg-[var(--color-primary-50)] dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)] dark:border-[var(--color-primary-800)] dark:opacity-50 text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-md"
+                  class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-md"
                   >{{ tag }}</span
                 >
               </div>
@@ -117,21 +119,25 @@
                   {{ bookmark.title }}
                 </h3>
                 <span
-                  class="px-2.5 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded-md text-gray-600 dark:text-gray-300"
+                  class="px-2.5 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded-md text-gray-700 dark:text-gray-200"
                   >{{ bookmark.category }}</span
                 >
               </div>
-              <p class="text-xs text-gray-400 mb-2 truncate">{{ bookmark.url }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 truncate">
+                {{ bookmark.url }}
+              </p>
               <div class="flex items-center justify-between">
                 <div class="flex flex-wrap gap-1.5">
                   <span
                     v-for="tag in bookmark.tags"
                     :key="tag"
-                    class="px-2 py-0.5 text-xs font-medium bg-[var(--color-primary-50)] dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)] dark:border-[var(--color-primary-800)] dark:opacity-50 text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-sm"
+                    class="px-2 py-0.5 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-sm"
                     >{{ tag }}</span
                   >
                 </div>
-                <span class="text-xs text-gray-400">{{ bookmark.visitCount }} 次访问</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400"
+                  >{{ bookmark.visitCount }} 次访问</span
+                >
               </div>
             </div>
             <u-button
@@ -148,11 +154,13 @@
           v-if="filteredBookmarks.length === 0"
           class="flex flex-col items-center justify-center py-16 text-center"
         >
-          <div class="w-20 h-20 flex items-center justify-center mb-6 text-gray-400">
+          <div
+            class="w-20 h-20 flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500"
+          >
             <u-icon name="i-heroicons-bookmark" class="w-16 h-16" />
           </div>
           <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">暂无书签</p>
-          <p class="text-sm text-gray-400">开始添加您的第一个书签吧</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">开始添加您的第一个书签吧</p>
         </div>
       </div>
 

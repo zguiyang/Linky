@@ -147,13 +147,13 @@ import MarketingLayout from '~/layouts/marketing.vue'
 
 .cta-description {
   font-size: 1.125rem;
-  color: var(--color-gray-500);
+  color: var(--color-gray-600);
   line-height: 1.7;
   margin-bottom: 28px;
 }
 
 .dark .cta-description {
-  color: var(--color-gray-400);
+  color: var(--color-gray-300);
 }
 
 .cta-buttons {

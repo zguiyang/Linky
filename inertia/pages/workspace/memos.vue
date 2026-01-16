@@ -2,14 +2,14 @@
   <workspace-layout>
     <div class="h-full flex flex-col">
       <div
-        class="sticky top-0 z-10 flex items-center justify-between px-8 py-6 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700"
+        class="sticky top-0 z-10 flex items-center justify-between px-8 py-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700"
       >
         <div class="flex items-center gap-4">
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
             我的备忘录
           </h1>
           <span
-            class="px-3 py-1 text-xs font-semibold bg-indigo-50 dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)] dark:border-[var(--color-primary-800)] text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-full"
+            class="px-3 py-1 text-xs font-semibold bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-full"
             >{{ filteredMemos.length }} 个备忘录</span
           >
         </div>
@@ -73,7 +73,7 @@
             :key="memo.id"
             class="group relative p-6 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50"
             :class="{
-              [pinnedMemoClass]: memo.pinned
+              [pinnedMemoClass]: memo.pinned,
             }"
             @click="selectMemo(memo)"
           >
@@ -83,7 +83,7 @@
             <h3 class="text-[17px] font-semibold text-gray-900 dark:text-white mb-3 pr-6 truncate">
               {{ memo.title || '无标题备忘录' }}
             </h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-5 line-clamp-3">
+            <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-5 line-clamp-3">
               {{ memo.content }}
             </p>
             <div class="flex items-center justify-between mt-auto">
@@ -91,16 +91,18 @@
                 <span
                   v-for="tag in memo.tags.slice(0, 3)"
                   :key="tag"
-                  class="px-2 py-1 text-xs font-medium bg-[var(--color-primary-50)] dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)]/50 dark:border-[var(--color-primary-800)]/50 text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-md"
+                  class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-md"
                   >{{ tag }}</span
                 >
                 <span
                   v-if="memo.tags.length > 3"
-                  class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 rounded-md"
+                  class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md"
                   >+{{ memo.tags.length - 3 }}</span
                 >
               </div>
-              <span class="text-xs text-gray-400">{{ formatDate(memo.updatedAt) }}</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                formatDate(memo.updatedAt)
+              }}</span>
             </div>
             <u-button
               icon="i-heroicons-ellipsis-horizontal"
@@ -129,7 +131,7 @@
               <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-2">
                 {{ memo.title || '无标题备忘录' }}
               </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-3 line-clamp-2">
+              <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-3 line-clamp-2">
                 {{ memo.content }}
               </p>
               <div class="flex items-center justify-between">
@@ -137,11 +139,13 @@
                   <span
                     v-for="tag in memo.tags"
                     :key="tag"
-                    class="px-2 py-1 text-xs font-medium bg-[var(--color-primary-50)] dark:bg-[var(--color-primary-900)] dark:opacity-30 border border-[var(--color-primary-200)]/50 dark:border-[var(--color-primary-800)]/50 text-[var(--color-primary-600)] dark:text-[var(--color-primary-400)] rounded-md"
+                    class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-md"
                     >{{ tag }}</span
                   >
                 </div>
-                <span class="text-xs text-gray-400">{{ formatDate(memo.updatedAt) }}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                  formatDate(memo.updatedAt)
+                }}</span>
               </div>
             </div>
             <u-button
@@ -158,11 +162,13 @@
           v-if="filteredMemos.length === 0"
           class="flex flex-col items-center justify-center py-16 text-center"
         >
-          <div class="w-20 h-20 flex items-center justify-center mb-6 text-gray-400">
+          <div
+            class="w-20 h-20 flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500"
+          >
             <u-icon name="i-heroicons-document-text" class="w-16 h-16" />
           </div>
           <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">暂无备忘录</p>
-          <p class="text-sm text-gray-400">开始创建您的第一个备忘录吧</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">开始创建您的第一个备忘录吧</p>
         </div>
       </div>
 
@@ -326,7 +332,7 @@ const memos = ref([
 ])
 
 const pinnedMemoClass = computed(() => {
-  return 'bg-gradient-to-br from-[var(--color-warning-50)] to-[var(--color-warning-50)] dark:from-[var(--color-warning-900)] dark:to-[var(--color-warning-900)] border-[var(--color-warning-200)] dark:border-[var(--color-warning-800)]'
+  return 'bg-gradient-to-br from-[var(--color-warning-50)] to-[var(--color-warning-50)] dark:from-[var(--color-warning-900)/60] dark:to-[var(--color-warning-900)/60] border-[var(--color-warning-200)] dark:border-[var(--color-warning-800)]'
 })
 
 const memoForm = ref({

@@ -3,7 +3,7 @@
     <div class="flex h-screen relative overflow-hidden">
       <!-- 第一栏：页面级导航 -->
       <nav
-        class="relative w-[72px] bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-6 z-10"
+        class="relative w-[72px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-6 z-10"
       >
         <!-- Logo -->
         <div class="mb-8">
@@ -72,12 +72,16 @@
 
       <!-- 第二栏：侧边栏 -->
       <aside
-        class="relative w-[280px] bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-y-auto z-5 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent"
+        class="relative w-[280px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-y-auto z-5 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent"
       >
         <!-- 分类区域 -->
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400">分类</h3>
+            <h3
+              class="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400"
+            >
+              分类
+            </h3>
             <div class="flex gap-1">
               <u-button icon="i-heroicons-plus" color="neutral" variant="ghost" size="xs" />
             </div>
@@ -86,7 +90,7 @@
             <div
               v-for="category in categories"
               :key="category.id"
-              class="flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+              class="flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800/50"
               :class="{ 'bg-[var(--color-primary-10)]': selectedCategory === category.id }"
               @click="selectCategory(category.id)"
             >
@@ -95,16 +99,16 @@
                 :class="
                   category.id === 'all'
                     ? 'bg-[var(--color-warning-10)] text-[var(--color-warning-500)]'
-                    : 'bg-[var(--color-gray-100)] dark:bg-[var(--color-gray-800)] text-[var(--color-gray-400)]'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                 "
               >
                 <u-icon :name="category.icon" class="w-[18px] h-[18px]" />
               </div>
-              <span class="flex-1 text-sm font-medium text-gray-600 dark:text-gray-300">{{
+              <span class="flex-1 text-sm font-medium text-gray-700 dark:text-gray-200">{{
                 category.name
               }}</span>
               <span
-                class="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded-full"
+                class="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded-full"
                 :class="{
                   'bg-[var(--color-primary-10)] text-[var(--color-primary-400)]':
                     selectedCategory === category.id,
@@ -118,16 +122,20 @@
         <!-- 标签区域 -->
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400">标签</h3>
+            <h3
+              class="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400"
+            >
+              标签
+            </h3>
             <u-button icon="i-heroicons-plus" color="neutral" variant="ghost" size="xs" />
           </div>
           <div class="flex flex-wrap gap-2">
             <span
               v-for="tag in popularTags"
               :key="tag.id"
-              class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-gray-600 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+              class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-200 cursor-pointer transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
               :class="{
-                'bg-[var(--color-primary-10)] border-[var(--color-primary-20)] text-[var(--color-primary-400)]':
+                'bg-indigo-50 dark:bg-indigo-900/50 border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300':
                   selectedTags.includes(tag.id),
               }"
               @click="toggleTag(tag.id)"
