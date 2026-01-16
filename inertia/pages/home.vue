@@ -1,13 +1,6 @@
 <template>
-  <div class="min-h-screen">
-    <div class="ambient-background">
-      <div class="gradient-orb orb-1"></div>
-      <div class="gradient-orb orb-2"></div>
-      <div class="gradient-orb orb-3"></div>
-      <div class="noise-overlay"></div>
-    </div>
-
-    <div class="relative z-10">
+  <MarketingLayout>
+    <div class="min-h-screen">
       <u-page-hero
         headline="全新上线"
         title="Linky"
@@ -95,126 +88,14 @@
         </div>
       </section>
     </div>
-  </div>
+  </MarketingLayout>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import MarketingLayout from '~/layouts/marketing.vue'
+</script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap');
-
-:root {
-  --primary-color: #2563eb;
-  --secondary-color: #3b82f6;
-  --cta-color: #f97316;
-  --bg-color: #f8fafc;
-  --text-color: #1e293b;
-  --border-color: #e2e8f0;
-}
-
-body {
-  font-family: 'Work Sans', sans-serif;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: 'Outfit', sans-serif;
-}
-
-.ambient-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.gradient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.3;
-  animation: float 20s ease-in-out infinite;
-}
-
-.orb-1 {
-  width: 600px;
-  height: 600px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  top: -200px;
-  left: -200px;
-  animation-delay: 0s;
-}
-
-.orb-2 {
-  width: 500px;
-  height: 500px;
-  background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
-  bottom: -150px;
-  right: -100px;
-  animation-delay: -7s;
-}
-
-.orb-3 {
-  width: 400px;
-  height: 400px;
-  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation-delay: -14s;
-}
-
-.noise-overlay {
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.02;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  25% {
-    transform: translate(30px, -30px) scale(1.05);
-  }
-  50% {
-    transform: translate(-20px, 20px) scale(0.95);
-  }
-  75% {
-    transform: translate(20px, 30px) scale(1.02);
-  }
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.dark .glass-card {
-  background: rgba(17, 24, 39, 0.7);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.glass-card:hover {
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
-}
-
 .cta-section {
   padding: 60px 20px;
   position: relative;
@@ -247,6 +128,15 @@ h6 {
   padding: 48px;
   position: relative;
   overflow: hidden;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(229, 231, 235, 1);
+  border-radius: 24px;
+}
+
+.dark .cta-card {
+  background: rgba(17, 24, 39, 0.7);
+  border-color: rgba(55, 65, 81, 1);
 }
 
 @media (max-width: 1024px) {
@@ -277,7 +167,7 @@ h6 {
   font-size: 3rem;
   font-weight: 700;
   font-family: 'Outfit', sans-serif;
-  color: var(--text-color);
+  color: #111827;
   line-height: 1.2;
   margin-bottom: 16px;
 }
@@ -320,13 +210,13 @@ h6 {
 .visual-circle {
   position: absolute;
   border-radius: 50%;
-  animation: pulse 4s ease-in-out infinite;
+  animation: pulse-slow 4s ease-in-out infinite;
 }
 
 .circle-1 {
   width: 200px;
   height: 200px;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
   opacity: 0.2;
   animation-delay: 0s;
 }
@@ -345,17 +235,5 @@ h6 {
   background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
   opacity: 0.4;
   animation-delay: 2s;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.2;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.3;
-  }
 }
 </style>

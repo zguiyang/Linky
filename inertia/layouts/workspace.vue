@@ -1,205 +1,145 @@
 <template>
-  <div class="workspace-container">
-    <!-- 动态背景层 -->
-    <div class="ambient-background">
-      <div class="gradient-orb orb-1"></div>
-      <div class="gradient-orb orb-2"></div>
-      <div class="gradient-orb orb-3"></div>
-      <div class="noise-overlay"></div>
-    </div>
-
-    <!-- 第一栏：页面级导航 -->
-    <nav class="nav-rail">
-      <!-- Logo -->
-      <div class="nav-logo">
-        <div class="logo-icon">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 2L2 7L12 12L22 7L12 2Z"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M2 17L12 22L22 17"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M2 12L12 17L22 12"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </div>
-      </div>
-
-      <!-- 页面导航 -->
-      <div class="nav-items">
-        <Link
-          v-for="item in navigationItems"
-          :key="item.to"
-          :href="item.to"
-          class="nav-item"
-          :class="{ active: isActiveRoute(item.to) }"
-        >
-          <div class="nav-item-inner">
-            <u-icon :name="item.icon" class="nav-icon" />
-            <span class="nav-tooltip">{{ item.label }}</span>
+  <RootLayout>
+    <div class="workspace-container">
+      <!-- 第一栏：页面级导航 -->
+      <nav class="nav-rail">
+        <!-- Logo -->
+        <div class="nav-logo">
+          <div class="logo-icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2L2 7L12 12L22 7L12 2Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M2 17L12 22L22 17"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M2 12L12 17L22 12"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </div>
-        </Link>
-      </div>
+        </div>
 
-      <!-- 底部工具 -->
-      <div class="nav-actions">
-        <button class="action-btn" @click="showGlobalSearchModal = true">
-          <u-icon name="i-heroicons-magnifying-glass" class="action-icon" />
-        </button>
-        <button class="action-btn">
-          <u-icon name="i-heroicons-cog-6-tooth" class="action-icon" />
-        </button>
-        <u-color-mode-button class="action-btn" />
-      </div>
-    </nav>
+        <!-- 页面导航 -->
+        <div class="nav-items">
+          <Link
+            v-for="item in navigationItems"
+            :key="item.to"
+            :href="item.to"
+            class="nav-item"
+            :class="{ active: isActiveRoute(item.to) }"
+          >
+            <div class="nav-item-inner">
+              <u-icon :name="item.icon" class="nav-icon" />
+              <span class="nav-tooltip">{{ item.label }}</span>
+            </div>
+          </Link>
+        </div>
 
-    <!-- 第二栏：侧边栏 -->
-    <aside class="sidebar">
-      <!-- 分类区域 -->
-      <div class="sidebar-section">
-        <div class="section-header">
-          <h3 class="section-title">分类</h3>
-          <div class="section-actions">
+        <!-- 底部工具 -->
+        <div class="nav-actions">
+          <button class="action-btn" @click="showGlobalSearchModal = true">
+            <u-icon name="i-heroicons-magnifying-glass" class="action-icon" />
+          </button>
+          <button class="action-btn">
+            <u-icon name="i-heroicons-cog-6-tooth" class="action-icon" />
+          </button>
+          <u-color-mode-button class="action-btn" />
+        </div>
+      </nav>
+
+      <!-- 第二栏：侧边栏 -->
+      <aside class="sidebar">
+        <!-- 分类区域 -->
+        <div class="sidebar-section">
+          <div class="section-header">
+            <h3 class="section-title">分类</h3>
+            <div class="section-actions">
+              <button class="icon-btn">
+                <u-icon name="i-heroicons-plus" class="icon-btn-icon" />
+              </button>
+            </div>
+          </div>
+          <div class="category-list">
+            <div
+              v-for="category in categories"
+              :key="category.id"
+              class="category-item"
+              :class="{ active: selectedCategory === category.id }"
+              @click="selectCategory(category.id)"
+            >
+              <div class="category-icon" :class="category.id === 'all' ? 'icon-all' : ''">
+                <u-icon :name="category.icon" class="category-icon-inner" />
+              </div>
+              <span class="category-name">{{ category.name }}</span>
+              <span class="category-count">{{ category.count }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 标签区域 -->
+        <div class="sidebar-section">
+          <div class="section-header">
+            <h3 class="section-title">标签</h3>
             <button class="icon-btn">
               <u-icon name="i-heroicons-plus" class="icon-btn-icon" />
             </button>
           </div>
-        </div>
-        <div class="category-list">
-          <div
-            v-for="category in categories"
-            :key="category.id"
-            class="category-item"
-            :class="{ active: selectedCategory === category.id }"
-            @click="selectCategory(category.id)"
-          >
-            <div class="category-icon" :class="category.id === 'all' ? 'icon-all' : ''">
-              <u-icon :name="category.icon" class="category-icon-inner" />
-            </div>
-            <span class="category-name">{{ category.name }}</span>
-            <span class="category-count">{{ category.count }}</span>
+          <div class="tag-cloud">
+            <span
+              v-for="tag in popularTags"
+              :key="tag.id"
+              class="tag-chip"
+              :class="{ active: selectedTags.includes(tag.id) }"
+              @click="toggleTag(tag.id)"
+            >
+              {{ tag.name }}
+            </span>
           </div>
         </div>
-      </div>
 
-      <!-- 标签区域 -->
-      <div class="sidebar-section">
-        <div class="section-header">
-          <h3 class="section-title">标签</h3>
-          <button class="icon-btn">
-            <u-icon name="i-heroicons-plus" class="icon-btn-icon" />
+        <!-- 添加按钮 -->
+        <div class="sidebar-footer">
+          <button class="add-btn" @click="handleAddAction">
+            <u-icon name="i-heroicons-plus" class="add-btn-icon" />
+            <span>{{ getAddButtonText() }}</span>
           </button>
         </div>
-        <div class="tag-cloud">
-          <span
-            v-for="tag in popularTags"
-            :key="tag.id"
-            class="tag-chip"
-            :class="{ active: selectedTags.includes(tag.id) }"
-            @click="toggleTag(tag.id)"
-          >
-            {{ tag.name }}
-          </span>
-        </div>
-      </div>
+      </aside>
 
-      <!-- 添加按钮 -->
-      <div class="sidebar-footer">
-        <button class="add-btn" @click="handleAddAction">
-          <u-icon name="i-heroicons-plus" class="add-btn-icon" />
-          <span>{{ getAddButtonText() }}</span>
-        </button>
-      </div>
-    </aside>
-
-    <!-- 第三栏：主内容区域 -->
-    <main class="main-content">
-      <slot />
-    </main>
-
-    <!-- 全局搜索模态框 -->
-    <ClientOnly>
-      <teleport to="body">
-        <transition name="modal">
-          <div
-            v-if="showGlobalSearchModal"
-            class="modal-overlay"
-            @click.self="showGlobalSearchModal = false"
-          >
-            <div class="modal-container search-modal">
-              <div class="modal-header">
-                <div class="modal-title-group">
-                  <u-icon name="i-heroicons-magnifying-glass" class="modal-title-icon" />
-                  <h3>全局搜索</h3>
-                </div>
-                <button class="close-btn" @click="showGlobalSearchModal = false">
-                  <u-icon name="i-heroicons-x-mark" class="close-btn-icon" />
-                </button>
-              </div>
-              <div class="modal-body">
-                <div class="search-input-wrapper">
-                  <u-icon name="i-heroicons-magnifying-glass" class="search-icon" />
-                  <input
-                    v-model="globalSearchQuery"
-                    type="text"
-                    placeholder="搜索书签、标签、分类..."
-                    class="search-input"
-                    @keyup.enter="handleGlobalSearch"
-                  />
-                </div>
-                <div v-if="searchResults.length > 0" class="search-results">
-                  <div
-                    v-for="result in searchResults"
-                    :key="result.type + result.id"
-                    class="search-result-item"
-                    @click="showGlobalSearchModal = false"
-                  >
-                    <div class="result-icon">
-                      <u-icon :name="result.icon" class="result-icon-inner" />
-                    </div>
-                    <div class="result-content">
-                      <p class="result-title">{{ result.title }}</p>
-                      <p class="result-description">{{ result.description }}</p>
-                    </div>
-                    <span class="result-type">{{ result.type }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Transition>
-      </Teleport>
-    </ClientOnly>
-  </div>
+      <!-- 第三栏：主内容区域 -->
+      <main class="main-content">
+        <slot />
+      </main>
+    </div>
+  </RootLayout>
 </template>
 
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
-import ClientOnly from '~/components/ClientOnly.vue'
+import { ref } from 'vue'
+import RootLayout from '~/layouts/root.vue'
 
 const page = usePage()
-const currentRoute = computed(() => page.props.url)
+const currentRoute = ref(page.props.url)
 
 // 模态框状态
 const showGlobalSearchModal = ref(false)
@@ -304,93 +244,14 @@ defineExpose({
 </script>
 
 <style scoped>
-/* ===== 全局布局 ===== */
+/* ===== Workspace Layout ===== */
 .workspace-container {
   display: flex;
   height: 100vh;
-  background: #f9fafb;
   position: relative;
   overflow: hidden;
-  font-family:
-    'SF Pro Display',
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
 }
 
-.dark .workspace-container {
-  background: #111827;
-}
-
-/* ===== 动态背景 ===== */
-.ambient-background {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.gradient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.4;
-  animation: float 20s ease-in-out infinite;
-}
-
-.orb-1 {
-  width: 600px;
-  height: 600px;
-  background: #6366f1;
-  top: -200px;
-  left: -200px;
-  animation-delay: 0s;
-}
-
-.orb-2 {
-  width: 500px;
-  height: 500px;
-  background: #ec4899;
-  bottom: -150px;
-  right: -100px;
-  animation-delay: -7s;
-}
-
-.orb-3 {
-  width: 400px;
-  height: 400px;
-  background: #8b5cf6;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation-delay: -14s;
-}
-
-.noise-overlay {
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.03;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  25% {
-    transform: translate(30px, -30px) scale(1.05);
-  }
-  50% {
-    transform: translate(-20px, 20px) scale(0.95);
-  }
-  75% {
-    transform: translate(20px, 30px) scale(1.02);
-  }
-}
-
-/* ===== 导航栏 ===== */
 .nav-rail {
   position: relative;
   width: 72px;
@@ -823,251 +684,5 @@ defineExpose({
 
 .dark .main-content::-webkit-scrollbar-thumb {
   background: rgba(75, 85, 99, 1);
-}
-
-/* ===== 模态框 ===== */
-.modal-container {
-  width: 100%;
-  max-width: 600px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(229, 231, 235, 1);
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-}
-
-.dark .modal-container {
-  background: rgba(17, 24, 39, 0.95);
-  border-color: rgba(55, 65, 81, 1);
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 1);
-}
-
-.dark .modal-header {
-  border-bottom-color: rgba(55, 65, 81, 1);
-}
-
-.modal-title-group {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.modal-title-group svg {
-  color: #9ca3af;
-}
-
-.modal-title-group h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-.dark .modal-title-group h3 {
-  color: #f9fafb;
-}
-
-.modal-title-icon {
-  width: 24px;
-  height: 24px;
-  color: #9ca3af;
-}
-
-.close-btn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  color: #9ca3af;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.close-btn:hover {
-  background: rgba(243, 244, 246, 1);
-  color: #6b7280;
-}
-
-.dark .close-btn:hover {
-  background: rgba(31, 41, 55, 1);
-  color: #9ca3af;
-}
-
-.close-btn-icon {
-  width: 20px;
-  height: 20px;
-}
-
-.modal-body {
-  padding: 1.5rem;
-}
-
-.search-input-wrapper {
-  position: relative;
-  margin-bottom: 1.5rem;
-}
-
-.search-icon {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.875rem 1rem 0.875rem 3rem;
-  background: rgba(249, 250, 251, 1);
-  border: 1px solid rgba(229, 231, 235, 1);
-  border-radius: 12px;
-  font-size: 0.9375rem;
-  color: #111827;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.dark .search-input {
-  background: rgba(31, 41, 55, 1);
-  border-color: rgba(55, 65, 81, 1);
-  color: #f9fafb;
-}
-
-.search-input::placeholder {
-  color: #9ca3af;
-}
-
-.search-input:focus {
-  background: rgba(255, 255, 255, 0.8);
-  border-color: #6366f1;
-}
-
-.dark .search-input:focus {
-  background: rgba(55, 65, 81, 1);
-  border-color: #6366f1;
-}
-
-.search-results {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.search-result-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(249, 250, 251, 1);
-  border: 1px solid rgba(229, 231, 235, 1);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.dark .search-result-item {
-  background: rgba(31, 41, 55, 1);
-  border-color: rgba(55, 65, 81, 1);
-}
-
-.search-result-item:hover {
-  background: rgba(243, 244, 246, 1);
-  border-color: rgba(209, 213, 219, 1);
-}
-
-.dark .search-result-item:hover {
-  background: rgba(41, 47, 61, 1);
-  border-color: rgba(75, 85, 99, 1);
-}
-
-.result-icon {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(99, 102, 241, 0.1);
-  border-radius: 10px;
-  color: #818cf8;
-}
-
-.result-icon-inner {
-  width: 20px;
-  height: 20px;
-}
-
-.result-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.result-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 0.25rem;
-}
-
-.dark .result-title {
-  color: #f9fafb;
-}
-
-.result-description {
-  font-size: 0.75rem;
-  color: #6b7280;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dark .result-description {
-  color: #9ca3af;
-}
-
-.result-type {
-  padding: 0.25rem 0.625rem;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  background: rgba(249, 250, 251, 1);
-  border-radius: 6px;
-  color: #9ca3af;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.dark .result-type {
-  background: rgba(31, 41, 55, 1);
-}
-
-/* ===== 模态框过渡动画 ===== */
-.modal-enter-active,
-.modal-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-active .modal-container,
-.modal-leave-active .modal-container {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.modal-enter-from .modal-container,
-.modal-leave-to .modal-container {
-  transform: scale(0.95) translateY(20px);
-  opacity: 0;
 }
 </style>
