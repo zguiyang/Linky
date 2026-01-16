@@ -22,6 +22,12 @@
           />
           <u-field-group>
             <u-button
+              :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
+              variant="ghost"
+              icon="i-heroicons-square-2x2"
+              @click="setViewMode('masonry')"
+            />
+            <u-button
               :color="viewMode === 'grid' ? 'primary' : 'neutral'"
               variant="ghost"
               icon="i-heroicons-squares-2x2"
@@ -71,7 +77,70 @@
 
       <div class="flex-1 p-8 overflow-y-auto">
         <div
-          v-if="viewMode === 'grid'"
+          v-if="viewMode === 'masonry'"
+          class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+        >
+          <div
+            v-for="memo in filteredMemos"
+            :key="memo.id"
+            class="group relative p-6 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 break-inside-avoid"
+            :class="{
+              [pinnedMemoClass]: memo.pinned,
+            }"
+          >
+            <div class="absolute top-3 right-3 z-10">
+              <u-dropdown-menu :items="getMemoMenuItems(memo)" :content="{ align: 'end' }">
+                <u-button
+                  icon="i-heroicons-ellipsis-horizontal"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  @click.stop
+                />
+              </u-dropdown-menu>
+            </div>
+            <div class="flex items-center gap-1.5 mb-3">
+              <u-icon
+                v-if="memo.pinned"
+                name="i-heroicons-star"
+                class="w-4 h-4 text-warning-500 fill-current shrink-0 mt-0.5"
+              />
+              <h3 class="text-[17px] font-semibold text-gray-900 dark:text-white pr-6 truncate">
+                {{ memo.title || '无标题备忘录' }}
+              </h3>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-5 line-clamp-3">
+              {{ memo.content }}
+            </p>
+            <div class="flex flex-wrap gap-1.5 mb-3">
+              <span
+                v-for="tag in memo.tags.slice(0, 3)"
+                :key="tag"
+                class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-md"
+                >{{ tag }}</span
+              >
+              <span
+                v-if="memo.tags.length > 3"
+                class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md"
+                >+{{ memo.tags.length - 3 }}</span
+              >
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                formatDate(memo.updatedAt)
+              }}</span>
+            </div>
+            <div
+              class="absolute bottom-3 right-3 p-1 rounded-lg bg-gray-200/80 dark:bg-gray-700/80 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              @click.stop="openFullscreen(memo)"
+            >
+              <u-icon name="i-heroicons-arrows-pointing-out" class="w-4 h-4" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          v-else-if="viewMode === 'grid'"
           class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
         >
           <div
@@ -341,7 +410,7 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 import { computed, ref } from 'vue'
 
 const searchQuery = ref('')
-const viewMode = ref<'grid' | 'list'>('grid')
+const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
 const viewFilter = ref<'all' | 'pinned'>('all')
 const selectedMemo = ref<any>(null)
 const showAddMemoModal = ref(false)
@@ -440,7 +509,7 @@ const sortOptions = [
   { label: '标题排序', value: 'name' },
 ]
 
-const setViewMode = (mode: 'grid' | 'list') => {
+const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
   viewMode.value = mode
 }
 
