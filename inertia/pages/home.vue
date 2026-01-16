@@ -11,7 +11,7 @@
         ]"
         :ui="{ container: 'flex flex-col lg:grid py-32 sm:py-40 lg:py-48 gap-16 sm:gap-y-24' }"
       />
-
+      
       <u-page-section
         id="features"
         headline="功能特性"
@@ -43,18 +43,13 @@
             description: '灵活的标签分类，让信息组织更加高效和个性化',
             icon: 'i-heroicons-tag',
           },
-          {
-            title: '响应式设计',
-            description: '适配各种设备，在手机、平板和桌面端都有流畅体验',
-            icon: 'i-heroicons-device-phone-mobile',
-          },
         ]"
         :ui="{ container: 'flex flex-col lg:grid py-20 sm:py-24 lg:py-32 gap-8 sm:gap-16' }"
       />
-
+      
       <section class="cta-section">
         <div class="container">
-          <div class="glass-card cta-card">
+          <div class="cta-card">
             <div class="cta-content">
               <u-badge label="Free" size="lg" color="primary" variant="soft" class="cta-badge" />
               <h2 class="cta-title">准备好开始整理您的知识了吗？</h2>
@@ -79,11 +74,6 @@
                 </u-button>
               </div>
             </div>
-            <div class="cta-visual">
-              <div class="visual-circle circle-1"></div>
-              <div class="visual-circle circle-2"></div>
-              <div class="visual-circle circle-3"></div>
-            </div>
           </div>
         </div>
       </section>
@@ -105,12 +95,6 @@ import MarketingLayout from '~/layouts/marketing.vue'
 @media (min-width: 640px) {
   .cta-section {
     padding: 100px 20px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .cta-section {
-    padding: 120px 20px;
   }
 }
 
@@ -139,20 +123,6 @@ import MarketingLayout from '~/layouts/marketing.vue'
   border-color: rgba(55, 65, 81, 1);
 }
 
-@media (max-width: 1024px) {
-  .cta-card {
-    grid-template-columns: 1fr;
-    gap: 32px;
-    padding: 32px;
-  }
-}
-
-@media (max-width: 640px) {
-  .cta-card {
-    padding: 24px;
-  }
-}
-
 .cta-content {
   position: relative;
   z-index: 1;
@@ -176,12 +146,6 @@ import MarketingLayout from '~/layouts/marketing.vue'
   color: #f9fafb;
 }
 
-@media (max-width: 640px) {
-  .cta-title {
-    font-size: 2rem;
-  }
-}
-
 .cta-description {
   font-size: 1.125rem;
   color: #64748b;
@@ -190,50 +154,12 @@ import MarketingLayout from '~/layouts/marketing.vue'
 }
 
 .dark .cta-description {
-  color: #94a3b8;
+  color: #9ca3af;
 }
 
 .cta-buttons {
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
-}
-
-.cta-visual {
-  position: relative;
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.visual-circle {
-  position: absolute;
-  border-radius: 50%;
-  animation: pulse-slow 4s ease-in-out infinite;
-}
-
-.circle-1 {
-  width: 200px;
-  height: 200px;
-  background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
-  opacity: 0.2;
-  animation-delay: 0s;
-}
-
-.circle-2 {
-  width: 150px;
-  height: 150px;
-  background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
-  opacity: 0.3;
-  animation-delay: 1s;
-}
-
-.circle-3 {
-  width: 100px;
-  height: 100px;
-  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
-  opacity: 0.4;
-  animation-delay: 2s;
 }
 </style>

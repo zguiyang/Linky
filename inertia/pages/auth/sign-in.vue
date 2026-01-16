@@ -1,32 +1,41 @@
 <template>
   <auth-layout>
-    <div class="auth-container">
-      <u-card class="auth-card glass-heavy" variant="outline">
+    <div class="w-full max-w-[400px] p-4">
+      <u-card
+        class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-[40px] border border-gray-200 dark:border-gray-700"
+        variant="outline"
+      >
         <template #header>
-          <h2 class="auth-title">系统登录</h2>
+          <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">系统登录</h2>
         </template>
-        <u-form @submit="onSubmit" class="auth-form">
+
+        <u-form @submit="onSubmit" class="flex flex-col gap-4">
           <u-form-field label="Email" name="email" size="lg">
-            <u-input
-              v-model="state.email"
-              placeholder="Email"
-              type="email"
-              class="w-full input-base"
-            />
+            <u-input v-model="state.email" placeholder="Email" type="email" class="w-full" />
           </u-form-field>
+
           <u-form-field label="Password" name="password" size="lg">
             <u-input
               v-model="state.password"
               placeholder="Password"
               type="password"
-              class="w-full input-base"
+              class="w-full"
             />
           </u-form-field>
-          <u-button type="submit" class="w-full btn btn-primary">登录</u-button>
-          <div class="auth-footer">
-            <Link href="/sign-up" class="auth-link">注册新账号</Link>
-          </div>
+
+          <u-button type="submit" block class="bg-indigo-500 hover:bg-indigo-600 text-white">
+            登录
+          </u-button>
         </u-form>
+
+        <div class="text-center mt-4">
+          <Link
+            href="/sign-up"
+            class="text-indigo-400 font-medium transition-all duration-200 ease hover:text-indigo-500 hover:underline"
+          >
+            注册新账号
+          </Link>
+        </div>
       </u-card>
     </div>
   </auth-layout>
@@ -48,56 +57,3 @@ const onSubmit = () => {
   window.location.href = '/'
 }
 </script>
-
-<style scoped>
-.auth-container {
-  width: 100%;
-  max-width: 400px;
-  padding: 1rem;
-}
-
-.auth-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(40px);
-  border: 1px solid rgba(229, 231, 235, 1);
-}
-
-.dark .auth-card {
-  background: rgba(17, 24, 39, 0.95);
-  border-color: rgba(55, 65, 81, 1);
-}
-
-.auth-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-align: center;
-  color: #111827;
-}
-
-.dark .auth-title {
-  color: #f9fafb;
-}
-
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.auth-footer {
-  text-align: center;
-  margin-top: 1rem;
-}
-
-.auth-link {
-  color: #818cf8;
-  text-decoration: none;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.auth-link:hover {
-  color: #6366f1;
-  text-decoration: underline;
-}
-</style>
