@@ -69,7 +69,7 @@
         <button class="action-btn">
           <UIcon name="i-heroicons-cog-6-tooth" class="action-icon" />
         </button>
-        <ColorModeButton class="action-btn" />
+        <UColorModeButton class="action-btn" />
       </div>
     </nav>
 
@@ -137,7 +137,7 @@
       <slot />
     </main>
 
-     <!-- 全局搜索模态框 -->
+    <!-- 全局搜索模态框 -->
     <ClientOnly>
       <Teleport to="body">
         <Transition name="modal">
@@ -146,58 +146,56 @@
             class="modal-overlay"
             @click.self="showGlobalSearchModal = false"
           >
-          <div class="modal-container search-modal">
-            <div class="modal-header">
-              <div class="modal-title-group">
-                <UIcon name="i-heroicons-magnifying-glass" class="modal-title-icon" />
-                <h3>全局搜索</h3>
+            <div class="modal-container search-modal">
+              <div class="modal-header">
+                <div class="modal-title-group">
+                  <UIcon name="i-heroicons-magnifying-glass" class="modal-title-icon" />
+                  <h3>全局搜索</h3>
+                </div>
+                <button class="close-btn" @click="showGlobalSearchModal = false">
+                  <UIcon name="i-heroicons-x-mark" class="close-btn-icon" />
+                </button>
               </div>
-              <button class="close-btn" @click="showGlobalSearchModal = false">
-                <UIcon name="i-heroicons-x-mark" class="close-btn-icon" />
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="search-input-wrapper">
-                <UIcon name="i-heroicons-magnifying-glass" class="search-icon" />
-                <input
-                  v-model="globalSearchQuery"
-                  type="text"
-                  placeholder="搜索书签、标签、分类..."
-                  class="search-input"
-                  @keyup.enter="handleGlobalSearch"
-                />
-              </div>
-              <div v-if="searchResults.length > 0" class="search-results">
-                <div
-                  v-for="result in searchResults"
-                  :key="result.type + result.id"
-                  class="search-result-item"
-                  @click="showGlobalSearchModal = false"
-                >
-                  <div class="result-icon">
-                    <UIcon :name="result.icon" class="result-icon-inner" />
+              <div class="modal-body">
+                <div class="search-input-wrapper">
+                  <UIcon name="i-heroicons-magnifying-glass" class="search-icon" />
+                  <input
+                    v-model="globalSearchQuery"
+                    type="text"
+                    placeholder="搜索书签、标签、分类..."
+                    class="search-input"
+                    @keyup.enter="handleGlobalSearch"
+                  />
+                </div>
+                <div v-if="searchResults.length > 0" class="search-results">
+                  <div
+                    v-for="result in searchResults"
+                    :key="result.type + result.id"
+                    class="search-result-item"
+                    @click="showGlobalSearchModal = false"
+                  >
+                    <div class="result-icon">
+                      <UIcon :name="result.icon" class="result-icon-inner" />
+                    </div>
+                    <div class="result-content">
+                      <p class="result-title">{{ result.title }}</p>
+                      <p class="result-description">{{ result.description }}</p>
+                    </div>
+                    <span class="result-type">{{ result.type }}</span>
                   </div>
-                  <div class="result-content">
-                    <p class="result-title">{{ result.title }}</p>
-                    <p class="result-description">{{ result.description }}</p>
-                  </div>
-                  <span class="result-type">{{ result.type }}</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </Transition>
-    </Teleport>
+        </Transition>
+      </Teleport>
     </ClientOnly>
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
-import ColorModeButton from '~/components/ColorModeButton.vue'
 import ClientOnly from '~/components/ClientOnly.vue'
 
 const page = usePage()
