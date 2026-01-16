@@ -27,3 +27,7 @@ yarn-error.log
 # auto type declarations
 auto-imports.d.ts
 components.d.ts
+
+# ai generated files
+.opencode
+openspec/
