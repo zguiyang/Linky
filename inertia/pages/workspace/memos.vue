@@ -20,7 +20,7 @@
             placeholder="搜索备忘录..."
             size="md"
           />
-          <u-button-group>
+          <u-field-group>
             <u-button
               :color="viewMode === 'grid' ? 'primary' : 'neutral'"
               variant="ghost"
@@ -33,7 +33,7 @@
               icon="i-heroicons-list-bullet"
               @click="setViewMode('list')"
             />
-          </u-button-group>
+          </u-field-group>
           <u-select v-model="sortBy" :items="sortOptions" placeholder="排序方式" size="md" />
         </div>
       </div>

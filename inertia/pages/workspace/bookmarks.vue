@@ -21,7 +21,7 @@
             placeholder="搜索书签..."
             size="md"
           />
-          <u-button-group>
+          <u-field-group>
             <u-button
               :color="viewMode === 'grid' ? 'primary' : 'neutral'"
               variant="ghost"
@@ -34,7 +34,7 @@
               icon="i-heroicons-list-bullet"
               @click="setViewMode('list')"
             />
-          </u-button-group>
+          </u-field-group>
           <u-select v-model="sortBy" :items="sortOptions" placeholder="排序方式" size="md" />
         </div>
       </div>
@@ -200,13 +200,7 @@
               <div
                 class="flex flex-wrap gap-2 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg"
               >
-                <u-button
-                  icon="i-heroicons-x-mark"
-                  color="neutral"
-                  variant="ghost"
-                  size="xs"
-                  @click="removeTag(index)"
-                />
+                <u-button icon="i-heroicons-x-mark" color="neutral" variant="ghost" size="xs" />
                 <UInput
                   v-model="tagInput"
                   type="text"
@@ -383,8 +377,8 @@ const addTag = () => {
   }
 }
 
-const removeTag = (index: number) => {
-  newBookmark.value.tags.splice(index, 1)
+const removeTag = (index: number | string) => {
+  newBookmark.value.tags.splice(Number(index), 1)
 }
 
 const selectedCategory = ref('all')
