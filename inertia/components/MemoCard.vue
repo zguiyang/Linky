@@ -185,7 +185,5 @@ const handleClick = () => {
   emit('view', props.memo)
 }
 
-const openFullscreen = (memo: Memo) => {
-  emit('openFullscreen', memo)
-}
+const openFullscreen = (memo: Memo) => {}
 </script>
