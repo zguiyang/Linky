@@ -184,28 +184,39 @@
               <u-input v-model="selectedMemo.title" placeholder="备忘录标题..." />
             </div>
             <div class="flex gap-4">
+        <template #body>
+          <div v-if="selectedMemo" class="space-y-4">
+            <div class="shrink-0">
+              <u-input v-model="selectedMemo.title" placeholder="备忘录标题..." />
+            </div>
+            <div class="flex gap-4">
               <tags-input v-model="selectedMemo.tags" />
             </div>
-            <div class="flex-1 flex flex-col gap-2">
-              <UEditor
-                v-model="selectedMemo.content"
-                content-type="markdown"
-                :editable="true"
-                class="min-h-48"
+            <div class="flex-1 flex flex-col">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                内容
+              </label>
+              <div
+                class="flex flex-col rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500 transition-all duration-200"
               >
-                <template #default="{ editor }">
-                  <UEditorToolbar :editor="editor" :items="toolbarItems" layout="fixed" />
-                </template>
-              </UEditor>
+                <UEditor
+                  v-model="selectedMemo.content"
+                  content-type="markdown"
+                  :editable="true"
+                  class="min-h-[250px] max-h-[400px]"
+                >
+                  <template #default="{ editor }">
+                    <div
+                      class="flex items-center gap-1 px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 shrink-0 sticky top-0"
+                    >
+                      <UEditorToolbar :editor="editor" :items="toolbarItems" layout="fixed" />
+                    </div>
+                  </template>
+                </UEditor>
+              </div>
             </div>
           </div>
         </template>
-
-        <template #footer="{}">
-          <u-button color="primary" variant="solid" @click="saveMemo">保存</u-button>
-        </template>
-      </u-modal>
-
       <u-modal v-model:open="showAddMemoModal" title="新建备忘录">
         <template #title>
           <span class="sr-only">新建备忘录</span>
@@ -270,7 +281,7 @@ import WorkspaceLayout from '~/layouts/workspace.vue'
 import TagsInput from '~/components/TagsInput.vue'
 import MemoCard from '~/components/MemoCard.vue'
 import { computed, ref } from 'vue'
-import type { EditorToolbarItem } from '@nuxt/ui'
+import type { EditorToolbarItem } from '@nuxt.ui'
 
 const searchQuery = ref('')
 const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
