@@ -88,8 +88,8 @@
             :key="memo.id"
             :memo="memo"
             view-mode="masonry"
-            @select="selectMemo"
-            @open-fullscreen="openFullscreen"
+            @view="viewMemo"
+            @edit="editMemo"
           />
         </div>
 
@@ -102,8 +102,8 @@
             :key="memo.id"
             :memo="memo"
             view-mode="grid"
-            @select="selectMemo"
-            @open-fullscreen="openFullscreen"
+            @view="viewMemo"
+            @edit="editMemo"
           />
         </div>
 
@@ -114,8 +114,8 @@
             :memo="memo"
             view-mode="list"
             class="w-full"
-            @select="handleListSelect"
-            @open-fullscreen="openFullscreen"
+            @view="viewMemo"
+            @edit="editMemo"
           />
         </div>
 
@@ -132,6 +132,81 @@
           <p class="text-sm text-gray-500 dark:text-gray-400">开始创建您的第一个备忘录吧</p>
         </div>
       </div>
+
+      <u-modal v-model:open="showViewModal" title="备忘录详情">
+        <template #title>
+          <span class="sr-only">备忘录详情</span>
+        </template>
+        <template #header="{ close }">
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
+              {{ viewedMemo?.title || '无标题备忘录' }}
+            </h3>
+            <span
+              class="shrink-0 px-3 py-1 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 rounded-full"
+              :class="{ 'opacity-50': !viewedMemo?.pinned }"
+            >
+              <u-icon
+                v-if="viewedMemo?.pinned"
+                name="i-heroicons-star-solid"
+                class="w-3.5 h-3.5 mr-1 inline fill-current"
+              />
+              {{ viewedMemo?.pinned ? '已置顶' : '未置顶' }}
+            </span>
+          </div>
+          <div class="flex items-center gap-1">
+            <u-button
+              icon="i-heroicons-pencil"
+              color="primary"
+              variant="solid"
+              size="sm"
+              @click="switchToEdit"
+            >
+              编辑
+            </u-button>
+            <u-button
+              icon="i-heroicons-x-mark"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              @click="close"
+            />
+          </div>
+        </template>
+
+        <template #body>
+          <div v-if="viewedMemo" class="space-y-4">
+            <div class="prose prose-sm dark:prose-invert max-w-none">
+              <p class="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                {{ viewedMemo.content }}
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <u-badge
+                v-for="tag in viewedMemo.tags"
+                :key="tag"
+                color="primary"
+                variant="outline"
+                size="md"
+              >
+                {{ tag }}
+              </u-badge>
+              <span
+                v-if="!viewedMemo.tags || viewedMemo.tags.length === 0"
+                class="text-sm text-gray-400"
+              >
+                暂无标签
+              </span>
+            </div>
+            <div class="pt-3 border-t border-gray-100 dark:border-gray-700">
+              <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                <span> 创建于: {{ formatDateTime(viewedMemo.createdAt) }} </span>
+                <span> 更新于: {{ formatDateTime(viewedMemo.updatedAt) }} </span>
+              </div>
+            </div>
+          </div>
+        </template>
+      </u-modal>
 
       <!-- TODO: Fix UModal accessibility warnings (DialogTitle/DialogDescription) -->
       <u-modal v-model:open="showEditorModal" title="编辑备忘录">
@@ -273,6 +348,8 @@ const searchQuery = ref('')
 const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
 const viewFilter = ref<'all' | 'pinned'>('all')
 const selectedMemo = ref<any>(null)
+const viewedMemo = ref<any>(null)
+const showViewModal = ref(false)
 const showAddMemoModal = ref(false)
 const showEditorModal = ref(false)
 const showDeleteModal = ref(false)
@@ -466,19 +543,31 @@ const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
   viewMode.value = mode
 }
 
-const selectMemo = (memo: any) => {
-  selectedMemo.value = memo
+const viewMemo = (memo: any) => {
+  viewedMemo.value = memo
+  showViewModal.value = true
+}
+
+const editMemo = (memo: any) => {
+  selectedMemo.value = { ...memo }
   showEditorModal.value = true
 }
 
-const handleListSelect = (memo: any) => {
-  selectedMemo.value = memo
-  showDeleteModal.value = true
+const switchToEdit = () => {
+  showViewModal.value = false
+  selectedMemo.value = { ...viewedMemo.value }
+  showEditorModal.value = true
 }
 
-const openFullscreen = (memo: any) => {
-  selectedMemo.value = memo
-  showEditorModal.value = true
+const formatDateTime = (date: string) => {
+  if (!date) return '-'
+  const d = new Date(date)
+  const year = d.getFullYear()
+  const month = d.getMonth() + 1
+  const day = d.getDate()
+  const hours = d.getHours().toString().padStart(2, '0')
+  const minutes = d.getMinutes().toString().padStart(2, '0')
+  return `${year}年${month}月${day}日 ${hours}:${minutes}`
 }
 
 const togglePin = () => {
