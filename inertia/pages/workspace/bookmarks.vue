@@ -77,12 +77,12 @@
               </u-dropdown-menu>
             </div>
             <div
-              class="relative w-14 h-14 flex items-center justify-center flex-shrink-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-4"
+              class="relative w-12 h-12 flex items-center justify-center flex-shrink-0 bg-white dark:bg-gray-700 rounded-xl overflow-hidden mb-3"
             >
               <img
                 :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
                 :alt="bookmark.title"
-                class="w-8 h-8 object-contain relative z-10"
+                class="w-6 h-6 object-contain relative z-10"
               />
               <div
                 class="absolute inset-0 bg-[radial(circle,var(--color-primary-10),rgba(0,0,0,0.7))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -91,25 +91,23 @@
             <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
               {{ bookmark.title }}
             </h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 line-clamp-3">
+            <p class="text-base text-gray-500 dark:text-gray-400 mb-3">
               {{ bookmark.description }}
             </p>
-            <div class="flex flex-wrap gap-3 mb-4">
-              <span
-                class="px-2.5 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded-md text-gray-700 dark:text-gray-200"
-                >{{ bookmark.category }}</span
-              >
-              <span class="text-xs text-gray-500 dark:text-gray-400"
-                >{{ bookmark.visitCount }} 次访问</span
-              >
+            <div class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mb-3">
+              <u-icon name="i-heroicons-eye" class="size-4" />
+              <span>{{ bookmark.visitCount }}次访问</span>
             </div>
-            <div class="flex flex-wrap gap-1.5">
-              <span
+            <div class="flex flex-wrap gap-2">
+              <u-badge
                 v-for="tag in bookmark.tags"
                 :key="tag"
-                class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-md"
-                >{{ tag }}</span
+                color="primary"
+                variant="outline"
+                size="md"
               >
+                {{ tag }}
+              </u-badge>
             </div>
           </div>
         </div>
@@ -136,40 +134,40 @@
               </u-dropdown-menu>
             </div>
             <div
-              class="relative w-14 h-14 flex items-center justify-center flex-shrink-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden"
+              class="relative w-12 h-12 flex items-center justify-center flex-shrink-0 bg-white dark:bg-gray-700 rounded-xl overflow-hidden"
             >
               <img
                 :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
                 :alt="bookmark.title"
-                class="w-8 h-8 object-contain relative z-10"
+                class="w-6 h-6 object-contain relative z-10"
               />
               <div
                 class="absolute inset-0 bg-[radial(circle,var(--color-primary-10),rgba(0,0,0,0.7))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
               ></div>
             </div>
             <div class="flex-1 min-w-0 relative z-10">
-              <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1 truncate">
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1.5 line-clamp-1">
                 {{ bookmark.title }}
               </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mb-3 truncate">
-                {{ bookmark.description }}
-              </p>
-              <div class="flex items-center gap-3 mb-3">
-                <span
-                  class="px-2.5 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded-md text-gray-700 dark:text-gray-200"
-                  >{{ bookmark.category }}</span
-                >
-                <span class="text-xs text-gray-500 dark:text-gray-400"
-                  >{{ bookmark.visitCount }} 次访问</span
-                >
+              <u-tooltip :text="bookmark.description">
+                <p class="text-base text-gray-500 dark:text-gray-400 mb-3 truncate">
+                  {{ bookmark.description }}
+                </p>
+              </u-tooltip>
+              <div class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mb-3">
+                <u-icon name="i-heroicons-eye" class="size-4" />
+                <span>{{ bookmark.visitCount }}次访问</span>
               </div>
-              <div class="flex flex-wrap gap-1.5">
-                <span
+              <div class="flex flex-wrap gap-2">
+                <u-badge
                   v-for="tag in bookmark.tags"
                   :key="tag"
-                  class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-md"
-                  >{{ tag }}</span
+                  color="primary"
+                  variant="outline"
+                  size="md"
                 >
+                  {{ tag }}
+                </u-badge>
               </div>
             </div>
           </div>
@@ -179,7 +177,7 @@
           <div
             v-for="bookmark in filteredBookmarks"
             :key="bookmark.id"
-            class="group relative flex items-center gap-4 p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600"
+            class="group relative flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer overflow-hidden transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50"
             @click="openBookmark(bookmark)"
           >
             <div class="absolute top-3 right-3 z-10">
@@ -194,56 +192,56 @@
               </u-dropdown-menu>
             </div>
             <div
-              class="w-11 h-11 flex items-center justify-center flex-shrink-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
+              class="w-10 h-10 flex items-center justify-center flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg"
             >
               <img
                 :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
                 :alt="bookmark.title"
-                class="w-6 h-6 object-contain"
+                class="w-5 h-5 object-contain"
               />
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-3 mb-1.5">
-                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
-                  {{ bookmark.title }}
-                </h3>
-                <span
-                  class="px-2.5 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded-md text-gray-700 dark:text-gray-200"
-                  >{{ bookmark.category }}</span
-                >
-              </div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 truncate">
-                {{ bookmark.url }}
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white truncate mb-1">
+                {{ bookmark.title }}
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                {{ bookmark.description }}
               </p>
               <div class="flex items-center justify-between">
-                <div class="flex flex-wrap gap-1.5">
-                  <span
+                <div class="flex flex-wrap gap-2">
+                  <u-badge
                     v-for="tag in bookmark.tags"
                     :key="tag"
-                    class="px-2 py-0.5 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-sm"
-                    >{{ tag }}</span
+                    color="primary"
+                    variant="outline"
+                    size="md"
                   >
+                    {{ tag }}
+                  </u-badge>
                 </div>
-                <span class="text-xs text-gray-500 dark:text-gray-400"
-                  >{{ bookmark.visitCount }} 次访问</span
-                >
+                <div class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+                  <u-icon name="i-heroicons-eye" class="size-4" />
+                  <span>{{ bookmark.visitCount }}次访问</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div
+        <u-empty
           v-if="filteredBookmarks.length === 0"
-          class="flex flex-col items-center justify-center py-16 text-center"
+          :ui="{ icon: 'size-16 text-gray-400 dark:text-gray-500' }"
         >
-          <div
-            class="w-20 h-20 flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500"
-          >
-            <u-icon name="i-heroicons-bookmark" class="w-16 h-16" />
-          </div>
-          <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">暂无书签</p>
-          <p class="text-sm text-gray-500 dark:text-gray-400">开始添加您的第一个书签吧</p>
-        </div>
+          <template #icon>
+            <u-icon name="i-heroicons-bookmark-slash" class="size-16" />
+          </template>
+          <template #title>
+            <span class="text-lg font-semibold text-gray-900 dark:text-white">暂无书签</span>
+          </template>
+          <template #description>
+            <span class="text-sm text-gray-500 dark:text-gray-400">开始添加您的第一个书签吧</span>
+          </template>
+        </u-empty>
       </div>
 
       <u-modal v-model:open="showAddBookmarkModal" title="添加新书签">
