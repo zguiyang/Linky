@@ -187,14 +187,16 @@
               <tags-input v-model="selectedMemo.tags" />
             </div>
             <div class="flex-1 flex flex-col gap-2">
-              <u-editor
+              <UEditor
                 v-model="selectedMemo.content"
                 content-type="markdown"
                 :editable="true"
                 class="min-h-48"
               >
-                <UEditorToolbar :editor="editor" :items="toolbarItems" layout="bubble" />
-              </u-editor>
+                <template #default="{ editor }">
+                  <UEditorToolbar :editor="editor" :items="toolbarItems" layout="bubble" />
+                </template>
+              </UEditor>
             </div>
           </div>
         </template>
@@ -268,7 +270,6 @@ import WorkspaceLayout from '~/layouts/workspace.vue'
 import TagsInput from '~/components/TagsInput.vue'
 import MemoCard from '~/components/MemoCard.vue'
 import { computed, ref } from 'vue'
-import type { Editor } from '@tiptap/vue-3'
 import type { EditorToolbarItem } from '@nuxt/ui'
 
 const searchQuery = ref('')
@@ -279,7 +280,6 @@ const showAddMemoModal = ref(false)
 const showEditorModal = ref(false)
 const showDeleteModal = ref(false)
 const sortBy = ref('recent')
-const editor = ref<Editor | null>(null)
 
 const memos = ref([
   {
@@ -316,8 +316,8 @@ const memos = ref([
   {
     id: 4,
     title: '读书笔记',
-    content:
-      '《设计心理学》第三章读书笔记。这本书讲述了如何设计出用户友好的产品。关键在于理解用户的需求和使用场景。设计师应该站在用户的角度思考问题，而不是仅仅关注技术和功能。',
+    content设计心理学》第三章读书笔记。这本书讲述了如何设计出用户友好的产品。:
+      '《关键在于理解用户的需求和使用场景。设计师应该站在用户的角度思考问题，而不是仅仅关注技术和功能。',
     tags: ['读书', '设计', '笔记'],
     category: 'life',
     pinned: true,
