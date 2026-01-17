@@ -28,10 +28,11 @@
             :key="tag"
             color="primary"
             variant="outline"
-            size="sm"
+            size="md"
           >
             {{ tag }}
           </u-badge>
+          <span v-if="displayTags.length === 0" class="text-xs text-gray-400"> 暂无标签 </span>
         </div>
       </div>
     </div>
@@ -47,17 +48,6 @@
           @click.stop
         />
       </u-dropdown-menu>
-    </div>
-
-    <div class="absolute bottom-3 right-3 z-10">
-      <u-button
-        icon="i-heroicons-arrows-pointing-out"
-        color="gray"
-        variant="ghost"
-        size="sm"
-        class="opacity-0 group-hover:opacity-100 transition-opacity"
-        @click.stop="openFullscreen(memo)"
-      />
     </div>
   </div>
 </template>
@@ -80,8 +70,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  select: [memo: Memo]
-  openFullscreen: [memo: Memo]
+  view: [memo: Memo]
+  edit: [memo: Memo]
 }>()
 
 const cardClasses = computed(() => {
@@ -176,7 +166,7 @@ const getMemoMenuItems = (memo: Memo): DropdownMenuItem[][] => {
         label: '编辑',
         icon: 'i-heroicons-pencil',
         onSelect: () => {
-          emit('select', memo)
+          emit('edit', memo)
         },
       },
       {
@@ -184,7 +174,7 @@ const getMemoMenuItems = (memo: Memo): DropdownMenuItem[][] => {
         icon: 'i-heroicons-trash',
         color: 'error',
         onSelect: () => {
-          emit('select', memo)
+          emit('view', memo)
         },
       },
     ],
@@ -192,7 +182,7 @@ const getMemoMenuItems = (memo: Memo): DropdownMenuItem[][] => {
 }
 
 const handleClick = () => {
-  emit('select', props.memo)
+  emit('view', props.memo)
 }
 
 const openFullscreen = (memo: Memo) => {
