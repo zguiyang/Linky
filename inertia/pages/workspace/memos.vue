@@ -217,6 +217,7 @@
             </div>
           </div>
         </template>
+      </u-modal>
       <u-modal v-model:open="showAddMemoModal" title="新建备忘录">
         <template #title>
           <span class="sr-only">新建备忘录</span>
