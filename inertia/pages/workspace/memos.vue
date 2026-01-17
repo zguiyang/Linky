@@ -193,7 +193,7 @@
               <div
                 class="flex flex-col rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500 transition-all duration-200"
               >
-                <UEditor
+                <u-editor
                   v-model="selectedMemo.content"
                   content-type="markdown"
                   :editable="true"
@@ -203,10 +203,10 @@
                     <div
                       class="flex items-center gap-1 px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 shrink-0 sticky top-0"
                     >
-                      <UEditorToolbar :editor="editor" :items="toolbarItems" layout="fixed" />
+                      <u-editor-toolbar :editor="editor" :items="toolbarItems" layout="fixed" />
                     </div>
                   </template>
-                </UEditor>
+                </u-editor>
               </div>
             </div>
           </div>
