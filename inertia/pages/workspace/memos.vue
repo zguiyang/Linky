@@ -194,7 +194,7 @@
                 class="min-h-48"
               >
                 <template #default="{ editor }">
-                  <UEditorToolbar :editor="editor" :items="toolbarItems" layout="bubble" />
+                  <UEditorToolbar :editor="editor" :items="toolbarItems" layout="fixed" />
                 </template>
               </UEditor>
             </div>
