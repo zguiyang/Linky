@@ -23,12 +23,15 @@
           {{ formatDate(memo.updatedAt) }}
         </span>
         <div class="flex flex-wrap gap-1.5">
-          <span
+          <u-badge
             v-for="tag in displayTags"
             :key="tag"
-            class="px-2 py-0.5 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-md"
-            >{{ tag }}</span
+            color="primary"
+            variant="outline"
+            size="sm"
           >
+            {{ tag }}
+          </u-badge>
         </div>
       </div>
     </div>
