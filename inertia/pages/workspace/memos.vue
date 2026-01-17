@@ -83,183 +83,40 @@
           v-if="viewMode === 'masonry'"
           class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
         >
-          <div
+          <memo-card
             v-for="memo in filteredMemos"
             :key="memo.id"
-            class="group relative p-6 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 break-inside-avoid"
-            :class="{
-              [pinnedMemoClass]: memo.pinned,
-            }"
-          >
-            <div class="absolute top-3 right-3 z-10">
-              <u-dropdown-menu :items="getMemoMenuItems(memo)" :content="{ align: 'end' }">
-                <u-button
-                  icon="i-heroicons-ellipsis-horizontal"
-                  color="neutral"
-                  variant="ghost"
-                  size="sm"
-                  @click.stop
-                />
-              </u-dropdown-menu>
-            </div>
-            <div class="flex items-center gap-1.5 mb-3">
-              <u-icon
-                v-if="memo.pinned"
-                name="i-heroicons-star"
-                class="w-4 h-4 text-warning-500 fill-current shrink-0 mt-0.5"
-              />
-              <h3 class="text-[17px] font-semibold text-gray-900 dark:text-white pr-6 truncate">
-                {{ memo.title || '无标题备忘录' }}
-              </h3>
-            </div>
-            <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-5 line-clamp-3">
-              {{ memo.content }}
-            </p>
-            <div class="flex flex-wrap gap-1.5 mb-3">
-              <span
-                v-for="tag in memo.tags.slice(0, 3)"
-                :key="tag"
-                class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-md"
-                >{{ tag }}</span
-              >
-              <span
-                v-if="memo.tags.length > 3"
-                class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md"
-                >+{{ memo.tags.length - 3 }}</span
-              >
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-xs text-gray-500 dark:text-gray-400">{{
-                formatDate(memo.updatedAt)
-              }}</span>
-            </div>
-            <div
-              class="absolute bottom-3 right-3 p-1 rounded-lg bg-gray-200/80 dark:bg-gray-700/80 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-              @click.stop="openFullscreen(memo)"
-            >
-              <u-icon name="i-heroicons-arrows-pointing-out" class="w-4 h-4" />
-            </div>
-          </div>
+            :memo="memo"
+            view-mode="masonry"
+            @select="selectMemo"
+            @open-fullscreen="openFullscreen"
+          />
         </div>
 
         <div
           v-else-if="viewMode === 'grid'"
           class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
         >
-          <div
+          <memo-card
             v-for="memo in filteredMemos"
             :key="memo.id"
-            class="group relative p-6 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50"
-            :class="{
-              [pinnedMemoClass]: memo.pinned,
-            }"
-          >
-            <div class="absolute top-3 right-3 z-10">
-              <u-dropdown-menu :items="getMemoMenuItems(memo)" :content="{ align: 'end' }">
-                <u-button
-                  icon="i-heroicons-ellipsis-horizontal"
-                  color="neutral"
-                  variant="ghost"
-                  size="sm"
-                  @click.stop
-                />
-              </u-dropdown-menu>
-            </div>
-            <div class="flex items-center gap-1.5 mb-3">
-              <u-icon
-                v-if="memo.pinned"
-                name="i-heroicons-star"
-                class="w-4 h-4 text-warning-500 fill-current shrink-0 mt-0.5"
-              />
-              <h3 class="text-[17px] font-semibold text-gray-900 dark:text-white pr-6 truncate">
-                {{ memo.title || '无标题备忘录' }}
-              </h3>
-            </div>
-            <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-5 line-clamp-3">
-              {{ memo.content }}
-            </p>
-            <div class="flex items-center justify-between mt-auto">
-              <div class="flex flex-wrap gap-1.5">
-                <span
-                  v-for="tag in memo.tags.slice(0, 3)"
-                  :key="tag"
-                  class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-md"
-                  >{{ tag }}</span
-                >
-                <span
-                  v-if="memo.tags.length > 3"
-                  class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md"
-                  >+{{ memo.tags.length - 3 }}</span
-                >
-              </div>
-              <span class="text-xs text-gray-500 dark:text-gray-400">{{
-                formatDate(memo.updatedAt)
-              }}</span>
-            </div>
-            <div
-              class="absolute bottom-3 right-3 p-1 rounded-lg bg-gray-200/80 dark:bg-gray-700/80 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-              @click.stop="openFullscreen(memo)"
-            >
-              <u-icon name="i-heroicons-arrows-pointing-out" class="w-4 h-4" />
-            </div>
-          </div>
+            :memo="memo"
+            view-mode="grid"
+            @select="selectMemo"
+            @open-fullscreen="openFullscreen"
+          />
         </div>
 
-        <div v-else class="flex flex-col gap-3">
-          <div
+        <div v-else class="flex flex-col gap-2">
+          <memo-card
             v-for="memo in filteredMemos"
             :key="memo.id"
-            class="group relative flex items-start gap-4 p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600"
-            :class="{
-              [pinnedMemoClass]: memo.pinned,
-            }"
-          >
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-1.5 mb-2">
-                <u-icon
-                  v-if="memo.pinned"
-                  name="i-heroicons-star"
-                  class="w-4 h-4 text-warning-500 fill-current shrink-0 mt-0.5"
-                />
-                <h3 class="text-base font-semibold text-gray-900 dark:text-white">
-                  {{ memo.title || '无标题备忘录' }}
-                </h3>
-              </div>
-              <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-3 line-clamp-2">
-                {{ memo.content }}
-              </p>
-              <div class="flex items-center justify-between">
-                <div class="flex flex-wrap gap-1.5">
-                  <span
-                    v-for="tag in memo.tags"
-                    :key="tag"
-                    class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-md"
-                    >{{ tag }}</span
-                  >
-                </div>
-                <span class="text-xs text-gray-500 dark:text-gray-400">{{
-                  formatDate(memo.updatedAt)
-                }}</span>
-              </div>
-            </div>
-            <div class="absolute top-3 right-3 z-10">
-              <u-dropdown-menu :items="getMemoMenuItems(memo)" :content="{ align: 'end' }">
-                <u-button
-                  icon="i-heroicons-ellipsis-horizontal"
-                  color="neutral"
-                  variant="ghost"
-                  size="sm"
-                  @click.stop
-                />
-              </u-dropdown-menu>
-            </div>
-            <div
-              class="absolute bottom-2 right-2 p-1.5 rounded-md bg-gray-200/80 dark:bg-gray-700/80 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-              @click.stop="openFullscreen(memo)"
-            >
-              <u-icon name="i-heroicons-arrows-pointing-out" class="w-4 h-4" />
-            </div>
-          </div>
+            :memo="memo"
+            view-mode="list"
+            class="w-full"
+            @select="handleListSelect"
+            @open-fullscreen="openFullscreen"
+          />
         </div>
 
         <div
@@ -409,7 +266,7 @@
 <script setup lang="ts">
 import WorkspaceLayout from '~/layouts/workspace.vue'
 import TagsInput from '~/components/TagsInput.vue'
-import type { DropdownMenuItem } from '@nuxt/ui'
+import MemoCard from '~/components/MemoCard.vue'
 import { computed, ref } from 'vue'
 
 const searchQuery = ref('')
@@ -552,10 +409,6 @@ const memos = ref([
   },
 ])
 
-const pinnedMemoClass = computed(() => {
-  return 'bg-warning-100 dark:bg-warning-900/40 border-warning-300 dark:border-warning-800'
-})
-
 const memoForm = ref({
   title: '',
   content: '',
@@ -618,53 +471,14 @@ const selectMemo = (memo: any) => {
   showEditorModal.value = true
 }
 
+const handleListSelect = (memo: any) => {
+  selectedMemo.value = memo
+  showDeleteModal.value = true
+}
+
 const openFullscreen = (memo: any) => {
   selectedMemo.value = memo
   showEditorModal.value = true
-}
-
-const getMemoMenuItems = (memo: any): DropdownMenuItem[][] => {
-  return [
-    [
-      {
-        label: '编辑',
-        icon: 'i-heroicons-pencil',
-        onSelect: () => {
-          selectedMemo.value = memo
-          showEditorModal.value = true
-        },
-      },
-      {
-        label: '删除',
-        icon: 'i-heroicons-trash',
-        color: 'error',
-        onSelect: () => {
-          selectedMemo.value = memo
-          showDeleteModal.value = true
-        },
-      },
-    ],
-  ]
-}
-
-const formatDate = (date: string) => {
-  const d = new Date(date)
-  const year = d.getFullYear()
-  const month = d.getMonth() + 1
-  const day = d.getDate()
-  const now = new Date()
-
-  if (year === now.getFullYear() && month === now.getMonth() + 1 && day === now.getDate()) {
-    return '今天'
-  } else if (
-    year === now.getFullYear() &&
-    month === now.getMonth() + 1 &&
-    day === now.getDate() - 1
-  ) {
-    return '昨天'
-  }
-
-  return `${year}年${month}月${day}日`
 }
 
 const togglePin = () => {
