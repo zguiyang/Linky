@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group relative border cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-750 hover:border-gray-300 dark:hover:border-gray-600"
+    class="group relative border cursor-pointer transition-all duration-200"
     :class="cardClasses"
     @click="handleClick"
   >
@@ -91,13 +91,13 @@ const cardClasses = computed(() => {
   if (isPinned) {
     switch (props.viewMode) {
       case 'masonry':
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-4 hover:-translate-y-1 hover:shadow-md break-inside-avoid'
+        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-4 hover:-translate-y-1 hover:shadow-md hover:bg-warning-100 dark:hover:bg-warning-900/50 hover:border-warning-300 dark:hover:border-warning-700 break-inside-avoid'
       case 'grid':
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-4 hover:-translate-y-1 hover:shadow-md'
+        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-4 hover:-translate-y-1 hover:shadow-md hover:bg-warning-100 dark:hover:bg-warning-900/50 hover:border-warning-300 dark:hover:border-warning-700'
       case 'list':
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-lg'
+        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-lg hover:bg-warning-100 dark:hover:bg-warning-900/50 hover:border-warning-300 dark:hover:border-warning-700'
       default:
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-4'
+        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-4 hover:-translate-y-1 hover:shadow-md hover:bg-warning-100 dark:hover:bg-warning-900/50 hover:border-warning-300 dark:hover:border-warning-700'
     }
   }
 
