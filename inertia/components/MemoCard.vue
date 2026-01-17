@@ -70,7 +70,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  view: [memo: Memo]
   edit: [memo: Memo]
 }>()
 
@@ -174,7 +173,7 @@ const getMemoMenuItems = (memo: Memo): DropdownMenuItem[][] => {
         icon: 'i-heroicons-trash',
         color: 'error',
         onSelect: () => {
-          emit('view', memo)
+          emit('edit', memo)
         },
       },
     ],
@@ -182,8 +181,6 @@ const getMemoMenuItems = (memo: Memo): DropdownMenuItem[][] => {
 }
 
 const handleClick = () => {
-  emit('view', props.memo)
+  emit('edit', props.memo)
 }
-
-const openFullscreen = (memo: Memo) => {}
 </script>
