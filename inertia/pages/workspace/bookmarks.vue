@@ -21,20 +21,29 @@
             placeholder="搜索书签..."
             size="md"
           />
-          <u-field-group>
+          <div class="inline-flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            <u-button
+              :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
+              :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
+              size="sm"
+              icon="i-heroicons-view-columns"
+              @click="setViewMode('masonry')"
+            />
             <u-button
               :color="viewMode === 'grid' ? 'primary' : 'neutral'"
-              variant="ghost"
+              :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
+              size="sm"
               icon="i-heroicons-squares-2x2"
               @click="setViewMode('grid')"
             />
             <u-button
               :color="viewMode === 'list' ? 'primary' : 'neutral'"
-              variant="ghost"
+              :variant="viewMode === 'list' ? 'solid' : 'ghost'"
+              size="sm"
               icon="i-heroicons-list-bullet"
               @click="setViewMode('list')"
             />
-          </u-field-group>
+          </div>
           <u-select
             v-model="sortBy"
             :items="sortOptions"
@@ -47,7 +56,66 @@
 
       <div class="flex-1 p-8 overflow-y-auto">
         <div
-          v-if="viewMode === 'grid'"
+          v-if="viewMode === 'masonry'"
+          class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+        >
+          <div
+            v-for="bookmark in filteredBookmarks"
+            :key="bookmark.id"
+            class="group relative p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 break-inside-avoid"
+            @click="openBookmark(bookmark)"
+          >
+            <div class="absolute top-3 right-3 z-10">
+              <u-dropdown-menu :items="getBookmarkMenuItems(bookmark)" :content="{ align: 'end' }">
+                <u-button
+                  icon="i-heroicons-ellipsis-horizontal"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  @click.stop
+                />
+              </u-dropdown-menu>
+            </div>
+            <div
+              class="relative w-14 h-14 flex items-center justify-center flex-shrink-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-4"
+            >
+              <img
+                :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
+                :alt="bookmark.title"
+                class="w-8 h-8 object-contain relative z-10"
+              />
+              <div
+                class="absolute inset-0 bg-[radial(circle,var(--color-primary-10),rgba(0,0,0,0.7))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              ></div>
+            </div>
+            <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+              {{ bookmark.title }}
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 line-clamp-3">
+              {{ bookmark.description }}
+            </p>
+            <div class="flex flex-wrap gap-3 mb-4">
+              <span
+                class="px-2.5 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 rounded-md text-gray-700 dark:text-gray-200"
+                >{{ bookmark.category }}</span
+              >
+              <span class="text-xs text-gray-500 dark:text-gray-400"
+                >{{ bookmark.visitCount }} 次访问</span
+              >
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <span
+                v-for="tag in bookmark.tags"
+                :key="tag"
+                class="px-2 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-md"
+                >{{ tag }}</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div
+          v-else-if="viewMode === 'grid'"
           class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
         >
           <div
@@ -250,7 +318,7 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 import { computed, ref, onMounted } from 'vue'
 
-const viewMode = ref<'grid' | 'list'>('grid')
+const viewMode = ref<'masonry' | 'grid' | 'list'>('grid')
 const searchQuery = ref('')
 const sortBy = ref('recent')
 const tagInput = ref('')
@@ -337,7 +405,7 @@ const sortOptions = [
   { label: '名称排序', value: 'name' },
 ]
 
-const setViewMode = (mode: 'grid' | 'list') => {
+const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
   viewMode.value = mode
 }
 
