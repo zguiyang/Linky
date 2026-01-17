@@ -467,10 +467,10 @@ const sortOptions = [
 
 const toolbarItems = [
   [
-    { kind: 'bold', icon: 'i-lucide-bold', tooltip: { text: '加粗' } },
-    { kind: 'italic', icon: 'i-lucide-italic', tooltip: { text: '斜体' } },
-    { kind: 'strike', icon: 'i-lucide-strikethrough', tooltip: { text: '删除线' } },
-    { kind: 'code', icon: 'i-lucide-code', tooltip: { text: '行内代码' } },
+    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: { text: '加粗' } },
+    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: { text: '斜体' } },
+    { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough', tooltip: { text: '删除线' } },
+    { kind: 'mark', mark: 'code', icon: 'i-lucide-code', tooltip: { text: '行内代码' } },
   ],
   [
     { kind: 'bulletList', icon: 'i-lucide-list', tooltip: { text: '无序列表' } },
