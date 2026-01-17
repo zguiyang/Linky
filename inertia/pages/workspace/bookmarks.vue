@@ -59,173 +59,36 @@
           v-if="viewMode === 'masonry'"
           class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
         >
-          <div
+          <bookmark-card
             v-for="bookmark in filteredBookmarks"
             :key="bookmark.id"
-            class="group relative p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 break-inside-avoid"
-            @click="openBookmark(bookmark)"
-          >
-            <div class="absolute top-3 right-3 z-10">
-              <u-dropdown-menu :items="getBookmarkMenuItems(bookmark)" :content="{ align: 'end' }">
-                <u-button
-                  icon="i-heroicons-ellipsis-horizontal"
-                  color="neutral"
-                  variant="ghost"
-                  size="sm"
-                  @click.stop
-                />
-              </u-dropdown-menu>
-            </div>
-            <div
-              class="relative w-12 h-12 flex items-center justify-center flex-shrink-0 bg-white dark:bg-gray-700 rounded-xl overflow-hidden mb-3"
-            >
-              <img
-                :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
-                :alt="bookmark.title"
-                class="w-6 h-6 object-contain relative z-10"
-              />
-              <div
-                class="absolute inset-0 bg-[radial(circle,var(--color-primary-10),rgba(0,0,0,0.7))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              ></div>
-            </div>
-            <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
-              {{ bookmark.title }}
-            </h3>
-            <p class="text-base text-gray-500 dark:text-gray-400 mb-3">
-              {{ bookmark.description }}
-            </p>
-            <div class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mb-3">
-              <u-icon name="i-heroicons-eye" class="size-4" />
-              <span>{{ bookmark.visitCount }}次访问</span>
-            </div>
-            <div class="flex flex-wrap gap-2">
-              <u-badge
-                v-for="tag in bookmark.tags"
-                :key="tag"
-                color="primary"
-                variant="outline"
-                size="md"
-              >
-                {{ tag }}
-              </u-badge>
-            </div>
-          </div>
+            :bookmark="bookmark"
+            view-mode="masonry"
+            @click="openBookmark"
+          />
         </div>
 
         <div
           v-else-if="viewMode === 'grid'"
           class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
         >
-          <div
+          <bookmark-card
             v-for="bookmark in filteredBookmarks"
             :key="bookmark.id"
-            class="group relative flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50 before:absolute before:inset-0 before:bg-gradient-to-br before:from-[var(--color-primary-10)] before:to-[var(--color-primary-10)] before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100"
-            @click="openBookmark(bookmark)"
-          >
-            <div class="absolute top-3 right-3 z-10">
-              <u-dropdown-menu :items="getBookmarkMenuItems(bookmark)" :content="{ align: 'end' }">
-                <u-button
-                  icon="i-heroicons-ellipsis-horizontal"
-                  color="neutral"
-                  variant="ghost"
-                  size="sm"
-                  @click.stop
-                />
-              </u-dropdown-menu>
-            </div>
-            <div
-              class="relative w-12 h-12 flex items-center justify-center flex-shrink-0 bg-white dark:bg-gray-700 rounded-xl overflow-hidden"
-            >
-              <img
-                :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
-                :alt="bookmark.title"
-                class="w-6 h-6 object-contain relative z-10"
-              />
-              <div
-                class="absolute inset-0 bg-[radial(circle,var(--color-primary-10),rgba(0,0,0,0.7))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              ></div>
-            </div>
-            <div class="flex-1 min-w-0 relative z-10">
-              <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1.5 line-clamp-1">
-                {{ bookmark.title }}
-              </h3>
-              <u-tooltip :text="bookmark.description">
-                <p class="text-base text-gray-500 dark:text-gray-400 mb-3 truncate">
-                  {{ bookmark.description }}
-                </p>
-              </u-tooltip>
-              <div class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mb-3">
-                <u-icon name="i-heroicons-eye" class="size-4" />
-                <span>{{ bookmark.visitCount }}次访问</span>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                <u-badge
-                  v-for="tag in bookmark.tags"
-                  :key="tag"
-                  color="primary"
-                  variant="outline"
-                  size="md"
-                >
-                  {{ tag }}
-                </u-badge>
-              </div>
-            </div>
-          </div>
+            :bookmark="bookmark"
+            view-mode="grid"
+            @click="openBookmark"
+          />
         </div>
 
         <div v-else class="flex flex-col gap-3">
-          <div
+          <bookmark-card
             v-for="bookmark in filteredBookmarks"
             :key="bookmark.id"
-            class="group relative flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer overflow-hidden transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50"
-            @click="openBookmark(bookmark)"
-          >
-            <div class="absolute top-3 right-3 z-10">
-              <u-dropdown-menu :items="getBookmarkMenuItems(bookmark)" :content="{ align: 'end' }">
-                <u-button
-                  icon="i-heroicons-ellipsis-horizontal"
-                  color="neutral"
-                  variant="ghost"
-                  size="sm"
-                  @click.stop
-                />
-              </u-dropdown-menu>
-            </div>
-            <div
-              class="w-10 h-10 flex items-center justify-center flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg"
-            >
-              <img
-                :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
-                :alt="bookmark.title"
-                class="w-5 h-5 object-contain"
-              />
-            </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="text-base font-semibold text-gray-900 dark:text-white truncate mb-1">
-                {{ bookmark.title }}
-              </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                {{ bookmark.description }}
-              </p>
-              <div class="flex items-center justify-between">
-                <div class="flex flex-wrap gap-2">
-                  <u-badge
-                    v-for="tag in bookmark.tags"
-                    :key="tag"
-                    color="primary"
-                    variant="outline"
-                    size="md"
-                  >
-                    {{ tag }}
-                  </u-badge>
-                </div>
-                <div class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-                  <u-icon name="i-heroicons-eye" class="size-4" />
-                  <span>{{ bookmark.visitCount }}次访问</span>
-                </div>
-              </div>
-            </div>
-          </div>
+            :bookmark="bookmark"
+            view-mode="list"
+            @click="openBookmark"
+          />
         </div>
 
         <u-empty
@@ -312,7 +175,7 @@
 
 <script setup lang="ts">
 import WorkspaceLayout from '~/layouts/workspace.vue'
-import type { DropdownMenuItem } from '@nuxt/ui'
+import BookmarkCard from '~/components/BookmarkCard.vue'
 
 import { computed, ref, onMounted } from 'vue'
 
@@ -643,28 +506,6 @@ const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
 const openBookmark = (bookmark: any) => {
   window.open(bookmark.url, '_blank')
   bookmark.visitCount++
-}
-
-const getBookmarkMenuItems = (bookmark: any): DropdownMenuItem[][] => {
-  return [
-    [
-      {
-        label: '编辑',
-        icon: 'i-heroicons-pencil',
-        onSelect: () => {
-          console.log('Mock: 编辑书签', bookmark)
-        },
-      },
-      {
-        label: '删除',
-        icon: 'i-heroicons-trash',
-        color: 'error',
-        onSelect: () => {
-          console.log('Mock: 删除书签', bookmark)
-        },
-      },
-    ],
-  ]
 }
 
 const getCategoryName = (categoryId: string) => {
