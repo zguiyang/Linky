@@ -184,12 +184,6 @@
               <u-input v-model="selectedMemo.title" placeholder="备忘录标题..." />
             </div>
             <div class="flex gap-4">
-        <template #body>
-          <div v-if="selectedMemo" class="space-y-4">
-            <div class="shrink-0">
-              <u-input v-model="selectedMemo.title" placeholder="备忘录标题..." />
-            </div>
-            <div class="flex gap-4">
               <tags-input v-model="selectedMemo.tags" />
             </div>
             <div class="flex-1 flex flex-col">
@@ -217,42 +211,42 @@
             </div>
           </div>
         </template>
-      </u-modal>
-      <u-modal v-model:open="showAddMemoModal" title="新建备忘录">
-        <template #title>
-          <span class="sr-only">新建备忘录</span>
-        </template>
-        <template #body="{ close }">
-          <u-form-field label="标题" name="title">
-            <u-input v-model="memoForm.title" placeholder="输入备忘录标题（可选）" />
-          </u-form-field>
+        <u-modal v-model:open="showAddMemoModal" title="新建备忘录">
+          <template #title>
+            <span class="sr-only">新建备忘录</span>
+          </template>
+          <template #body="{ close }">
+            <u-form-field label="标题" name="title">
+              <u-input v-model="memoForm.title" placeholder="输入备忘录标题（可选）" />
+            </u-form-field>
 
-          <u-form-field label="内容" name="content">
-            <u-textarea v-model="memoForm.content" placeholder="输入备忘录内容" />
-          </u-form-field>
+            <u-form-field label="内容" name="content">
+              <u-textarea v-model="memoForm.content" placeholder="输入备忘录内容" />
+            </u-form-field>
 
-          <u-form-field label="标签" name="tags">
-            <tags-input v-model="memoForm.tags" />
-          </u-form-field>
+            <u-form-field label="标签" name="tags">
+              <tags-input v-model="memoForm.tags" />
+            </u-form-field>
 
-          <u-form-field label="分类" name="category">
-            <u-select
-              v-model="memoForm.category"
-              :items="categoryOptions"
-              placeholder="选择分类"
-              :popper="{ strategy: 'fixed' }"
-            />
-          </u-form-field>
+            <u-form-field label="分类" name="category">
+              <u-select
+                v-model="memoForm.category"
+                :items="categoryOptions"
+                placeholder="选择分类"
+                :popper="{ strategy: 'fixed' }"
+              />
+            </u-form-field>
 
-          <u-form-field label="置顶" name="pinned">
-            <u-checkbox v-model="memoForm.pinned" label="将备忘录添加到置顶列表" />
-          </u-form-field>
-        </template>
+            <u-form-field label="置顶" name="pinned">
+              <u-checkbox v-model="memoForm.pinned" label="将备忘录添加到置顶列表" />
+            </u-form-field>
+          </template>
 
-        <template #footer="{ close }">
-          <u-button color="neutral" variant="outline" @click="close">取消</u-button>
-          <u-button color="primary" variant="solid" @click="handleSaveMemo">创建</u-button>
-        </template>
+          <template #footer="{ close }">
+            <u-button color="neutral" variant="outline" @click="close">取消</u-button>
+            <u-button color="primary" variant="solid" @click="handleSaveMemo">创建</u-button>
+          </template>
+        </u-modal>
       </u-modal>
 
       <u-modal v-model:open="showDeleteModal" title="删除备忘录">
@@ -282,7 +276,7 @@ import WorkspaceLayout from '~/layouts/workspace.vue'
 import TagsInput from '~/components/TagsInput.vue'
 import MemoCard from '~/components/MemoCard.vue'
 import { computed, ref } from 'vue'
-import type { EditorToolbarItem } from '@nuxt.ui'
+import type { EditorToolbarItem } from '@nuxt/ui'
 
 const searchQuery = ref('')
 const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
