@@ -33,3 +33,6 @@ components.d.ts
 openspec/
 .roo/
 AGENTS.md
+
+# docker files
+docker-compose.dev.yml
