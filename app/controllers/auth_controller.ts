@@ -35,17 +35,24 @@ export default class AuthController {
   async login({ request, response, auth }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator)
 
-    const user = await User.verifyCredentials(email, password)
+    try {
+      const user = await User.verifyCredentials(email, password)
 
-    const token = await auth.use('api').createToken(user)
+      const token = await auth.use('api').createToken(user)
 
-    return response.ok({
-      success: true,
-      data: {
-        user: user.serialize(),
-        token,
-      },
-    })
+      return response.ok({
+        success: true,
+        data: {
+          user: user.serialize(),
+          token,
+        },
+      })
+    } catch (error) {
+      return response.unauthorized({
+        success: false,
+        message: 'Invalid credentials',
+      })
+    }
   }
 
   async logout({ auth, response }: HttpContext) {
