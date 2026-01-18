@@ -50,7 +50,7 @@
             :popper="{ strategy: 'fixed' }"
             size="md"
           />
-          <u-button color="primary" size="md" @click="showAddMemoModal = true">
+          <u-button color="primary" size="md" @click="openAddModal">
             <template #leading>
               <u-icon name="i-heroicons-plus" class="w-4 h-4" />
             </template>
@@ -137,11 +137,11 @@
       </div>
 
       <u-modal
-        v-model:open="showEditorModal"
-        title="编辑备忘录"
+        v-model:open="showMemoModal"
+        :title="modalMode === 'add' ? '新建备忘录' : '编辑备忘录'"
         :ui="{
           content:
-            'w-[calc(100vw-2rem)] max-w-3xl rounded-xl shadow-2xl ring ring-gray-200 dark:ring-gray-700',
+            'w-[calc(100vw-2rem)] max-w-3xl rounded-xl shadow-2xl ring ring-gray-200 dark:ring-gray-700 transition-all duration-200',
           header: 'px-6 py-5 border-b border-gray-100 dark:border-gray-800',
           body: 'p-0',
           footer:
@@ -149,27 +149,29 @@
         }"
       >
         <template #title>
-          <span class="sr-only">编辑备忘录</span>
+          <span class="sr-only">{{ modalMode === 'add' ? '新建备忘录' : '编辑备忘录' }}</span>
         </template>
         <template #header="{ close }">
           <div class="flex items-center gap-4 flex-1 min-w-0">
             <div
-              class="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30"
+              class="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 transition-colors duration-200"
             >
               <u-icon
-                name="i-heroicons-document-text"
+                :name="modalMode === 'add' ? 'i-heroicons-plus' : 'i-heroicons-document-text'"
                 class="w-5 h-5 text-indigo-600 dark:text-indigo-400"
               />
             </div>
             <div class="flex-1 min-w-0">
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                {{ selectedMemo?.title || '无标题备忘录' }}
+                {{ modalMode === 'add' ? '新建备忘录' : formData.title || '无标题备忘录' }}
               </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">编辑您的备忘录内容</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                {{ modalMode === 'add' ? '创建新的备忘录' : '编辑您的备忘录内容' }}
+              </p>
             </div>
             <span
-              v-if="selectedMemo?.pinned"
-              class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-600 dark:text-amber-400 rounded-full"
+              v-if="modalMode === 'edit' && formData.pinned"
+              class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-600 dark:text-amber-400 rounded-full transition-all duration-200"
             >
               <u-icon name="i-heroicons-star-solid" class="w-3.5 h-3.5" />
               已置顶
@@ -177,45 +179,47 @@
           </div>
           <div class="flex items-center gap-2 ml-4">
             <u-button
-              :icon="selectedMemo?.pinned ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-              :color="selectedMemo?.pinned ? 'warning' : 'neutral'"
+              v-if="modalMode === 'edit'"
+              :icon="formData.pinned ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+              :color="formData.pinned ? 'warning' : 'neutral'"
               variant="ghost"
               size="md"
-              :title="selectedMemo?.pinned ? '取消置顶' : '置顶'"
-              class="hover:bg-gray-100 dark:hover:bg-gray-800"
+              :title="formData.pinned ? '取消置顶' : '置顶'"
+              class="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
               @click="togglePin"
             />
             <u-button
+              v-if="modalMode === 'edit'"
               icon="i-heroicons-trash"
               color="error"
               variant="ghost"
               size="md"
               title="删除"
-              class="hover:bg-red-50 dark:hover:bg-red-900/20"
+              class="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
               @click="showDeleteModal = true"
             />
-            <div class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+            <div v-if="modalMode === 'edit'" class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
             <u-button
               icon="i-heroicons-x-mark"
               color="neutral"
               variant="ghost"
               size="md"
-              class="hover:bg-gray-100 dark:hover:bg-gray-800"
+              class="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
               @click="close"
             />
           </div>
         </template>
 
         <template #body>
-          <div v-if="selectedMemo" class="flex flex-col">
+          <div class="flex flex-col">
             <!-- Title Section -->
             <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
                 标题
               </label>
               <u-input
-                v-model="selectedMemo.title"
-                placeholder="输入备忘录标题..."
+                v-model="formData.title"
+                placeholder="输入备忘录标题（可选）"
                 size="lg"
                 :ui="{
                   base: 'text-base',
@@ -228,7 +232,7 @@
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
                 标签
               </label>
-              <tags-input v-model="selectedMemo.tags" />
+              <tags-input v-model="formData.tags" />
             </div>
 
             <!-- Content Section -->
@@ -240,7 +244,7 @@
                 class="flex flex-col rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/50 focus-within:border-indigo-500 transition-all duration-200"
               >
                 <u-editor
-                  v-model="selectedMemo.content"
+                  v-model="formData.content"
                   content-type="markdown"
                   :editable="true"
                   class="min-h-[320px] max-h-[450px]"
@@ -255,62 +259,58 @@
                 </u-editor>
               </div>
             </div>
+
+            <!-- Category & Pinned Section (新建模式使用 Switch) -->
+            <div class="px-6 py-5 border-t border-gray-100 dark:border-gray-800">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <u-switch v-model="formData.pinned" color="warning" />
+                  <div class="flex flex-col">
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">置顶</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">添加到置顶列表</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </template>
 
         <template #footer="{ close }">
           <div class="flex items-center justify-between w-full">
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <!-- 编辑模式显示最后更新时间 -->
+            <p v-if="modalMode === 'edit'" class="text-sm text-gray-500 dark:text-gray-400">
               <u-icon name="i-heroicons-clock" class="w-4 h-4 inline mr-1" />
-              最后更新: {{ selectedMemo?.updatedAt }}
+              最后更新: {{ formData.updatedAt }}
             </p>
+            <p v-else class="text-sm text-gray-500 dark:text-gray-400"></p>
             <div class="flex items-center gap-3">
-              <u-button color="neutral" variant="outline" size="md" @click="close"> 取消 </u-button>
-              <u-button color="primary" variant="solid" size="md" @click="saveMemo">
+              <u-button
+                color="neutral"
+                variant="outline"
+                size="md"
+                class="transition-colors duration-200"
+                @click="close"
+              >
+                取消
+              </u-button>
+              <u-button
+                color="primary"
+                variant="solid"
+                size="md"
+                class="transition-colors duration-200"
+                @click="handleSaveMemo"
+              >
                 <template #leading>
-                  <u-icon name="i-heroicons-check" class="w-4 h-4" />
+                  <u-icon
+                    :name="modalMode === 'add' ? 'i-heroicons-plus' : 'i-heroicons-check'"
+                    class="w-4 h-4"
+                  />
                 </template>
-                保存更改
+                {{ modalMode === 'add' ? '创建备忘录' : '保存更改' }}
               </u-button>
             </div>
           </div>
         </template>
-        <u-modal v-model:open="showAddMemoModal" title="新建备忘录">
-          <template #title>
-            <span class="sr-only">新建备忘录</span>
-          </template>
-          <template #body="{ close }">
-            <u-form-field label="标题" name="title">
-              <u-input v-model="memoForm.title" placeholder="输入备忘录标题（可选）" />
-            </u-form-field>
-
-            <u-form-field label="内容" name="content">
-              <u-textarea v-model="memoForm.content" placeholder="输入备忘录内容" />
-            </u-form-field>
-
-            <u-form-field label="标签" name="tags">
-              <tags-input v-model="memoForm.tags" />
-            </u-form-field>
-
-            <u-form-field label="分类" name="category">
-              <u-select
-                v-model="memoForm.category"
-                :items="categoryOptions"
-                placeholder="选择分类"
-                :popper="{ strategy: 'fixed' }"
-              />
-            </u-form-field>
-
-            <u-form-field label="置顶" name="pinned">
-              <u-checkbox v-model="memoForm.pinned" label="将备忘录添加到置顶列表" />
-            </u-form-field>
-          </template>
-
-          <template #footer="{ close }">
-            <u-button color="neutral" variant="outline" @click="close">取消</u-button>
-            <u-button color="primary" variant="solid" @click="handleSaveMemo">创建</u-button>
-          </template>
-        </u-modal>
       </u-modal>
 
       <u-modal v-model:open="showDeleteModal" title="删除备忘录">
@@ -346,10 +346,24 @@ const searchQuery = ref('')
 const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
 const viewFilter = ref<'all' | 'pinned'>('all')
 const selectedMemo = ref<any>(null)
-const showAddMemoModal = ref(false)
-const showEditorModal = ref(false)
 const showDeleteModal = ref(false)
 const sortBy = ref('recent')
+
+// 合并后的弹窗状态
+const showMemoModal = ref(false)
+const modalMode = ref<'add' | 'edit'>('add')
+
+// 统一的表单数据
+const formData = ref({
+  id: 0,
+  title: '',
+  content: '',
+  category: '',
+  tags: [] as string[],
+  pinned: false,
+  createdAt: '',
+  updatedAt: '',
+})
 
 const memos = ref([
   {
@@ -482,14 +496,6 @@ const memos = ref([
   },
 ])
 
-const memoForm = ref({
-  title: '',
-  content: '',
-  category: '',
-  tags: [] as string[],
-  pinned: false,
-})
-
 const filteredMemos = computed(() => {
   let result = memos.value
 
@@ -552,54 +558,90 @@ const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
   viewMode.value = mode
 }
 
-const openEditor = (memo: any) => {
-  selectedMemo.value = { ...memo }
-  showEditorModal.value = true
-}
-
-const togglePin = () => {
-  if (selectedMemo.value) {
-    selectedMemo.value.pinned = !selectedMemo.value.pinned
-  }
-}
-
-const saveMemo = () => {
-  console.log('Mock: 保存备忘录（仅演示，不实际保存）')
-  showEditorModal.value = false
-}
-
-const confirmDelete = () => {
-  console.log('Mock: 删除备忘录（仅演示，不实际删除）')
-  showDeleteModal.value = false
-  selectedMemo.value = null
-}
-
-const handleSaveMemo = () => {
-  if (!memoForm.value.content) {
-    return
-  }
-
-  const memo = {
-    id: memos.value.length + 1,
-    title: memoForm.value.title || '无标题备忘录',
-    content: memoForm.value.content,
-    category: memoForm.value.category,
-    tags: memoForm.value.tags,
-    pinned: memoForm.value.pinned || false,
-    createdAt: new Date().toISOString().split('T')[0] || '',
-    updatedAt: new Date().toISOString().split('T')[0] || '',
-  }
-
-  memos.value.unshift(memo)
-  showAddMemoModal.value = false
-  console.log('Mock: 新备忘录已添加（内存中）', memo)
-
-  memoForm.value = {
+const openAddModal = () => {
+  // 重置表单数据
+  formData.value = {
+    id: 0,
     title: '',
     content: '',
     category: '',
     tags: [],
     pinned: false,
+    createdAt: '',
+    updatedAt: '',
   }
+  modalMode.value = 'add'
+  showMemoModal.value = true
+}
+
+const openEditor = (memo: any) => {
+  // 复制备忘录数据到表单
+  formData.value = { ...memo }
+  selectedMemo.value = { ...memo }
+  modalMode.value = 'edit'
+  showMemoModal.value = true
+}
+
+const togglePin = () => {
+  if (formData.value) {
+    formData.value.pinned = !formData.value.pinned
+  }
+}
+
+const saveMemo = () => {
+  console.log('Mock: 保存备忘录（仅演示，不实际保存）')
+  showMemoModal.value = false
+}
+
+const confirmDelete = () => {
+  console.log('Mock: 删除备忘录（仅演示，不实际删除）')
+  showDeleteModal.value = false
+  showMemoModal.value = false
+  selectedMemo.value = null
+}
+
+const getCategoryLabel = (value: string) => {
+  const option = categoryOptions.find((opt) => opt.value === value)
+  return option?.label || ''
+}
+
+const handleSaveMemo = () => {
+  if (!formData.value.content && modalMode.value === 'add') {
+    return
+  }
+
+  const now = new Date().toISOString().split('T')[0] || ''
+
+  if (modalMode.value === 'add') {
+    // 新建模式
+    const memo = {
+      id: memos.value.length + 1,
+      title: formData.value.title || '无标题备忘录',
+      content: formData.value.content,
+      category: formData.value.category,
+      tags: formData.value.tags,
+      pinned: formData.value.pinned || false,
+      createdAt: now,
+      updatedAt: now,
+    }
+    memos.value.unshift(memo)
+    console.log('Mock: 新备忘录已添加（内存中）', memo)
+  } else {
+    // 编辑模式
+    const index = memos.value.findIndex((m) => m.id === formData.value.id)
+    if (index !== -1) {
+      memos.value[index] = {
+        ...memos.value[index],
+        title: formData.value.title,
+        content: formData.value.content,
+        tags: formData.value.tags,
+        pinned: formData.value.pinned,
+        updatedAt: now,
+      }
+      console.log('Mock: 备忘录已更新（内存中）', memos.value[index])
+    }
+  }
+
+  showMemoModal.value = false
 }
 </script>
