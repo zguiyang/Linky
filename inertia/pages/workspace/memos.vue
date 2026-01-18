@@ -50,6 +50,12 @@
             :popper="{ strategy: 'fixed' }"
             size="md"
           />
+          <u-button color="primary" size="md" @click="showAddMemoModal = true">
+            <template #leading>
+              <u-icon name="i-heroicons-plus" class="w-4 h-4" />
+            </template>
+            新建备忘录
+          </u-button>
         </div>
       </div>
 
@@ -130,84 +136,142 @@
         </div>
       </div>
 
-      <u-modal v-model:open="showEditorModal" title="编辑备忘录">
+      <u-modal
+        v-model:open="showEditorModal"
+        title="编辑备忘录"
+        :ui="{
+          content:
+            'w-[calc(100vw-2rem)] max-w-3xl rounded-xl shadow-2xl ring ring-gray-200 dark:ring-gray-700',
+          header: 'px-6 py-5 border-b border-gray-100 dark:border-gray-800',
+          body: 'p-0',
+          footer:
+            'px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50',
+        }"
+      >
         <template #title>
           <span class="sr-only">编辑备忘录</span>
         </template>
         <template #header="{ close }">
-          <div class="flex items-center gap-3 flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
-              {{ selectedMemo?.title || '无标题备忘录' }}
-            </h3>
-            <span
-              class="shrink-0 px-3 py-1 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 rounded-full"
-              :class="{ 'opacity-50': !selectedMemo?.pinned }"
+          <div class="flex items-center gap-4 flex-1 min-w-0">
+            <div
+              class="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30"
             >
               <u-icon
-                v-if="selectedMemo?.pinned"
-                name="i-heroicons-star-solid"
-                class="w-3.5 h-3.5 mr-1 inline fill-current"
+                name="i-heroicons-document-text"
+                class="w-5 h-5 text-indigo-600 dark:text-indigo-400"
               />
-              {{ selectedMemo?.pinned ? '已置顶' : '未置顶' }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                {{ selectedMemo?.title || '无标题备忘录' }}
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">编辑您的备忘录内容</p>
+            </div>
+            <span
+              v-if="selectedMemo?.pinned"
+              class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-600 dark:text-amber-400 rounded-full"
+            >
+              <u-icon name="i-heroicons-star-solid" class="w-3.5 h-3.5" />
+              已置顶
             </span>
           </div>
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-2 ml-4">
             <u-button
               :icon="selectedMemo?.pinned ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
               :color="selectedMemo?.pinned ? 'warning' : 'neutral'"
               variant="ghost"
-              size="sm"
+              size="md"
               :title="selectedMemo?.pinned ? '取消置顶' : '置顶'"
+              class="hover:bg-gray-100 dark:hover:bg-gray-800"
               @click="togglePin"
             />
             <u-button
               icon="i-heroicons-trash"
               color="error"
               variant="ghost"
-              size="sm"
+              size="md"
               title="删除"
+              class="hover:bg-red-50 dark:hover:bg-red-900/20"
               @click="showDeleteModal = true"
             />
+            <div class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
             <u-button
               icon="i-heroicons-x-mark"
               color="neutral"
               variant="ghost"
-              size="sm"
+              size="md"
+              class="hover:bg-gray-100 dark:hover:bg-gray-800"
               @click="close"
             />
           </div>
         </template>
 
         <template #body>
-          <div v-if="selectedMemo" class="space-y-4">
-            <div class="shrink-0">
-              <u-input v-model="selectedMemo.title" placeholder="备忘录标题..." />
+          <div v-if="selectedMemo" class="flex flex-col">
+            <!-- Title Section -->
+            <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
+                标题
+              </label>
+              <u-input
+                v-model="selectedMemo.title"
+                placeholder="输入备忘录标题..."
+                size="lg"
+                :ui="{
+                  base: 'text-base',
+                }"
+              />
             </div>
-            <div class="flex gap-4">
+
+            <!-- Tags Section -->
+            <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
+                标签
+              </label>
               <tags-input v-model="selectedMemo.tags" />
             </div>
-            <div class="flex-1 flex flex-col">
-              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+
+            <!-- Content Section -->
+            <div class="px-6 py-5">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
                 内容
               </label>
               <div
-                class="flex flex-col rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500 transition-all duration-200"
+                class="flex flex-col rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/50 focus-within:border-indigo-500 transition-all duration-200"
               >
                 <u-editor
                   v-model="selectedMemo.content"
                   content-type="markdown"
                   :editable="true"
-                  class="min-h-[250px] max-h-[400px]"
+                  class="min-h-[320px] max-h-[450px]"
                 >
                   <template #default="{ editor }">
                     <div
-                      class="flex items-center gap-1 px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 shrink-0 sticky top-0"
+                      class="flex items-center gap-1.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 shrink-0 sticky top-0"
                     >
                       <u-editor-toolbar :editor="editor" :items="toolbarItems" layout="fixed" />
                     </div>
                   </template>
                 </u-editor>
               </div>
+            </div>
+          </div>
+        </template>
+
+        <template #footer="{ close }">
+          <div class="flex items-center justify-between w-full">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              <u-icon name="i-heroicons-clock" class="w-4 h-4 inline mr-1" />
+              最后更新: {{ selectedMemo?.updatedAt }}
+            </p>
+            <div class="flex items-center gap-3">
+              <u-button color="neutral" variant="outline" size="md" @click="close"> 取消 </u-button>
+              <u-button color="primary" variant="solid" size="md" @click="saveMemo">
+                <template #leading>
+                  <u-icon name="i-heroicons-check" class="w-4 h-4" />
+                </template>
+                保存更改
+              </u-button>
             </div>
           </div>
         </template>
