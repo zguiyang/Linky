@@ -1,66 +1,31 @@
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { registerValidator } from '#validators/register'
 import { loginValidator } from '#validators/login'
-import User from '#models/user'
+import AuthService from '#services/auth_service'
 
+@inject()
 export default class AuthController {
-  async register({ request, response, auth }: HttpContext) {
+  constructor(private authService: AuthService) {}
+
+  async register({ request, auth }: HttpContext) {
     const payload = await request.validateUsing(registerValidator)
-
-    const existingUser = await User.findBy('email', payload.email)
-    if (existingUser) {
-      return response.badRequest({
-        success: false,
-        message: 'Email already exists',
-      })
-    }
-
-    const user = await User.create({
-      fullName: payload.fullName,
-      email: payload.email,
-      password: payload.password,
-    })
-
+    const user = await this.authService.register(payload)
     const token = await auth.use('api').createToken(user)
 
-    return response.created({
-      success: true,
-      data: {
-        user: user.serialize(),
-        token,
-      },
-    })
+    return { user: user.serialize(), token }
   }
 
-  async login({ request, response, auth }: HttpContext) {
+  async login({ request, auth }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator)
+    const user = await this.authService.login(email, password)
+    const token = await auth.use('api').createToken(user)
 
-    try {
-      const user = await User.verifyCredentials(email, password)
-
-      const token = await auth.use('api').createToken(user)
-
-      return response.ok({
-        success: true,
-        data: {
-          user: user.serialize(),
-          token,
-        },
-      })
-    } catch (error) {
-      return response.unauthorized({
-        success: false,
-        message: 'Invalid credentials',
-      })
-    }
+    return { user: user.serialize(), token }
   }
 
-  async logout({ auth, response }: HttpContext) {
+  async logout({ auth }: HttpContext) {
     await auth.use('api').invalidateToken()
-
-    return response.ok({
-      success: true,
-      message: 'Successfully logged out',
-    })
+    return { message: 'Successfully logged out' }
   }
 }
