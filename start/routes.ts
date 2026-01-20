@@ -45,3 +45,6 @@ router
 router
   .get('/api/auth/verify-email', '#controllers/auth_controller.verifyEmail')
   .middleware(middleware.guest())
+router
+  .post('/auth/resend-verification', '#controllers/auth_controller.resendVerification')
+  .middleware(middleware.auth())

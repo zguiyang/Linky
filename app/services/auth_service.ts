@@ -10,18 +10,13 @@ function generateToken(): string {
 
 export class AuthService {
   async register(data: { email: string; name: string; password: string }) {
-    const verificationToken = generateToken()
-
     const user = await User.create({
       email: data.email,
       fullName: data.name,
       password: data.password,
-      verificationToken,
     })
 
-    const verifyEmailModule = await import('#mails/verify_email_notification')
-    const VerifyEmailNotification = verifyEmailModule.default
-    await mail.sendLater(new VerifyEmailNotification(user, verificationToken))
+    await this.sendVerificationEmail(user)
 
     return user
   }
@@ -37,23 +32,19 @@ export class AuthService {
     await ctx.auth.use('web').logout()
   }
 
-  async requestPasswordReset(email: string) {
+  async requestPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
     const user = await User.findBy('email', email)
 
     if (!user) {
-      return
+      return { success: false, message: '该邮箱未绑定用户' }
     }
 
-    const resetToken = generateToken()
-    const expiresAt = DateTime.now().plus({ hours: 1 })
+    if (!user.emailVerifiedAt) {
+      return { success: false, message: '请先验证您的邮箱地址' }
+    }
 
-    user.resetPasswordToken = resetToken
-    user.resetPasswordExpiresAt = expiresAt
-    await user.save()
-
-    const resetPasswordModule = await import('#mails/reset_password_notification')
-    const ResetPasswordNotification = resetPasswordModule.default
-    await mail.sendLater(new ResetPasswordNotification(user, resetToken))
+    await this.sendResetPasswordEmail(user)
+    return { success: true, message: '重置密码邮件已发送' }
   }
 
   async resetPassword(token: string, newPassword: string) {
@@ -80,8 +71,58 @@ export class AuthService {
 
     user.emailVerifiedAt = DateTime.now()
     user.verificationToken = null
+    user.verificationEmailSentAt = null
     await user.save()
 
     return user
+  }
+
+  private async sendVerificationEmail(user: User): Promise<void> {
+    const verificationToken = generateToken()
+
+    user.verificationToken = verificationToken
+    user.verificationEmailSentAt = DateTime.now()
+    await user.save()
+
+    const verifyEmailModule = await import('#mails/verify_email_notification')
+    const VerifyEmailNotification = verifyEmailModule.default
+    await mail.sendLater(new VerifyEmailNotification(user, verificationToken))
+  }
+
+  private async sendResetPasswordEmail(user: User): Promise<void> {
+    const resetToken = generateToken()
+    const expiresAt = DateTime.now().plus({ hours: 1 })
+
+    user.resetPasswordToken = resetToken
+    user.resetPasswordExpiresAt = expiresAt
+    await user.save()
+
+    const resetPasswordModule = await import('#mails/reset_password_notification')
+    const ResetPasswordNotification = resetPasswordModule.default
+    await mail.sendLater(new ResetPasswordNotification(user, resetToken))
+  }
+
+  async resendVerificationEmail(email: string): Promise<{ success: boolean; message: string }> {
+    const user = await User.findBy('email', email)
+
+    if (!user) {
+      return { success: false, message: '该邮箱未绑定用户' }
+    }
+
+    if (user.emailVerifiedAt) {
+      return { success: false, message: '邮箱已验证' }
+    }
+
+    if (user.verificationEmailSentAt) {
+      const timeSinceLastSent = DateTime.now().diff(user.verificationEmailSentAt, 'minutes').minutes
+      if (timeSinceLastSent < 1) {
+        const remainingSeconds = Math.ceil(60 - timeSinceLastSent * 60)
+        return { success: false, message: `请等待 ${remainingSeconds} 秒后重新发送` }
+      }
+    }
+
+    await this.sendVerificationEmail(user)
+
+    return { success: true, message: '验证邮件已发送' }
   }
 }

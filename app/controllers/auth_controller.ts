@@ -35,7 +35,15 @@ export default class AuthController {
   async forgotPassword({ request, response }: HttpContext) {
     const data = request.only(['email'])
     const authService = new AuthService()
-    await authService.requestPasswordReset(data.email)
+    const result = await authService.requestPasswordReset(data.email)
+
+    if (request.accepts(['html', 'json']) === 'json') {
+      return response.json(result)
+    }
+
+    if (!result.success) {
+      return response.redirect('/sign-in?error=' + encodeURIComponent(result.message))
+    }
 
     return response.redirect('/sign-in?status=reset-sent')
   }
@@ -73,5 +81,13 @@ export default class AuthController {
       return response.json({ success: true })
     }
     return response.redirect('/workspace/bookmarks')
+  }
+
+  async resendVerification({ response, auth }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const authService = new AuthService()
+    const result = await authService.resendVerificationEmail(user.email)
+
+    return response.json(result)
   }
 }
