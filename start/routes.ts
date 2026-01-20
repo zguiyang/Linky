@@ -14,8 +14,8 @@ import { middleware } from '#start/kernel'
 router.on('/').renderInertia('home')
 
 // 工作区页面
-router.on('/workspace/bookmarks').renderInertia('workspace/bookmarks')
-router.on('/workspace/memos').renderInertia('workspace/memos')
+router.on('/workspace/bookmarks').renderInertia('workspace/bookmarks').middleware(middleware.auth())
+router.on('/workspace/memos').renderInertia('workspace/memos').middleware(middleware.auth())
 
 // 认证页面（保留前端页面，Session认证会实现后端逻辑）
 router.on('/sign-in').renderInertia('auth/sign-in').middleware(middleware.guest())

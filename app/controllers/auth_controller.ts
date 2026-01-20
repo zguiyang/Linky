@@ -12,7 +12,7 @@ export default class AuthController {
 
     await auth.use('web').login(user)
 
-    return response.redirect('/')
+    return response.redirect('/workspace/bookmarks')
   }
 
   async login(ctx: HttpContext) {
@@ -21,7 +21,7 @@ export default class AuthController {
     const authService = new AuthService()
     await authService.login(ctx, data.email, data.password, data.rememberMe ?? false)
 
-    return ctx.response.redirect('/')
+    return ctx.response.redirect('/workspace/bookmarks')
   }
 
   async logout(ctx: HttpContext) {

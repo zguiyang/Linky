@@ -64,8 +64,31 @@
             color="neutral"
             variant="ghost"
             @click="showGlobalSearchModal = true"
+            class="cursor-pointer"
           />
-          <u-button icon="i-heroicons-cog-6-tooth" color="neutral" variant="ghost" />
+          <u-button
+            icon="i-heroicons-cog-6-tooth"
+            color="neutral"
+            variant="ghost"
+            class="cursor-pointer"
+          />
+          <u-dropdown-menu
+            :items="userMenuItems"
+            :content="{ align: 'start', side: 'top', sideOffset: 8 }"
+            :ui="{ content: 'w-56' }"
+          >
+            <template #default>
+              <u-avatar
+                :alt="user?.fullName || user?.email || 'User'"
+                size="sm"
+                class="cursor-pointer"
+              >
+                <template #fallback>
+                  {{ (user?.fullName || user?.email || 'U').charAt(0).toUpperCase() }}
+                </template>
+              </u-avatar>
+            </template>
+          </u-dropdown-menu>
           <u-color-mode-button />
         </div>
       </nav>
@@ -113,11 +136,13 @@
 
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { router } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
 import RootLayout from '~/layouts/root.vue'
-import type { NavigationMenuItem } from '@nuxt/ui'
+import type { NavigationMenuItem, DropdownMenuItem } from '@nuxt/ui'
 
 const page = usePage()
+const user = computed(() => page.props.user as { fullName: string | null; email: string } | null)
 
 const showGlobalSearchModal = ref(false)
 const globalSearchQuery = ref('')
@@ -126,6 +151,44 @@ const searchResults = ref<any[]>([])
 const navigationItems = ref<NavigationMenuItem[]>([
   { label: '书签', icon: 'i-heroicons-bookmark', to: '/workspace/bookmarks' },
   { label: '备忘录', icon: 'i-heroicons-document-text', to: '/workspace/memos' },
+])
+
+const handleLogout = () => {
+  router.post(
+    '/auth/logout',
+    {},
+    {
+      onSuccess: () => {
+        window.location.href = '/'
+      },
+    }
+  )
+}
+
+const userMenuItems = computed<DropdownMenuItem[]>(() => [
+  {
+    type: 'label',
+    label: '当前用户',
+  },
+  {
+    type: 'item',
+    label: user.value?.fullName || user.value?.email || 'User',
+    description: user.value?.email,
+    avatar: {
+      alt: user.value?.fullName || user.value?.email || 'User',
+      size: 'md',
+    },
+  },
+  {
+    type: 'separator',
+  },
+  {
+    type: 'item',
+    label: '登出',
+    icon: 'i-heroicons-arrow-right-on-rectangle',
+    onSelect: handleLogout,
+    color: 'error',
+  },
 ])
 
 const popularTags = ref([

@@ -6,7 +6,12 @@
         title="Linky"
         description="您的个人知识管理空间 - 高效管理书签、记录想法、让知识触手可及"
         :links="[
-          { label: '开始使用', to: '/sign-in', size: 'xl', icon: 'i-heroicons-arrow-right' },
+          {
+            label: entryButton.label,
+            to: entryButton.to,
+            size: 'xl',
+            icon: 'i-heroicons-arrow-right',
+          },
           { label: '了解更多', to: '#features', color: 'neutral', variant: 'ghost', size: 'xl' },
         ]"
         :ui="{ container: 'flex flex-col lg:grid py-32 sm:py-40 lg:py-48 gap-16 sm:gap-y-24' }"
@@ -56,12 +61,12 @@
               <p class="cta-description">立即登录，开始使用 Linky 打造属于您的个人知识管理空间</p>
               <div class="cta-buttons">
                 <u-button
-                  to="/sign-in"
+                  :to="entryButton.to"
                   size="xl"
                   icon="i-heroicons-rocket-launch"
                   class="cursor-pointer"
                 >
-                  立即开始
+                  {{ entryButton.label }}
                 </u-button>
                 <u-button
                   to="#features"
@@ -82,7 +87,17 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import MarketingLayout from '~/layouts/marketing.vue'
+
+const page = usePage()
+const user = computed(() => page.props.user as { fullName: string | null; email: string } | null)
+
+const entryButton = computed(() => ({
+  label: user.value ? '进入工作区' : '开始使用',
+  to: user.value ? '/workspace/bookmarks' : '/sign-in',
+}))
 </script>
 
 <style scoped>
