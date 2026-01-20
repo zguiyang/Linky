@@ -28,6 +28,7 @@ router
   .on('/auth/reset-password')
   .renderInertia('auth/reset-password')
   .middleware(middleware.guest())
+router.on('/auth/verify-email').renderInertia('auth/verify-email').middleware(middleware.guest())
 
 // 认证API路由
 router
@@ -36,11 +37,11 @@ router
 router.post('/auth/login', '#controllers/auth_controller.login').middleware(middleware.guest())
 router.post('/auth/logout', '#controllers/auth_controller.logout').middleware(middleware.auth())
 router
-  .post('/auth/forgot-password', '#controllers/auth_controller.forgot_password')
+  .post('/auth/forgot-password', '#controllers/auth_controller.forgotPassword')
   .middleware(middleware.guest())
 router
-  .post('/auth/reset-password', '#controllers/auth_controller.reset_password')
+  .post('/auth/reset-password', '#controllers/auth_controller.resetPassword')
   .middleware(middleware.guest())
 router
-  .get('/auth/verify-email', '#controllers/auth_controller.verify_email')
+  .get('/api/auth/verify-email', '#controllers/auth_controller.verifyEmail')
   .middleware(middleware.guest())

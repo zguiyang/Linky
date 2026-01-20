@@ -23,9 +23,17 @@
             />
           </u-form-field>
 
-          <div class="flex items-center gap-2">
-            <u-checkbox v-model="state.rememberMe" />
-            <span class="text-sm text-gray-700 dark:text-gray-300">记住我</span>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <u-checkbox v-model="state.rememberMe" />
+              <span class="text-sm text-gray-700 dark:text-gray-300">记住我</span>
+            </div>
+            <Link
+              href="/auth/forgot-password"
+              class="text-sm text-[var(--color-primary-500)] dark:text-[var(--color-primary-300)] hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-primary-200)] transition-colors"
+            >
+              忘记密码？
+            </Link>
           </div>
 
           <u-button

@@ -59,10 +59,19 @@ export default class AuthController {
     const user = await authService.verifyEmail(data.token)
 
     if (!user) {
+      if (request.accepts(['html', 'json']) === 'json') {
+        return response.status(422).json({
+          errors: { token: ['验证令牌无效或已过期'] },
+        })
+      }
       return response.redirect('/sign-in?status=verify-failed')
     }
 
     await auth.use('web').login(user)
+
+    if (request.accepts(['html', 'json']) === 'json') {
+      return response.json({ success: true })
+    }
     return response.redirect('/workspace/bookmarks')
   }
 }

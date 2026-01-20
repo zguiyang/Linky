@@ -1,5 +1,4 @@
 import User from '#models/user'
-import hash from '@adonisjs/core/services/hash'
 import mail from '@adonisjs/mail/services/main'
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
@@ -11,13 +10,12 @@ function generateToken(): string {
 
 export class AuthService {
   async register(data: { email: string; name: string; password: string }) {
-    const hashedPassword = await hash.use('scrypt').make(data.password)
     const verificationToken = generateToken()
 
     const user = await User.create({
       email: data.email,
       fullName: data.name,
-      password: hashedPassword,
+      password: data.password,
       verificationToken,
     })
 
@@ -65,9 +63,7 @@ export class AuthService {
       return null
     }
 
-    const hashedPassword = await hash.use('scrypt').make(newPassword)
-
-    user.password = hashedPassword
+    user.password = newPassword
     user.resetPasswordToken = null
     user.resetPasswordExpiresAt = null
     await user.save()
