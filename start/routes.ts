@@ -9,8 +9,6 @@
 
 import router from '@adonisjs/core/services/router'
 
-const AuthController = () => import('#controllers/auth_controller')
-
 // 首页
 router.on('/').renderInertia('home')
 
@@ -18,14 +16,6 @@ router.on('/').renderInertia('home')
 router.on('/workspace/bookmarks').renderInertia('workspace/bookmarks')
 router.on('/workspace/memos').renderInertia('workspace/memos')
 
-// 认证页面
+// 认证页面（保留前端页面，Session认证会实现后端逻辑）
 router.on('/sign-in').renderInertia('auth/sign-in')
 router.on('/sign-up').renderInertia('auth/sign-up')
-
-// API 认证路由
-router.post('/api/auth/register', [AuthController, 'register'])
-router.post('/api/auth/login', [AuthController, 'login'])
-router.post('/api/auth/logout', [AuthController, 'logout']).use(async ({ auth }, next) => {
-  await auth.authenticateUsing(['api'])
-  return next()
-})
