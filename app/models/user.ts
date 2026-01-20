@@ -24,6 +24,18 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column({ serializeAs: null })
   declare password: string
 
+  @column.dateTime()
+  declare emailVerifiedAt: DateTime | null
+
+  @column()
+  declare verificationToken: string | null
+
+  @column()
+  declare resetPasswordToken: string | null
+
+  @column.dateTime()
+  declare resetPasswordExpiresAt: DateTime | null
+
   @hasMany(() => RememberMeToken)
   declare rememberMeTokens: HasManyType<typeof RememberMeToken>
 
