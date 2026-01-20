@@ -23,14 +23,27 @@
             />
           </u-form-field>
 
+          <div class="flex items-center gap-2">
+            <u-checkbox v-model="state.rememberMe" />
+            <span class="text-sm text-gray-700 dark:text-gray-300">记住我</span>
+          </div>
+
           <u-button
             type="submit"
             block
+            :loading="loading"
             class="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-white"
           >
             登录
           </u-button>
         </u-form>
+
+        <div
+          v-if="error"
+          class="mt-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm"
+        >
+          {{ error }}
+        </div>
 
         <div class="text-center mt-4">
           <Link
@@ -46,18 +59,30 @@
 </template>
 
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3'
-import { reactive } from 'vue'
+import { Link, router } from '@inertiajs/vue3'
+import { reactive, ref } from 'vue'
 import AuthLayout from '~/layouts/auth.vue'
+
+const loading = ref(false)
+const error = ref('')
 
 const state = reactive({
   email: '',
   password: '',
+  rememberMe: false,
 })
 
 const onSubmit = () => {
-  console.log('Mock: 登录提交', state)
-  alert('登录成功！（Mock演示）')
-  window.location.href = '/'
+  loading.value = true
+  error.value = ''
+
+  router.post('/auth/login', state, {
+    onFinish: () => {
+      loading.value = false
+    },
+    onError: (errors) => {
+      error.value = Object.values(errors)[0] || '登录失败，请检查您的凭据'
+    },
+  })
 }
 </script>

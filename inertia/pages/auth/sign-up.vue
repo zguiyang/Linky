@@ -25,11 +25,19 @@
           <u-button
             type="submit"
             block
+            :loading="loading"
             class="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-white"
           >
             注册
           </u-button>
         </u-form>
+
+        <div
+          v-if="error"
+          class="mt-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm"
+        >
+          {{ error }}
+        </div>
 
         <div class="text-center mt-4">
           <Link
@@ -45,9 +53,12 @@
 </template>
 
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3'
-import { reactive } from 'vue'
+import { Link, router } from '@inertiajs/vue3'
+import { reactive, ref } from 'vue'
 import AuthLayout from '~/layouts/auth.vue'
+
+const loading = ref(false)
+const error = ref('')
 
 const state = reactive({
   email: '',
@@ -56,8 +67,16 @@ const state = reactive({
 })
 
 const onSubmit = () => {
-  console.log('Mock: 注册提交', state)
-  alert('注册成功！请登录（Mock演示）')
-  window.location.href = '/sign-in'
+  loading.value = true
+  error.value = ''
+
+  router.post('/auth/register', state, {
+    onFinish: () => {
+      loading.value = false
+    },
+    onError: (errors) => {
+      error.value = Object.values(errors)[0] || '注册失败，请稍后重试'
+    },
+  })
 }
 </script>
