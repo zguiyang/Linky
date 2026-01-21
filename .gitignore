@@ -36,3 +36,11 @@ AGENTS.md
 
 # docker files
 docker-compose.dev.yml
+
+# web/ directory (Nuxt.js)
+.output
+.data
+.nuxt
+.nitro
+dist
+!.env.example

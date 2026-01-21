@@ -14,14 +14,10 @@ import { middleware } from '#start/kernel'
 router
   .group(() => {
     // 认证API
-    router
-      .post('/auth/register', '#controllers/auth_controller.register')
-      .middleware(middleware.guest())
-    router.post('/auth/login', '#controllers/auth_controller.login').middleware(middleware.guest())
+    router.post('/auth/register', '#controllers/auth_controller.register')
+    router.post('/auth/login', '#controllers/auth_controller.login')
     router.post('/auth/logout', '#controllers/auth_controller.logout').middleware(middleware.auth())
-    router
-      .post('/auth/forgot-password', '#controllers/auth_controller.forgotPassword')
-      .middleware(middleware.guest())
+    router.post('/auth/forgot-password', '#controllers/auth_controller.forgotPassword')
     router
       .post('/auth/reset-password', '#controllers/auth_controller.resetPassword')
       .middleware(middleware.guest())

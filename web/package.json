@@ -1,5 +1,5 @@
 {
-  "name": "linky-nuxt",
+  "name": "@linky/web",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,7 +15,8 @@
     "@iconify-json/simple-icons": "^1.2.63",
     "@nuxt/ui": "^4.3.0",
     "nuxt": "^4.2.2",
-    "ofetch": "^1.5.1"
+    "ofetch": "^1.5.1",
+    "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.12.1",
