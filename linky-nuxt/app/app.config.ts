@@ -7,7 +7,7 @@ export default defineAppConfig({
       success: 'green',
       error: 'red',
       info: 'blue',
-      neutral: 'zinc',
-    },
-  },
+      neutral: 'zinc'
+    }
+  }
 })

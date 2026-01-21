@@ -4,9 +4,15 @@
     :class="cardClasses"
     @click="handleClick"
   >
-    <div class="flex flex-col" :class="contentPaddingClass">
+    <div
+      class="flex flex-col"
+      :class="contentPaddingClass"
+    >
       <div class="flex items-center justify-between gap-4 mb-1.5">
-        <h3 class="font-semibold text-gray-900 dark:text-white truncate" :class="titleClass">
+        <h3
+          class="font-semibold text-gray-900 dark:text-white truncate"
+          :class="titleClass"
+        >
           {{ memo.title || '无标题备忘录' }}
         </h3>
       </div>
@@ -32,13 +38,19 @@
           >
             {{ tag }}
           </u-badge>
-          <span v-if="displayTags.length === 0" class="text-xs text-gray-400"> 暂无标签 </span>
+          <span
+            v-if="displayTags.length === 0"
+            class="text-xs text-gray-400"
+          > 暂无标签 </span>
         </div>
       </div>
     </div>
 
     <div class="absolute top-3 right-3 z-10">
-      <u-dropdown-menu :items="getMemoMenuItems(memo)" :content="{ align: 'end' }">
+      <u-dropdown-menu
+        :items="getMemoMenuItems(memo)"
+        :content="{ align: 'end' }"
+      >
         <u-button
           icon="i-heroicons-ellipsis-horizontal"
           color="neutral"
@@ -150,9 +162,9 @@ const formatDate = (date: string) => {
   if (year === now.getFullYear() && month === now.getMonth() + 1 && day === now.getDate()) {
     return '今天'
   } else if (
-    year === now.getFullYear() &&
-    month === now.getMonth() + 1 &&
-    day === now.getDate() - 1
+    year === now.getFullYear()
+    && month === now.getMonth() + 1
+    && day === now.getDate() - 1
   ) {
     return '昨天'
   }
@@ -168,7 +180,7 @@ const getMemoMenuItems = (memo: Memo): DropdownMenuItem[][] => {
         icon: 'i-heroicons-pencil',
         onSelect: () => {
           emit('edit', memo)
-        },
+        }
       },
       {
         label: '删除',
@@ -176,9 +188,9 @@ const getMemoMenuItems = (memo: Memo): DropdownMenuItem[][] => {
         color: 'error',
         onSelect: () => {
           emit('edit', memo)
-        },
-      },
-    ],
+        }
+      }
+    ]
   ]
 }
 

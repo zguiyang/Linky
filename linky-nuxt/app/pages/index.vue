@@ -9,9 +9,9 @@
           label: entryButton.label,
           to: entryButton.to,
           size: 'xl',
-          icon: 'i-heroicons-arrow-right',
+          icon: 'i-heroicons-arrow-right'
         },
-        { label: '了解更多', to: '#features', color: 'neutral', variant: 'ghost', size: 'xl' },
+        { label: '了解更多', to: '#features', color: 'neutral', variant: 'ghost', size: 'xl' }
       ]"
       :ui="{ container: 'flex flex-col lg:grid py-32 sm:py-40 lg:py-48 gap-16 sm:gap-y-24' }"
     />
@@ -25,28 +25,28 @@
         {
           title: '书签管理',
           description: '高效管理您的网络书签，支持分类整理和智能标签，让链接井井有条',
-          icon: 'i-heroicons-bookmark',
+          icon: 'i-heroicons-bookmark'
         },
         {
           title: '备忘录',
           description: '快速记录想法、灵感和重要信息，随时随地访问您的笔记',
-          icon: 'i-heroicons-document-text',
+          icon: 'i-heroicons-document-text'
         },
         {
           title: '安全访问',
           description: '基于 Access Token 的安全认证，保护您的个人数据隐私',
-          icon: 'i-heroicons-shield-check',
+          icon: 'i-heroicons-shield-check'
         },
         {
           title: '快速搜索',
           description: '通过关键词快速找到书签或备忘录，提升工作效率',
-          icon: 'i-heroicons-magnifying-glass',
+          icon: 'i-heroicons-magnifying-glass'
         },
         {
           title: '标签系统',
           description: '灵活的标签分类，让信息组织更加高效和个性化',
-          icon: 'i-heroicons-tag',
-        },
+          icon: 'i-heroicons-tag'
+        }
       ]"
       :ui="{ container: 'flex flex-col lg:grid py-20 sm:py-24 lg:py-32 gap-8 sm:gap-16' }"
     />
@@ -55,9 +55,19 @@
       <div class="container">
         <div class="cta-card">
           <div class="cta-content">
-            <u-badge label="Free" size="lg" color="primary" variant="soft" class="cta-badge" />
-            <h2 class="cta-title">准备好开始整理您的知识了吗？</h2>
-            <p class="cta-description">立即登录，开始使用 Linky 打造属于您的个人知识管理空间</p>
+            <u-badge
+              label="Free"
+              size="lg"
+              color="primary"
+              variant="soft"
+              class="cta-badge"
+            />
+            <h2 class="cta-title">
+              准备好开始整理您的知识了吗？
+            </h2>
+            <p class="cta-description">
+              立即登录，开始使用 Linky 打造属于您的个人知识管理空间
+            </p>
             <div class="cta-buttons">
               <u-button
                 :to="entryButton.to"
@@ -90,11 +100,11 @@ import { computed, ref } from 'vue'
 definePageMeta({ layout: 'marketing' })
 
 // TODO: Replace with actual auth state
-const user = ref<{ fullName: string | null; email: string } | null>(null)
+const user = ref<{ fullName: string | null, email: string } | null>(null)
 
 const entryButton = computed(() => ({
   label: user.value ? '进入工作区' : '开始使用',
-  to: user.value ? '/workspace/bookmarks' : '/auth/sign-in',
+  to: user.value ? '/workspace/bookmarks' : '/auth/sign-in'
 }))
 </script>
 

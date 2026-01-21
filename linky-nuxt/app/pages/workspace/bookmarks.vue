@@ -80,7 +80,10 @@
         />
       </div>
 
-      <div v-else class="flex flex-col gap-3">
+      <div
+        v-else
+        class="flex flex-col gap-3"
+      >
         <bookmark-card
           v-for="bookmark in filteredBookmarks"
           :key="bookmark.id"
@@ -92,7 +95,10 @@
 
       <u-empty v-if="filteredBookmarks.length === 0">
         <template #icon>
-          <u-icon name="i-heroicons-bookmark-slash" class="size-16" />
+          <u-icon
+            name="i-heroicons-bookmark-slash"
+            class="size-16"
+          />
         </template>
         <template #title>
           <span class="text-lg font-semibold text-gray-900 dark:text-white">暂无书签</span>
@@ -103,25 +109,29 @@
       </u-empty>
     </div>
 
-    <u-modal v-model:open="showAddBookmarkModal" title="添加新书签">
+    <u-modal
+      v-model:open="showAddBookmarkModal"
+      title="添加新书签"
+    >
       <template #body>
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-              >标题 <span class="text-red-500">*</span></label
-            >
-            <u-input v-model="newBookmark.title" placeholder="输入书签标题" />
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标题 <span class="text-red-500">*</span></label>
+            <u-input
+              v-model="newBookmark.title"
+              placeholder="输入书签标题"
+            />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-              >URL <span class="text-red-500">*</span></label
-            >
-            <u-input v-model="newBookmark.url" type="url" placeholder="https://example.com" />
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">URL <span class="text-red-500">*</span></label>
+            <u-input
+              v-model="newBookmark.url"
+              type="url"
+              placeholder="https://example.com"
+            />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-              >描述</label
-            >
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">描述</label>
             <u-textarea
               v-model="newBookmark.description"
               placeholder="添加简短描述（可选）"
@@ -130,9 +140,7 @@
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-                >分类</label
-              >
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">分类</label>
               <u-select
                 v-model="newBookmark.category"
                 :items="categoryOptions"
@@ -142,13 +150,16 @@
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-              >标签</label
-            >
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标签</label>
             <div
               class="flex flex-wrap gap-2 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg"
             >
-              <u-button icon="i-heroicons-x-mark" color="neutral" variant="ghost" size="xs" />
+              <u-button
+                icon="i-heroicons-x-mark"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+              />
               <UInput
                 v-model="tagInput"
                 type="text"
@@ -161,8 +172,17 @@
         </div>
       </template>
       <template #footer="{ close }">
-        <u-button label="取消" color="neutral" variant="outline" @click="close" />
-        <u-button label="添加" color="primary" @click="handleAddBookmark(close)" />
+        <u-button
+          label="取消"
+          color="neutral"
+          variant="outline"
+          @click="close"
+        />
+        <u-button
+          label="添加"
+          color="primary"
+          @click="handleAddBookmark(close)"
+        />
       </template>
     </u-modal>
   </div>
@@ -188,7 +208,7 @@ const bookmarks = ref([
     category: '开发工具',
     tags: ['Vue', 'JavaScript'],
     visitCount: 128,
-    createdAt: '2024-12-01',
+    createdAt: '2024-12-01'
   },
   {
     id: 2,
@@ -198,7 +218,7 @@ const bookmarks = ref([
     category: '开发工具',
     tags: ['CSS', 'Tailwind'],
     visitCount: 95,
-    createdAt: '2024-11-28',
+    createdAt: '2024-11-28'
   },
   {
     id: 3,
@@ -208,7 +228,7 @@ const bookmarks = ref([
     category: '开发工具',
     tags: ['Git', '代码托管'],
     visitCount: 234,
-    createdAt: '2024-11-20',
+    createdAt: '2024-11-20'
   },
   {
     id: 4,
@@ -219,7 +239,7 @@ const bookmarks = ref([
     category: '效率工具',
     tags: ['笔记', '协作', '效率', '知识管理', '生产力'],
     visitCount: 156,
-    createdAt: '2024-11-25',
+    createdAt: '2024-11-25'
   },
   {
     id: 5,
@@ -229,7 +249,7 @@ const bookmarks = ref([
     category: '设计资源',
     tags: ['UI设计', '协作'],
     visitCount: 89,
-    createdAt: '2024-12-05',
+    createdAt: '2024-12-05'
   },
   {
     id: 6,
@@ -240,7 +260,7 @@ const bookmarks = ref([
     category: '开发工具',
     tags: ['问答', '编程', '社区'],
     visitCount: 312,
-    createdAt: '2024-11-15',
+    createdAt: '2024-11-15'
   },
   {
     id: 7,
@@ -250,7 +270,7 @@ const bookmarks = ref([
     category: '设计资源',
     tags: ['UI设计', '灵感', '作品集', '设计社区', '素材'],
     visitCount: 67,
-    createdAt: '2024-12-02',
+    createdAt: '2024-12-02'
   },
   {
     id: 8,
@@ -260,7 +280,7 @@ const bookmarks = ref([
     category: '学习资源',
     tags: ['HTML', 'CSS', 'JavaScript', 'Web开发'],
     visitCount: 278,
-    createdAt: '2024-11-18',
+    createdAt: '2024-11-18'
   },
   {
     id: 9,
@@ -271,7 +291,7 @@ const bookmarks = ref([
     category: '开发工具',
     tags: ['编辑器', '开发工具', 'IDE'],
     visitCount: 423,
-    createdAt: '2024-11-10',
+    createdAt: '2024-11-10'
   },
   {
     id: 10,
@@ -282,7 +302,7 @@ const bookmarks = ref([
     category: '效率工具',
     tags: ['AI', '人工智能', '聊天', '生产力'],
     visitCount: 567,
-    createdAt: '2024-12-08',
+    createdAt: '2024-12-08'
   },
   {
     id: 11,
@@ -292,7 +312,7 @@ const bookmarks = ref([
     category: '学习资源',
     tags: ['博客', '阅读', '文章'],
     visitCount: 45,
-    createdAt: '2024-12-03',
+    createdAt: '2024-12-03'
   },
   {
     id: 12,
@@ -302,7 +322,7 @@ const bookmarks = ref([
     category: '设计资源',
     tags: ['在线设计', '模板', '图形'],
     visitCount: 134,
-    createdAt: '2024-11-22',
+    createdAt: '2024-11-22'
   },
   {
     id: 13,
@@ -313,7 +333,7 @@ const bookmarks = ref([
     category: '开发工具',
     tags: ['代码编辑器', '前端', '演示'],
     visitCount: 98,
-    createdAt: '2024-11-28',
+    createdAt: '2024-11-28'
   },
   {
     id: 14,
@@ -324,7 +344,7 @@ const bookmarks = ref([
     category: '效率工具',
     tags: ['项目管理', '团队协作', '效率'],
     visitCount: 76,
-    createdAt: '2024-12-06',
+    createdAt: '2024-12-06'
   },
   {
     id: 15,
@@ -334,7 +354,7 @@ const bookmarks = ref([
     category: '学习资源',
     tags: ['社区', '博客', '编程'],
     visitCount: 112,
-    createdAt: '2024-11-30',
+    createdAt: '2024-11-30'
   },
   {
     id: 16,
@@ -345,7 +365,7 @@ const bookmarks = ref([
     category: '开发工具',
     tags: ['部署', '前端', '云服务', 'Next.js', 'Nuxt.js', '性能'],
     visitCount: 201,
-    createdAt: '2024-11-12',
+    createdAt: '2024-11-12'
   },
   {
     id: 17,
@@ -356,7 +376,7 @@ const bookmarks = ref([
     category: '开发工具',
     tags: ['支付', 'API', '金融'],
     visitCount: 89,
-    createdAt: '2024-11-20',
+    createdAt: '2024-11-20'
   },
   {
     id: 18,
@@ -367,7 +387,7 @@ const bookmarks = ref([
     category: '设计资源',
     tags: ['设计', '作品集', 'Adobe'],
     visitCount: 54,
-    createdAt: '2024-12-04',
+    createdAt: '2024-12-04'
   },
   {
     id: 19,
@@ -378,7 +398,7 @@ const bookmarks = ref([
     category: '学习资源',
     tags: ['视频', '教程', '娱乐', '学习'],
     visitCount: 345,
-    createdAt: '2024-11-08',
+    createdAt: '2024-11-08'
   },
   {
     id: 20,
@@ -388,7 +408,7 @@ const bookmarks = ref([
     category: '开发工具',
     tags: ['通信', 'API', '消息', '语音'],
     visitCount: 43,
-    createdAt: '2024-12-07',
+    createdAt: '2024-12-07'
   },
   {
     id: 21,
@@ -398,7 +418,7 @@ const bookmarks = ref([
     category: '效率工具',
     tags: ['产品', '发现', '创业'],
     visitCount: 167,
-    createdAt: '2024-11-14',
+    createdAt: '2024-11-14'
   },
   {
     id: 22,
@@ -409,7 +429,7 @@ const bookmarks = ref([
     category: '设计资源',
     tags: ['图片', '免费素材', '摄影'],
     visitCount: 289,
-    createdAt: '2024-11-16',
+    createdAt: '2024-11-16'
   },
   {
     id: 23,
@@ -419,7 +439,7 @@ const bookmarks = ref([
     category: '学习资源',
     tags: ['技术', '新闻'],
     visitCount: 31,
-    createdAt: '2024-12-09',
+    createdAt: '2024-12-09'
   },
   {
     id: 24,
@@ -430,7 +450,7 @@ const bookmarks = ref([
     category: '效率工具',
     tags: ['Mac', '启动器', '生产力', '工具', '快捷键', '效率', '工作流'],
     visitCount: 156,
-    createdAt: '2024-11-26',
+    createdAt: '2024-11-26'
   },
   {
     id: 25,
@@ -441,8 +461,8 @@ const bookmarks = ref([
     category: '效率工具',
     tags: ['白板', '绘图', '协作', '架构'],
     visitCount: 92,
-    createdAt: '2024-11-24',
-  },
+    createdAt: '2024-11-24'
+  }
 ])
 
 const newBookmark = ref({
@@ -450,7 +470,7 @@ const newBookmark = ref({
   url: '',
   description: '',
   category: '',
-  tags: [] as string[],
+  tags: [] as string[]
 })
 
 const filteredBookmarks = computed(() => {
@@ -459,10 +479,10 @@ const filteredBookmarks = computed(() => {
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(
-      (b) =>
-        b.title.toLowerCase().includes(query) ||
-        b.description.toLowerCase().includes(query) ||
-        b.tags.some((tag) => tag.toLowerCase().includes(query))
+      b =>
+        b.title.toLowerCase().includes(query)
+        || b.description.toLowerCase().includes(query)
+        || b.tags.some(tag => tag.toLowerCase().includes(query))
     )
   }
 
@@ -484,13 +504,13 @@ const categoryOptions = [
   { label: '设计资源', value: '设计资源' },
   { label: '学习资源', value: '学习资源' },
   { label: '效率工具', value: '效率工具' },
-  { label: '其他', value: '其他' },
+  { label: '其他', value: '其他' }
 ]
 
 const sortOptions = [
   { label: '最近添加', value: 'recent' },
   { label: '最多访问', value: 'visits' },
-  { label: '名称排序', value: 'name' },
+  { label: '名称排序', value: 'name' }
 ]
 
 const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
@@ -508,7 +528,7 @@ const getCategoryName = (categoryId: string) => {
     design: '设计资源',
     learning: '学习资源',
     productivity: '效率工具',
-    other: '其他',
+    other: '其他'
   }
   return categoryMap[categoryId] || '未分类'
 }
@@ -527,7 +547,7 @@ const handleAddBookmark = (close?: () => void) => {
     category: newBookmark.value.category,
     tags: newBookmark.value.tags,
     visitCount: 0,
-    createdAt: new Date().toISOString().split('T')[0] || '',
+    createdAt: new Date().toISOString().split('T')[0] || ''
   }
 
   bookmarks.value.unshift(bookmark)
@@ -539,7 +559,7 @@ const handleAddBookmark = (close?: () => void) => {
     url: '',
     description: '',
     category: '',
-    tags: [],
+    tags: []
   }
 
   close?.()
@@ -552,7 +572,7 @@ const addTag = () => {
   }
 }
 
-const removeTag = (index: number | string) => {
+const _removeTag = (index: number | string) => {
   newBookmark.value.tags.splice(Number(index), 1)
 }
 

@@ -5,11 +5,20 @@
       variant="outline"
     >
       <template #header>
-        <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">忘记密码</h2>
+        <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
+          忘记密码
+        </h2>
       </template>
 
-      <u-form class="flex flex-col gap-4" @submit="onSubmit">
-        <u-form-field label="邮箱" name="email" size="lg">
+      <u-form
+        class="flex flex-col gap-4"
+        @submit="onSubmit"
+      >
+        <u-form-field
+          label="邮箱"
+          name="email"
+          size="lg"
+        >
           <u-input
             v-model="state.email"
             placeholder="请输入您的注册邮箱"
@@ -64,6 +73,7 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+
 definePageMeta({ layout: 'auth' })
 
 const loading = ref(false)
@@ -71,7 +81,7 @@ const success = ref(false)
 const error = ref('')
 
 const state = reactive({
-  email: '',
+  email: ''
 })
 
 const onSubmit = async () => {

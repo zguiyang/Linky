@@ -24,7 +24,10 @@
 
         <template #footer>
           <NuxtLink to="/">
-            <u-button block color="primary"> 返回首页 </u-button>
+            <u-button
+              block
+              color="primary"
+            > 返回首页 </u-button>
           </NuxtLink>
         </template>
       </u-card>
@@ -36,8 +39,8 @@
 defineProps({
   error: {
     type: Object,
-    required: true,
-  },
+    required: true
+  }
 })
 
 // Clear error on load

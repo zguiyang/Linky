@@ -5,16 +5,39 @@
       variant="outline"
     >
       <template #header>
-        <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">系统登录</h2>
+        <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
+          系统登录
+        </h2>
       </template>
 
-      <u-form class="flex flex-col gap-4" @submit="onSubmit">
-        <u-form-field label="Email" name="email" size="lg">
-          <u-input v-model="state.email" placeholder="Email" type="email" class="w-full" />
+      <u-form
+        class="flex flex-col gap-4"
+        @submit="onSubmit"
+      >
+        <u-form-field
+          label="Email"
+          name="email"
+          size="lg"
+        >
+          <u-input
+            v-model="state.email"
+            placeholder="Email"
+            type="email"
+            class="w-full"
+          />
         </u-form-field>
 
-        <u-form-field label="Password" name="password" size="lg">
-          <u-input v-model="state.password" placeholder="Password" type="password" class="w-full" />
+        <u-form-field
+          label="Password"
+          name="password"
+          size="lg"
+        >
+          <u-input
+            v-model="state.password"
+            placeholder="Password"
+            type="password"
+            class="w-full"
+          />
         </u-form-field>
 
         <div class="flex items-center justify-between">
@@ -70,7 +93,7 @@ const error = ref('')
 const state = reactive({
   email: '',
   password: '',
-  rememberMe: false,
+  rememberMe: false
 })
 
 const onSubmit = async () => {

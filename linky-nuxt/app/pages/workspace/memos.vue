@@ -4,11 +4,12 @@
       class="sticky top-0 z-10 flex items-center justify-between px-8 py-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700"
     >
       <div class="flex items-center gap-4">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">我的备忘录</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+          我的备忘录
+        </h1>
         <span
           class="px-3 py-1 text-xs font-semibold bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-full"
-          >{{ filteredMemos.length }} 个备忘录</span
-        >
+        >{{ filteredMemos.length }} 个备忘录</span>
       </div>
       <div class="flex items-center gap-4">
         <u-input
@@ -47,9 +48,16 @@
           :popper="{ strategy: 'fixed' }"
           size="md"
         />
-        <u-button color="primary" size="md" @click="openAddModal">
+        <u-button
+          color="primary"
+          size="md"
+          @click="openAddModal"
+        >
           <template #leading>
-            <u-icon name="i-heroicons-plus" class="w-4 h-4" />
+            <u-icon
+              name="i-heroicons-plus"
+              class="w-4 h-4"
+            />
           </template>
           新建备忘录
         </u-button>
@@ -72,7 +80,10 @@
         @click="viewFilter = 'pinned'"
       >
         <template #leading>
-          <u-icon name="i-heroicons-star" :class="{ 'text-amber-500': viewFilter === 'pinned' }" />
+          <u-icon
+            name="i-heroicons-star"
+            :class="{ 'text-amber-500': viewFilter === 'pinned' }"
+          />
         </template>
         已置顶
       </u-button>
@@ -105,7 +116,10 @@
         />
       </div>
 
-      <div v-else class="flex flex-col gap-2">
+      <div
+        v-else
+        class="flex flex-col gap-2"
+      >
         <memo-card
           v-for="memo in filteredMemos"
           :key="memo.id"
@@ -123,10 +137,17 @@
         <div
           class="w-20 h-20 flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500"
         >
-          <u-icon name="i-heroicons-document-text" class="w-16 h-16" />
+          <u-icon
+            name="i-heroicons-document-text"
+            class="w-16 h-16"
+          />
         </div>
-        <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">暂无备忘录</p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">开始创建您的第一个备忘录吧</p>
+        <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          暂无备忘录
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          开始创建您的第一个备忘录吧
+        </p>
       </div>
     </div>
 
@@ -139,7 +160,7 @@
         header: 'px-6 py-5 border-b border-gray-100 dark:border-gray-800',
         body: 'p-0',
         footer:
-          'px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50',
+          'px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50'
       }"
     >
       <template #title>
@@ -167,7 +188,10 @@
             v-if="modalMode === 'edit' && formData.pinned"
             class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-600 dark:text-amber-400 rounded-full transition-all duration-200"
           >
-            <u-icon name="i-heroicons-star-solid" class="w-3.5 h-3.5" />
+            <u-icon
+              name="i-heroicons-star-solid"
+              class="w-3.5 h-3.5"
+            />
             已置顶
           </span>
         </div>
@@ -192,7 +216,10 @@
             class="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
             @click="showDeleteModal = true"
           />
-          <div v-if="modalMode === 'edit'" class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+          <div
+            v-if="modalMode === 'edit'"
+            class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1"
+          />
           <u-button
             icon="i-heroicons-x-mark"
             color="neutral"
@@ -216,7 +243,7 @@
               placeholder="输入备忘录标题（可选）"
               size="lg"
               :ui="{
-                base: 'text-base',
+                base: 'text-base'
               }"
             />
           </div>
@@ -247,7 +274,11 @@
                   <div
                     class="flex items-center gap-1.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 shrink-0 sticky top-0"
                   >
-                    <u-editor-toolbar :editor="editor" :items="toolbarItems" layout="fixed" />
+                    <u-editor-toolbar
+                      :editor="editor"
+                      :items="toolbarItems"
+                      layout="fixed"
+                    />
                   </div>
                 </template>
               </u-editor>
@@ -258,7 +289,10 @@
           <div class="px-6 py-5 border-t border-gray-100 dark:border-gray-800">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <u-switch v-model="formData.pinned" color="warning" />
+                <u-switch
+                  v-model="formData.pinned"
+                  color="warning"
+                />
                 <div class="flex flex-col">
                   <span class="text-sm font-medium text-gray-700 dark:text-gray-300">置顶</span>
                   <span class="text-xs text-gray-500 dark:text-gray-400">添加到置顶列表</span>
@@ -272,11 +306,20 @@
       <template #footer="{ close }">
         <div class="flex items-center justify-between w-full">
           <!-- 编辑模式显示最后更新时间 -->
-          <p v-if="modalMode === 'edit'" class="text-sm text-gray-500 dark:text-gray-400">
-            <u-icon name="i-heroicons-clock" class="w-4 h-4 inline mr-1" />
+          <p
+            v-if="modalMode === 'edit'"
+            class="text-sm text-gray-500 dark:text-gray-400"
+          >
+            <u-icon
+              name="i-heroicons-clock"
+              class="w-4 h-4 inline mr-1"
+            />
             最后更新: {{ formData.updatedAt }}
           </p>
-          <p v-else class="text-sm text-gray-500 dark:text-gray-400" />
+          <p
+            v-else
+            class="text-sm text-gray-500 dark:text-gray-400"
+          />
           <div class="flex items-center gap-3">
             <u-button
               color="neutral"
@@ -307,7 +350,10 @@
       </template>
     </u-modal>
 
-    <u-modal v-model:open="showDeleteModal" title="删除备忘录">
+    <u-modal
+      v-model:open="showDeleteModal"
+      title="删除备忘录"
+    >
       <template #title>
         <span class="sr-only">删除备忘录</span>
       </template>
@@ -315,14 +361,25 @@
         <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed text-center">
           您确定要删除备忘录 "<strong class="text-gray-900 dark:text-white">{{
             selectedMemo?.title || '无标题备忘录'
-          }}</strong
-          >" 吗？
+          }}</strong>" 吗？
         </p>
       </template>
 
       <template #footer="{ close }">
-        <u-button color="neutral" variant="outline" @click="close"> 取消 </u-button>
-        <u-button color="error" variant="solid" @click="confirmDelete"> 删除 </u-button>
+        <u-button
+          color="neutral"
+          variant="outline"
+          @click="close"
+        >
+          取消
+        </u-button>
+        <u-button
+          color="error"
+          variant="solid"
+          @click="confirmDelete"
+        >
+          删除
+        </u-button>
       </template>
     </u-modal>
   </div>
@@ -337,7 +394,7 @@ definePageMeta({ layout: 'workspace' })
 const searchQuery = ref('')
 const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
 const viewFilter = ref<'all' | 'pinned'>('all')
-const selectedMemo = ref<{ id: number; title: string } | null>(null)
+const selectedMemo = ref<{ id: number, title: string } | null>(null)
 const showDeleteModal = ref(false)
 const sortBy = ref('recent')
 
@@ -363,7 +420,7 @@ const formData = ref<{
   tags: [],
   pinned: false,
   createdAt: '',
-  updatedAt: '',
+  updatedAt: ''
 })
 
 const memos = ref([
@@ -375,7 +432,7 @@ const memos = ref([
     category: 'work',
     pinned: true,
     createdAt: '2024-12-01',
-    updatedAt: '2024-12-15',
+    updatedAt: '2024-12-15'
   },
   {
     id: 2,
@@ -386,7 +443,7 @@ const memos = ref([
     category: 'study',
     pinned: false,
     createdAt: '2024-11-28',
-    updatedAt: '2024-12-10',
+    updatedAt: '2024-12-10'
   },
   {
     id: 3,
@@ -396,7 +453,7 @@ const memos = ref([
     category: 'work',
     pinned: false,
     createdAt: '2024-11-20',
-    updatedAt: '2024-12-05',
+    updatedAt: '2024-12-05'
   },
   {
     id: 4,
@@ -407,7 +464,7 @@ const memos = ref([
     category: 'life',
     pinned: true,
     createdAt: '2024-12-10',
-    updatedAt: '2024-12-14',
+    updatedAt: '2024-12-14'
   },
   {
     id: 5,
@@ -417,7 +474,7 @@ const memos = ref([
     category: 'life',
     pinned: false,
     createdAt: '2024-12-14',
-    updatedAt: '2024-12-14',
+    updatedAt: '2024-12-14'
   },
   {
     id: 6,
@@ -428,7 +485,7 @@ const memos = ref([
     category: 'study',
     pinned: false,
     createdAt: '2024-12-08',
-    updatedAt: '2024-12-12',
+    updatedAt: '2024-12-12'
   },
   {
     id: 7,
@@ -439,7 +496,7 @@ const memos = ref([
     category: 'work',
     pinned: false,
     createdAt: '2024-12-13',
-    updatedAt: '2024-12-13',
+    updatedAt: '2024-12-13'
   },
   {
     id: 8,
@@ -450,7 +507,7 @@ const memos = ref([
     category: 'other',
     pinned: true,
     createdAt: '2024-12-11',
-    updatedAt: '2024-12-15',
+    updatedAt: '2024-12-15'
   },
   {
     id: 9,
@@ -461,7 +518,7 @@ const memos = ref([
     category: 'life',
     pinned: false,
     createdAt: '2024-12-12',
-    updatedAt: '2024-12-12',
+    updatedAt: '2024-12-12'
   },
   {
     id: 10,
@@ -472,7 +529,7 @@ const memos = ref([
     category: 'work',
     pinned: false,
     createdAt: '2024-12-09',
-    updatedAt: '2024-12-14',
+    updatedAt: '2024-12-14'
   },
   {
     id: 11,
@@ -482,7 +539,7 @@ const memos = ref([
     category: 'life',
     pinned: false,
     createdAt: '2024-12-15',
-    updatedAt: '2024-12-15',
+    updatedAt: '2024-12-15'
   },
   {
     id: 12,
@@ -493,8 +550,8 @@ const memos = ref([
     category: 'other',
     pinned: false,
     createdAt: '2024-12-07',
-    updatedAt: '2024-12-13',
-  },
+    updatedAt: '2024-12-13'
+  }
 ])
 
 const filteredMemos = computed(() => {
@@ -503,15 +560,15 @@ const filteredMemos = computed(() => {
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(
-      (m) =>
-        m.title.toLowerCase().includes(query) ||
-        m.content.toLowerCase().includes(query) ||
-        m.tags.some((tag) => tag.toLowerCase().includes(query))
+      m =>
+        m.title.toLowerCase().includes(query)
+        || m.content.toLowerCase().includes(query)
+        || m.tags.some(tag => tag.toLowerCase().includes(query))
     )
   }
 
   if (viewFilter.value === 'pinned') {
-    result = result.filter((m) => m.pinned)
+    result = result.filter(m => m.pinned)
   }
 
   if (sortBy.value === 'recent') {
@@ -533,13 +590,13 @@ const categoryOptions = [
   { label: '工作', value: 'work' },
   { label: '学习', value: 'study' },
   { label: '生活', value: 'life' },
-  { label: '其他', value: 'other' },
+  { label: '其他', value: 'other' }
 ]
 
 const sortOptions = [
   { label: '最近更新', value: 'recent' },
   { label: '最早创建', value: 'oldest' },
-  { label: '标题排序', value: 'name' },
+  { label: '标题排序', value: 'name' }
 ]
 
 const toolbarItems = [
@@ -547,12 +604,12 @@ const toolbarItems = [
     { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: { text: '加粗' } },
     { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: { text: '斜体' } },
     { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough', tooltip: { text: '删除线' } },
-    { kind: 'mark', mark: 'code', icon: 'i-lucide-code', tooltip: { text: '行内代码' } },
+    { kind: 'mark', mark: 'code', icon: 'i-lucide-code', tooltip: { text: '行内代码' } }
   ],
   [
     { kind: 'bulletList', icon: 'i-lucide-list', tooltip: { text: '无序列表' } },
-    { kind: 'orderedList', icon: 'i-lucide-list-ordered', tooltip: { text: '有序列表' } },
-  ],
+    { kind: 'orderedList', icon: 'i-lucide-list-ordered', tooltip: { text: '有序列表' } }
+  ]
 ] satisfies EditorToolbarItem[][]
 
 const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
@@ -569,7 +626,7 @@ const openAddModal = () => {
     tags: [],
     pinned: false,
     createdAt: '',
-    updatedAt: '',
+    updatedAt: ''
   }
   modalMode.value = 'add'
   showMemoModal.value = true
@@ -611,7 +668,7 @@ const confirmDelete = () => {
 }
 
 const _getCategoryLabel = (value: string) => {
-  const option = categoryOptions.find((opt) => opt.value === value)
+  const option = categoryOptions.find(opt => opt.value === value)
   return option?.label || ''
 }
 
@@ -632,13 +689,13 @@ const handleSaveMemo = () => {
       tags: formData.value.tags,
       pinned: formData.value.pinned || false,
       createdAt: now,
-      updatedAt: now,
+      updatedAt: now
     }
     memos.value.unshift(memo)
     console.log('Mock: 新备忘录已添加（内存中）', memo)
   } else {
     // 编辑模式
-    const index = memos.value.findIndex((m) => m.id === formData.value.id)
+    const index = memos.value.findIndex(m => m.id === formData.value.id)
     if (index !== -1) {
       const existingMemo = memos.value[index]!
       memos.value[index] = {
@@ -649,7 +706,7 @@ const handleSaveMemo = () => {
         tags: formData.value.tags,
         pinned: formData.value.pinned,
         createdAt: existingMemo.createdAt,
-        updatedAt: now,
+        updatedAt: now
       }
       console.log('Mock: 备忘录已更新（内存中）', memos.value[index])
     }

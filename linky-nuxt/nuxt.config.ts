@@ -3,21 +3,21 @@ export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxt/ui'],
 
   devtools: {
-    enabled: true,
+    enabled: true
   },
 
   css: ['~/assets/css/main.css'],
   ui: {
-    fonts: false,
+    fonts: false
   },
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:3333',
-      appName: process.env.NUXT_PUBLIC_APP_NAME || 'Linky',
-    },
+      appName: process.env.NUXT_PUBLIC_APP_NAME || 'Linky'
+    }
   },
   routeRules: {
-    '/': { prerender: true },
+    '/': { prerender: true }
   },
 
   compatibilityDate: '2025-01-15',
@@ -26,8 +26,8 @@ export default defineNuxtConfig({
     config: {
       stylistic: {
         commaDangle: 'never',
-        braceStyle: '1tbs',
-      },
-    },
-  },
+        braceStyle: '1tbs'
+      }
+    }
+  }
 })
