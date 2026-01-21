@@ -13,6 +13,10 @@ export default class AuthController {
 
     await auth.use('web').login(user)
 
+    if (request.accepts(['html', 'json']) === 'json') {
+      return response.json({ success: true, user: user.serialize() })
+    }
+
     return response.redirect('/workspace/bookmarks')
   }
 
@@ -20,7 +24,11 @@ export default class AuthController {
     const data = await ctx.request.validateUsing(loginValidator)
 
     const authService = new AuthService()
-    await authService.login(ctx, data.email, data.password, data.rememberMe ?? false)
+    const user = await authService.login(ctx, data.email, data.password, data.rememberMe ?? false)
+
+    if (ctx.request.accepts(['html', 'json']) === 'json') {
+      return ctx.response.json({ success: true, user: user.serialize() })
+    }
 
     return ctx.response.redirect('/workspace/bookmarks')
   }
@@ -28,6 +36,10 @@ export default class AuthController {
   async logout(ctx: HttpContext) {
     const authService = new AuthService()
     await authService.logout(ctx)
+
+    if (ctx.request.accepts(['html', 'json']) === 'json') {
+      return ctx.response.json({ success: true })
+    }
 
     return ctx.response.redirect('/sign-in')
   }
@@ -54,10 +66,21 @@ export default class AuthController {
     const user = await authService.resetPassword(data.token, data.password)
 
     if (!user) {
+      if (request.accepts(['html', 'json']) === 'json') {
+        return response.status(422).json({
+          success: false,
+          errors: { token: ['重置令牌无效或已过期'] },
+        })
+      }
       return response.redirect('/sign-in?status=reset-failed')
     }
 
     await auth.use('web').login(user)
+
+    if (request.accepts(['html', 'json']) === 'json') {
+      return response.json({ success: true, user: user.serialize() })
+    }
+
     return response.redirect('/workspace/bookmarks')
   }
 
@@ -89,5 +112,10 @@ export default class AuthController {
     const result = await authService.resendVerificationEmail(user.email)
 
     return response.json(result)
+  }
+
+  async me({ auth, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+    return response.json({ success: true, user: user.serialize() })
   }
 }

@@ -4,5 +4,11 @@
     "rootDir": "./",
     "outDir": "./build"
   },
-  "exclude": ["./inertia/**/*", "node_modules", "build"]
+  "exclude": [
+    "./inertia/**/*",
+    "./inertia_backup/**/*",
+    "./linky-nuxt/**/*",
+    "node_modules",
+    "build"
+  ]
 }

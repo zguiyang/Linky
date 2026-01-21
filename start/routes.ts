@@ -30,21 +30,27 @@ router
   .middleware(middleware.guest())
 router.on('/auth/verify-email').renderInertia('auth/verify-email').middleware(middleware.guest())
 
-// 认证API路由
+// API路由组
 router
-  .post('/auth/register', '#controllers/auth_controller.register')
-  .middleware(middleware.guest())
-router.post('/auth/login', '#controllers/auth_controller.login').middleware(middleware.guest())
-router.post('/auth/logout', '#controllers/auth_controller.logout').middleware(middleware.auth())
-router
-  .post('/auth/forgot-password', '#controllers/auth_controller.forgotPassword')
-  .middleware(middleware.guest())
-router
-  .post('/auth/reset-password', '#controllers/auth_controller.resetPassword')
-  .middleware(middleware.guest())
-router
-  .get('/api/auth/verify-email', '#controllers/auth_controller.verifyEmail')
-  .middleware(middleware.guest())
-router
-  .post('/auth/resend-verification', '#controllers/auth_controller.resendVerification')
-  .middleware(middleware.auth())
+  .group(() => {
+    // 认证API
+    router
+      .post('/auth/register', '#controllers/auth_controller.register')
+      .middleware(middleware.guest())
+    router.post('/auth/login', '#controllers/auth_controller.login').middleware(middleware.guest())
+    router.post('/auth/logout', '#controllers/auth_controller.logout').middleware(middleware.auth())
+    router
+      .post('/auth/forgot-password', '#controllers/auth_controller.forgotPassword')
+      .middleware(middleware.guest())
+    router
+      .post('/auth/reset-password', '#controllers/auth_controller.resetPassword')
+      .middleware(middleware.guest())
+    router
+      .get('/auth/verify-email', '#controllers/auth_controller.verifyEmail')
+      .middleware(middleware.guest())
+    router
+      .post('/auth/resend-verification', '#controllers/auth_controller.resendVerification')
+      .middleware(middleware.auth())
+    router.get('/auth/me', '#controllers/auth_controller.me').middleware(middleware.auth())
+  })
+  .prefix('api')
