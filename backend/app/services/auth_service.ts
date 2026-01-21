@@ -1,6 +1,5 @@
 import User from '#models/user'
 import mail from '@adonisjs/mail/services/main'
-import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import { randomBytes } from 'node:crypto'
 
@@ -21,15 +20,11 @@ export class AuthService {
     return user
   }
 
-  async login(ctx: HttpContext, email: string, password: string, rememberMe: boolean = false) {
+  async login(email: string, password: string) {
     const user = await User.verifyCredentials(email, password)
-    await ctx.auth.use('web').login(user, rememberMe)
+    const token = await User.accessTokens.create(user)
 
-    return user
-  }
-
-  async logout(ctx: HttpContext) {
-    await ctx.auth.use('web').logout()
+    return { user, token }
   }
 
   async requestPasswordReset(email: string): Promise<{ success: boolean; message: string }> {

@@ -12,25 +12,29 @@ export default class AuthController {
     const authService = new AuthService()
     const user = await authService.register(data)
 
-    await auth.use('web').login(user)
+    const token = await auth.use('api').createToken(user)
 
-    return response.json(user.serialize())
+    return response.json({
+      user: user.serialize(),
+      token: token.value?.release() ?? '',
+    })
   }
 
   async login(ctx: HttpContext) {
     const data = await ctx.request.validateUsing(loginValidator)
 
     const authService = new AuthService()
-    const user = await authService.login(ctx, data.email, data.password, data.rememberMe ?? false)
+    const { user, token } = await authService.login(data.email, data.password)
 
-    return ctx.response.json(user.serialize())
+    return ctx.response.json({
+      user: user.serialize(),
+      token: token.value?.release() ?? '',
+    })
   }
 
   async logout(ctx: HttpContext) {
-    const authService = new AuthService()
-    await authService.logout(ctx)
-
-    return ctx.response.json(undefined)
+    await ctx.auth.use('api').invalidateToken()
+    return ctx.response.json({ success: true })
   }
 
   async forgotPassword({ request, response }: HttpContext) {
@@ -41,7 +45,7 @@ export default class AuthController {
     return response.json(result)
   }
 
-  async resetPassword({ request, response, auth }: HttpContext) {
+  async resetPassword({ request, response }: HttpContext) {
     const data = await request.validateUsing(resetPasswordValidator)
     const authService = new AuthService()
     const user = await authService.resetPassword(data.token, data.password)
@@ -50,9 +54,7 @@ export default class AuthController {
       throw new Exception('重置令牌无效或已过期', { status: 422 })
     }
 
-    await auth.use('web').login(user)
-
-    return response.json(user.serialize())
+    return response.json({ success: true })
   }
 
   async verifyEmail({ request, response }: HttpContext) {
@@ -68,10 +70,10 @@ export default class AuthController {
     return response.json({ success: true, message: '邮箱验证成功' })
   }
 
-  async resendVerification({ response, auth }: HttpContext) {
-    const user = auth.getUserOrFail()
+  async resendVerification({ request, response }: HttpContext) {
+    const email = request.input('email')
     const authService = new AuthService()
-    const result = await authService.resendVerificationEmail(user.email)
+    const result = await authService.resendVerificationEmail(email)
 
     return response.json(result)
   }
