@@ -14,7 +14,7 @@ export default class ResetPasswordNotification extends BaseMail {
   subject = 'Reset Your Password - Linky'
 
   prepare() {
-    const resetUrl = `${env.get('APP_URL')}/auth/reset-password?token=${this.token}`
+    const resetUrl = `${env.get('CLIENT_URL', env.get('APP_URL'))}/auth/reset-password?token=${this.token}`
 
     this.message.to(this.user.email).htmlView('emails/reset_password', {
       user: this.user,
