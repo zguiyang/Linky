@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { Exception } from '@adonisjs/core/exceptions'
 import { registerValidator } from '#validators/register'
 import { loginValidator } from '#validators/login'
 import { resetPasswordValidator } from '#validators/reset_password'
@@ -14,7 +15,7 @@ export default class AuthController {
     await auth.use('web').login(user)
 
     if (request.accepts(['html', 'json']) === 'json') {
-      return response.json({ success: true, user: user.serialize() })
+      return response.json(user.serialize())
     }
 
     return response.redirect('/workspace/bookmarks')
@@ -27,7 +28,7 @@ export default class AuthController {
     const user = await authService.login(ctx, data.email, data.password, data.rememberMe ?? false)
 
     if (ctx.request.accepts(['html', 'json']) === 'json') {
-      return ctx.response.json({ success: true, user: user.serialize() })
+      return ctx.response.json(user.serialize())
     }
 
     return ctx.response.redirect('/workspace/bookmarks')
@@ -38,7 +39,7 @@ export default class AuthController {
     await authService.logout(ctx)
 
     if (ctx.request.accepts(['html', 'json']) === 'json') {
-      return ctx.response.json({ success: true })
+      return ctx.response.json(undefined)
     }
 
     return ctx.response.redirect('/sign-in')
@@ -67,10 +68,7 @@ export default class AuthController {
 
     if (!user) {
       if (request.accepts(['html', 'json']) === 'json') {
-        return response.status(422).json({
-          success: false,
-          errors: { token: ['重置令牌无效或已过期'] },
-        })
+        throw new Exception('重置令牌无效或已过期', { status: 422 })
       }
       return response.redirect('/sign-in?status=reset-failed')
     }
@@ -78,31 +76,30 @@ export default class AuthController {
     await auth.use('web').login(user)
 
     if (request.accepts(['html', 'json']) === 'json') {
-      return response.json({ success: true, user: user.serialize() })
+      return response.json(user.serialize())
     }
 
     return response.redirect('/workspace/bookmarks')
   }
 
   async verifyEmail({ request, response, auth }: HttpContext) {
-    const data = request.only(['token'])
+    const token = request.input('token')
+
     const authService = new AuthService()
-    const user = await authService.verifyEmail(data.token)
+    const user = await authService.verifyEmail(token)
 
     if (!user) {
       if (request.accepts(['html', 'json']) === 'json') {
-        return response.status(422).json({
-          errors: { token: ['验证令牌无效或已过期'] },
-        })
+        throw new Exception('验证令牌无效或已过期', { status: 422 })
       }
-      return response.redirect('/sign-in?status=verify-failed')
+      return response.redirect('/sign-in?status=verification-failed')
     }
-
-    await auth.use('web').login(user)
 
     if (request.accepts(['html', 'json']) === 'json') {
-      return response.json({ success: true })
+      await auth.use('web').login(user)
+      return response.json(undefined)
     }
+
     return response.redirect('/workspace/bookmarks')
   }
 
@@ -116,6 +113,6 @@ export default class AuthController {
 
   async me({ auth, response }: HttpContext) {
     const user = auth.getUserOrFail()
-    return response.json({ success: true, user: user.serialize() })
+    return response.json(user.serialize())
   }
 }
