@@ -45,9 +45,7 @@ router
     router
       .post('/auth/reset-password', '#controllers/auth_controller.resetPassword')
       .middleware(middleware.guest())
-    router
-      .get('/auth/verify-email', '#controllers/auth_controller.verifyEmail')
-      .middleware(middleware.guest())
+    router.get('/auth/verify-email', '#controllers/auth_controller.verifyEmail')
     router
       .post('/auth/resend-verification', '#controllers/auth_controller.resendVerification')
       .middleware(middleware.auth())

@@ -82,25 +82,17 @@ export default class AuthController {
     return response.redirect('/workspace/bookmarks')
   }
 
-  async verifyEmail({ request, response, auth }: HttpContext) {
+  async verifyEmail({ request, response }: HttpContext) {
     const token = request.input('token')
 
     const authService = new AuthService()
     const user = await authService.verifyEmail(token)
 
     if (!user) {
-      if (request.accepts(['html', 'json']) === 'json') {
-        throw new Exception('验证令牌无效或已过期', { status: 422 })
-      }
-      return response.redirect('/sign-in?status=verification-failed')
+      throw new Exception('验证令牌无效或已过期', { status: 422 })
     }
 
-    if (request.accepts(['html', 'json']) === 'json') {
-      await auth.use('web').login(user)
-      return response.json(undefined)
-    }
-
-    return response.redirect('/workspace/bookmarks')
+    return response.json({ success: true, message: '邮箱验证成功' })
   }
 
   async resendVerification({ response, auth }: HttpContext) {
