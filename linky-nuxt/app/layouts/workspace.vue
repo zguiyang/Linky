@@ -1,0 +1,243 @@
+<template>
+  <div class="w-full">
+    <AmbientBackground />
+
+    <email-verification-alert :user="user" />
+
+      <div class="flex h-screen relative overflow-hidden">
+        <!-- 第一栏：页面级导航 -->
+        <nav
+          class="relative w-[72px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-6 z-0"
+        >
+          <!-- Logo -->
+          <div class="mb-8">
+            <div
+              class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-pink-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/30"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2L2 7L12 12L22 7L12 2Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M2 17L12 22L22 17"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M2 12L12 17L22 12"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+
+          <!-- 页面导航 -->
+          <div class="flex-1 w-full">
+            <u-navigation-menu
+              :items="navigationItems"
+              orientation="vertical"
+              collapsed
+              :tooltip="{ content: { side: 'right' } }"
+              :popover="false"
+              :ui="{
+                link: 'w-full h-12 rounded-xl flex items-center justify-center data-[state=active]:bg-primary/10',
+                linkLeadingIcon: 'w-6 h-6 data-[state=active]:text-primary'
+              }"
+            />
+          </div>
+
+          <!-- 底部工具 -->
+          <div class="flex flex-col gap-2 p-3">
+            <u-button
+              icon="i-heroicons-magnifying-glass"
+              color="neutral"
+              variant="ghost"
+              class="cursor-pointer"
+              @click="showGlobalSearchModal = true"
+            />
+            <u-button
+              icon="i-heroicons-cog-6-tooth"
+              color="neutral"
+              variant="ghost"
+              class="cursor-pointer"
+            />
+            <u-dropdown-menu
+              :items="userMenuItems"
+              :content="{ align: 'start', side: 'top', sideOffset: 8 }"
+              :ui="{ content: 'w-56' }"
+            >
+              <template #default>
+                <u-avatar
+                  :alt="user?.fullName || user?.email || 'User'"
+                  size="sm"
+                  class="cursor-pointer"
+                >
+                  <template #fallback>
+                    {{ (user?.fullName || user?.email || 'U').charAt(0).toUpperCase() }}
+                  </template>
+                </u-avatar>
+              </template>
+            </u-dropdown-menu>
+            <u-color-mode-button />
+          </div>
+        </nav>
+
+        <!-- 第二栏：侧边栏 -->
+        <aside
+          class="relative w-[280px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-y-auto z-0 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent"
+        >
+          <!-- 标签区域 -->
+          <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between mb-4">
+              <h3
+                class="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400"
+              >
+                标签
+              </h3>
+              <u-button
+                icon="i-heroicons-plus"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+              />
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-for="tag in popularTags"
+                :key="tag.id"
+                class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-200 cursor-pointer transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
+                :class="{
+                  'bg-indigo-50 dark:bg-indigo-900/50 border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300':
+                    selectedTags.includes(tag.id)
+                }"
+                @click="toggleTag(tag.id)"
+              >
+                {{ tag.name }}
+              </span>
+            </div>
+          </div>
+        </aside>
+
+        <!-- 第三栏：主内容区域 -->
+        <main
+          class="relative flex-1 overflow-y-auto z-0 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
+        >
+          <slot />
+        </main>
+      </div>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import type { NavigationMenuItem } from '@nuxt/ui'
+import AmbientBackground from '~/components/shared/AmbientBackground.vue'
+
+// TODO: Replace with actual auth state
+const user = ref<{ fullName: string | null, email: string, emailVerifiedAt: string | null } | null>(
+  null
+)
+
+const showGlobalSearchModal = ref(false)
+const globalSearchQuery = ref('')
+const searchResults = ref<any[]>([])
+
+const navigationItems = ref<NavigationMenuItem[]>([
+  { label: '书签', icon: 'i-heroicons-bookmark', to: '/workspace/bookmarks' },
+  { label: '备忘录', icon: 'i-heroicons-document-text', to: '/workspace/memos' }
+])
+
+const handleLogout = () => {
+  // TODO: Implement actual logout
+  console.log('Mock: Logout')
+  navigateTo('/auth/sign-in')
+}
+
+const userMenuItems = computed(() => {
+  return [
+    [
+      {
+        label: '当前用户'
+      },
+      {
+        label: user.value?.fullName || user.value?.email || 'User',
+        description: user.value?.email,
+        avatar: {
+          alt: user.value?.fullName || user.value?.email || 'User',
+          size: 'md'
+        }
+      }
+    ],
+    [
+      {
+        label: '登出',
+        icon: 'i-heroicons-arrow-right-on-rectangle',
+        onSelect: handleLogout,
+        color: 'error'
+      }
+    ]
+  ]
+})
+
+const popularTags = ref([
+  { id: 'javascript', name: 'JavaScript', count: 2 },
+  { id: 'vue', name: 'Vue', count: 2 },
+  { id: 'css', name: 'CSS', count: 1 },
+  { id: 'tailwind', name: 'Tailwind', count: 1 }
+])
+
+const selectedTags = ref<string[]>([])
+
+const handleGlobalSearch = () => {
+  const query = globalSearchQuery.value.toLowerCase()
+  if (!query) return
+
+  console.log('Mock: 搜索', query)
+  searchResults.value = [
+    {
+      type: 'bookmark',
+      id: 1,
+      title: 'Vue.js 官方文档',
+      description: 'https://vuejs.org',
+      icon: 'i-heroicons-bookmark'
+    },
+    {
+      type: 'memo',
+      id: 1,
+      title: '项目规划',
+      description: '这是一个关于项目规划的备忘录...',
+      icon: 'i-heroicons-document-text'
+    }
+  ]
+}
+
+const toggleTag = (tagId: string) => {
+  const index = selectedTags.value.indexOf(tagId)
+  if (index > -1) {
+    selectedTags.value.splice(index, 1)
+  } else {
+    selectedTags.value.push(tagId)
+  }
+}
+
+defineExpose({
+  popularTags,
+  selectedTags,
+  toggleTag
+})
+</script>

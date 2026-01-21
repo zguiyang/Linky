@@ -1,76 +1,177 @@
 <template>
-  <div>
-    <UPageHero
-      title="Nuxt Starter Template"
-      description="A production-ready starter template powered by Nuxt UI. Build beautiful, accessible, and performant applications in minutes, not hours."
-      :links="[{
-        label: 'Get started',
-        to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-        target: '_blank',
-        trailingIcon: 'i-lucide-arrow-right',
-        size: 'xl'
-      }, {
-        label: 'Use this template',
-        to: 'https://github.com/nuxt-ui-templates/starter',
-        target: '_blank',
-        icon: 'i-simple-icons-github',
-        size: 'xl',
-        color: 'neutral',
-        variant: 'subtle'
-      }]"
+  <div class="min-h-screen">
+    <u-page-hero
+      headline="全新上线"
+      title="Linky"
+      description="您的个人知识管理空间 - 高效管理书签、记录想法、让知识触手可及"
+      :links="[
+        {
+          label: entryButton.label,
+          to: entryButton.to,
+          size: 'xl',
+          icon: 'i-heroicons-arrow-right',
+        },
+        { label: '了解更多', to: '#features', color: 'neutral', variant: 'ghost', size: 'xl' },
+      ]"
+      :ui="{ container: 'flex flex-col lg:grid py-32 sm:py-40 lg:py-48 gap-16 sm:gap-y-24' }"
     />
 
-    <UPageSection
+    <u-page-section
       id="features"
-      title="Everything you need to build modern Nuxt apps"
-      description="Start with a solid foundation. This template includes all the essentials for building production-ready applications with Nuxt UI's powerful component system."
-      :features="[{
-        icon: 'i-lucide-rocket',
-        title: 'Production-ready from day one',
-        description: 'Pre-configured with TypeScript, ESLint, Tailwind CSS, and all the best practices. Focus on building features, not setting up tooling.'
-      }, {
-        icon: 'i-lucide-palette',
-        title: 'Beautiful by default',
-        description: 'Leveraging Nuxt UI\'s design system with automatic dark mode, consistent spacing, and polished components that look great out of the box.'
-      }, {
-        icon: 'i-lucide-zap',
-        title: 'Lightning fast',
-        description: 'Optimized for performance with SSR/SSG support, automatic code splitting, and edge-ready deployment. Your users will love the speed.'
-      }, {
-        icon: 'i-lucide-blocks',
-        title: '100+ components included',
-        description: 'Access Nuxt UI\'s comprehensive component library. From forms to navigation, everything is accessible, responsive, and customizable.'
-      }, {
-        icon: 'i-lucide-code-2',
-        title: 'Developer experience first',
-        description: 'Auto-imports, hot module replacement, and TypeScript support. Write less boilerplate and ship more features.'
-      }, {
-        icon: 'i-lucide-shield-check',
-        title: 'Built for scale',
-        description: 'Enterprise-ready architecture with proper error handling, SEO optimization, and security best practices built-in.'
-      }]"
+      headline="功能特性"
+      title="一站式知识管理"
+      description="Linky 提供简洁而强大的工具，帮助您整理和访问网络资源与个人想法"
+      :features="[
+        {
+          title: '书签管理',
+          description: '高效管理您的网络书签，支持分类整理和智能标签，让链接井井有条',
+          icon: 'i-heroicons-bookmark',
+        },
+        {
+          title: '备忘录',
+          description: '快速记录想法、灵感和重要信息，随时随地访问您的笔记',
+          icon: 'i-heroicons-document-text',
+        },
+        {
+          title: '安全访问',
+          description: '基于 Access Token 的安全认证，保护您的个人数据隐私',
+          icon: 'i-heroicons-shield-check',
+        },
+        {
+          title: '快速搜索',
+          description: '通过关键词快速找到书签或备忘录，提升工作效率',
+          icon: 'i-heroicons-magnifying-glass',
+        },
+        {
+          title: '标签系统',
+          description: '灵活的标签分类，让信息组织更加高效和个性化',
+          icon: 'i-heroicons-tag',
+        },
+      ]"
+      :ui="{ container: 'flex flex-col lg:grid py-20 sm:py-24 lg:py-32 gap-8 sm:gap-16' }"
     />
 
-    <UPageSection>
-      <UPageCTA
-        title="Ready to build your next Nuxt app?"
-        description="Join thousands of developers building with Nuxt and Nuxt UI. Get this template and start shipping today."
-        variant="subtle"
-        :links="[{
-          label: 'Start building',
-          to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-          target: '_blank',
-          trailingIcon: 'i-lucide-arrow-right',
-          color: 'neutral'
-        }, {
-          label: 'View on GitHub',
-          to: 'https://github.com/nuxt-ui-templates/starter',
-          target: '_blank',
-          icon: 'i-simple-icons-github',
-          color: 'neutral',
-          variant: 'outline'
-        }]"
-      />
-    </UPageSection>
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-card">
+          <div class="cta-content">
+            <u-badge label="Free" size="lg" color="primary" variant="soft" class="cta-badge" />
+            <h2 class="cta-title">准备好开始整理您的知识了吗？</h2>
+            <p class="cta-description">立即登录，开始使用 Linky 打造属于您的个人知识管理空间</p>
+            <div class="cta-buttons">
+              <u-button
+                :to="entryButton.to"
+                size="xl"
+                icon="i-heroicons-rocket-launch"
+                class="cursor-pointer"
+              >
+                {{ entryButton.label }}
+              </u-button>
+              <u-button
+                to="#features"
+                color="neutral"
+                variant="ghost"
+                size="xl"
+                class="cursor-pointer"
+              >
+                了解更多
+              </u-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+
+definePageMeta({ layout: 'marketing' })
+
+// TODO: Replace with actual auth state
+const user = ref<{ fullName: string | null; email: string } | null>(null)
+
+const entryButton = computed(() => ({
+  label: user.value ? '进入工作区' : '开始使用',
+  to: user.value ? '/workspace/bookmarks' : '/auth/sign-in',
+}))
+</script>
+
+<style scoped>
+.cta-section {
+  padding: 60px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .cta-section {
+    padding: 100px 20px;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.cta-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
+  background: var(--color-glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(229, 231, 235, 1);
+  border-radius: 24px;
+}
+
+.dark .cta-card {
+  background: var(--dark-color-glass-bg);
+}
+
+.cta-content {
+  position: relative;
+  z-index: 1;
+}
+
+.cta-badge {
+  margin-bottom: 20px;
+  display: inline-flex;
+}
+
+.cta-title {
+  font-size: 3rem;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  color: var(--color-gray-900);
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.dark .cta-title {
+  color: var(--color-gray-50);
+}
+
+.cta-description {
+  font-size: 1.125rem;
+  color: var(--color-gray-600);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.dark .cta-description {
+  color: var(--color-gray-300);
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+</style>

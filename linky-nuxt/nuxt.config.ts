@@ -10,6 +10,12 @@ export default defineNuxtConfig({
   ui: {
     fonts: false,
   },
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:3333',
+      appName: process.env.NUXT_PUBLIC_APP_NAME || 'Linky',
+    },
+  },
   routeRules: {
     '/': { prerender: true },
   },
