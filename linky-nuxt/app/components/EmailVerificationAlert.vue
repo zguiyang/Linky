@@ -25,6 +25,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
+import { useAuth } from '~/composables/useAuth'
 
 interface User {
   emailVerifiedAt: string | null
@@ -39,6 +40,7 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
+const { resendVerification } = useAuth()
 const showAlert = computed(() => props.user && !props.user.emailVerifiedAt)
 const userClosed = ref(false)
 
@@ -57,19 +59,11 @@ const handleResend = async () => {
   sending.value = true
 
   try {
-    // TODO: Replace with actual API call
-    // const result = await $fetch('/api/auth/resend-verification', {
-    //   method: 'POST',
-    // })
-
-    console.log('Mock: Resending verification email for', props.user?.email)
-
-    // Mock successful response
+    await resendVerification()
     startCooldown()
     emit('refresh')
   } catch (error) {
     console.error('Failed to resend verification email:', error)
-    alert('发送失败，请稍后重试')
   } finally {
     sending.value = false
   }

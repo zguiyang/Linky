@@ -11,6 +11,7 @@
       </template>
 
       <u-form
+        :state="state"
         class="flex flex-col gap-4"
         @submit="onSubmit"
       >
@@ -31,7 +32,7 @@
           type="submit"
           block
           :loading="loading"
-          class="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-bg-hover)] text-white"
+          class="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-white"
         >
           发送重置链接
         </u-button>
@@ -48,21 +49,10 @@
         重置邮件已发送，请检查您的邮箱
       </u-alert>
 
-      <u-alert
-        v-if="error"
-        color="error"
-        variant="subtle"
-        icon="i-heroicons-x-circle"
-        title="发送失败"
-        class="mt-4"
-      >
-        {{ error }}
-      </u-alert>
-
       <div class="text-center mt-4">
         <NuxtLink
           to="/auth/sign-in"
-          class="text-[var(--color-primary-500)] dark:text-[var(--color-primary-light)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-bg-hover)] dark:hover:text-[var(--color-primary-light)] hover:underline"
+          class="text-[var(--color-primary-500)] dark:text-[var(--color-primary-300)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-primary-200)] hover:underline"
         >
           ← 返回登录
         </NuxtLink>
@@ -72,39 +62,27 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
+import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({ layout: 'auth' })
 
-const loading = ref(false)
-const success = ref(false)
-const error = ref('')
+const { forgotPassword, loading } = useAuth()
 
 const state = reactive({
   email: ''
 })
 
+const success = ref(false)
+
 const onSubmit = async () => {
-  loading.value = true
-  error.value = ''
   success.value = false
-
-  try {
-    // TODO: Replace with actual API call
-    // await $fetch('/api/auth/forgot-password', {
-    //   method: 'POST',
-    //   body: state,
-    // })
-
-    console.log('Mock: Forgot password request for', state.email)
+  const result = await forgotPassword(state)
+  if (result?.success) {
     success.value = true
     setTimeout(() => {
       navigateTo('/auth/sign-in')
     }, 3000)
-  } catch (err: any) {
-    error.value = err.data?.message || '发送失败，请重试'
-  } finally {
-    loading.value = false
   }
 }
 </script>

@@ -11,6 +11,8 @@
       </template>
 
       <u-form
+        ref="formRef"
+        :state="state"
         class="flex flex-col gap-4"
         @submit="onSubmit"
       >
@@ -63,13 +65,6 @@
         </u-button>
       </u-form>
 
-      <div
-        v-if="error"
-        class="mt-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm"
-      >
-        {{ error }}
-      </div>
-
       <div class="text-center mt-4">
         <nuxt-link
           to="/auth/sign-up"
@@ -84,11 +79,12 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({ layout: 'auth' })
 
-const loading = ref(false)
-const error = ref('')
+const { login, loading } = useAuth()
+const formRef = ref()
 
 const state = reactive({
   email: '',
@@ -97,22 +93,6 @@ const state = reactive({
 })
 
 const onSubmit = async () => {
-  loading.value = true
-  error.value = ''
-
-  try {
-    // TODO: Replace with actual API call
-    // await $fetch('/api/auth/login', {
-    //   method: 'POST',
-    //   body: state,
-    // })
-
-    console.log('Mock: Login attempt with', state.email)
-    await navigateTo('/workspace/bookmarks')
-  } catch (err: any) {
-    error.value = err.data?.message || '登录失败，请检查您的凭据'
-  } finally {
-    loading.value = false
-  }
+  await login(state)
 }
 </script>

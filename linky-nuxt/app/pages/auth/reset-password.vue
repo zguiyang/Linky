@@ -11,6 +11,8 @@
       </template>
 
       <u-form
+        ref="formRef"
+        :state="state"
         class="flex flex-col gap-4"
         @submit="onSubmit"
       >
@@ -48,7 +50,7 @@
           type="submit"
           block
           :loading="loading"
-          class="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-bg-hover)] text-white"
+          class="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-white"
         >
           重置密码
         </u-button>
@@ -80,13 +82,13 @@
         <NuxtLink
           v-if="showRetryLink"
           to="/auth/forgot-password"
-          class="text-[var(--color-primary-500)] dark:text-[var(--color-primary-light)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-bg-hover)] dark:hover:text-[var(--color-primary-light)] hover:underline"
+          class="text-[var(--color-primary-500)] dark:text-[var(--color-primary-300)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-primary-200)] hover:underline"
         >
           重新发送重置链接
         </NuxtLink>
         <NuxtLink
           to="/auth/sign-in"
-          class="text-[var(--color-primary-500)] dark:text-[var(--color-primary-light)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-bg-hover)] dark:hover:text-[var(--color-primary-light)] hover:underline"
+          class="text-[var(--color-primary-500)] dark:text-[var(--color-primary-300)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-primary-200)] hover:underline"
         >
           ← 返回登录
         </NuxtLink>
@@ -98,11 +100,13 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRoute } from '#app'
+import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({ layout: 'auth' })
 
 const route = useRoute()
-const loading = ref(false)
+const { resetPassword, loading } = useAuth()
+const formRef = ref()
 const success = ref(false)
 const error = ref('')
 const showRetryLink = ref(false)
@@ -116,32 +120,23 @@ const state = reactive({
 })
 
 const onSubmit = async () => {
-  loading.value = true
   error.value = ''
   success.value = false
   showRetryLink.value = false
 
   try {
-    // TODO: Replace with actual API call
-    // await $fetch('/api/auth/reset-password', {
-    //   method: 'POST',
-    //   body: state,
-    // })
-
-    console.log('Mock: Reset password with token', token)
+    await resetPassword(state)
     success.value = true
     setTimeout(() => {
       navigateTo('/workspace/bookmarks')
     }, 2000)
   } catch (err: any) {
-    const errorMessage = err.data?.message || '重置失败，请重试'
+    const errorMessage = err.message || '重置失败，请重试'
     error.value = errorMessage
 
     if (errorMessage.includes('过期') || errorMessage.includes('无效')) {
       showRetryLink.value = true
     }
-  } finally {
-    loading.value = false
   }
 }
 </script>

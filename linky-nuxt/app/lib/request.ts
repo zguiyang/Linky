@@ -1,22 +1,31 @@
 import type { NitroFetchOptions, NitroFetchRequest } from 'nitropack'
+import { useHttpError } from '~/composables/useHttpError'
 
-export type ApiRequestOptions<R extends NitroFetchRequest = NitroFetchRequest> =
-  NitroFetchOptions<R>
+export type ApiRequestOptions<R extends NitroFetchRequest = NitroFetchRequest>
+  = NitroFetchOptions<R>
 
 export async function apiRequest<T = any, R extends NitroFetchRequest = NitroFetchRequest>(
   url: R,
   options: ApiRequestOptions<R> = {}
 ): Promise<T> {
-  const { baseURL = '/api', ...fetchOptions } = options
+  const { baseURL = 'http://localhost:3333/api', ...fetchOptions } = options
   const fetcher: typeof $fetch = import.meta.server ? (useRequestFetch() as any) : $fetch
 
-  const response = await fetcher<T>(url as any, {
-    ...fetchOptions,
-    baseURL,
-    timeout: 10000,
-  })
+  try {
+    const response = await fetcher<T>(url as any, {
+      ...fetchOptions,
+      baseURL,
+      timeout: 10000,
+      credentials: 'include'
+    })
 
-  return response as T
+    return response as T
+  } catch (error: any) {
+    const { handleError } = useHttpError()
+    handleError(error)
+
+    throw error
+  }
 }
 
 export const request = {
@@ -33,7 +42,28 @@ export const request = {
     return apiRequest<T>(url as any, {
       method: 'delete',
       ...(hasBody ? { body: paramsOrBody } : { params: paramsOrBody }),
-      ...options,
+      ...options
     })
   },
+
+  getErrorMessage: (error: any): string => {
+    if (error?.data?.message) {
+      return error.data.message
+    }
+
+    if (error?.data?.errors) {
+      const errors = error.data.errors
+      const firstField = Object.keys(errors)[0]
+      if (firstField && errors[firstField]?.[0]) {
+        return errors[firstField][0]
+      }
+      return '表单验证失败，请检查输入'
+    }
+
+    if (error?.message) {
+      return error.message
+    }
+
+    return '操作失败，请稍后重试'
+  }
 }

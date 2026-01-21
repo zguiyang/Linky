@@ -24,7 +24,7 @@
 
       <div
         v-else-if="success"
-        class="flex flex-col items-center py-6"
+        class="flex flex-col items-center justify-center py-6"
       >
         <div
           class="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4"
@@ -36,7 +36,7 @@
           variant="subtle"
           icon="i-heroicons-check-circle"
           title="验证成功"
-          class="w-full mb-4"
+          class="w-full"
         >
           您的邮箱已验证成功，正在跳转...
         </u-alert>
@@ -44,7 +44,7 @@
 
       <div
         v-else-if="error"
-        class="flex flex-col items-center py-6"
+        class="flex flex-col items-center justify-center py-6"
       >
         <div
           class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4"
@@ -56,11 +56,11 @@
           variant="subtle"
           icon="i-heroicons-x-circle"
           title="验证失败"
-          class="w-full mb-4"
+          class="w-full"
         >
           {{ error }}
         </u-alert>
-        <div class="flex flex-col gap-2 w-full">
+        <div class="flex flex-col gap-2 w-full mt-4">
           <NuxtLink
             to="/auth/forgot-password"
             class="text-center w-full px-4 py-2 bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-white rounded-lg transition-colors"
@@ -80,13 +80,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from '#app'
+import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({ layout: 'auth' })
 
 const route = useRoute()
-const loading = ref(false)
+const { verifyEmail, loading } = useAuth()
+
 const success = ref(false)
 const error = ref('')
 
@@ -98,25 +100,11 @@ onMounted(async () => {
     return
   }
 
-  loading.value = true
-  error.value = ''
-
   try {
-    // TODO: Replace with actual API call
-    // await $fetch('/api/auth/verify-email', {
-    //   method: 'GET',
-    //   query: { token },
-    // })
-
-    console.log('Mock: Verify email with token', token)
+    await verifyEmail(token)
     success.value = true
-    setTimeout(() => {
-      navigateTo('/workspace/bookmarks')
-    }, 2000)
   } catch (err: any) {
-    error.value = err.data?.message || '验证失败，请重试'
-  } finally {
-    loading.value = false
+    error.value = err.message || '验证失败，请重试'
   }
 })
 </script>
