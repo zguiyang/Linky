@@ -14,11 +14,7 @@ export default class AuthController {
 
     await auth.use('web').login(user)
 
-    if (request.accepts(['html', 'json']) === 'json') {
-      return response.json(user.serialize())
-    }
-
-    return response.redirect('/workspace/bookmarks')
+    return response.json(user.serialize())
   }
 
   async login(ctx: HttpContext) {
@@ -27,22 +23,14 @@ export default class AuthController {
     const authService = new AuthService()
     const user = await authService.login(ctx, data.email, data.password, data.rememberMe ?? false)
 
-    if (ctx.request.accepts(['html', 'json']) === 'json') {
-      return ctx.response.json(user.serialize())
-    }
-
-    return ctx.response.redirect('/workspace/bookmarks')
+    return ctx.response.json(user.serialize())
   }
 
   async logout(ctx: HttpContext) {
     const authService = new AuthService()
     await authService.logout(ctx)
 
-    if (ctx.request.accepts(['html', 'json']) === 'json') {
-      return ctx.response.json(undefined)
-    }
-
-    return ctx.response.redirect('/sign-in')
+    return ctx.response.json(undefined)
   }
 
   async forgotPassword({ request, response }: HttpContext) {
@@ -50,15 +38,7 @@ export default class AuthController {
     const authService = new AuthService()
     const result = await authService.requestPasswordReset(data.email)
 
-    if (request.accepts(['html', 'json']) === 'json') {
-      return response.json(result)
-    }
-
-    if (!result.success) {
-      return response.redirect('/sign-in?error=' + encodeURIComponent(result.message))
-    }
-
-    return response.redirect('/sign-in?status=reset-sent')
+    return response.json(result)
   }
 
   async resetPassword({ request, response, auth }: HttpContext) {
@@ -67,19 +47,12 @@ export default class AuthController {
     const user = await authService.resetPassword(data.token, data.password)
 
     if (!user) {
-      if (request.accepts(['html', 'json']) === 'json') {
-        throw new Exception('重置令牌无效或已过期', { status: 422 })
-      }
-      return response.redirect('/sign-in?status=reset-failed')
+      throw new Exception('重置令牌无效或已过期', { status: 422 })
     }
 
     await auth.use('web').login(user)
 
-    if (request.accepts(['html', 'json']) === 'json') {
-      return response.json(user.serialize())
-    }
-
-    return response.redirect('/workspace/bookmarks')
+    return response.json(user.serialize())
   }
 
   async verifyEmail({ request, response }: HttpContext) {

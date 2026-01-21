@@ -21,8 +21,10 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * to return the HTML contents to send as a response.
    */
   protected statusPages: Record<StatusPageRange, StatusPageRenderer> = {
-    '404': (error, { inertia }) => inertia.render('errors/not_found', { error }),
-    '500..599': (error, { inertia }) => inertia.render('errors/server_error', { error }),
+    '404': (_error, { response }) =>
+      response.status(404).json({ error: { message: '资源未找到' } }),
+    '500..599': (_error, { response }) =>
+      response.status(500).json({ error: { message: '服务器内部错误' } }),
   }
 
   /**

@@ -10,26 +10,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
-// 首页
-router.on('/').renderInertia('home')
-
-// 工作区页面
-router.on('/workspace/bookmarks').renderInertia('workspace/bookmarks').middleware(middleware.auth())
-router.on('/workspace/memos').renderInertia('workspace/memos').middleware(middleware.auth())
-
-// 认证页面（保留前端页面，Session认证会实现后端逻辑）
-router.on('/sign-in').renderInertia('auth/sign-in').middleware(middleware.guest())
-router.on('/sign-up').renderInertia('auth/sign-up').middleware(middleware.guest())
-router
-  .on('/auth/forgot-password')
-  .renderInertia('auth/forgot-password')
-  .middleware(middleware.guest())
-router
-  .on('/auth/reset-password')
-  .renderInertia('auth/reset-password')
-  .middleware(middleware.guest())
-router.on('/auth/verify-email').renderInertia('auth/verify-email').middleware(middleware.guest())
-
 // API路由组
 router
   .group(() => {
