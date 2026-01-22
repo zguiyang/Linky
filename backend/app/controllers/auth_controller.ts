@@ -70,10 +70,10 @@ export default class AuthController {
     return response.json({ success: true, message: '邮箱验证成功' })
   }
 
-  async resendVerification({ request, response }: HttpContext) {
-    const email = request.input('email')
+  async resendVerification({ auth, response }: HttpContext) {
+    const user = auth.getUserOrFail()
     const authService = new AuthService()
-    const result = await authService.resendVerificationEmail(email)
+    const result = await authService.resendVerificationEmail(user)
 
     return response.json(result)
   }

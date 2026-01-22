@@ -97,13 +97,7 @@ export class AuthService {
     await mail.sendLater(new ResetPasswordNotification(user, resetToken))
   }
 
-  async resendVerificationEmail(email: string): Promise<{ success: boolean; message: string }> {
-    const user = await User.findBy('email', email)
-
-    if (!user) {
-      return { success: false, message: '该邮箱未绑定用户' }
-    }
-
+  async resendVerificationEmail(user: User): Promise<{ success: boolean; message: string }> {
     if (user.emailVerifiedAt) {
       return { success: false, message: '邮箱已验证' }
     }
