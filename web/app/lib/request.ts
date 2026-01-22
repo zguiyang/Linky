@@ -11,18 +11,27 @@ export async function apiRequest<T = any, R extends NitroFetchRequest = NitroFet
   const { baseURL = 'http://localhost:3333/api', ...fetchOptions } = options
   const fetcher: typeof $fetch = import.meta.server ? (useRequestFetch() as any) : $fetch
 
+  const token = useCookie('auth_token').value
+
   try {
     const response = await fetcher<T>(url as any, {
       ...fetchOptions,
       baseURL,
       timeout: 10000,
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        ...fetchOptions.headers,
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      }
     })
 
     return response as T
   } catch (error: any) {
-    const { handleError } = useHttpError()
-    handleError(error)
+    const isLogoutRequest = options.method === 'post' && url === '/auth/logout'
+    if (!isLogoutRequest) {
+      const { handleError } = useHttpError()
+      handleError(error)
+    }
 
     throw error
   }

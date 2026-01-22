@@ -1,6 +1,7 @@
 import { navigateTo } from '#app'
 
 let currentError: any = null
+let isLoggingOut = false
 
 export const useHttpError = () => {
   const getError = () => {
@@ -12,6 +13,9 @@ export const useHttpError = () => {
   }
 
   const handle401 = () => {
+    if (isLoggingOut) return
+    isLoggingOut = true
+
     const toast = useToast()
     toast.add({
       title: '未登录或登录已过期',
@@ -20,10 +24,14 @@ export const useHttpError = () => {
       icon: 'i-heroicons-lock-closed'
     })
 
-    const { logout } = useAuth()
-    logout()
+    const tokenCookie = useCookie('auth_token')
+    tokenCookie.value = null
 
     navigateTo('/auth/sign-in')
+
+    setTimeout(() => {
+      isLoggingOut = false
+    }, 1000)
   }
 
   const handleError = (error: any) => {

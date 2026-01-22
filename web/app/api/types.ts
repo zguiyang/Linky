@@ -8,6 +8,11 @@ export interface User {
   updatedAt: string | null
 }
 
+export interface AuthResponse {
+  user: User
+  token: string
+}
+
 export interface LoginRequest {
   email: string
   password: string

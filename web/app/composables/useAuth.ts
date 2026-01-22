@@ -28,8 +28,16 @@ export const useAuth = () => {
   const login = async (data: LoginRequest) => {
     loading.value = true
     try {
-      const userData = await authApi.login(data)
-      user.value = userData
+      const authResponse = await authApi.login(data)
+      user.value = authResponse.user
+
+      const tokenCookie = useCookie('auth_token', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30
+      })
+      tokenCookie.value = authResponse.token
 
       const lastPath = useCookie('lastPath')
       const redirectPath = lastPath.value || '/workspace/bookmarks'
@@ -38,6 +46,7 @@ export const useAuth = () => {
       await navigateTo(redirectPath)
     } catch (error) {
       console.error('Login failed:', error)
+      throw error
     } finally {
       loading.value = false
     }
@@ -46,8 +55,16 @@ export const useAuth = () => {
   const register = async (data: RegisterRequest) => {
     loading.value = true
     try {
-      const userData = await authApi.register(data)
-      user.value = userData
+      const authResponse = await authApi.register(data)
+      user.value = authResponse.user
+
+      const tokenCookie = useCookie('auth_token', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30
+      })
+      tokenCookie.value = authResponse.token
 
       const lastPath = useCookie('lastPath')
       const redirectPath = lastPath.value || '/workspace/bookmarks'
@@ -56,6 +73,7 @@ export const useAuth = () => {
       await navigateTo(redirectPath)
     } catch (error) {
       console.error('Registration failed:', error)
+      throw error
     } finally {
       loading.value = false
     }
@@ -65,18 +83,13 @@ export const useAuth = () => {
     loading.value = true
     try {
       await authApi.logout()
-      user.value = null
-      await navigateTo('/auth/sign-in')
-
-      const toast = useToast()
-      toast.add({
-        title: '已退出登录',
-        color: 'neutral',
-        icon: 'i-heroicons-arrow-right-on-rectangle'
-      })
     } catch {
+      console.warn('Logout request failed')
+    } finally {
+      const tokenCookie = useCookie('auth_token')
+      tokenCookie.value = null
       user.value = null
-      await navigateTo('/auth/sign-in')
+      loading.value = false
 
       const toast = useToast()
       toast.add({
@@ -84,8 +97,8 @@ export const useAuth = () => {
         color: 'neutral',
         icon: 'i-heroicons-arrow-right-on-rectangle'
       })
-    } finally {
-      loading.value = false
+
+      await navigateTo('/auth/sign-in')
     }
   }
 
@@ -114,8 +127,16 @@ export const useAuth = () => {
   const resetPassword = async (data: ResetPasswordRequest) => {
     loading.value = true
     try {
-      const userData = await authApi.resetPassword(data)
-      user.value = userData
+      const authResponse = await authApi.resetPassword(data)
+      user.value = authResponse.user
+
+      const tokenCookie = useCookie('auth_token', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30
+      })
+      tokenCookie.value = authResponse.token
 
       const lastPath = useCookie('lastPath')
       const redirectPath = lastPath.value || '/workspace/bookmarks'
@@ -132,6 +153,7 @@ export const useAuth = () => {
       })
     } catch (error) {
       console.error('Reset password failed:', error)
+      throw error
     } finally {
       loading.value = false
     }
