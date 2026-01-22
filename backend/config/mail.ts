@@ -4,16 +4,17 @@ import { defineConfig, transports } from '@adonisjs/mail'
 const mailConfig = defineConfig({
   default: 'resend',
 
-  from: {
-    address: env.get('MAIL_FROM_ADDRESS'),
-    name: env.get('MAIL_FROM_NAME'),
-  },
-
-  mailers: {
+   /**
+    * The mailers object can be used to configure multiple mailers
+    * each using a different transport or same transport with different
+    * options.
+   */
+  mailers: {      
     resend: transports.resend({
       key: env.get('RESEND_API_KEY'),
       baseUrl: 'https://api.resend.com',
     }),
+    
   },
 })
 
