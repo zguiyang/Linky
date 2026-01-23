@@ -57,6 +57,7 @@
     "@adonisjs/lucid": "^21.8.2",
     "@adonisjs/mail": "^9.2.2",
     "@vinejs/vine": "^3.0.1",
+    "edge.js": "^6.4.0",
     "luxon": "^3.7.2",
     "pg": "^8.17.2",
     "reflect-metadata": "^0.2.2"

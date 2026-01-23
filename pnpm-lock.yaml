@@ -35,6 +35,9 @@ importers:
       '@vinejs/vine':
         specifier: ^3.0.1
         version: 3.0.1
+      edge.js:
+        specifier: ^6.4.0
+        version: 6.4.0
       luxon:
         specifier: ^3.7.2
         version: 3.7.2
