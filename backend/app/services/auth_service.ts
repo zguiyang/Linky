@@ -81,7 +81,7 @@ export class AuthService {
 
     const verifyEmailModule = await import('#mails/verify_email_notification')
     const VerifyEmailNotification = verifyEmailModule.default
-    await mail.sendLater(new VerifyEmailNotification(user, verificationToken))
+    await mail.send(new VerifyEmailNotification(user, verificationToken))
   }
 
   private async sendResetPasswordEmail(user: User): Promise<void> {
@@ -94,7 +94,7 @@ export class AuthService {
 
     const resetPasswordModule = await import('#mails/reset_password_notification')
     const ResetPasswordNotification = resetPasswordModule.default
-    await mail.sendLater(new ResetPasswordNotification(user, resetToken))
+    await mail.send(new ResetPasswordNotification(user, resetToken))
   }
 
   async resendVerificationEmail(user: User): Promise<{ success: boolean; message: string }> {
