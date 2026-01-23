@@ -1,21 +1,79 @@
-MIT License
+GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
 
-Copyright (c) 2025 Nuxt UI Templates
+Copyright (C) 2025 Linky
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+===================================
+
+COMMERCIAL LICENSE OPTION
+
+If you wish to use Linky in a commercial context, you have two options:
+
+1. Open Source License (GPLv3)
+   - Use Linky under the GPLv3 license
+   - Make your source code available under the same license
+   - Provide attribution
+   - No fee required
+
+2. Commercial License
+   - Use Linky without making your source code public
+   - Priority support
+   - Custom features and integration support
+   - Contact us for pricing and terms
+
+For commercial licensing inquiries, please contact:
+Email: your-email@example.com
+Website: https://your-website.com
+
+===================================
+
+SUMMARY OF GPLv3 KEY TERMS
+
+✅ Permitted:
+- Commercial use
+- Modification
+- Distribution
+- Private use
+
+❌ Conditions:
+- License and copyright notice
+- State changes
+- Disclose source
+- Same license (GPLv3)
+
+❌ Limitations:
+- Liability
+- Warranty
+- Use trademark
+
+For the full GPLv3 license text, visit:
+https://www.gnu.org/licenses/gpl-3.0.txt
+
+===================================
+
+WHEN DO YOU NEED A COMMERCIAL LICENSE?
+
+You need a commercial license if you want to:
+- Distribute Linky or derivative works in a proprietary product
+- Use Linky without making your modifications open source
+- Remove or modify attribution requirements
+- Sell Linky or incorporate it into a paid product
+- Use Linky in a business without complying with GPLv3
+
+You DON'T need a commercial license if you:
+- Use Linky for personal, educational, or non-profit projects
+- Contribute back your modifications as open source under GPLv3
+- Deploy Linky in an internal tool without distributing it externally

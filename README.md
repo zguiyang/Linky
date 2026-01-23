@@ -584,7 +584,24 @@ Refer to `app/composables/useHttpError.ts`, it automatically redirects to the lo
 
 ## License
 
-This project is UNLICENSED.
+Linky is dual-licensed under the following terms:
+
+### Open Source License (GPLv3)
+- Free for personal, educational, and non-commercial use
+- Modifications must be shared under the same license
+- Suitable for open-source projects and internal tools
+
+### Commercial License
+- Use in commercial products without making your code public
+- Priority support and custom features
+- Remove attribution requirements
+- Contact us for pricing and terms
+
+**For commercial licensing inquiries**, please contact us at:
+- Email: zhaoguiyang18@outlook.com
+- Website: https://linky.zhaoguiyang.com
+
+For full license details, see the [LICENSE](LICENSE) file.
 
 ## Resources
 
