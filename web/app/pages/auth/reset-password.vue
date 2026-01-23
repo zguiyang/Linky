@@ -71,7 +71,7 @@
         v-if="error"
         color="error"
         variant="subtle"
-        icon="i-heroicons-x-circle"
+        icon="i-heroicons-x-mark"
         title="重置失败"
         class="mt-4"
       >

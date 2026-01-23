@@ -29,7 +29,10 @@
         <div
           class="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4"
         >
-          <i-heroicons-check-circle class="w-10 h-10 text-green-500" />
+          <u-icon
+            name="i-heroicons-check-circle"
+            class="w-10 h-10 text-green-500"
+          />
         </div>
         <u-alert
           color="success"
@@ -49,30 +52,33 @@
         <div
           class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4"
         >
-          <i-heroicons-x-circle class="w-10 h-10 text-red-500" />
+          <u-icon
+            name="i-heroicons-x-mark"
+            class="w-10 h-10 text-red-500"
+          />
         </div>
         <u-alert
           color="error"
           variant="subtle"
-          icon="i-heroicons-x-circle"
+          icon="i-heroicons-x-mark"
           title="验证失败"
           class="w-full"
         >
           {{ error }}
         </u-alert>
         <div class="flex flex-col gap-2 w-full mt-4">
-          <NuxtLink
+          <nuxt-link
             to="/auth/forgot-password"
             class="text-center w-full px-4 py-2 bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-white rounded-lg transition-colors"
           >
             重新发送验证邮件
-          </NuxtLink>
-          <NuxtLink
+          </nuxt-link>
+          <nuxt-link
             to="/auth/sign-in"
             class="text-center text-[var(--color-primary-500)] dark:text-[var(--color-primary-300)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-primary-200)] hover:underline"
           >
             返回登录
-          </NuxtLink>
+          </nuxt-link>
         </div>
       </div>
     </u-card>

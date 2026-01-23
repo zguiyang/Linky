@@ -42,7 +42,7 @@ export const useHttpError = () => {
       title: '请求失败',
       description: error?.data?.message || error?.message || '操作失败，请稍后重试',
       color: 'error',
-      icon: 'i-heroicons-x-circle'
+      icon: 'i-heroicons-x-mark'
     })
 
     if (error?.status === 401) {
