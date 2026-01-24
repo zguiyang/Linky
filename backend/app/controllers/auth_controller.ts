@@ -1,3 +1,4 @@
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { Exception } from '@adonisjs/core/exceptions'
 import { registerValidator } from '#validators/register'
@@ -5,81 +6,72 @@ import { loginValidator } from '#validators/login'
 import { resetPasswordValidator } from '#validators/reset_password'
 import { AuthService } from '#services/auth_service'
 
+@inject()
 export default class AuthController {
-  async register({ request, response, auth }: HttpContext) {
+  constructor(private authService: AuthService) {}
+
+  async register({ request, auth }: HttpContext) {
     const data = await request.validateUsing(registerValidator)
-
-    const authService = new AuthService()
-    const user = await authService.register(data)
-
+    const user = await this.authService.register(data)
     const token = await auth.use('api').createToken(user)
 
-    return response.json({
+    return {
       user: user.serialize(),
       token: token.value?.release() ?? '',
-    })
+    }
   }
 
-  async login({ request, response }: HttpContext) {
+  async login({ request }: HttpContext) {
     const data = await request.validateUsing(loginValidator)
+    const { user, token } = await this.authService.login(data.email, data.password)
 
-    const authService = new AuthService()
-    const { user, token } = await authService.login(data.email, data.password)
-
-    return response.json({
+    return {
       user: user.serialize(),
       token: token.value?.release() ?? '',
-    })
+    }
   }
 
-  async logout({ auth, response }: HttpContext) {
+  async logout({ auth }: HttpContext) {
     await auth.use('api').invalidateToken()
-    return response.json({ success: true })
+    return { success: true }
   }
 
-  async forgotPassword({ request, response }: HttpContext) {
+  async forgotPassword({ request }: HttpContext) {
     const data = request.only(['email'])
-    const authService = new AuthService()
-    const result = await authService.requestPasswordReset(data.email)
-
-    return response.json(result)
+    const result = await this.authService.requestPasswordReset(data.email)
+    return result
   }
 
-  async resetPassword({ request, response }: HttpContext) {
+  async resetPassword({ request }: HttpContext) {
     const data = await request.validateUsing(resetPasswordValidator)
-    const authService = new AuthService()
-    const user = await authService.resetPassword(data.token, data.password)
+    const user = await this.authService.resetPassword(data.token, data.password)
 
     if (!user) {
       throw new Exception('重置令牌无效或已过期', { status: 422 })
     }
 
-    return response.json({ success: true })
+    return { success: true }
   }
 
-  async verifyEmail({ request, response }: HttpContext) {
+  async verifyEmail({ request }: HttpContext) {
     const token = request.input('token')
-
-    const authService = new AuthService()
-    const user = await authService.verifyEmail(token)
+    const user = await this.authService.verifyEmail(token)
 
     if (!user) {
       throw new Exception('验证令牌无效或已过期', { status: 422 })
     }
 
-    return response.json({ success: true, message: '邮箱验证成功' })
+    return { success: true, message: '邮箱验证成功' }
   }
 
-  async resendVerification({ auth, response }: HttpContext) {
+  async resendVerification({ auth }: HttpContext) {
     const user = auth.getUserOrFail()
-    const authService = new AuthService()
-    const result = await authService.resendVerificationEmail(user)
-
-    return response.json(result)
+    const result = await this.authService.resendVerificationEmail(user)
+    return result
   }
 
-  async me({ auth, response }: HttpContext) {
+  async me({ auth }: HttpContext) {
     const user = auth.getUserOrFail()
-    return response.json(user.serialize())
+    return user.serialize()
   }
 }
