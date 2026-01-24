@@ -15,174 +15,151 @@ const loading = ref(false)
 export const useAuth = () => {
   const fetchUser = async () => {
     loading.value = true
-    try {
-      const userData = await authApi.me()
-      user.value = userData
-    } finally {
-      loading.value = false
-    }
+    const userData = await authApi.me()
+    user.value = userData
+    loading.value = false
   }
 
   const login = async (data: LoginRequest) => {
     loading.value = true
-    try {
-      const authResponse = await authApi.login(data)
-      user.value = authResponse.user
+    const authResponse = await authApi.login(data)
+    user.value = authResponse.user
 
-      const tokenCookie = useCookie('auth_token', {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 30
-      })
-      tokenCookie.value = authResponse.token
+    const tokenCookie = useCookie('auth_token', {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 30
+    })
+    tokenCookie.value = authResponse.token
 
-      const lastPath = useCookie('lastPath')
-      const redirectPath = lastPath.value || '/workspace/bookmarks'
-      lastPath.value = null
+    const lastPath = useCookie('lastPath')
+    const redirectPath = lastPath.value || '/workspace/bookmarks'
+    lastPath.value = null
 
-      await navigateTo(redirectPath)
-    } finally {
-      loading.value = false
-    }
+    loading.value = false
+
+    await navigateTo(redirectPath)
   }
 
   const register = async (data: RegisterRequest) => {
     loading.value = true
-    try {
-      const authResponse = await authApi.register(data)
-      user.value = authResponse.user
+    const authResponse = await authApi.register(data)
+    user.value = authResponse.user
 
-      const tokenCookie = useCookie('auth_token', {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 30
-      })
-      tokenCookie.value = authResponse.token
+    const tokenCookie = useCookie('auth_token', {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 30
+    })
+    tokenCookie.value = authResponse.token
 
-      const lastPath = useCookie('lastPath')
-      const redirectPath = lastPath.value || '/workspace/bookmarks'
-      lastPath.value = null
+    const lastPath = useCookie('lastPath')
+    const redirectPath = lastPath.value || '/workspace/bookmarks'
+    lastPath.value = null
 
-      await navigateTo(redirectPath)
-    } finally {
-      loading.value = false
-    }
+    loading.value = false
+
+    await navigateTo(redirectPath)
   }
 
   const logout = async () => {
     loading.value = true
-    try {
-      await authApi.logout()
-    } finally {
-      const tokenCookie = useCookie('auth_token')
-      tokenCookie.value = null
-      user.value = null
-      loading.value = false
+    await authApi.logout()
 
-      const toast = useToast()
-      toast.add({
-        title: '已退出登录',
-        color: 'neutral',
-        icon: 'i-heroicons-arrow-right-on-rectangle'
-      })
+    const tokenCookie = useCookie('auth_token')
+    tokenCookie.value = null
+    user.value = null
+    loading.value = false
 
-      await navigateTo('/auth/sign-in')
-    }
+    const toast = useToast()
+    toast.add({
+      title: '已退出登录',
+      color: 'neutral',
+      icon: 'i-heroicons-arrow-right-on-rectangle'
+    })
+
+    await navigateTo('/auth/sign-in')
   }
 
   const forgotPassword = async (data: ForgotPasswordRequest) => {
     loading.value = true
-    try {
-      const result = await authApi.forgotPassword(data)
+    await authApi.forgotPassword(data)
+    loading.value = false
 
-      const toast = useToast()
-      toast.add({
-        title: '发送成功',
-        description: result.message || '重置邮件已发送',
-        color: 'success',
-        icon: 'i-heroicons-check-circle'
-      })
-
-      return { success: true, message: result.message }
-    } finally {
-      loading.value = false
-    }
+    const toast = useToast()
+    toast.add({
+      title: '发送成功',
+      description: '重置邮件已发送，请检查您的邮箱',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
   }
 
   const resetPassword = async (data: ResetPasswordRequest) => {
     loading.value = true
-    try {
-      const authResponse = await authApi.resetPassword(data)
-      user.value = authResponse.user
+    const authResponse = await authApi.resetPassword(data)
+    user.value = authResponse.user
 
-      const tokenCookie = useCookie('auth_token', {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 30
-      })
-      tokenCookie.value = authResponse.token
+    const tokenCookie = useCookie('auth_token', {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 30
+    })
+    tokenCookie.value = authResponse.token
 
-      const lastPath = useCookie('lastPath')
-      const redirectPath = lastPath.value || '/workspace/bookmarks'
-      lastPath.value = null
+    const lastPath = useCookie('lastPath')
+    const redirectPath = lastPath.value || '/workspace/bookmarks'
+    lastPath.value = null
 
-      await navigateTo(redirectPath)
+    loading.value = false
 
-      const toast = useToast()
-      toast.add({
-        title: '密码重置成功',
-        description: '已自动登录',
-        color: 'success',
-        icon: 'i-heroicons-check-circle'
-      })
-    } finally {
-      loading.value = false
-    }
+    await navigateTo(redirectPath)
+
+    const toast = useToast()
+    toast.add({
+      title: '密码重置成功',
+      description: '已自动登录',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
   }
 
   const verifyEmail = async (token: string) => {
     loading.value = true
-    try {
-      await authApi.verifyEmail(token)
-      await fetchUser()
+    await authApi.verifyEmail(token)
+    await fetchUser()
 
-      const lastPath = useCookie('lastPath')
-      const redirectPath = lastPath.value || '/workspace/bookmarks'
-      lastPath.value = null
+    const lastPath = useCookie('lastPath')
+    const redirectPath = lastPath.value || '/workspace/bookmarks'
+    lastPath.value = null
 
-      await navigateTo(redirectPath)
+    loading.value = false
 
-      const toast = useToast()
-      toast.add({
-        title: '邮箱验证成功',
-        color: 'success',
-        icon: 'i-heroicons-check-circle'
-      })
-    } finally {
-      loading.value = false
-    }
+    await navigateTo(redirectPath)
+
+    const toast = useToast()
+    toast.add({
+      title: '邮箱验证成功',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
   }
 
   const resendVerification = async () => {
     loading.value = true
-    try {
-      const result = await authApi.resendVerification()
+    await authApi.resendVerification()
+    loading.value = false
 
-      const toast = useToast()
-      toast.add({
-        title: '验证邮件已发送',
-        description: result.message || '请检查您的邮箱',
-        color: 'success',
-        icon: 'i-heroicons-envelope'
-      })
-
-      return result.message
-    } finally {
-      loading.value = false
-    }
+    const toast = useToast()
+    toast.add({
+      title: '验证邮件已发送',
+      description: '请检查您的邮箱',
+      color: 'success',
+      icon: 'i-heroicons-envelope'
+    })
   }
 
   const isEmailVerified = computed(() => {

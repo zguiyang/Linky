@@ -33,7 +33,6 @@ export default class AuthController {
 
   async logout({ auth }: HttpContext) {
     await auth.use('api').invalidateToken()
-    return { success: true }
   }
 
   async forgotPassword({ request }: HttpContext) {
@@ -49,8 +48,6 @@ export default class AuthController {
     if (!user) {
       throw new Exception('重置令牌无效或已过期', { status: 422 })
     }
-
-    return { success: true }
   }
 
   async verifyEmail({ request }: HttpContext) {
@@ -60,14 +57,11 @@ export default class AuthController {
     if (!user) {
       throw new Exception('验证令牌无效或已过期', { status: 422 })
     }
-
-    return { success: true, message: '邮箱验证成功' }
   }
 
   async resendVerification({ auth }: HttpContext) {
     const user = auth.getUserOrFail()
-    const result = await this.authService.resendVerificationEmail(user)
-    return result
+    return await this.authService.resendVerificationEmail(user)
   }
 
   async me({ auth }: HttpContext) {

@@ -60,15 +60,6 @@ export const request = {
       return (error as any).data.message
     }
 
-    if ((error as any)?.data?.errors) {
-      const errors = (error as any).data.errors
-      const firstField = Object.keys(errors)[0]
-      if (firstField && errors[firstField]?.[0]) {
-        return errors[firstField][0]
-      }
-      return '表单验证失败，请检查输入'
-    }
-
     if ((error as any)?.message) {
       return (error as any).message
     }

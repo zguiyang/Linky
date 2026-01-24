@@ -77,12 +77,10 @@ const success = ref(false)
 
 const onSubmit = async () => {
   success.value = false
-  const result = await forgotPassword(state)
-  if (result?.success) {
-    success.value = true
-    setTimeout(() => {
-      navigateTo('/auth/sign-in')
-    }, 3000)
-  }
+  await forgotPassword(state)
+  success.value = true
+  setTimeout(() => {
+    navigateTo('/auth/sign-in')
+  }, 3000)
 }
 </script>

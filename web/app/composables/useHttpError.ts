@@ -1,4 +1,5 @@
 import { navigateTo } from '#app'
+import { request } from '~/lib/request'
 
 export const useHttpError = () => {
   const currentError = useState<unknown | null>('currentError', () => null)
@@ -19,7 +20,7 @@ export const useHttpError = () => {
     const toast = useToast()
     toast.add({
       title: '未登录或登录已过期',
-      description: '请重新登录',
+      description: request.getErrorMessage(currentError.value) || '请重新登录',
       color: 'error',
       icon: 'i-heroicons-lock-closed'
     })
@@ -40,7 +41,7 @@ export const useHttpError = () => {
     const toast = useToast()
     toast.add({
       title: '请求失败',
-      description: (error as any)?.data?.message || (error as any)?.message || '操作失败，请稍后重试',
+      description: request.getErrorMessage(error),
       color: 'error',
       icon: 'i-heroicons-x-mark'
     })

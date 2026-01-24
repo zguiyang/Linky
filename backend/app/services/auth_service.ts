@@ -4,6 +4,7 @@ import ResetPasswordNotification from '#mails/reset_password_notification'
 import mail from '@adonisjs/mail/services/main'
 import { DateTime } from 'luxon'
 import { randomBytes } from 'node:crypto'
+import { Exception } from '@adonisjs/core/exceptions'
 
 function generateToken(): string {
   return randomBytes(32).toString('hex')
@@ -29,19 +30,18 @@ export class AuthService {
     return { user, token }
   }
 
-  async requestPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
+  async requestPasswordReset(email: string): Promise<void> {
     const user = await User.findBy('email', email)
 
     if (!user) {
-      return { success: false, message: '该邮箱未绑定用户' }
+      throw new Exception('该邮箱未绑定用户', { status: 422 })
     }
 
     if (!user.emailVerifiedAt) {
-      return { success: false, message: '请先验证您的邮箱地址' }
+      throw new Exception('请先验证您的邮箱地址', { status: 422 })
     }
 
     await this.sendResetPasswordEmail(user)
-    return { success: true, message: '重置密码邮件已发送' }
   }
 
   async resetPassword(token: string, newPassword: string) {
@@ -95,21 +95,19 @@ export class AuthService {
     await mail.send(new ResetPasswordNotification(user, resetToken))
   }
 
-  async resendVerificationEmail(user: User): Promise<{ success: boolean; message: string }> {
+  async resendVerificationEmail(user: User): Promise<void> {
     if (user.emailVerifiedAt) {
-      return { success: false, message: '邮箱已验证' }
+      throw new Exception('邮箱已验证', { status: 422 })
     }
 
     if (user.verificationEmailSentAt) {
       const timeSinceLastSent = DateTime.now().diff(user.verificationEmailSentAt, 'minutes').minutes
       if (timeSinceLastSent < 1) {
         const remainingSeconds = Math.ceil(60 - timeSinceLastSent * 60)
-        return { success: false, message: `请等待 ${remainingSeconds} 秒后重新发送` }
+        throw new Exception(`请等待 ${remainingSeconds} 秒后重新发送`, { status: 422 })
       }
     }
 
     await this.sendVerificationEmail(user)
-
-    return { success: true, message: '验证邮件已发送' }
   }
 }
