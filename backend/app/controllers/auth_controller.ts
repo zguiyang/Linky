@@ -20,21 +20,21 @@ export default class AuthController {
     })
   }
 
-  async login(ctx: HttpContext) {
-    const data = await ctx.request.validateUsing(loginValidator)
+  async login({ request, response }: HttpContext) {
+    const data = await request.validateUsing(loginValidator)
 
     const authService = new AuthService()
     const { user, token } = await authService.login(data.email, data.password)
 
-    return ctx.response.json({
+    return response.json({
       user: user.serialize(),
       token: token.value?.release() ?? '',
     })
   }
 
-  async logout(ctx: HttpContext) {
-    await ctx.auth.use('api').invalidateToken()
-    return ctx.response.json({ success: true })
+  async logout({ auth, response }: HttpContext) {
+    await auth.use('api').invalidateToken()
+    return response.json({ success: true })
   }
 
   async forgotPassword({ request, response }: HttpContext) {

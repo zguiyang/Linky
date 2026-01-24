@@ -4,7 +4,7 @@ import { useHttpError } from '~/composables/useHttpError'
 export type ApiRequestOptions<R extends NitroFetchRequest = NitroFetchRequest>
   = NitroFetchOptions<R>
 
-export async function apiRequest<T = any, R extends NitroFetchRequest = NitroFetchRequest>(
+export async function apiRequest<T = unknown, R extends NitroFetchRequest = NitroFetchRequest>(
   url: R,
   options: ApiRequestOptions<R> = {}
 ): Promise<T> {
@@ -26,7 +26,7 @@ export async function apiRequest<T = any, R extends NitroFetchRequest = NitroFet
     })
 
     return response as T
-  } catch (error: any) {
+  } catch (error: unknown) {
     const isLogoutRequest = options.method === 'post' && url === '/auth/logout'
     if (!isLogoutRequest) {
       const { handleError } = useHttpError()
@@ -38,15 +38,15 @@ export async function apiRequest<T = any, R extends NitroFetchRequest = NitroFet
 }
 
 export const request = {
-  get: <T = any>(url: string, params?: Record<string, any>, options?: ApiRequestOptions) =>
+  get: <T = unknown>(url: string, params?: Record<string, any>, options?: ApiRequestOptions) =>
     apiRequest<T>(url as any, { method: 'get', params, ...options }),
-  post: <T = any>(url: string, body?: any, options?: ApiRequestOptions) =>
+  post: <T = unknown>(url: string, body?: any, options?: ApiRequestOptions) =>
     apiRequest<T>(url as any, { method: 'post', body, ...options }),
-  put: <T = any>(url: string, body?: any, options?: ApiRequestOptions) =>
+  put: <T = unknown>(url: string, body?: any, options?: ApiRequestOptions) =>
     apiRequest<T>(url as any, { method: 'put', body, ...options }),
-  patch: <T = any>(url: string, body?: any, options?: ApiRequestOptions) =>
+  patch: <T = unknown>(url: string, body?: any, options?: ApiRequestOptions) =>
     apiRequest<T>(url as any, { method: 'patch', body, ...options }),
-  delete: <T = any>(url: string, paramsOrBody?: any, options?: ApiRequestOptions) => {
+  delete: <T = unknown>(url: string, paramsOrBody?: any, options?: ApiRequestOptions) => {
     const hasBody = paramsOrBody && typeof paramsOrBody === 'object' && !Array.isArray(paramsOrBody)
     return apiRequest<T>(url as any, {
       method: 'delete',
@@ -55,13 +55,13 @@ export const request = {
     })
   },
 
-  getErrorMessage: (error: any): string => {
-    if (error?.data?.message) {
-      return error.data.message
+  getErrorMessage: (error: unknown): string => {
+    if ((error as any)?.data?.message) {
+      return (error as any).data.message
     }
 
-    if (error?.data?.errors) {
-      const errors = error.data.errors
+    if ((error as any)?.data?.errors) {
+      const errors = (error as any).data.errors
       const firstField = Object.keys(errors)[0]
       if (firstField && errors[firstField]?.[0]) {
         return errors[firstField][0]
@@ -69,8 +69,8 @@ export const request = {
       return '表单验证失败，请检查输入'
     }
 
-    if (error?.message) {
-      return error.message
+    if ((error as any)?.message) {
+      return (error as any).message
     }
 
     return '操作失败，请稍后重试'

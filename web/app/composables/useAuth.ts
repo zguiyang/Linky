@@ -18,8 +18,6 @@ export const useAuth = () => {
     try {
       const userData = await authApi.me()
       user.value = userData
-    } catch (error) {
-      console.error('Failed to fetch user:', error)
     } finally {
       loading.value = false
     }
@@ -44,9 +42,6 @@ export const useAuth = () => {
       lastPath.value = null
 
       await navigateTo(redirectPath)
-    } catch (error) {
-      console.error('Login failed:', error)
-      throw error
     } finally {
       loading.value = false
     }
@@ -71,9 +66,6 @@ export const useAuth = () => {
       lastPath.value = null
 
       await navigateTo(redirectPath)
-    } catch (error) {
-      console.error('Registration failed:', error)
-      throw error
     } finally {
       loading.value = false
     }
@@ -83,8 +75,6 @@ export const useAuth = () => {
     loading.value = true
     try {
       await authApi.logout()
-    } catch {
-      console.warn('Logout request failed')
     } finally {
       const tokenCookie = useCookie('auth_token')
       tokenCookie.value = null
@@ -116,9 +106,6 @@ export const useAuth = () => {
       })
 
       return { success: true, message: result.message }
-    } catch (error) {
-      console.error('Forgot password failed:', error)
-      return { success: false, message: null }
     } finally {
       loading.value = false
     }
@@ -151,9 +138,6 @@ export const useAuth = () => {
         color: 'success',
         icon: 'i-heroicons-check-circle'
       })
-    } catch (error) {
-      console.error('Reset password failed:', error)
-      throw error
     } finally {
       loading.value = false
     }
@@ -177,8 +161,6 @@ export const useAuth = () => {
         color: 'success',
         icon: 'i-heroicons-check-circle'
       })
-    } catch (error) {
-      console.error('Email verification failed:', error)
     } finally {
       loading.value = false
     }
@@ -198,9 +180,6 @@ export const useAuth = () => {
       })
 
       return result.message
-    } catch (error) {
-      console.error('Resend verification failed:', error)
-      return null
     } finally {
       loading.value = false
     }

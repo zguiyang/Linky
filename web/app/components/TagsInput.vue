@@ -14,7 +14,7 @@
 import { computed } from 'vue'
 
 interface Props {
-  modelValue: string[] | null
+  modelValue?: string[]
 }
 
 const props = defineProps<Props>()
@@ -25,6 +25,6 @@ const emit = defineEmits<{
 
 const modelValue = computed({
   get: () => props.modelValue ?? [],
-  set: value => emit('update:modelValue', value)
+  set: (value: string[]) => emit('update:modelValue', value)
 })
 </script>

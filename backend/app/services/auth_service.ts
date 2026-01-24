@@ -1,4 +1,6 @@
 import User from '#models/user'
+import VerifyEmailNotification from '#mails/verify_email_notification'
+import ResetPasswordNotification from '#mails/reset_password_notification'
 import mail from '@adonisjs/mail/services/main'
 import { DateTime } from 'luxon'
 import { randomBytes } from 'node:crypto'
@@ -79,8 +81,6 @@ export class AuthService {
     user.verificationEmailSentAt = DateTime.now()
     await user.save()
 
-    const verifyEmailModule = await import('#mails/verify_email_notification')
-    const VerifyEmailNotification = verifyEmailModule.default
     await mail.send(new VerifyEmailNotification(user, verificationToken))
   }
 
@@ -92,8 +92,6 @@ export class AuthService {
     user.resetPasswordExpiresAt = expiresAt
     await user.save()
 
-    const resetPasswordModule = await import('#mails/reset_password_notification')
-    const ResetPasswordNotification = resetPasswordModule.default
     await mail.send(new ResetPasswordNotification(user, resetToken))
   }
 

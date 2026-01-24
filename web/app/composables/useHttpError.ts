@@ -1,20 +1,20 @@
 import { navigateTo } from '#app'
 
-let currentError: any = null
-let isLoggingOut = false
-
 export const useHttpError = () => {
+  const currentError = useState<unknown | null>('currentError', () => null)
+  const isLoggingOut = useState('isLoggingOut', () => false)
+
   const getError = () => {
-    return currentError
+    return currentError.value
   }
 
   const clearError = () => {
-    currentError = null
+    currentError.value = null
   }
 
   const handle401 = () => {
-    if (isLoggingOut) return
-    isLoggingOut = true
+    if (isLoggingOut.value) return
+    isLoggingOut.value = true
 
     const toast = useToast()
     toast.add({
@@ -30,22 +30,22 @@ export const useHttpError = () => {
     navigateTo('/auth/sign-in')
 
     setTimeout(() => {
-      isLoggingOut = false
+      isLoggingOut.value = false
     }, 1000)
   }
 
-  const handleError = (error: any) => {
-    currentError = error
+  const handleError = (error: unknown) => {
+    currentError.value = error
 
     const toast = useToast()
     toast.add({
       title: '请求失败',
-      description: error?.data?.message || error?.message || '操作失败，请稍后重试',
+      description: (error as any)?.data?.message || (error as any)?.message || '操作失败，请稍后重试',
       color: 'error',
       icon: 'i-heroicons-x-mark'
     })
 
-    if (error?.status === 401) {
+    if ((error as any)?.status === 401) {
       handle401()
     }
   }

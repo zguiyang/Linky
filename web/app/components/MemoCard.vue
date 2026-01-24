@@ -85,6 +85,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   edit: [memo: Memo]
+  delete: [memo: Memo]
 }>()
 
 const cardClasses = computed(() => {
@@ -187,7 +188,7 @@ const getMemoMenuItems = (memo: Memo): DropdownMenuItem[][] => {
         icon: 'i-heroicons-trash',
         color: 'error',
         onSelect: () => {
-          emit('edit', memo)
+          emit('delete', memo)
         }
       }
     ]
