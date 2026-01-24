@@ -24,5 +24,13 @@ router
       .post('/auth/resend-verification', '#controllers/auth_controller.resendVerification')
       .middleware(middleware.auth())
     router.get('/auth/me', '#controllers/auth_controller.me').middleware(middleware.auth())
+
+    // 标签 API（所有路由需要认证）
+    router.get('/tags', '#controllers/tags_controller.index')
+    router.get('/tags/:id', '#controllers/tags_controller.show')
+    router.post('/tags', '#controllers/tags_controller.store')
+    router.put('/tags/:id', '#controllers/tags_controller.update')
+    router.delete('/tags/:id', '#controllers/tags_controller.destroy')
   })
   .prefix('api')
+  .middleware(middleware.auth())
