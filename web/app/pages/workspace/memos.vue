@@ -253,7 +253,15 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
               标签
             </label>
-            <tags-input v-model="formData.tags" />
+            <u-input-tags
+              v-model="formData.tags"
+              placeholder="Enter tags..."
+              :max-length="20"
+              :duplicate="false"
+              size="md"
+              variant="outline"
+              color="primary"
+            />
           </div>
 
           <!-- Content Section -->
