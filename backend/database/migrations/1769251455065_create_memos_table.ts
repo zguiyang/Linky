@@ -1,0 +1,26 @@
+import { BaseSchema } from '@adonisjs/lucid/schema'
+
+export default class extends BaseSchema {
+  protected tableName = 'memos'
+
+  async up() {
+    this.schema.createTable(this.tableName, (table) => {
+      table.increments('id')
+      table.string('title', 200).notNullable()
+      table.text('content').notNullable()
+      table.boolean('is_pinned').defaultTo(false)
+      table
+        .integer('user_id')
+        .unsigned()
+        .references('id')
+        .inTable('users')
+        .onDelete('CASCADE')
+        .notNullable()
+      table.timestamps(true, true)
+    })
+  }
+
+  async down() {
+    this.schema.dropTable(this.tableName)
+  }
+}

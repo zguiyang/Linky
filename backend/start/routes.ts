@@ -39,6 +39,14 @@ router
     router.post('/bookmarks', '#controllers/bookmarks_controller.store')
     router.put('/bookmarks/:id', '#controllers/bookmarks_controller.update')
     router.delete('/bookmarks/:id', '#controllers/bookmarks_controller.destroy')
+
+    // 备忘录 API（所有路由需要认证）
+    router.get('/memos', '#controllers/memos_controller.index')
+    router.get('/memos/paginate', '#controllers/memos_controller.paginate')
+    router.get('/memos/:id', '#controllers/memos_controller.show')
+    router.post('/memos', '#controllers/memos_controller.store')
+    router.put('/memos/:id', '#controllers/memos_controller.update')
+    router.delete('/memos/:id', '#controllers/memos_controller.destroy')
   })
   .prefix('api')
   .middleware(middleware.auth())
