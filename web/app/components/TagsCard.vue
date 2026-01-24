@@ -25,7 +25,7 @@
       </div>
 
       <div
-        v-else-if="!tags || tags.length === 0"
+        v-else-if="!tagsList || tagsList.length === 0"
         class="text-center py-8"
       >
         <u-icon
@@ -42,14 +42,14 @@
         class="space-y-2"
       >
         <div
-          v-for="tag in tags"
+          v-for="tag in tagsList"
           :key="tag.id"
           class="flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all duration-200 select-none"
           :class="{
             'border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20':
-              selectedTags.includes(tag.id),
+              selectedTagsList.includes(tag.id),
             'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800':
-              !selectedTags.includes(tag.id)
+              !selectedTagsList.includes(tag.id)
           }"
           @click="toggleTag(tag.id)"
         >
@@ -67,9 +67,9 @@
               class="text-sm truncate"
               :class="{
                 'text-indigo-600 dark:text-indigo-300':
-                  selectedTags.includes(tag.id),
+                  selectedTagsList.includes(tag.id),
                 'text-gray-700 dark:text-gray-200':
-                  !selectedTags.includes(tag.id)
+                  !selectedTagsList.includes(tag.id)
               }"
             >
               {{ tag.name }}
@@ -199,20 +199,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { tagsApi } from '~/api/tags'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 
-const { data: tags, pending, refresh } = useAsyncData<Tag[]>(
-  'tags',
-  () => tagsApi.index(),
-  {
-    server: true,
-    default: () => []
-  }
-)
+const props = defineProps<{
+  tags: Tag[]
+  selectedTags: number[]
+}>()
 
-const selectedTags = ref<number[]>([])
+const emit = defineEmits<{
+  'update:selectedTags': [selectedTags: number[]]
+  'refresh-tags': []
+}>()
 
 const showTagModal = ref(false)
 const isEditMode = ref(false)
@@ -224,19 +223,19 @@ const contextTag = ref<Tag | null>(null)
 const isSubmitting = ref(false)
 const isDeleting = ref(false)
 
-const pendingValue = computed(() => pending.value)
+const tagsList = computed(() => props.tags)
+const selectedTagsList = computed(() => props.selectedTags)
 
-defineEmits<{
-  'update:selectedTags': [selectedTags: number[]]
-}>()
+const pendingValue = computed(() => false)
 
 const toggleTag = (tagId: number) => {
-  const index = selectedTags.value.indexOf(tagId)
+  const index = selectedTagsList.value.indexOf(tagId)
   if (index > -1) {
-    selectedTags.value.splice(index, 1)
+    selectedTagsList.value.splice(index, 1)
   } else {
-    selectedTags.value.push(tagId)
+    selectedTagsList.value.push(tagId)
   }
+  emit('update:selectedTags', selectedTagsList.value)
 }
 
 const openEditModal = (tag: Tag) => {
@@ -269,7 +268,7 @@ const handleCreateTag = async (close?: () => void) => {
       color: tagForm.value.color || undefined
     }
     await tagsApi.create(data)
-    await refresh()
+    emit('refresh-tags')
 
     close?.()
     showTagModal.value = false
@@ -291,7 +290,7 @@ const handleUpdateTag = async (close?: () => void) => {
       color: tagForm.value.color || undefined
     }
     await tagsApi.update(contextTag.value.id, data)
-    await refresh()
+    emit('refresh-tags')
 
     close?.()
     showTagModal.value = false
@@ -312,8 +311,9 @@ const handleDeleteTag = async (close?: () => void) => {
   try {
     isDeleting.value = true
     await tagsApi.delete(deletedTagId)
-    await refresh()
-    selectedTags.value = selectedTags.value.filter(id => id !== deletedTagId)
+    const newSelectedTags = selectedTagsList.value.filter(id => id !== deletedTagId)
+    emit('update:selectedTags', newSelectedTags)
+    emit('refresh-tags')
 
     close?.()
     showDeleteConfirm.value = false
@@ -322,8 +322,4 @@ const handleDeleteTag = async (close?: () => void) => {
     isDeleting.value = false
   }
 }
-
-defineExpose({
-  refresh
-})
 </script>

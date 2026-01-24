@@ -1,59 +1,73 @@
 <template>
-  <div class="h-full flex flex-col">
-    <div
-      class="sticky top-0 z-10 flex items-center justify-between px-8 py-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700"
-    >
-      <div class="flex items-center gap-4">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-          {{ selectedCategory === 'all' ? '我的书签' : getCategoryName(selectedCategory) }}
-        </h1>
-        <span
-          class="px-3 py-1 text-xs font-semibold bg-indigo-50 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-full"
-        >
-          {{ filteredBookmarks.length }} 个书签
-        </span>
-      </div>
-      <div class="flex items-center gap-4">
-        <u-input
-          v-model="searchQuery"
-          icon="i-heroicons-magnifying-glass"
-          placeholder="搜索书签..."
-          size="md"
-        />
-        <div class="inline-flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
-          <u-button
-            :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
-            :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
-            size="sm"
-            icon="i-heroicons-view-columns"
-            @click="setViewMode('masonry')"
-          />
-          <u-button
-            :color="viewMode === 'grid' ? 'primary' : 'neutral'"
-            :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
-            size="sm"
-            icon="i-heroicons-squares-2x2"
-            @click="setViewMode('grid')"
-          />
-          <u-button
-            :color="viewMode === 'list' ? 'primary' : 'neutral'"
-            :variant="viewMode === 'list' ? 'solid' : 'ghost'"
-            size="sm"
-            icon="i-heroicons-list-bullet"
-            @click="setViewMode('list')"
-          />
+  <div class="flex flex-col lg:flex-row gap-6 p-6">
+    <!-- 左侧：书签列表 (70%) -->
+    <div class="flex-1 lg:flex-[0_0_70%] flex flex-col gap-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+            我的书签
+          </h1>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            共 {{ filteredBookmarks.length }} 个书签
+          </p>
         </div>
-        <u-select
-          v-model="sortBy"
-          :items="sortOptions"
-          placeholder="排序方式"
-          :popper="{ strategy: 'fixed' }"
-          size="md"
-        />
-      </div>
-    </div>
 
-    <div class="flex-1 p-8 overflow-y-auto">
+        <div class="flex items-center gap-3">
+          <u-input
+            v-model="searchQuery"
+            icon="i-heroicons-magnifying-glass"
+            placeholder="搜索书签..."
+            size="md"
+            class="w-full sm:w-auto"
+          />
+          <div class="inline-flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            <u-button
+              :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
+              :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
+              size="sm"
+              icon="i-heroicons-view-columns"
+              @click="setViewMode('masonry')"
+            />
+            <u-button
+              :color="viewMode === 'grid' ? 'primary' : 'neutral'"
+              :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
+              size="sm"
+              icon="i-heroicons-squares-2x2"
+              @click="setViewMode('grid')"
+            />
+            <u-button
+              :color="viewMode === 'list' ? 'primary' : 'neutral'"
+              :variant="viewMode === 'list' ? 'solid' : 'ghost'"
+              size="sm"
+              icon="i-heroicons-list-bullet"
+              @click="setViewMode('list')"
+            />
+          </div>
+
+          <u-button
+            color="primary"
+            size="md"
+            @click="showAddBookmarkModal = true"
+          >
+            <template #leading>
+              <u-icon
+                name="i-heroicons-plus"
+                class="w-4 h-4"
+              />
+            </template>
+            添加书签
+          </u-button>
+        </div>
+      </div>
+
+      <!-- 移动端标签药丸 -->
+      <tags-pills
+        v-if="!pending && tags && tags.length > 0"
+        :tags="tags"
+        :selected-tags="selectedTags"
+        @toggle:tag="toggleTag"
+      />
+
       <div
         v-if="viewMode === 'masonry'"
         class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
@@ -107,89 +121,104 @@
           <span class="text-sm text-gray-500 dark:text-gray-400">开始添加您的第一个书签吧</span>
         </template>
       </u-empty>
+
+      <u-modal
+        v-model:open="showAddBookmarkModal"
+        title="添加新书签"
+      >
+        <template #body>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标题 <span class="text-red-500">*</span></label>
+              <u-input
+                v-model="newBookmark.title"
+                placeholder="输入书签标题"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">URL <span class="text-red-500">*</span></label>
+              <u-input
+                v-model="newBookmark.url"
+                type="url"
+                placeholder="https://example.com"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">描述</label>
+              <u-textarea
+                v-model="newBookmark.description"
+                placeholder="添加简短描述（可选）"
+                :rows="3"
+              />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">分类</label>
+                <u-select
+                  v-model="newBookmark.category"
+                  :items="categoryOptions"
+                  placeholder="选择分类"
+                  :popper="{ strategy: 'fixed' }"
+                />
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标签</label>
+              <div
+                class="flex flex-wrap gap-2 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg"
+              >
+                <u-button
+                  icon="i-heroicons-x-mark"
+                  color="neutral"
+                  variant="ghost"
+                  size="xs"
+                />
+                <u-input
+                  v-model="tagInput"
+                  type="text"
+                  placeholder="输入标签后按回车"
+                  class="flex-1 min-w-[120px] bg-transparent border-none outline-none"
+                  @keyup.enter="addTag"
+                />
+              </div>
+            </div>
+          </div>
+        </template>
+        <template #footer="{ close }">
+          <u-button
+            label="取消"
+            color="neutral"
+            variant="outline"
+            @click="close"
+          />
+          <u-button
+            label="添加"
+            color="primary"
+            @click="handleAddBookmark(close)"
+          />
+        </template>
+      </u-modal>
     </div>
 
-    <u-modal
-      v-model:open="showAddBookmarkModal"
-      title="添加新书签"
-    >
-      <template #body>
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标题 <span class="text-red-500">*</span></label>
-            <u-input
-              v-model="newBookmark.title"
-              placeholder="输入书签标题"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">URL <span class="text-red-500">*</span></label>
-            <u-input
-              v-model="newBookmark.url"
-              type="url"
-              placeholder="https://example.com"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">描述</label>
-            <u-textarea
-              v-model="newBookmark.description"
-              placeholder="添加简短描述（可选）"
-              :rows="3"
-            />
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">分类</label>
-              <u-select
-                v-model="newBookmark.category"
-                :items="categoryOptions"
-                placeholder="选择分类"
-                :popper="{ strategy: 'fixed' }"
-              />
-            </div>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标签</label>
-            <div
-              class="flex flex-wrap gap-2 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg"
-            >
-              <u-button
-                icon="i-heroicons-x-mark"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-              />
-              <UInput
-                v-model="tagInput"
-                type="text"
-                placeholder="输入标签后按回车"
-                class="flex-1 min-w-[120px] bg-transparent border-none outline-none"
-                @keyup.enter="addTag"
-              />
-            </div>
-          </div>
-        </div>
-      </template>
-      <template #footer="{ close }">
-        <u-button
-          label="取消"
-          color="neutral"
-          variant="outline"
-          @click="close"
+    <!-- 右侧：标签卡片 (30%) - 仅桌面端 -->
+    <div class="hidden lg:block lg:flex-[0_0_30%]">
+      <div class="sticky top-6">
+        <tags-card
+          v-if="!pending && tags"
+          :tags="tags"
+          :selected-tags="selectedTags"
+          @update:selected-tags="selectedTags = $event"
+          @refresh-tags="refresh"
         />
-        <u-button
-          label="添加"
-          color="primary"
-          @click="handleAddBookmark(close)"
-        />
-      </template>
-    </u-modal>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
+import { tagsApi } from '~/api/tags'
+import type { Tag } from '~/api/types'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -198,6 +227,25 @@ const searchQuery = ref('')
 const sortBy = ref('recent')
 const tagInput = ref('')
 const showAddBookmarkModal = ref(false)
+const selectedTags = ref<number[]>([])
+
+const { data: tags, pending, refresh } = await useAsyncData<Tag[]>(
+  'tags',
+  () => tagsApi.index(),
+  {
+    server: true,
+    default: () => []
+  }
+)
+
+const toggleTag = (tagId: number) => {
+  const index = selectedTags.value.indexOf(tagId)
+  if (index > -1) {
+    selectedTags.value.splice(index, 1)
+  } else {
+    selectedTags.value.push(tagId)
+  }
+}
 
 const bookmarks = ref([
   {
@@ -507,30 +555,12 @@ const categoryOptions = [
   { label: '其他', value: '其他' }
 ]
 
-const sortOptions = [
-  { label: '最近添加', value: 'recent' },
-  { label: '最多访问', value: 'visits' },
-  { label: '名称排序', value: 'name' }
-]
-
 const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
   viewMode.value = mode
 }
 
 const openBookmark = (bookmark: { url: string }) => {
   window.open(bookmark.url, '_blank')
-}
-
-const getCategoryName = (categoryId: string) => {
-  const categoryMap: Record<string, string> = {
-    all: '全部',
-    dev: '开发工具',
-    design: '设计资源',
-    learning: '学习资源',
-    productivity: '效率工具',
-    other: '其他'
-  }
-  return categoryMap[categoryId] || '未分类'
 }
 
 const handleAddBookmark = (close?: () => void) => {
@@ -575,8 +605,6 @@ const addTag = () => {
 const _removeTag = (index: number | string) => {
   newBookmark.value.tags.splice(Number(index), 1)
 }
-
-const selectedCategory = ref('all')
 
 onMounted(() => {
   window.addEventListener('add-bookmark', () => {
