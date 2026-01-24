@@ -193,7 +193,7 @@ import { computed, ref, onMounted } from 'vue'
 
 definePageMeta({ layout: 'workspace' })
 
-const viewMode = ref<'masonry' | 'grid' | 'list'>('grid')
+const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
 const searchQuery = ref('')
 const sortBy = ref('recent')
 const tagInput = ref('')
