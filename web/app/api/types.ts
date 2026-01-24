@@ -34,3 +34,22 @@ export interface ResetPasswordRequest {
   password: string
   passwordConfirmation: string
 }
+
+export interface Tag {
+  id: number
+  name: string
+  color: string | null
+  userId: number
+  createdAt: string
+  updatedAt: string | null
+}
+
+export interface CreateTagRequest {
+  name: string
+  color?: string
+}
+
+export interface UpdateTagRequest {
+  name?: string
+  color?: string
+}
