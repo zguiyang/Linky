@@ -95,15 +95,7 @@
       <aside
         class="relative w-[280px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-700 flex flex-col overflow-y-auto z-0 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent"
       >
-        <tags-card
-          :tags="tags"
-          :selected-tags="selectedTags"
-          :loading="loading"
-          @add-tag="openAddModal"
-          @edit-tag="openEditModal"
-          @delete-tag="openDeleteConfirm"
-          @toggle-tag="toggleTag"
-        />
+        <tags-card />
       </aside>
 
       <main
@@ -113,97 +105,61 @@
       </main>
 
       <u-modal
-        v-model:open="showTagModal"
-        :title="isEditMode ? '编辑标签' : '新增标签'"
+        v-model:open="showGlobalSearchModal"
+        title="全局搜索"
       >
         <template #body>
-          <div class="space-y-4">
-            <div>
-              <label
-                for="tagName"
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-              >
-                标签名称 <span class="text-red-500">*</span>
-              </label>
-              <u-input
-                id="tagName"
-                v-model="tagForm.name"
-                placeholder="输入标签名称"
-                autofocus
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                标签颜色
-              </label>
-              <div class="flex items-center gap-2">
-                <input
-                  v-model="tagForm.color"
-                  type="color"
-                  class="w-10 h-10 rounded cursor-pointer border border-gray-200 dark:border-gray-600"
-                >
-                <u-input
-                  v-model="tagForm.color"
-                  placeholder="#000000"
-                  class="flex-1"
-                />
-              </div>
-            </div>
-          </div>
-        </template>
-        <template #footer="{ close }">
-          <u-button
-            label="取消"
-            color="neutral"
-            variant="outline"
-            @click="close"
+          <u-input
+            v-model="globalSearchQuery"
+            icon="i-heroicons-magnifying-glass"
+            placeholder="搜索..."
+            size="md"
+            @keyup.enter="handleGlobalSearch"
           />
-          <u-button
-            :label="isEditMode ? '保存' : '创建'"
-            :loading="isSubmitting"
-            :disabled="!tagForm.name.trim()"
-            color="primary"
-            @click="isEditMode ? handleUpdateTag(close) : handleCreateTag(close)"
-          />
-        </template>
-      </u-modal>
-
-      <u-modal
-        v-model:open="showDeleteConfirm"
-        title="确认删除"
-      >
-        <template #body>
-          <div class="text-center space-y-4">
-            <div class="flex justify-center">
-              <div class="w-16 h-16 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
+          <div
+            v-if="searchResults.length > 0"
+            class="mt-4 space-y-2"
+          >
+            <div
+              v-for="result in searchResults"
+              :key="`${result.type}-${result.id}`"
+              class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-all"
+            >
+              <div class="flex items-center gap-3">
                 <u-icon
-                  name="i-heroicons-exclamation-triangle"
-                  class="w-8 h-8 text-red-500"
+                  :name="result.icon"
+                  class="w-5 h-5 text-gray-400"
                 />
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-medium text-gray-900 dark:text-white truncate">
+                    {{ result.title }}
+                  </h4>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+                    {{ result.description }}
+                  </p>
+                </div>
               </div>
             </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                确定要删除这个标签吗？
-              </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                标签名称: <strong>{{ contextTag?.name }}</strong>
-              </p>
-            </div>
+          </div>
+          <div
+            v-else-if="globalSearchQuery"
+            class="mt-4 text-center py-8"
+          >
+            <u-icon
+              name="i-heroicons-magnifying-glass"
+              class="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto"
+            />
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              暂无搜索结果
+            </p>
           </div>
         </template>
         <template #footer="{ close }">
           <u-button
-            label="取消"
+            label="关闭"
             color="neutral"
             variant="outline"
             @click="close"
-          />
-          <u-button
-            label="删除"
-            color="error"
-            :loading="isDeleting"
-            @click="handleDeleteTag(close)"
           />
         </template>
       </u-modal>
@@ -218,8 +174,6 @@ import AmbientBackground from '~/components/shared/AmbientBackground.vue'
 import EmailVerificationAlert from '../components/EmailVerificationAlert.vue'
 import TagsCard from '~/components/TagsCard.vue'
 import { useAuth } from '~/composables/useAuth'
-import { tagsApi } from '~/api/tags'
-import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 
 const { user, logout, fetchUser } = useAuth()
 
@@ -262,11 +216,7 @@ const userMenuItems = computed(() => {
   ]
 })
 
-const tags = ref<Tag[]>([])
-const loading = ref(false)
-const selectedTags = ref<number[]>([])
-
-const _handleGlobalSearch = () => {
+const handleGlobalSearch = () => {
   const query = globalSearchQuery.value.toLowerCase()
   if (!query) {
     return
@@ -291,130 +241,7 @@ const _handleGlobalSearch = () => {
   ]
 }
 
-const toggleTag = (tagId: number) => {
-  const index = selectedTags.value.indexOf(tagId)
-  if (index > -1) {
-    selectedTags.value.splice(index, 1)
-  } else {
-    selectedTags.value.push(tagId)
-  }
-}
-
-const loadTags = async () => {
-  try {
-    loading.value = true
-    const data = await tagsApi.index()
-    tags.value = data
-  } finally {
-    loading.value = false
-  }
-}
-
-const showTagModal = ref(false)
-const isEditMode = ref(false)
-const showDeleteConfirm = ref(false)
-
-const tagForm = ref<{ name: string, color: string }>({ name: '', color: '' })
-const isSubmitting = ref(false)
-const isDeleting = ref(false)
-
-const contextTag = ref<Tag | null>(null)
-
-const handleCreateTag = async (close?: () => void) => {
-  if (!tagForm.value.name.trim()) {
-    return
-  }
-
-  try {
-    isSubmitting.value = true
-    const data: CreateTagRequest = {
-      name: tagForm.value.name.trim(),
-      color: tagForm.value.color || undefined
-    }
-    const result = await tagsApi.create(data)
-    tags.value.push(result)
-
-    close?.()
-    showTagModal.value = false
-    tagForm.value = { name: '', color: '' }
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-const handleUpdateTag = async (close?: () => void) => {
-  if (!contextTag.value || !tagForm.value.name.trim()) {
-    return
-  }
-
-  try {
-    isSubmitting.value = true
-    const data: UpdateTagRequest = {
-      name: tagForm.value.name.trim(),
-      color: tagForm.value.color || undefined
-    }
-    const result = await tagsApi.update(contextTag.value.id, data)
-
-    const index = tags.value.findIndex(t => t.id === result.id)
-    if (index !== -1) {
-      tags.value[index] = result
-    }
-
-    close?.()
-    showTagModal.value = false
-    tagForm.value = { name: '', color: '' }
-    contextTag.value = null
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-const handleDeleteTag = async (close?: () => void) => {
-  if (!contextTag.value) {
-    return
-  }
-
-  try {
-    isDeleting.value = true
-    await tagsApi.delete(contextTag.value.id)
-
-    tags.value = tags.value.filter(t => t.id !== contextTag.value?.id)
-    selectedTags.value = selectedTags.value.filter(id => id !== contextTag.value?.id)
-
-    close?.()
-    showDeleteConfirm.value = false
-    contextTag.value = null
-  } finally {
-    isDeleting.value = false
-  }
-}
-
-const openEditModal = (tag: Tag) => {
-  isEditMode.value = true
-  tagForm.value = { name: tag.name, color: tag.color || '' }
-  contextTag.value = tag
-  showTagModal.value = true
-}
-
-const openAddModal = () => {
-  isEditMode.value = false
-  tagForm.value = { name: '', color: '' }
-  showTagModal.value = true
-}
-
-const openDeleteConfirm = (tag: Tag) => {
-  contextTag.value = tag
-  showDeleteConfirm.value = true
-}
-
 onMounted(async () => {
-  await loadTags()
   fetchUser()
-})
-
-defineExpose({
-  tags,
-  selectedTags,
-  toggleTag
 })
 </script>
