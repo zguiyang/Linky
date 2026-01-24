@@ -19,7 +19,8 @@
   },
   "devDependencies": {
     "@linky/backend": "workspace:*",
-    "@linky/web": "workspace:*"
+    "@linky/web": "workspace:*",
+    "@types/node": "^22.19.7"
   },
   "engines": {
     "node": ">=20.0.0"
