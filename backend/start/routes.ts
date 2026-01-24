@@ -31,6 +31,14 @@ router
     router.post('/tags', '#controllers/tags_controller.store')
     router.put('/tags/:id', '#controllers/tags_controller.update')
     router.delete('/tags/:id', '#controllers/tags_controller.destroy')
+
+    // 书签 API（所有路由需要认证）
+    router.get('/bookmarks', '#controllers/bookmarks_controller.index')
+    router.get('/bookmarks/paginate', '#controllers/bookmarks_controller.paginate')
+    router.get('/bookmarks/:id', '#controllers/bookmarks_controller.show')
+    router.post('/bookmarks', '#controllers/bookmarks_controller.store')
+    router.put('/bookmarks/:id', '#controllers/bookmarks_controller.update')
+    router.delete('/bookmarks/:id', '#controllers/bookmarks_controller.destroy')
   })
   .prefix('api')
   .middleware(middleware.auth())
