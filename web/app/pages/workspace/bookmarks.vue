@@ -266,25 +266,16 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { useTags } from '~/composables/useTags'
-import { tagsApi } from '~/api/tags'
 import { bookmarksApi } from '~/api/bookmarks'
-import type { Tag, Bookmark } from '~/api/types'
+import type { Bookmark, Tag } from '~/api/types'
 
 definePageMeta({ layout: 'workspace' })
 
-const { selectedTags, removeTag, clearTags } = useTags()
+const { tags, selectedTags, removeTag, clearTags, fetchTags } = useTags()
+await fetchTags()
 
 const viewMode = useState('view-mode', () => 'masonry' as 'masonry' | 'grid' | 'list')
 const searchQuery = ref('')
-
-const { data: tags } = await useAsyncData<Tag[]>(
-  'bookmarks-tags',
-  () => tagsApi.index(),
-  {
-    server: true,
-    default: () => []
-  }
-)
 
 const page = ref(1)
 const perPage = ref(20)

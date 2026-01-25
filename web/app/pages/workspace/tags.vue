@@ -185,15 +185,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { tagsApi } from '~/api/tags'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
+import { useTags } from '~/composables/useTags'
 
 definePageMeta({ layout: 'workspace' })
 
-const { data: tags, pending, refresh } = await useAsyncData<Tag[]>('tags-page-tags', () => tagsApi.index(), {
-  server: true,
-  default: () => []
-})
+const { tags, pending, createTag, updateTag, deleteTag, fetchTags } = useTags()
+await fetchTags()
 
 const showModal = ref(false)
 const isEditing = ref(false)
@@ -233,8 +231,7 @@ const handleCreateTag = async (close?: () => void) => {
       name: tagForm.value.name.trim(),
       color: tagForm.value.color || undefined
     }
-    await tagsApi.create(data)
-    await refresh()
+    await createTag(data)
     close?.()
     showModal.value = false
     tagForm.value = { name: '', color: '' }
@@ -254,8 +251,7 @@ const handleUpdateTag = async (close?: () => void) => {
       name: tagForm.value.name.trim(),
       color: tagForm.value.color || undefined
     }
-    await tagsApi.update(contextTag.value.id, data)
-    await refresh()
+    await updateTag(contextTag.value.id, data)
     close?.()
     showModal.value = false
     tagForm.value = { name: '', color: '' }
@@ -274,8 +270,7 @@ const handleDeleteTag = async (close?: () => void) => {
 
   try {
     isDeleting.value = true
-    await tagsApi.delete(deletedTagId)
-    await refresh()
+    await deleteTag(deletedTagId)
     close?.()
     showDeleteConfirm.value = false
     contextTag.value = null

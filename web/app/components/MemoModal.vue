@@ -77,9 +77,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted } from 'vue'
-import { tagsApi } from '~/api/tags'
-import type { Tag, Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
+import { computed, ref, watch } from 'vue'
+import type { Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
+import { useTags } from '~/composables/useTags'
 
 interface Props {
   modelValue: boolean
@@ -96,21 +96,8 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const tags = ref<Tag[]>([])
-
-const loadTags = async () => {
-  try {
-    const data = await tagsApi.index()
-    tags.value = data
-  } catch (error) {
-    console.error('Failed to load tags:', error)
-    tags.value = []
-  }
-}
-
-onMounted(() => {
-  loadTags()
-})
+const { tags, fetchTags } = useTags()
+await fetchTags()
 
 const isOpen = computed({
   get: () => {

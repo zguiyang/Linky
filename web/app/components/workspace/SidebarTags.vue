@@ -208,21 +208,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { tagsApi } from '~/api/tags'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 import type { DropdownMenuItem, ContextMenuItem } from '@nuxt/ui'
 import { useTags } from '~/composables/useTags'
 
-defineProps<{
-  tags: Tag[]
-  pending?: boolean
-}>()
-
-const emit = defineEmits<{
-  'refresh-tags': []
-}>()
-
-const { isSelected } = useTags()
+const { tags, pending, createTag, updateTag, deleteTag, fetchTags, isSelected } = useTags()
+await fetchTags()
 
 const showModal = ref(false)
 const isEditing = ref(false)
@@ -297,8 +288,7 @@ const handleCreateTag = async (close?: () => void) => {
       name: tagForm.value.name.trim(),
       color: tagForm.value.color || undefined
     }
-    await tagsApi.create(data)
-    emit('refresh-tags')
+    await createTag(data)
     close?.()
     showModal.value = false
     tagForm.value = { name: '', color: '' }
@@ -318,8 +308,7 @@ const handleUpdateTag = async (close?: () => void) => {
       name: tagForm.value.name.trim(),
       color: tagForm.value.color || undefined
     }
-    await tagsApi.update(contextTag.value.id, data)
-    emit('refresh-tags')
+    await updateTag(contextTag.value.id, data)
     close?.()
     showModal.value = false
     tagForm.value = { name: '', color: '' }
@@ -338,8 +327,7 @@ const handleDeleteTag = async (close?: () => void) => {
 
   try {
     isDeleting.value = true
-    await tagsApi.delete(deletedTagId)
-    emit('refresh-tags')
+    await deleteTag(deletedTagId)
     close?.()
     showDeleteConfirm.value = false
     contextTag.value = null

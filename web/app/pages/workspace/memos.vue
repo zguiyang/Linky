@@ -213,27 +213,19 @@
 import { computed, ref } from 'vue'
 import { useTags } from '~/composables/useTags'
 import { useHttpError } from '~/composables/useHttpError'
-import { tagsApi } from '~/api/tags'
 import { memosApi } from '~/api/memos'
 import MemoModal from '~/components/MemoModal.vue'
-import type { Tag, Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
+import type { Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
 
 definePageMeta({ layout: 'workspace' })
 
-const { selectedTags, removeTag, clearTags } = useTags()
+const { tags, selectedTags, removeTag, clearTags, fetchTags } = useTags()
+await fetchTags()
+
 const { handleError } = useHttpError()
 
 const searchQuery = ref('')
 const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
-
-const { data: tags } = await useAsyncData<Tag[]>(
-  'memos-tags',
-  () => tagsApi.index(),
-  {
-    server: true,
-    default: () => []
-  }
-)
 
 const page = ref(1)
 const perPage = ref(20)

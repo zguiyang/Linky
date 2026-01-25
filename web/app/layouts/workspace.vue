@@ -34,11 +34,7 @@
         <div class="mx-3 my-2 border-t border-neutral-200 dark:border-neutral-700" />
 
         <div class="p-2">
-          <sidebar-tags
-            :tags="tagsData || []"
-            :pending="pending"
-            @refresh-tags="refreshTags"
-          />
+          <sidebar-tags />
         </div>
       </template>
 
@@ -78,17 +74,10 @@
 <script setup lang="ts">
 import WorkspaceUserDropdown from '~/components/workspace/UserDropdown.vue'
 import SidebarTags from '~/components/workspace/SidebarTags.vue'
-import { tagsApi } from '~/api/tags'
-import type { Tag } from '~/api/types'
 
 const navItems = [
   { label: '书签', to: '/workspace/bookmarks', icon: 'i-heroicons-bookmark' },
   { label: '备忘录', to: '/workspace/memos', icon: 'i-heroicons-document-text' },
   { label: '标签管理', to: '/workspace/tags', icon: 'i-heroicons-tag' }
 ]
-
-const { data: tagsData, pending, refresh: refreshTags } = await useAsyncData<Tag[]>('tags', () => tagsApi.index(), {
-  server: true,
-  default: () => []
-})
 </script>
