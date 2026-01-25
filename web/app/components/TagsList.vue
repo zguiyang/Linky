@@ -50,31 +50,31 @@
             :key="tag.id"
             class="flex items-center gap-1"
           >
-            <u-button
-              :color="selectedTagsList.includes(tag.id) ? 'primary' : 'neutral'"
-              variant="soft"
-              size="sm"
-              @click="toggleTag(tag.id)"
-            >
-              <template
-                v-if="tag.color"
-                #leading
-              >
-                <span
-                  class="w-2 h-2 rounded-full inline-block"
-                  :style="{ backgroundColor: tag.color }"
-                />
-              </template>
-              {{ tag.name }}
-            </u-button>
-
             <u-dropdown-menu :items="getTagMenuItems(tag)">
               <u-button
-                icon="i-heroicons-ellipsis-horizontal"
-                color="neutral"
-                variant="ghost"
+                :color="selectedTagsList.includes(tag.id) ? 'primary' : 'neutral'"
+                variant="soft"
                 size="sm"
-              />
+                @click="toggleTag(tag.id)"
+              >
+                <template
+                  v-if="tag.color"
+                  #leading
+                >
+                  <span
+                    class="w-2 h-2 rounded-full inline-block"
+                    :style="{ backgroundColor: tag.color }"
+                  />
+                </template>
+                {{ tag.name }}
+                <template #trailing>
+                  <u-icon
+                    name="i-heroicons-ellipsis-horizontal"
+                    class="text-gray-500 dark:text-gray-400"
+                    @click.stop
+                  />
+                </template>
+              </u-button>
             </u-dropdown-menu>
           </div>
         </template>
