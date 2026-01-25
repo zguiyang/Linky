@@ -264,7 +264,7 @@ import type { Tag, Bookmark } from '~/api/types'
 
 definePageMeta({ layout: 'workspace' })
 
-const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
+const viewMode = useState('view-mode', () => 'masonry' as 'masonry' | 'grid' | 'list')
 const searchQuery = ref('')
 const selectedTags = ref<number[]>([])
 
@@ -284,7 +284,6 @@ const { data: paginationData, pending: bookmarksPending, refresh: refreshBookmar
   'bookmarks-page-1',
   () => bookmarksApi.paginate(page.value, perPage.value),
   {
-    server: false,
     default: () => ({
       meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
       data: []
