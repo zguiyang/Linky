@@ -190,7 +190,7 @@ import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 
 definePageMeta({ layout: 'workspace' })
 
-const { data: tags, pending, refresh } = await useAsyncData<Tag[]>('tags', () => tagsApi.index(), {
+const { data: tags, pending, refresh } = await useAsyncData<Tag[]>('tags-page-tags', () => tagsApi.index(), {
   server: true,
   default: () => []
 })

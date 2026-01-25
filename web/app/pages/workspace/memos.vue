@@ -204,7 +204,7 @@ const selectedMemo = ref<{ id: number, title: string } | null>(null)
 const showDeleteModal = ref(false)
 
 const { data: tags } = await useAsyncData<Tag[]>(
-  'tags',
+  'memos-tags',
   () => tagsApi.index(),
   {
     server: true,
@@ -360,7 +360,7 @@ const _handleSaveMemo = () => {
   } else {
     const index = memos.value.findIndex(m => m.id === formData.value.id)
     if (index !== -1) {
-      const existingMemo = memos.value[index]
+      const existingMemo = memos.value[index]!
       memos.value[index] = {
         id: existingMemo.id,
         title: formData.value.title,

@@ -272,13 +272,13 @@ import type { Tag, Bookmark } from '~/api/types'
 
 definePageMeta({ layout: 'workspace' })
 
-const { selectedTags, removeTag, clearTags, isSelected } = useTags()
+const { selectedTags, removeTag, clearTags } = useTags()
 
 const viewMode = useState('view-mode', () => 'masonry' as 'masonry' | 'grid' | 'list')
 const searchQuery = ref('')
 
-const { data: tags, refresh } = await useAsyncData<Tag[]>(
-  'tags',
+const { data: tags } = await useAsyncData<Tag[]>(
+  'bookmarks-tags',
   () => tagsApi.index(),
   {
     server: true,

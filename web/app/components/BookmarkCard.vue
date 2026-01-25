@@ -136,18 +136,6 @@
 <script setup lang="ts">
 import type { Bookmark } from '~/api/types'
 
-interface Bookmark {
-  id: number
-  title: string
-  url: string
-  description: string | undefined | null
-  tags: Tag[]
-  visitCount: number
-  userId: number
-  createdAt: string
-  updatedAt: string | null
-}
-
 const props = defineProps<{
   bookmark: Bookmark
   viewMode: 'masonry' | 'grid' | 'list'

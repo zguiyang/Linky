@@ -177,21 +177,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { tagsApi } from '~/api/tags'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 import type { DropdownMenuItem, ContextMenuItem } from '@nuxt/ui'
 import { useTags } from '~/composables/useTags'
 
-const props = defineProps<{
+defineProps<{
   tags: Tag[]
+  pending?: boolean
 }>()
 
 const emit = defineEmits<{
   'refresh-tags': []
 }>()
 
-const { selectedTags, toggleTag, isSelected } = useTags()
+const { isSelected } = useTags()
 
 const isMobile = ref(false)
 const showModal = ref(false)

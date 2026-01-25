@@ -35,7 +35,8 @@
 
         <div class="p-2">
           <sidebar-tags
-            :tags="tagsData?.value || []"
+            :tags="tagsData || []"
+            :pending="pending"
             @refresh-tags="refreshTags"
           />
         </div>
@@ -86,7 +87,7 @@ const navItems = [
   { label: '标签管理', to: '/workspace/tags', icon: 'i-heroicons-tag' }
 ]
 
-const { data: tagsData, refresh: refreshTags } = await useAsyncData<Tag[]>('tags', () => tagsApi.index(), {
+const { data: tagsData, pending, refresh: refreshTags } = await useAsyncData<Tag[]>('tags', () => tagsApi.index(), {
   server: true,
   default: () => []
 })
