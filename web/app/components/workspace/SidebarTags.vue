@@ -1,16 +1,28 @@
 <template>
   <div class="flex flex-col gap-2">
-    <div class="flex items-center justify-between px-4 py-3">
+    <div
+      class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-colors"
+      @click="toggleExpand"
+    >
       <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-        My Tags
+        我的书签
       </span>
-      <u-dropdown-menu :items="headerMenuItems">
-        <u-button
-          icon="i-heroicons-plus"
-          size="xs"
-          variant="ghost"
+      <div class="flex items-center gap-1">
+        <u-dropdown-menu
+          :items="headerMenuItems"
+          @click.stop
+        >
+          <u-button
+            icon="i-heroicons-plus"
+            size="xs"
+            variant="ghost"
+          />
+        </u-dropdown-menu>
+        <u-icon
+          :name="isExpanded ? 'i-heroicons-chevron-down' : 'i-heroicons-chevron-up'"
+          class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
         />
-      </u-dropdown-menu>
+      </div>
     </div>
 
     <div
@@ -28,13 +40,17 @@
       class="flex flex-col items-center justify-center py-16"
     >
       <p class="text-sm text-neutral-500 dark:text-neutral-400">
-        No tags yet
+        暂无书签
       </p>
     </div>
 
     <nav
-      v-else
-      class="flex flex-col gap-1 px-2 py-1"
+      v-show="!pending && tags && tags.length > 0"
+      class="flex flex-wrap gap-2 px-2 py-1 overflow-hidden transition-all duration-300 ease-in-out"
+      :class="{
+        'max-h-0 opacity-0': !isExpanded,
+        'max-h-[1000px] opacity-100': isExpanded
+      }"
     >
       <template
         v-for="tag in tags"
@@ -46,16 +62,20 @@
         >
           <u-link
             :to="getTagLink(tag.id)"
-            class="flex items-center gap-2 px-2 py-2 rounded-md transition-all duration-200 ease-in-out text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
-            :class="{ 'bg-primary-50 text-primary-600 shadow-sm dark:bg-primary-500/20 dark:text-primary-300': isSelected(tag.id) }"
+            class="inline-flex items-center px-2.5 py-1 rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100/80 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800/80 dark:text-neutral-300 dark:hover:bg-neutral-700 transition-all duration-200 whitespace-nowrap"
+            :class="{
+              'bg-primary-100 text-primary-700 border-primary-200 dark:bg-primary-500/20 dark:text-primary-300 dark:border-primary-500/30 shadow-sm ring-2 ring-primary-500/20': isSelected(tag.id)
+            }"
           >
-            <span
-              v-if="tag.color"
-              class="size-2 rounded-full flex-shrink-0"
-              :style="{ backgroundColor: tag.color }"
-            />
-            <span class="flex-1 truncate">{{ tag.name }}</span>
-            <span class="text-xs text-neutral-400/50 flex-shrink-0">0</span>
+            <div class="inline-flex items-center gap-1 pr-2">
+              <span
+                v-if="tag.color"
+                class="shrink-0 font-medium text-sm"
+                :style="{ color: tag.color }"
+              >#</span>
+              <span class="text-sm">{{ tag.name }}</span>
+            </div>
+            <span class="text-xs text-neutral-400/60 font-medium">0</span>
           </u-link>
         </u-context-menu>
 
@@ -66,21 +86,23 @@
         >
           <u-link
             :to="getTagLink(tag.id)"
-            class="flex items-center justify-between gap-2 px-2 py-2 rounded-md transition-all duration-200 ease-in-out text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+            class="inline-flex items-center gap-2.5 px-2.5 py-1 rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100/80 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800/80 dark:text-neutral-300 dark:hover:bg-neutral-700 transition-all duration-200 whitespace-nowrap"
           >
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1">
               <span
                 v-if="tag.color"
-                class="size-2 rounded-full flex-shrink-0"
-                :style="{ backgroundColor: tag.color }"
-              />
-              <span class="flex-1 truncate">{{ tag.name }}</span>
-              <span class="text-xs text-neutral-400/50 flex-shrink-0">0</span>
+                class="shrink-0 font-medium text-sm"
+                :style="{ color: tag.color }"
+              >#</span>
+              <span class="text-sm">{{ tag.name }}</span>
             </div>
-            <u-icon
-              name="i-heroicons-ellipsis-vertical"
-              class="text-neutral-400/50 flex-shrink-0"
-            />
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs text-neutral-400/60 font-medium">0</span>
+              <u-icon
+                name="i-heroicons-ellipsis-vertical"
+                class="text-neutral-400/60 flex-shrink-0"
+              />
+            </div>
           </u-link>
         </u-dropdown-menu>
       </template>
@@ -205,6 +227,11 @@ const contextTag = ref<Tag | null>(null)
 const isSubmitting = ref(false)
 const isDeleting = ref(false)
 const tagForm = ref<{ name: string, color: string }>({ name: '', color: '' })
+const isExpanded = ref(true)
+
+const toggleExpand = () => {
+  isExpanded.value = !isExpanded.value
+}
 
 const headerMenuItems: DropdownMenuItem[][] = [[
   {
