@@ -3,16 +3,27 @@
     :items="menuItems"
     :content="{ align: 'end' }"
   >
-    <template #default>
-      <UAvatar
-        :alt="user?.fullName || user?.email || 'User'"
-        size="md"
-        class="cursor-pointer hover:ring-2 hover:ring-primary-20 transition-all duration-200"
-      >
-        <template #fallback>
-          {{ (user?.fullName || user?.email || 'U').charAt(0).toUpperCase() }}
-        </template>
-      </UAvatar>
+    <template #default="{ open }">
+      <div class="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+        <UAvatar
+          :alt="user?.fullName || user?.email || 'User'"
+          size="md"
+        >
+          <template #fallback>
+            {{ (user?.fullName || user?.email || 'U').charAt(0).toUpperCase() }}
+          </template>
+        </UAvatar>
+        <div class="flex flex-col flex-1 min-w-0">
+          <span class="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
+            {{ user?.fullName || user?.email }}
+          </span>
+        </div>
+        <UIcon
+          name="i-heroicons-chevron-down"
+          class="size-4 text-gray-500 transition-transform duration-200"
+          :class="{ 'rotate-180': open }"
+        />
+      </div>
     </template>
   </UDropdownMenu>
 </template>
@@ -26,20 +37,7 @@ const { user, logout } = useAuth()
 const menuItems = computed(() => [
   [
     {
-      label: '当前用户'
-    },
-    {
-      label: user.value?.fullName || 'User',
-      description: user.value?.email,
-      avatar: {
-        alt: user.value?.fullName || 'User',
-        size: 'md'
-      }
-    }
-  ],
-  [
-    {
-      label: '个人资料',
+      label: '个人信息',
       icon: 'i-heroicons-user',
       onSelect: () => navigateTo('/workspace/profile')
     },
