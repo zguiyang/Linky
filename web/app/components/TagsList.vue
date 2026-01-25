@@ -206,7 +206,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import type { ContextMenuItem } from '@nuxt/ui'
 import { tagsApi } from '~/api/tags'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
@@ -230,15 +230,24 @@ const contextTag = ref<Tag | null>(null)
 
 const isSubmitting = ref(false)
 const isDeleting = ref(false)
+const isMobile = ref(false)
 
 const tagsList = computed(() => props.tags)
 const selectedTagsList = computed(() => props.selectedTags)
 
 const pendingValue = computed(() => false)
 
-const isMobile = computed(() => {
-  if (import.meta.server) return false
-  return window.innerWidth < 1024
+onMounted(() => {
+  isMobile.value = window.innerWidth < 1024
+  window.addEventListener('resize', () => {
+    isMobile.value = window.innerWidth < 1024
+  })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', () => {
+    isMobile.value = window.innerWidth < 1024
+  })
 })
 
 const getTagMenuItems = (tag: Tag): ContextMenuItem[][] => {
