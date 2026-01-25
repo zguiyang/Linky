@@ -17,11 +17,20 @@ export class TagService {
   }
 
   async findAll(userId: number) {
-    return await Tag.query().where('user_id', userId).orderBy('name', 'asc')
+    return await Tag.query()
+      .where('user_id', userId)
+      .withCount('bookmarks')
+      .withCount('memos')
+      .orderBy('name', 'asc')
   }
 
   async findById(userId: number, tagId: number) {
-    const tag = await Tag.query().where('id', tagId).where('user_id', userId).first()
+    const tag = await Tag.query()
+      .where('id', tagId)
+      .where('user_id', userId)
+      .withCount('bookmarks')
+      .withCount('memos')
+      .first()
 
     if (!tag) {
       throw new Exception('标签不存在', { status: 404 })

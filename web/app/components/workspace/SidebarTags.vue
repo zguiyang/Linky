@@ -75,7 +75,9 @@
               >#</span>
               <span class="text-sm">{{ tag.name }}</span>
             </div>
-            <span class="text-xs text-neutral-400/60 font-medium">0</span>
+            <span class="text-xs text-neutral-400/60 font-medium">
+              {{ tag.bookmarksCount + tag.memosCount }}
+            </span>
           </u-link>
         </u-context-menu>
 
@@ -97,7 +99,9 @@
               <span class="text-sm">{{ tag.name }}</span>
             </div>
             <div class="flex items-center gap-1.5">
-              <span class="text-xs text-neutral-400/60 font-medium">0</span>
+              <span class="text-xs text-neutral-400/60 font-medium">
+                {{ tag.bookmarksCount + tag.memosCount }}
+              </span>
               <u-icon
                 name="i-heroicons-ellipsis-vertical"
                 class="text-neutral-400/60 flex-shrink-0"

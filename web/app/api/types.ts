@@ -40,6 +40,8 @@ export interface Tag {
   name: string
   color: string | null
   userId: number
+  bookmarksCount: number
+  memosCount: number
   createdAt: string
   updatedAt: string | null
 }
