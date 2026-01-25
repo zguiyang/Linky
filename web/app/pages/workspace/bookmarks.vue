@@ -6,7 +6,7 @@
           我的书签
         </h1>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          共 {{ filteredBookmarks.length }} 个书签
+          共 {{ total }} 个书签
         </p>
       </div>
 
@@ -50,19 +50,19 @@
           color="primary"
           size="md"
           title="添加书签"
-          @click="showAddBookmarkModal = true"
+          @click="openAddModal"
         />
       </div>
     </div>
 
     <div class="flex flex-1 lg:flex-row gap-6 min-h-0 overflow-hidden">
-      <div class="flex-1 lg:flex-[0_0_80%] min-h-0">
+      <div class="flex flex-col flex-1 lg:flex-[0_0_80%] min-h-0">
         <u-scroll-area
-          class="h-full"
+          class="flex-1 min-h-0"
           :ui="{ viewport: 'py-2' }"
         >
           <tags-list
-            v-if="!pending && tags"
+            v-if="!bookmarksPending && tags"
             :tags="tags"
             :selected-tags="selectedTags"
             class="lg:hidden mb-6"
@@ -80,6 +80,8 @@
               :bookmark="bookmark"
               view-mode="masonry"
               @click="openBookmark"
+              @edit="openEditModal"
+              @delete="openDeleteConfirm"
             />
           </div>
 
@@ -93,6 +95,8 @@
               :bookmark="bookmark"
               view-mode="grid"
               @click="openBookmark"
+              @edit="openEditModal"
+              @delete="openDeleteConfirm"
             />
           </div>
 
@@ -106,6 +110,8 @@
               :bookmark="bookmark"
               view-mode="list"
               @click="openBookmark"
+              @edit="openEditModal"
+              @delete="openDeleteConfirm"
             />
           </div>
 
@@ -124,12 +130,24 @@
             </template>
           </u-empty>
         </u-scroll-area>
+
+        <div
+          v-if="!bookmarksPending && total > 0"
+          class="flex justify-center py-4 flex-shrink-0"
+        >
+          <u-pagination
+            v-model:page="page"
+            :total="total"
+            :items-per-page="perPage"
+            @update:page="handlePageChange"
+          />
+        </div>
       </div>
 
       <div class="hidden lg:block lg:flex-[0_0_20%] min-h-0">
         <div class="sticky top-0 pr-6">
           <tags-list
-            v-if="!pending && tags"
+            v-if="!bookmarksPending && tags"
             :tags="tags"
             :selected-tags="selectedTags"
             @update:selected-tags="selectedTags = $event"
@@ -140,22 +158,22 @@
     </div>
 
     <u-modal
-      v-model:open="showAddBookmarkModal"
-      title="添加新书签"
+      v-model:open="showBookmarkModal"
+      :title="isEditing ? '编辑书签' : '添加新书签'"
     >
       <template #body>
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标题 <span class="text-red-500">*</span></label>
             <u-input
-              v-model="newBookmark.title"
+              v-model="bookmarkForm.title"
               placeholder="输入书签标题"
             />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">URL <span class="text-red-500">*</span></label>
             <u-input
-              v-model="newBookmark.url"
+              v-model="bookmarkForm.url"
               type="url"
               placeholder="https://example.com"
             />
@@ -163,41 +181,21 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">描述</label>
             <u-textarea
-              v-model="newBookmark.description"
+              v-model="bookmarkForm.description"
               placeholder="添加简短描述（可选）"
               :rows="3"
             />
           </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">分类</label>
-              <u-select
-                v-model="newBookmark.category"
-                :items="categoryOptions"
-                placeholder="选择分类"
-                :popper="{ strategy: 'fixed' }"
-              />
-            </div>
-          </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标签</label>
-            <div
-              class="flex flex-wrap gap-2 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg"
-            >
-              <u-button
-                icon="i-heroicons-x-mark"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-              />
-              <u-input
-                v-model="tagInput"
-                type="text"
-                placeholder="输入标签后按回车"
-                class="flex-1 min-w-[120px] bg-transparent border-none outline-none"
-                @keyup.enter="addTag"
-              />
-            </div>
+            <u-select-menu
+              v-model="bookmarkForm.tagIds"
+              :items="tagSelectItems"
+              multiple
+              value-key="value"
+              label-key="label"
+              placeholder="选择标签"
+            />
           </div>
         </div>
       </template>
@@ -209,9 +207,49 @@
           @click="close"
         />
         <u-button
-          label="添加"
+          :label="isEditing ? '保存' : '添加'"
           color="primary"
-          @click="handleAddBookmark(close)"
+          @click="handleSaveBookmark(close)"
+        />
+      </template>
+    </u-modal>
+
+    <u-modal
+      v-model:open="showDeleteConfirm"
+      title="确认删除"
+    >
+      <template #body>
+        <div class="text-center space-y-4">
+          <div class="flex justify-center">
+            <div class="w-16 h-16 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
+              <u-icon
+                name="i-heroicons-exclamation-triangle"
+                class="w-8 h-8 text-red-500"
+              />
+            </div>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              确定要删除这个书签吗？
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              书签名称: <strong>{{ contextBookmark?.title }}</strong>
+            </p>
+          </div>
+        </div>
+      </template>
+      <template #footer="{ close }">
+        <u-button
+          label="取消"
+          color="neutral"
+          variant="outline"
+          @click="close"
+        />
+        <u-button
+          label="删除"
+          color="error"
+          :loading="isDeleting"
+          @click="handleDeleteBookmark(close)"
         />
       </template>
     </u-modal>
@@ -221,18 +259,16 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { tagsApi } from '~/api/tags'
-import type { Tag } from '~/api/types'
+import { bookmarksApi } from '~/api/bookmarks'
+import type { Tag, Bookmark } from '~/api/types'
 
 definePageMeta({ layout: 'workspace' })
 
 const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
 const searchQuery = ref('')
-const sortBy = ref('recent')
-const tagInput = ref('')
-const showAddBookmarkModal = ref(false)
 const selectedTags = ref<number[]>([])
 
-const { data: tags, pending, refresh } = await useAsyncData<Tag[]>(
+const { data: tags, refresh } = await useAsyncData<Tag[]>(
   'tags',
   () => tagsApi.index(),
   {
@@ -241,278 +277,45 @@ const { data: tags, pending, refresh } = await useAsyncData<Tag[]>(
   }
 )
 
-const bookmarks = ref([
-  {
-    id: 1,
-    title: 'Vue.js 官方文档',
-    url: 'https://vuejs.org',
-    description: 'Vue.js 官方文档，包含完整的API参考和指南，是学习Vue.js的必备资源',
-    category: '开发工具',
-    tags: ['Vue', 'JavaScript'],
-    visitCount: 128,
-    createdAt: '2024-12-01'
-  },
-  {
-    id: 2,
-    title: 'Tailwind CSS 文档',
-    url: 'https://tailwindcss.com',
-    description: '实用优先的CSS框架，现代化UI开发必备',
-    category: '开发工具',
-    tags: ['CSS', 'Tailwind'],
-    visitCount: 95,
-    createdAt: '2024-11-28'
-  },
-  {
-    id: 3,
-    title: 'GitHub',
-    url: 'https://github.com',
-    description: '全球最大的代码托管平台',
-    category: '开发工具',
-    tags: ['Git', '代码托管'],
-    visitCount: 234,
-    createdAt: '2024-11-20'
-  },
-  {
-    id: 4,
-    title: 'Notion',
-    url: 'https://notion.so',
-    description:
-      'Notion 是一个一体化的工作空间，可以记录笔记、管理任务、创建文档，非常适合个人和团队使用',
-    category: '效率工具',
-    tags: ['笔记', '协作', '效率', '知识管理', '生产力'],
-    visitCount: 156,
-    createdAt: '2024-11-25'
-  },
-  {
-    id: 5,
-    title: 'Figma',
-    url: 'https://figma.com',
-    description: 'Figma',
-    category: '设计资源',
-    tags: ['UI设计', '协作'],
-    visitCount: 89,
-    createdAt: '2024-12-05'
-  },
-  {
-    id: 6,
-    title: 'Stack Overflow',
-    url: 'https://stackoverflow.com',
-    description:
-      'Stack Overflow 是全球最大的程序员问答社区，当你遇到编程问题时，这里通常能找到答案',
-    category: '开发工具',
-    tags: ['问答', '编程', '社区'],
-    visitCount: 312,
-    createdAt: '2024-11-15'
-  },
-  {
-    id: 7,
-    title: 'Dribbble',
-    url: 'https://dribbble.com',
-    description: '设计师作品分享平台，这里汇集了全球最优秀的设计师作品，是寻找设计灵感的绝佳去处',
-    category: '设计资源',
-    tags: ['UI设计', '灵感', '作品集', '设计社区', '素材'],
-    visitCount: 67,
-    createdAt: '2024-12-02'
-  },
-  {
-    id: 8,
-    title: 'MDN Web Docs',
-    url: 'https://developer.mozilla.org',
-    description: 'MDN',
-    category: '学习资源',
-    tags: ['HTML', 'CSS', 'JavaScript', 'Web开发'],
-    visitCount: 278,
-    createdAt: '2024-11-18'
-  },
-  {
-    id: 9,
-    title: 'VS Code',
-    url: 'https://code.visualstudio.com',
-    description:
-      'Visual Studio Code 是一款轻量级但功能强大的代码编辑器，支持多种编程语言，拥有丰富的插件生态',
-    category: '开发工具',
-    tags: ['编辑器', '开发工具', 'IDE'],
-    visitCount: 423,
-    createdAt: '2024-11-10'
-  },
-  {
-    id: 10,
-    title: 'ChatGPT',
-    url: 'https://chat.openai.com',
-    description:
-      'OpenAI 的 ChatGPT 是一款基于大语言模型的对话式AI助手，可以回答问题、编写代码、提供建议等',
-    category: '效率工具',
-    tags: ['AI', '人工智能', '聊天', '生产力'],
-    visitCount: 567,
-    createdAt: '2024-12-08'
-  },
-  {
-    id: 11,
-    title: 'Medium',
-    url: 'https://medium.com',
-    description: 'Medium 是一个高质量的在线内容发布平台，汇集了各个领域的优质文章和深度思考',
-    category: '学习资源',
-    tags: ['博客', '阅读', '文章'],
-    visitCount: 45,
-    createdAt: '2024-12-03'
-  },
-  {
-    id: 12,
-    title: 'Canva',
-    url: 'https://canva.com',
-    description: 'Canva',
-    category: '设计资源',
-    tags: ['在线设计', '模板', '图形'],
-    visitCount: 134,
-    createdAt: '2024-11-22'
-  },
-  {
-    id: 13,
-    title: 'CodePen',
-    url: 'https://codepen.io',
-    description:
-      'CodePen 是一个在线代码编辑器和社交开发环境，开发者可以在这里编写和分享HTML、CSS和JavaScript代码片段',
-    category: '开发工具',
-    tags: ['代码编辑器', '前端', '演示'],
-    visitCount: 98,
-    createdAt: '2024-11-28'
-  },
-  {
-    id: 14,
-    title: 'Linear',
-    url: 'https://linear.app',
-    description:
-      'Linear 是一款现代化的项目管理和问题追踪工具，专为软件团队设计，界面简洁美观，操作流畅',
-    category: '效率工具',
-    tags: ['项目管理', '团队协作', '效率'],
-    visitCount: 76,
-    createdAt: '2024-12-06'
-  },
-  {
-    id: 15,
-    title: 'Dev.to',
-    url: 'https://dev.to',
-    description: 'Dev.to',
-    category: '学习资源',
-    tags: ['社区', '博客', '编程'],
-    visitCount: 112,
-    createdAt: '2024-11-30'
-  },
-  {
-    id: 16,
-    title: 'Vercel',
-    url: 'https://vercel.com',
-    description:
-      'Vercel 是一个领先的云平台，专门用于部署前端应用，支持 Next.js、Nuxt.js 等框架，提供极致的性能和开发体验',
-    category: '开发工具',
-    tags: ['部署', '前端', '云服务', 'Next.js', 'Nuxt.js', '性能'],
-    visitCount: 201,
-    createdAt: '2024-11-12'
-  },
-  {
-    id: 17,
-    title: 'Stripe',
-    url: 'https://stripe.com',
-    description:
-      'Stripe 是一个全球领先的在线支付处理平台，为开发者提供简单、强大的支付集成解决方案',
-    category: '开发工具',
-    tags: ['支付', 'API', '金融'],
-    visitCount: 89,
-    createdAt: '2024-11-20'
-  },
-  {
-    id: 18,
-    title: 'Behance',
-    url: 'https://behance.net',
-    description:
-      'Adobe Behance 是一个展示和发现创意作品的平台，设计师可以在这里展示自己的作品集，获得更多曝光机会',
-    category: '设计资源',
-    tags: ['设计', '作品集', 'Adobe'],
-    visitCount: 54,
-    createdAt: '2024-12-04'
-  },
-  {
-    id: 19,
-    title: 'YouTube',
-    url: 'https://youtube.com',
-    description:
-      'YouTube 是全球最大的视频分享平台，有海量的教程、演讲、娱乐内容，是学习和娱乐的重要来源',
-    category: '学习资源',
-    tags: ['视频', '教程', '娱乐', '学习'],
-    visitCount: 345,
-    createdAt: '2024-11-08'
-  },
-  {
-    id: 20,
-    title: 'Twilio',
-    url: 'https://twilio.com',
-    description: 'Twilio 提供强大的通信API，可以让开发者在应用中轻松集成语音、短信、视频等通信功能',
-    category: '开发工具',
-    tags: ['通信', 'API', '消息', '语音'],
-    visitCount: 43,
-    createdAt: '2024-12-07'
-  },
-  {
-    id: 21,
-    title: 'Product Hunt',
-    url: 'https://producthunt.com',
-    description: 'Product Hunt 是发现新产品的最佳平台，每天都有新的科技产品和初创公司在这里发布',
-    category: '效率工具',
-    tags: ['产品', '发现', '创业'],
-    visitCount: 167,
-    createdAt: '2024-11-14'
-  },
-  {
-    id: 22,
-    title: 'Unsplash',
-    url: 'https://unsplash.com',
-    description:
-      'Unsplash 提供免费的高质量照片，所有图片都可以免费使用，是设计师和开发者的理想图片来源',
-    category: '设计资源',
-    tags: ['图片', '免费素材', '摄影'],
-    visitCount: 289,
-    createdAt: '2024-11-16'
-  },
-  {
-    id: 23,
-    title: 'Lobsters',
-    url: 'https://lobste.rs',
-    description: 'Lobsters',
-    category: '学习资源',
-    tags: ['技术', '新闻'],
-    visitCount: 31,
-    createdAt: '2024-12-09'
-  },
-  {
-    id: 24,
-    title: 'Raycast',
-    url: 'https://raycast.com',
-    description:
-      'Raycast 是一款强大的 Mac 启动器和生产力工具，可以快速启动应用、搜索文件、执行命令，大大提升工作效率',
-    category: '效率工具',
-    tags: ['Mac', '启动器', '生产力', '工具', '快捷键', '效率', '工作流'],
-    visitCount: 156,
-    createdAt: '2024-11-26'
-  },
-  {
-    id: 25,
-    title: 'Excalidraw',
-    url: 'https://excalidraw.com',
-    description:
-      'Excalidraw 是一个虚拟白板工具，可以绘制手绘风格的图表，非常适合用于头脑风暴、架构设计和文档说明',
-    category: '效率工具',
-    tags: ['白板', '绘图', '协作', '架构'],
-    visitCount: 92,
-    createdAt: '2024-11-24'
-  }
-])
+const page = ref(1)
+const perPage = ref(20)
 
-const newBookmark = ref({
+const { data: paginationData, pending: bookmarksPending, refresh: refreshBookmarks } = await useAsyncData(
+  'bookmarks-page-1',
+  () => bookmarksApi.paginate(page.value, perPage.value),
+  {
+    server: false,
+    default: () => ({
+      meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
+      data: []
+    })
+  }
+)
+
+const bookmarks = computed(() => paginationData.value?.data || [])
+const total = computed(() => paginationData.value?.meta.total || 0)
+
+const showBookmarkModal = ref(false)
+const isEditing = ref(false)
+const editingBookmarkId = ref<number | null>(null)
+const showDeleteConfirm = ref(false)
+const contextBookmark = ref<Bookmark | null>(null)
+const isDeleting = ref(false)
+
+const bookmarkForm = ref({
   title: '',
   url: '',
   description: '',
-  category: '',
-  tags: [] as string[]
+  tagIds: [] as number[]
+})
+
+const tagSelectItems = computed(() => {
+  if (!tags.value) return []
+  return tags.value.map(tag => ({
+    label: tag.name,
+    value: tag.id,
+    ...(tag.color && { color: tag.color })
+  }))
 })
 
 const filteredBookmarks = computed(() => {
@@ -520,89 +323,102 @@ const filteredBookmarks = computed(() => {
 
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    result = result.filter(
-      b =>
-        b.title.toLowerCase().includes(query)
-        || b.description.toLowerCase().includes(query)
-        || b.tags.some(tag => tag.toLowerCase().includes(query))
+    result = result.filter((b: Bookmark) =>
+      b.title.toLowerCase().includes(query)
+      || b.description?.toLowerCase().includes(query)
     )
   }
 
-  if (sortBy.value === 'recent') {
-    result = result.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  if (selectedTags.value.length > 0) {
+    result = result.filter((b: Bookmark) =>
+      b.tags.some((t: Tag) => selectedTags.value.includes(t.id))
     )
-  } else if (sortBy.value === 'visits') {
-    result = result.sort((a, b) => b.visitCount - a.visitCount)
-  } else if (sortBy.value === 'name') {
-    result = result.sort((a, b) => a.title.localeCompare(b.title))
   }
 
   return result
 })
 
-const categoryOptions = [
-  { label: '开发工具', value: '开发工具' },
-  { label: '设计资源', value: '设计资源' },
-  { label: '学习资源', value: '学习资源' },
-  { label: '效率工具', value: '效率工具' },
-  { label: '其他', value: '其他' }
-]
-
 const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
   viewMode.value = mode
 }
 
-const openBookmark = (bookmark: { url: string }) => {
+const openBookmark = (bookmark: Bookmark) => {
   window.open(bookmark.url, '_blank')
 }
 
-const handleAddBookmark = (close?: () => void) => {
-  console.log('Mock: 添加书签（仅演示，不实际保存）')
-  if (!newBookmark.value.title || !newBookmark.value.url) {
-    return
-  }
-
-  const bookmark = {
-    id: bookmarks.value.length + 1,
-    title: newBookmark.value.title,
-    url: newBookmark.value.url,
-    description: newBookmark.value.description,
-    category: newBookmark.value.category,
-    tags: newBookmark.value.tags,
-    visitCount: 0,
-    createdAt: new Date().toISOString().split('T')[0] || ''
-  }
-
-  bookmarks.value.unshift(bookmark)
-  showAddBookmarkModal.value = false
-  console.log('Mock: 新书签已添加（内存中）', bookmark)
-
-  newBookmark.value = {
+const openAddModal = () => {
+  isEditing.value = false
+  editingBookmarkId.value = null
+  bookmarkForm.value = {
     title: '',
     url: '',
     description: '',
-    category: '',
-    tags: []
+    tagIds: []
+  }
+  showBookmarkModal.value = true
+}
+
+const openEditModal = (bookmark: Bookmark) => {
+  isEditing.value = true
+  editingBookmarkId.value = bookmark.id
+  bookmarkForm.value = {
+    title: bookmark.title,
+    url: bookmark.url,
+    description: bookmark.description || '',
+    tagIds: bookmark.tags.map((t: Tag) => t.id)
+  }
+  showBookmarkModal.value = true
+}
+
+const openDeleteConfirm = (bookmark: Bookmark) => {
+  contextBookmark.value = bookmark
+  showDeleteConfirm.value = true
+}
+
+const handleSaveBookmark = async (close?: () => void) => {
+  if (!bookmarkForm.value.title || !bookmarkForm.value.url) {
+    return
   }
 
+  if (isEditing.value && editingBookmarkId.value) {
+    await bookmarksApi.update(editingBookmarkId.value, bookmarkForm.value)
+  } else {
+    await bookmarksApi.create(bookmarkForm.value)
+  }
+
+  await refreshBookmarks()
   close?.()
-}
-
-const addTag = () => {
-  if (tagInput.value.trim() && !newBookmark.value.tags.includes(tagInput.value.trim())) {
-    newBookmark.value.tags.push(tagInput.value.trim())
-    tagInput.value = ''
+  showBookmarkModal.value = false
+  bookmarkForm.value = {
+    title: '',
+    url: '',
+    description: '',
+    tagIds: []
   }
 }
 
-const _removeTag = (index: number | string) => {
-  newBookmark.value.tags.splice(Number(index), 1)
+const handleDeleteBookmark = async (close?: () => void) => {
+  if (!contextBookmark.value) return
+
+  try {
+    isDeleting.value = true
+    await bookmarksApi.delete(contextBookmark.value.id)
+    await refreshBookmarks()
+    close?.()
+    showDeleteConfirm.value = false
+    contextBookmark.value = null
+  } finally {
+    isDeleting.value = false
+  }
+}
+
+const handlePageChange = (newPage: number) => {
+  page.value = newPage
 }
 
 onMounted(() => {
   window.addEventListener('add-bookmark', () => {
-    showAddBookmarkModal.value = true
+    openAddModal()
   })
 })
 </script>

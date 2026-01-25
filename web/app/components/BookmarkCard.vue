@@ -55,7 +55,7 @@
       </template>
 
       <template v-else-if="viewMode === 'grid'">
-        <u-tooltip :text="bookmark.description">
+        <u-tooltip :text="bookmark.description ?? undefined">
           <p
             class="text-base text-gray-500 dark:text-gray-400 truncate"
             :class="descriptionClasses"
@@ -82,12 +82,12 @@
           >
             <u-badge
               v-for="tag in bookmark.tags"
-              :key="tag"
+              :key="tag.id"
               color="primary"
               variant="outline"
               size="md"
             >
-              {{ tag }}
+              {{ tag.name }}
             </u-badge>
           </div>
           <div
@@ -120,12 +120,12 @@
         >
           <u-badge
             v-for="tag in bookmark.tags"
-            :key="tag"
+            :key="tag.id"
             color="primary"
             variant="outline"
             size="md"
           >
-            {{ tag }}
+            {{ tag.name }}
           </u-badge>
         </div>
       </template>
@@ -134,17 +134,18 @@
 </template>
 
 <script setup lang="ts">
-import type { DropdownMenuItem } from '@nuxt/ui'
+import type { Bookmark } from '~/api/types'
 
 interface Bookmark {
   id: number
   title: string
   url: string
-  description: string
-  category: string
-  tags: string[]
+  description: string | undefined | null
+  tags: Tag[]
   visitCount: number
+  userId: number
   createdAt: string
+  updatedAt: string | null
 }
 
 const props = defineProps<{
@@ -152,17 +153,19 @@ const props = defineProps<{
   viewMode: 'masonry' | 'grid' | 'list'
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   click: [bookmark: Bookmark]
+  edit: [bookmark: Bookmark]
+  delete: [bookmark: Bookmark]
 }>()
 
-const menuItems: DropdownMenuItem[][] = [
+const menuItems = [
   [
     {
       label: '编辑',
       icon: 'i-heroicons-pencil',
       onSelect: () => {
-        console.log('Mock: 编辑书签', props.bookmark)
+        emit('edit', props.bookmark)
       }
     },
     {
@@ -170,7 +173,7 @@ const menuItems: DropdownMenuItem[][] = [
       icon: 'i-heroicons-trash',
       color: 'error',
       onSelect: () => {
-        console.log('Mock: 删除书签', props.bookmark)
+        emit('delete', props.bookmark)
       }
     }
   ]

@@ -53,3 +53,41 @@ export interface UpdateTagRequest {
   name?: string
   color?: string
 }
+
+export interface Bookmark {
+  id: number
+  title: string
+  url: string
+  description: string | undefined | null
+  visitCount: number
+  userId: number
+  tags: Tag[]
+  createdAt: string
+  updatedAt: string | null
+}
+
+export interface CreateBookmarkRequest {
+  title: string
+  url: string
+  description?: string
+  tagIds?: number[]
+}
+
+export interface UpdateBookmarkRequest {
+  title?: string
+  url?: string
+  description?: string
+  tagIds?: number[]
+}
+
+export interface PaginatorMeta {
+  currentPage: number
+  perPage: number
+  total: number
+  lastPage: number
+}
+
+export interface PaginatedResponse<T> {
+  meta: PaginatorMeta
+  data: T[]
+}
