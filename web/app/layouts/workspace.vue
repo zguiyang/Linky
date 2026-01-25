@@ -2,13 +2,13 @@
   <u-dashboard-group>
     <u-dashboard-sidebar>
       <template #header>
-        <div class="flex items-center justify-center p-4">
-          <div class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">
+        <div class="flex items-center gap-2 p-4">
+          <app-logo class="h-8 w-auto" />
+          <span class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">
             Linky
-          </div>
+          </span>
         </div>
       </template>
-
       <template #default>
         <nav class="flex flex-col gap-1 p-2">
           <u-link
@@ -29,10 +29,10 @@
       </template>
 
       <template #footer>
-        <div class="p-2 border-t border-gray-200 dark:border-gray-700">
+        <div class="border-gray-200 dark:border-gray-700 w-full">
           <u-link
             to="/workspace/settings"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+            class="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
           >
             <u-icon
               name="i-heroicons-cog-6-tooth"
