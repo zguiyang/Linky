@@ -1,6 +1,6 @@
 <template>
   <div class="marketing-layout">
-    <AmbientBackground />
+    <ambient-background />
 
     <slot />
   </div>

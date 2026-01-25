@@ -1,31 +1,31 @@
 <template>
-  <UDropdownMenu
+  <u-dropdown-menu
     :items="menuItems"
     :content="{ align: 'end' }"
   >
     <template #default="{ open }">
       <div class="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-        <UAvatar
+        <u-avatar
           :alt="user?.fullName || user?.email || 'User'"
           size="md"
         >
           <template #fallback>
             {{ (user?.fullName || user?.email || 'U').charAt(0).toUpperCase() }}
           </template>
-        </UAvatar>
+        </u-avatar>
         <div class="flex flex-col flex-1 min-w-0">
           <span class="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
             {{ user?.fullName || user?.email }}
           </span>
         </div>
-        <UIcon
+        <u-icon
           name="i-heroicons-chevron-down"
           class="size-4 text-gray-500 transition-transform duration-200"
           :class="{ 'rotate-180': open }"
         />
       </div>
     </template>
-  </UDropdownMenu>
+  </u-dropdown-menu>
 </template>
 
 <script setup lang="ts">

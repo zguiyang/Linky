@@ -23,12 +23,12 @@
         </template>
 
         <template #footer>
-          <NuxtLink to="/">
+          <nuxt-link to="/">
             <u-button
               block
               color="primary"
             > 返回首页 </u-button>
-          </NuxtLink>
+          </nuxt-link>
         </template>
       </u-card>
     </div>

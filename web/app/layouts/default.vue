@@ -1,7 +1,7 @@
 <template>
   <u-app>
     <div class="root-container">
-      <AmbientBackground />
+      <ambient-background />
 
       <slot />
     </div>
