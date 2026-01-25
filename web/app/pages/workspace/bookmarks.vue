@@ -55,106 +55,113 @@
       </div>
     </div>
 
-    <div class="flex flex-1 lg:flex-row gap-6 min-h-0 overflow-hidden">
-      <div class="flex flex-col flex-1 lg:flex-[0_0_80%] min-h-0">
-        <u-scroll-area
-          class="flex-1 min-h-0"
-          :ui="{ viewport: 'py-2' }"
-        >
-          <tags-list
-            v-if="!bookmarksPending && tags"
-            :tags="tags"
-            :selected-tags="selectedTags"
-            class="lg:hidden mb-6"
-            @update:selected-tags="selectedTags = $event"
-            @refresh-tags="refresh"
-          />
-
-          <div
-            v-if="viewMode === 'masonry'"
-            class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+    <div
+      v-if="selectedTags.length > 0"
+      class="active-filters"
+    >
+      <div class="filters-left">
+        <span class="text-sm text-gray-600 dark:text-gray-400">已选标签：</span>
+        <div class="filter-tags">
+          <u-badge
+            v-for="tagId in selectedTags"
+            :key="tagId"
+            color="primary"
+            variant="soft"
+            size="md"
           >
-            <bookmark-card
-              v-for="bookmark in filteredBookmarks"
-              :key="bookmark.id"
-              :bookmark="bookmark"
-              view-mode="masonry"
-              @click="openBookmark"
-              @edit="openEditModal"
-              @delete="openDeleteConfirm"
+            {{ getTagName(tagId) }}
+            <u-button
+              icon="i-heroicons-x-mark"
+              size="xs"
+              variant="ghost"
+              color="neutral"
+              @click="removeTag(tagId)"
             />
-          </div>
-
-          <div
-            v-else-if="viewMode === 'grid'"
-            class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
-          >
-            <bookmark-card
-              v-for="bookmark in filteredBookmarks"
-              :key="bookmark.id"
-              :bookmark="bookmark"
-              view-mode="grid"
-              @click="openBookmark"
-              @edit="openEditModal"
-              @delete="openDeleteConfirm"
-            />
-          </div>
-
-          <div
-            v-else
-            class="flex flex-col gap-3"
-          >
-            <bookmark-card
-              v-for="bookmark in filteredBookmarks"
-              :key="bookmark.id"
-              :bookmark="bookmark"
-              view-mode="list"
-              @click="openBookmark"
-              @edit="openEditModal"
-              @delete="openDeleteConfirm"
-            />
-          </div>
-
-          <u-empty v-if="filteredBookmarks.length === 0">
-            <template #icon>
-              <u-icon
-                name="i-heroicons-bookmark-slash"
-                class="size-16"
-              />
-            </template>
-            <template #title>
-              <span class="text-lg font-semibold text-gray-900 dark:text-white">暂无书签</span>
-            </template>
-            <template #description>
-              <span class="text-sm text-gray-500 dark:text-gray-400">开始添加您的第一个书签吧</span>
-            </template>
-          </u-empty>
-        </u-scroll-area>
-
-        <div
-          v-if="!bookmarksPending && total > 0"
-          class="flex justify-center py-4 flex-shrink-0"
-        >
-          <u-pagination
-            v-model:page="page"
-            :total="total"
-            :items-per-page="perPage"
-            @update:page="handlePageChange"
-          />
+          </u-badge>
         </div>
+        <u-button
+          size="sm"
+          variant="ghost"
+          color="neutral"
+          @click="clearTags"
+        >
+          清除筛选
+        </u-button>
+      </div>
+    </div>
+
+    <u-scroll-area class="flex-1 min-h-0">
+      <div
+        v-if="viewMode === 'masonry'"
+        class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+      >
+        <bookmark-card
+          v-for="bookmark in filteredBookmarks"
+          :key="bookmark.id"
+          :bookmark="bookmark"
+          view-mode="masonry"
+          @click="openBookmark"
+          @edit="openEditModal"
+          @delete="openDeleteConfirm"
+        />
       </div>
 
-      <div class="hidden lg:block lg:flex-[0_0_20%] min-h-0">
-        <div class="sticky top-0 pr-6">
-          <tags-list
-            v-if="!bookmarksPending && tags"
-            :tags="tags"
-            :selected-tags="selectedTags"
-            @update:selected-tags="selectedTags = $event"
-            @refresh-tags="refresh"
-          />
-        </div>
+      <div
+        v-else-if="viewMode === 'grid'"
+        class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
+      >
+        <bookmark-card
+          v-for="bookmark in filteredBookmarks"
+          :key="bookmark.id"
+          :bookmark="bookmark"
+          view-mode="grid"
+          @click="openBookmark"
+          @edit="openEditModal"
+          @delete="openDeleteConfirm"
+        />
       </div>
+
+      <div
+        v-else
+        class="flex flex-col gap-3"
+      >
+        <bookmark-card
+          v-for="bookmark in filteredBookmarks"
+          :key="bookmark.id"
+          :bookmark="bookmark"
+          view-mode="list"
+          @click="openBookmark"
+          @edit="openEditModal"
+          @delete="openDeleteConfirm"
+        />
+      </div>
+
+      <u-empty v-if="filteredBookmarks.length === 0">
+        <template #icon>
+          <u-icon
+            name="i-heroicons-bookmark-slash"
+            class="size-16"
+          />
+        </template>
+        <template #title>
+          <span class="text-lg font-semibold text-gray-900 dark:text-white">暂无书签</span>
+        </template>
+        <template #description>
+          <span class="text-sm text-gray-500 dark:text-gray-400">开始添加您的第一个书签吧</span>
+        </template>
+      </u-empty>
+    </u-scroll-area>
+
+    <div
+      v-if="!bookmarksPending && total > 0"
+      class="flex justify-center py-4 flex-shrink-0"
+    >
+      <u-pagination
+        v-model:page="page"
+        :total="total"
+        :items-per-page="perPage"
+        @update:page="handlePageChange"
+      />
     </div>
 
     <u-modal
@@ -258,15 +265,17 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
+import { useTags } from '~/composables/useTags'
 import { tagsApi } from '~/api/tags'
 import { bookmarksApi } from '~/api/bookmarks'
 import type { Tag, Bookmark } from '~/api/types'
 
 definePageMeta({ layout: 'workspace' })
 
+const { selectedTags, removeTag, clearTags, isSelected } = useTags()
+
 const viewMode = useState('view-mode', () => 'masonry' as 'masonry' | 'grid' | 'list')
 const searchQuery = ref('')
-const selectedTags = ref<number[]>([])
 
 const { data: tags, refresh } = await useAsyncData<Tag[]>(
   'tags',
@@ -336,6 +345,11 @@ const filteredBookmarks = computed(() => {
 
   return result
 })
+
+const getTagName = (tagId: number) => {
+  const tag = tags.value?.find(t => t.id === tagId)
+  return tag?.name || ''
+}
 
 const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
   viewMode.value = mode
@@ -421,3 +435,23 @@ onMounted(() => {
   })
 })
 </script>
+
+<style scoped>
+.active-filters {
+  padding: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgb(229 231 235 / 0.12);
+}
+
+.filters-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filter-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+</style>

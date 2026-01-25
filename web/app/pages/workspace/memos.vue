@@ -62,375 +62,148 @@
       </div>
     </div>
 
-    <div class="flex flex-1 lg:flex-row gap-6 min-h-0 overflow-hidden">
-      <div class="flex-1 lg:flex-[0_0_80%] min-h-0">
-        <u-scroll-area
-          class="h-full"
-          :ui="{ viewport: 'py-2' }"
-        >
-          <div class="flex items-center gap-3 mb-6">
+    <div
+      v-if="selectedTags.length > 0"
+      class="active-filters"
+    >
+      <div class="filters-left">
+        <span class="text-sm text-gray-600 dark:text-gray-400">已选标签：</span>
+        <div class="filter-tags">
+          <u-badge
+            v-for="tagId in selectedTags"
+            :key="tagId"
+            color="primary"
+            variant="soft"
+            size="md"
+          >
+            {{ getTagName(tagId) }}
             <u-button
-              :color="viewFilter === 'all' ? 'primary' : 'neutral'"
-              variant="soft"
-              size="sm"
-              @click="viewFilter = 'all'"
-            >
-              全部
-            </u-button>
-            <u-button
-              :color="viewFilter === 'pinned' ? 'primary' : 'neutral'"
-              variant="soft"
-              size="sm"
-              @click="viewFilter = 'pinned'"
-            >
-              <template #leading>
-                <u-icon
-                  name="i-heroicons-star"
-                  :class="{ 'text-amber-500': viewFilter === 'pinned' }"
-                />
-              </template>
-              已置顶
-            </u-button>
-          </div>
-
-          <tags-list
-            v-if="!pending && tags"
-            :tags="tags"
-            :selected-tags="selectedTags"
-            class="lg:hidden mb-6"
-            @update:selected-tags="selectedTags = $event"
-            @refresh-tags="refresh"
-          />
-
-          <div
-            v-if="viewMode === 'masonry'"
-            class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
-          >
-            <memo-card
-              v-for="memo in filteredMemos"
-              :key="memo.id"
-              :memo="memo"
-              view-mode="masonry"
-              @edit="openEditor"
+              icon="i-heroicons-x-mark"
+              size="xs"
+              variant="ghost"
+              color="neutral"
+              @click="removeTag(tagId)"
             />
-          </div>
-
-          <div
-            v-else-if="viewMode === 'grid'"
-            class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
-          >
-            <memo-card
-              v-for="memo in filteredMemos"
-              :key="memo.id"
-              :memo="memo"
-              view-mode="grid"
-              @edit="openEditor"
-            />
-          </div>
-
-          <div
-            v-else
-            class="flex flex-col gap-2"
-          >
-            <memo-card
-              v-for="memo in filteredMemos"
-              :key="memo.id"
-              :memo="memo"
-              view-mode="list"
-              class="w-full"
-              @edit="openEditor"
-            />
-          </div>
-
-          <div
-            v-if="filteredMemos.length === 0"
-            class="flex flex-col items-center justify-center py-16 text-center"
-          >
-            <div
-              class="w-20 h-20 flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500"
-            >
-              <u-icon
-                name="i-heroicons-document-text"
-                class="w-16 h-16"
-              />
-            </div>
-            <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              暂无备忘录
-            </p>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              开始创建您的第一个备忘录吧
-            </p>
-          </div>
-        </u-scroll-area>
-      </div>
-
-      <div class="hidden lg:block lg:flex-[0_0_20%] min-h-0">
-        <div class="sticky top-0 pr-6">
-          <tags-list
-            v-if="!pending && tags"
-            :tags="tags"
-            :selected-tags="selectedTags"
-            @update:selected-tags="selectedTags = $event"
-            @refresh-tags="refresh"
-          />
+          </u-badge>
         </div>
+        <u-button
+          size="sm"
+          variant="ghost"
+          color="neutral"
+          @click="clearTags"
+        >
+          清除筛选
+        </u-button>
       </div>
     </div>
 
-    <u-modal
-      v-model:open="showMemoModal"
-      :title="modalMode === 'add' ? '新建备忘录' : '编辑备忘录'"
-      :ui="{
-        content:
-          'w-[calc(100vw-2rem)] max-w-3xl rounded-xl shadow-2xl ring ring-gray-200 dark:ring-gray-700 transition-all duration-200',
-        header: 'px-6 py-5 border-b border-gray-100 dark:border-gray-800',
-        body: 'p-0',
-        footer:
-          'px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50'
-      }"
-    >
-      <template #title>
-        <span class="sr-only">{{ modalMode === 'add' ? '新建备忘录' : '编辑备忘录' }}</span>
-      </template>
-      <template #header="{ close }">
-        <div class="flex items-center gap-4 flex-1 min-w-0">
-          <div
-            class="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 transition-colors duration-200"
-          >
+    <u-scroll-area class="flex-1 min-h-0">
+      <div class="flex items-center gap-3 mb-6">
+        <u-button
+          :color="viewFilter === 'all' ? 'primary' : 'neutral'"
+          variant="soft"
+          size="sm"
+          @click="viewFilter = 'all'"
+        >
+          全部
+        </u-button>
+        <u-button
+          :color="viewFilter === 'pinned' ? 'primary' : 'neutral'"
+          variant="soft"
+          size="sm"
+          @click="viewFilter = 'pinned'"
+        >
+          <template #leading>
             <u-icon
-              :name="modalMode === 'add' ? 'i-heroicons-plus' : 'i-heroicons-document-text'"
-              class="w-5 h-5 text-indigo-600 dark:text-indigo-400"
+              name="i-heroicons-star"
+              :class="{ 'text-amber-500': viewFilter === 'pinned' }"
             />
-          </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
-              {{ modalMode === 'add' ? '新建备忘录' : formData.title || '无标题备忘录' }}
-            </h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-              {{ modalMode === 'add' ? '创建新的备忘录' : '编辑您的备忘录内容' }}
-            </p>
-          </div>
-          <span
-            v-if="modalMode === 'edit' && formData.pinned"
-            class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-600 dark:text-amber-400 rounded-full transition-all duration-200"
-          >
-            <u-icon
-              name="i-heroicons-star-solid"
-              class="w-3.5 h-3.5"
-            />
-            已置顶
-          </span>
+          </template>
+          已置顶
+        </u-button>
+      </div>
+
+      <div
+        v-if="viewMode === 'masonry'"
+        class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+      >
+        <memo-card
+          v-for="memo in filteredMemos"
+          :key="memo.id"
+          :memo="memo"
+          view-mode="masonry"
+          @edit="openEditor"
+        />
+      </div>
+
+      <div
+        v-else-if="viewMode === 'grid'"
+        class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
+      >
+        <memo-card
+          v-for="memo in filteredMemos"
+          :key="memo.id"
+          :memo="memo"
+          view-mode="grid"
+          @edit="openEditor"
+        />
+      </div>
+
+      <div
+        v-else
+        class="flex flex-col gap-2"
+      >
+        <memo-card
+          v-for="memo in filteredMemos"
+          :key="memo.id"
+          :memo="memo"
+          view-mode="list"
+          class="w-full"
+          @edit="openEditor"
+        />
+      </div>
+
+      <div
+        v-if="filteredMemos.length === 0"
+        class="flex flex-col items-center justify-center py-16 text-center"
+      >
+        <div
+          class="w-20 h-20 flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500"
+        >
+          <u-icon
+            name="i-heroicons-document-text"
+            class="w-16 h-16"
+          />
         </div>
-        <div class="flex items-center gap-2 ml-4">
-          <u-button
-            v-if="modalMode === 'edit'"
-            :icon="formData.pinned ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-            :color="formData.pinned ? 'warning' : 'neutral'"
-            variant="ghost"
-            size="md"
-            :title="formData.pinned ? '取消置顶' : '置顶'"
-            class="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-            @click="togglePin"
-          />
-          <u-button
-            v-if="modalMode === 'edit'"
-            icon="i-heroicons-trash"
-            color="error"
-            variant="ghost"
-            size="md"
-            title="删除"
-            class="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
-            @click="showDeleteModal = true"
-          />
-          <div
-            v-if="modalMode === 'edit'"
-            class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1"
-          />
-          <u-button
-            icon="i-heroicons-x-mark"
-            color="neutral"
-            variant="ghost"
-            size="md"
-            class="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-            @click="close"
-          />
-        </div>
-      </template>
-
-      <template #body>
-        <div class="flex flex-col">
-          <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
-              标题
-            </label>
-            <u-input
-              v-model="formData.title"
-              placeholder="输入备忘录标题（可选）"
-              size="lg"
-              :ui="{
-                base: 'text-base'
-              }"
-            />
-          </div>
-
-          <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
-              标签
-            </label>
-            <u-input-tags
-              v-model="formData.tags"
-              placeholder="Enter tags..."
-              :max-length="20"
-              :duplicate="false"
-              size="md"
-              variant="outline"
-              color="primary"
-            />
-          </div>
-
-          <div class="px-6 py-5">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
-              内容
-            </label>
-            <div
-              class="flex flex-col rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/50 focus-within:border-indigo-500 transition-all duration-200"
-            >
-              <u-editor
-                v-model="formData.content"
-                content-type="markdown"
-                :editable="true"
-                class="min-h-[320px] max-h-[450px]"
-              >
-                <template #default="{ editor }">
-                  <div
-                    class="flex items-center gap-1.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 shrink-0 sticky top-0"
-                  >
-                    <u-editor-toolbar
-                      :editor="editor"
-                      :items="toolbarItems"
-                      layout="fixed"
-                    />
-                  </div>
-                </template>
-              </u-editor>
-            </div>
-          </div>
-
-          <div class="px-6 py-5 border-t border-gray-100 dark:border-gray-800">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <u-switch
-                  v-model="formData.pinned"
-                  color="warning"
-                />
-                <div class="flex flex-col">
-                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">置顶</span>
-                  <span class="text-xs text-gray-500 dark:text-gray-400">添加到置顶列表</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </template>
-
-      <template #footer="{ close }">
-        <div class="flex items-center justify-between w-full">
-          <p
-            v-if="modalMode === 'edit'"
-            class="text-sm text-gray-500 dark:text-gray-400"
-          >
-            <u-icon
-              name="i-heroicons-clock"
-              class="w-4 h-4 inline mr-1"
-            />
-            最后更新: {{ formData.updatedAt }}
-          </p>
-          <p
-            v-else
-            class="text-sm text-gray-500 dark:text-gray-400"
-          />
-          <div class="flex items-center gap-3">
-            <u-button
-              color="neutral"
-              variant="outline"
-              size="md"
-              class="transition-colors duration-200"
-              @click="close"
-            >
-              取消
-            </u-button>
-            <u-button
-              color="primary"
-              variant="solid"
-              size="md"
-              class="transition-colors duration-200"
-              @click="handleSaveMemo"
-            >
-              <template #leading>
-                <u-icon
-                  :name="modalMode === 'add' ? 'i-heroicons-plus' : 'i-heroicons-check'"
-                  class="w-4 h-4"
-                />
-              </template>
-              {{ modalMode === 'add' ? '创建备忘录' : '保存更改' }}
-            </u-button>
-          </div>
-        </div>
-      </template>
-    </u-modal>
-
-    <u-modal
-      v-model:open="showDeleteModal"
-      title="删除备忘录"
-    >
-      <template #title>
-        <span class="sr-only">删除备忘录</span>
-      </template>
-      <template #body>
-        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed text-center">
-          您确定要删除备忘录 "<strong class="text-gray-900 dark:text-white">{{
-            selectedMemo?.title || '无标题备忘录'
-          }}</strong>" 吗？
+        <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          暂无备忘录
         </p>
-      </template>
-
-      <template #footer="{ close }">
-        <u-button
-          color="neutral"
-          variant="outline"
-          @click="close"
-        >
-          取消
-        </u-button>
-        <u-button
-          color="error"
-          variant="solid"
-          @click="confirmDelete"
-        >
-          删除
-        </u-button>
-      </template>
-    </u-modal>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          开始创建您的第一个备忘录吧
+        </p>
+      </div>
+    </u-scroll-area>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { EditorToolbarItem } from '@nuxt/ui'
+import { useTags } from '~/composables/useTags'
 import { tagsApi } from '~/api/tags'
 import type { Tag } from '~/api/types'
 
 definePageMeta({ layout: 'workspace' })
 
+const { selectedTags, removeTag, clearTags } = useTags()
+
 const searchQuery = ref('')
 const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
 const viewFilter = ref<'all' | 'pinned'>('all')
+const sortBy = ref<'recent' | 'oldest' | 'name'>('recent')
 const selectedMemo = ref<{ id: number, title: string } | null>(null)
 const showDeleteModal = ref(false)
-const sortBy = ref('recent')
-const selectedTags = ref<number[]>([])
 
-const { data: tags, pending, refresh } = await useAsyncData<Tag[]>(
+const { data: tags } = await useAsyncData<Tag[]>(
   'tags',
   () => tagsApi.index(),
   {
@@ -465,131 +238,23 @@ const formData = ref<{
 const memos = ref([
   {
     id: 1,
-    title: '项目规划',
-    content: '这是一个关于项目规划的备忘录。我需要在这里记录项目的关键里程碑、时间节点和重要决策。',
-    tags: ['规划', '项目', '重要'],
-    category: 'work',
+    title: '示例备忘录 1',
+    content: '这是一个示例备忘录内容。',
+    tags: ['示例'],
+    category: 'other',
     pinned: true,
-    createdAt: '2024-12-01',
-    updatedAt: '2024-12-15'
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   },
   {
     id: 2,
-    title: '学习笔记 - Vue 3 组合式 API',
-    content:
-      'Vue 3 的组合式 API 是一种新的编写组件逻辑的方式。通过 setup() 函数，我们可以使用响应式 API 来组织组件的逻辑。这种方式使得逻辑可以更好地复用，也使得代码更加清晰和易于维护。组合式 API 包括 ref、computed、watch、watchEffect 等函数。',
-    tags: ['Vue', 'JavaScript', '前端'],
-    category: 'study',
-    pinned: false,
-    createdAt: '2024-11-28',
-    updatedAt: '2024-12-10'
-  },
-  {
-    id: 3,
-    title: 'TODO 列表',
-    content: '待办事项：完成书签页面开发、实现书签分类功能、完成备忘录页面开发。',
-    tags: ['TODO', '开发'],
+    title: '示例备忘录 2',
+    content: '另一个示例备忘录内容。',
+    tags: ['示例'],
     category: 'work',
     pinned: false,
-    createdAt: '2024-11-20',
-    updatedAt: '2024-12-05'
-  },
-  {
-    id: 4,
-    title: '读书笔记',
-    content:
-      '《关键在于理解用户的需求和使用场景。设计师应该站在用户的角度思考问题，而不是仅仅关注技术和功能。',
-    tags: ['读书', '设计', '笔记'],
-    category: 'life',
-    pinned: true,
-    createdAt: '2024-12-10',
-    updatedAt: '2024-12-14'
-  },
-  {
-    id: 5,
-    title: '购物清单',
-    content: '牛奶、面包、鸡蛋、水果、蔬菜',
-    tags: ['生活', '购物'],
-    category: 'life',
-    pinned: false,
-    createdAt: '2024-12-14',
-    updatedAt: '2024-12-14'
-  },
-  {
-    id: 6,
-    title: '技术调研 - CSS Grid vs Flexbox',
-    content:
-      'CSS Grid 和 Flexbox 都是现代 CSS 布局的重要工具。Flexbox 适用于一维布局（行或列），而 Grid 适用于二维布局（行和列）。在实际项目中，我们需要根据具体需求选择合适的布局方式。Grid 在创建复杂网格布局时更加强大，而 Flexbox 在处理组件内部布局时更加灵活。',
-    tags: ['CSS', '前端', '技术调研'],
-    category: 'study',
-    pinned: false,
-    createdAt: '2024-12-08',
-    updatedAt: '2024-12-12'
-  },
-  {
-    id: 7,
-    title: '会议记录',
-    content:
-      '本周团队会议要点：1. 确认了 Q1 目标；2. 分配了各成员的任务；3. 确定了每周例会时间；4. 讨论了技术债务问题需要在下个迭代中处理。会议效率很高，大家对下一步工作有了清晰的认识。',
-    tags: ['会议', '工作'],
-    category: 'work',
-    pinned: false,
-    createdAt: '2024-12-13',
-    updatedAt: '2024-12-13'
-  },
-  {
-    id: 8,
-    title: '灵感闪现',
-    content:
-      '也许可以做一个基于 AI 的笔记助手，自动提取关键信息和生成摘要。这个想法很有潜力，需要进一步调研可行性。',
-    tags: ['灵感', 'AI', '产品'],
-    category: 'other',
-    pinned: true,
-    createdAt: '2024-12-11',
-    updatedAt: '2024-12-15'
-  },
-  {
-    id: 9,
-    title: '周末计划',
-    content:
-      '周六：睡到自然醒，下午去图书馆还书，晚上看电影。周日：上午跑步，下午整理房间，晚上准备下周工作。',
-    tags: ['计划', '周末'],
-    category: 'life',
-    pinned: false,
-    createdAt: '2024-12-12',
-    updatedAt: '2024-12-12'
-  },
-  {
-    id: 10,
-    title: '代码规范提醒',
-    content:
-      '团队代码规范更新：1. 所有组件必须使用 TypeScript；2. 提交代码前必须运行 lint 和 typecheck；3. 命名使用 kebab-case；4. 组件文件使用 PascalCase；5. 常量使用 SCREAMING_SNAKE_CASE。请各位同事注意遵守。',
-    tags: ['规范', '代码', '团队'],
-    category: 'work',
-    pinned: false,
-    createdAt: '2024-12-09',
-    updatedAt: '2024-12-14'
-  },
-  {
-    id: 11,
-    title: '短笔记',
-    content: '今天天气不错，适合外出散步。',
-    tags: [],
-    category: 'life',
-    pinned: false,
-    createdAt: '2024-12-15',
-    updatedAt: '2024-12-15'
-  },
-  {
-    id: 12,
-    title: '深度思考 - 关于职业发展',
-    content:
-      '最近在思考职业发展方向的问题。从初级开发者到高级开发者，需要不仅仅是技术能力的提升，还需要培养系统思维、沟通能力和项目管理能力。技术深度和广度需要平衡发展，不能只关注某一方面。另外，软技能的培养同样重要，比如如何有效地与团队协作、如何表达自己的观点、如何处理冲突等。这些能力往往决定了一个人能否走得更远。职业发展是一个长期的过程，需要持续学习和反思。',
-    tags: ['思考', '职业', '成长'],
-    category: 'other',
-    pinned: false,
-    createdAt: '2024-12-07',
-    updatedAt: '2024-12-13'
+    createdAt: '2024-01-02',
+    updatedAt: '2024-01-02'
   }
 ])
 
@@ -610,6 +275,10 @@ const filteredMemos = computed(() => {
     result = result.filter(m => m.pinned)
   }
 
+  if (selectedTags.value.length > 0) {
+    result = result.filter(m => m.tags.some((t: string) => selectedTags.value.includes(parseInt(t))))
+  }
+
   if (sortBy.value === 'recent') {
     result = result.sort(
       (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -625,37 +294,23 @@ const filteredMemos = computed(() => {
   return result
 })
 
-const categoryOptions = [
-  { label: '工作', value: 'work' },
-  { label: '学习', value: 'study' },
-  { label: '生活', value: 'life' },
-  { label: '其他', value: 'other' }
-]
-
 const sortOptions = [
   { label: '最近更新', value: 'recent' },
   { label: '最早创建', value: 'oldest' },
   { label: '标题排序', value: 'name' }
 ]
 
-const toolbarItems = [
-  [
-    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: { text: '加粗' } },
-    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: { text: '斜体' } },
-    { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough', tooltip: { text: '删除线' } },
-    { kind: 'mark', mark: 'code', icon: 'i-lucide-code', tooltip: { text: '行内代码' } }
-  ],
-  [
-    { kind: 'bulletList', icon: 'i-lucide-list', tooltip: { text: '无序列表' } },
-    { kind: 'orderedList', icon: 'i-lucide-list-ordered', tooltip: { text: '有序列表' } }
-  ]
-] satisfies EditorToolbarItem[][]
+const getTagName = (tagId: number) => {
+  const tag = tags.value?.find(t => t.id === tagId)
+  return tag?.name || ''
+}
 
 const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
   viewMode.value = mode
 }
 
 const openAddModal = () => {
+  modalMode.value = 'add'
   formData.value = {
     id: 0,
     title: '',
@@ -666,50 +321,23 @@ const openAddModal = () => {
     createdAt: '',
     updatedAt: ''
   }
-  modalMode.value = 'add'
   showMemoModal.value = true
 }
 
-const openEditor = (memo: {
-  id: number
-  title: string
-  content: string
-  tags: string[]
-  category: string
-  pinned: boolean
-  createdAt: string
-  updatedAt: string
-}) => {
+const openEditor = (memo: any) => {
+  modalMode.value = 'edit'
   formData.value = { ...memo }
   selectedMemo.value = { ...memo }
-  modalMode.value = 'edit'
   showMemoModal.value = true
 }
 
-const togglePin = () => {
+const _togglePin = () => {
   if (formData.value) {
     formData.value.pinned = !formData.value.pinned
   }
 }
 
-const _saveMemo = () => {
-  console.log('Mock: 保存备忘录（仅演示，不实际保存）')
-  showMemoModal.value = false
-}
-
-const confirmDelete = () => {
-  console.log('Mock: 删除备忘录（仅演示，不实际删除）')
-  showDeleteModal.value = false
-  showMemoModal.value = false
-  selectedMemo.value = null
-}
-
-const _getCategoryLabel = (value: string) => {
-  const option = categoryOptions.find(opt => opt.value === value)
-  return option?.label || ''
-}
-
-const handleSaveMemo = () => {
+const _handleSaveMemo = () => {
   if (!formData.value.content && modalMode.value === 'add') {
     return
   }
@@ -717,7 +345,7 @@ const handleSaveMemo = () => {
   const now = new Date().toISOString().split('T')[0] || ''
 
   if (modalMode.value === 'add') {
-    const memo = {
+    const newMemo = {
       id: memos.value.length + 1,
       title: formData.value.title || '无标题备忘录',
       content: formData.value.content,
@@ -727,12 +355,12 @@ const handleSaveMemo = () => {
       createdAt: now,
       updatedAt: now
     }
-    memos.value.unshift(memo)
-    console.log('Mock: 新备忘录已添加（内存中）', memo)
+    memos.value.unshift(newMemo)
+    console.log('Mock: 新备忘录已添加（内存中）', newMemo)
   } else {
     const index = memos.value.findIndex(m => m.id === formData.value.id)
     if (index !== -1) {
-      const existingMemo = memos.value[index]!
+      const existingMemo = memos.value[index]
       memos.value[index] = {
         id: existingMemo.id,
         title: formData.value.title,
@@ -748,5 +376,12 @@ const handleSaveMemo = () => {
   }
 
   showMemoModal.value = false
+}
+
+const _confirmDelete = () => {
+  console.log('Mock: 删除备忘录（仅演示，不实际删除）')
+  showDeleteModal.value = false
+  showMemoModal.value = false
+  selectedMemo.value = null
 }
 </script>

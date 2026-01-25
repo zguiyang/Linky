@@ -87,6 +87,33 @@ export interface PaginatorMeta {
   lastPage: number
 }
 
+export interface Memo {
+  id: number
+  title: string
+  content: string
+  category: string
+  tags: string[]
+  pinned: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateMemoRequest {
+  title: string
+  content: string
+  category: string
+  tags: string[]
+  pinned: boolean
+}
+
+export interface UpdateMemoRequest {
+  title?: string
+  content?: string
+  category?: string
+  tags?: string[]
+  pinned?: boolean
+}
+
 export interface PaginatedResponse<T> {
   meta: PaginatorMeta
   data: T[]
