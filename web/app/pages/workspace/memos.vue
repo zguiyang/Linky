@@ -1,412 +1,417 @@
 <template>
-  <div class="flex flex-col lg:flex-row gap-6 p-6">
-    <!-- 左侧：备忘录列表 (70%) -->
-    <div class="flex-1 lg:flex-[0_0_70%] flex flex-col gap-6">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-            我的备忘录
-          </h1>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            共 {{ filteredMemos.length }} 个备忘录
-          </p>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <u-input
-            v-model="searchQuery"
-            icon="i-heroicons-magnifying-glass"
-            placeholder="搜索备忘录..."
-            size="md"
-            class="w-full sm:w-auto"
-          />
-          <div class="inline-flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <u-button
-              :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
-              :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
-              size="sm"
-              icon="i-heroicons-view-columns"
-              @click="setViewMode('masonry')"
-            />
-            <u-button
-              :color="viewMode === 'grid' ? 'primary' : 'neutral'"
-              :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
-              size="sm"
-              icon="i-heroicons-squares-2x2"
-              @click="setViewMode('grid')"
-            />
-            <u-button
-              :color="viewMode === 'list' ? 'primary' : 'neutral'"
-              :variant="viewMode === 'list' ? 'solid' : 'ghost'"
-              size="sm"
-              icon="i-heroicons-list-bullet"
-              @click="setViewMode('list')"
-            />
-          </div>
-          <u-select
-            v-model="sortBy"
-            :items="sortOptions"
-            placeholder="排序方式"
-            :popper="{ strategy: 'fixed' }"
-            size="md"
-          />
-          <u-button
-            color="primary"
-            size="md"
-            @click="openAddModal"
-          >
-            <template #leading>
-              <u-icon
-                name="i-heroicons-plus"
-                class="w-4 h-4"
-              />
-            </template>
-            新建备忘录
-          </u-button>
-        </div>
+  <div class="flex flex-col gap-6 h-full min-h-0 p-6">
+    <div class="flex items-center justify-between gap-4 flex-shrink-0">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          我的备忘录
+        </h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          共 {{ filteredMemos.length }} 个备忘录
+        </p>
       </div>
 
       <div class="flex items-center gap-3">
+        <u-input
+          v-model="searchQuery"
+          icon="i-heroicons-magnifying-glass"
+          placeholder="搜索备忘录..."
+          size="md"
+          class="w-full sm:w-auto"
+        />
+        <div class="inline-flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+          <u-button
+            :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
+            :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
+            size="sm"
+            icon="i-heroicons-view-columns"
+            @click="setViewMode('masonry')"
+          />
+          <u-button
+            :color="viewMode === 'grid' ? 'primary' : 'neutral'"
+            :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
+            size="sm"
+            icon="i-heroicons-squares-2x2"
+            @click="setViewMode('grid')"
+          />
+          <u-button
+            :color="viewMode === 'list' ? 'primary' : 'neutral'"
+            :variant="viewMode === 'list' ? 'solid' : 'ghost'"
+            size="sm"
+            icon="i-heroicons-list-bullet"
+            @click="setViewMode('list')"
+          />
+        </div>
+        <u-select
+          v-model="sortBy"
+          :items="sortOptions"
+          placeholder="排序方式"
+          :popper="{ strategy: 'fixed' }"
+          size="md"
+        />
         <u-button
-          :color="viewFilter === 'all' ? 'primary' : 'neutral'"
-          variant="soft"
-          size="sm"
-          @click="viewFilter = 'all'"
-        >
-          全部
-        </u-button>
-        <u-button
-          :color="viewFilter === 'pinned' ? 'primary' : 'neutral'"
-          variant="soft"
-          size="sm"
-          @click="viewFilter = 'pinned'"
+          color="primary"
+          size="md"
+          @click="openAddModal"
         >
           <template #leading>
             <u-icon
-              name="i-heroicons-star"
-              :class="{ 'text-amber-500': viewFilter === 'pinned' }"
+              name="i-heroicons-plus"
+              class="w-4 h-4"
             />
           </template>
-          已置顶
+          新建备忘录
         </u-button>
       </div>
+    </div>
 
-      <!-- 移动端标签药丸 -->
-      <tags-pills
-        v-if="!pending && tags && tags.length > 0"
-        :tags="tags"
-        :selected-tags="selectedTags"
-        @toggle:tag="toggleTag"
-      />
-
-      <div
-        v-if="viewMode === 'masonry'"
-        class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
-      >
-        <memo-card
-          v-for="memo in filteredMemos"
-          :key="memo.id"
-          :memo="memo"
-          view-mode="masonry"
-          @edit="openEditor"
-        />
-      </div>
-
-      <div
-        v-else-if="viewMode === 'grid'"
-        class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
-      >
-        <memo-card
-          v-for="memo in filteredMemos"
-          :key="memo.id"
-          :memo="memo"
-          view-mode="grid"
-          @edit="openEditor"
-        />
-      </div>
-
-      <div
-        v-else
-        class="flex flex-col gap-2"
-      >
-        <memo-card
-          v-for="memo in filteredMemos"
-          :key="memo.id"
-          :memo="memo"
-          view-mode="list"
-          class="w-full"
-          @edit="openEditor"
-        />
-      </div>
-
-      <div
-        v-if="filteredMemos.length === 0"
-        class="flex flex-col items-center justify-center py-16 text-center"
-      >
-        <div
-          class="w-20 h-20 flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500"
+    <div class="flex flex-1 lg:flex-row gap-6 min-h-0 overflow-hidden">
+      <div class="flex-1 lg:flex-[0_0_80%] min-h-0">
+        <u-scroll-area
+          class="h-full"
+          :ui="{ viewport: 'py-2' }"
         >
-          <u-icon
-            name="i-heroicons-document-text"
-            class="w-16 h-16"
+          <div class="flex items-center gap-3 mb-6">
+            <u-button
+              :color="viewFilter === 'all' ? 'primary' : 'neutral'"
+              variant="soft"
+              size="sm"
+              @click="viewFilter = 'all'"
+            >
+              全部
+            </u-button>
+            <u-button
+              :color="viewFilter === 'pinned' ? 'primary' : 'neutral'"
+              variant="soft"
+              size="sm"
+              @click="viewFilter = 'pinned'"
+            >
+              <template #leading>
+                <u-icon
+                  name="i-heroicons-star"
+                  :class="{ 'text-amber-500': viewFilter === 'pinned' }"
+                />
+              </template>
+              已置顶
+            </u-button>
+          </div>
+
+          <tags-pills
+            v-if="!pending && tags && tags.length > 0"
+            :tags="tags"
+            :selected-tags="selectedTags"
+            class="lg:hidden mb-6"
+            @toggle:tag="toggleTag"
+          />
+
+          <div
+            v-if="viewMode === 'masonry'"
+            class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+          >
+            <memo-card
+              v-for="memo in filteredMemos"
+              :key="memo.id"
+              :memo="memo"
+              view-mode="masonry"
+              @edit="openEditor"
+            />
+          </div>
+
+          <div
+            v-else-if="viewMode === 'grid'"
+            class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
+          >
+            <memo-card
+              v-for="memo in filteredMemos"
+              :key="memo.id"
+              :memo="memo"
+              view-mode="grid"
+              @edit="openEditor"
+            />
+          </div>
+
+          <div
+            v-else
+            class="flex flex-col gap-2"
+          >
+            <memo-card
+              v-for="memo in filteredMemos"
+              :key="memo.id"
+              :memo="memo"
+              view-mode="list"
+              class="w-full"
+              @edit="openEditor"
+            />
+          </div>
+
+          <div
+            v-if="filteredMemos.length === 0"
+            class="flex flex-col items-center justify-center py-16 text-center"
+          >
+            <div
+              class="w-20 h-20 flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500"
+            >
+              <u-icon
+                name="i-heroicons-document-text"
+                class="w-16 h-16"
+              />
+            </div>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              暂无备忘录
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              开始创建您的第一个备忘录吧
+            </p>
+          </div>
+        </u-scroll-area>
+      </div>
+
+      <div class="hidden lg:block lg:flex-[0_0_20%] min-h-0">
+        <div class="sticky top-0 pr-6">
+          <tags-card
+            v-if="!pending && tags"
+            :tags="tags"
+            :selected-tags="selectedTags"
+            @update:selected-tags="selectedTags = $event"
+            @refresh-tags="refresh"
           />
         </div>
-        <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          暂无备忘录
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          开始创建您的第一个备忘录吧
-        </p>
       </div>
+    </div>
 
-      <u-modal
-        v-model:open="showMemoModal"
-        :title="modalMode === 'add' ? '新建备忘录' : '编辑备忘录'"
-        :ui="{
-          content:
-            'w-[calc(100vw-2rem)] max-w-3xl rounded-xl shadow-2xl ring ring-gray-200 dark:ring-gray-700 transition-all duration-200',
-          header: 'px-6 py-5 border-b border-gray-100 dark:border-gray-800',
-          body: 'p-0',
-          footer:
-            'px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50'
-        }"
-      >
-        <template #title>
-          <span class="sr-only">{{ modalMode === 'add' ? '新建备忘录' : '编辑备忘录' }}</span>
-        </template>
-        <template #header="{ close }">
-          <div class="flex items-center gap-4 flex-1 min-w-0">
-            <div
-              class="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 transition-colors duration-200"
-            >
-              <u-icon
-                :name="modalMode === 'add' ? 'i-heroicons-plus' : 'i-heroicons-document-text'"
-                class="w-5 h-5 text-indigo-600 dark:text-indigo-400"
-              />
-            </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                {{ modalMode === 'add' ? '新建备忘录' : formData.title || '无标题备忘录' }}
-              </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                {{ modalMode === 'add' ? '创建新的备忘录' : '编辑您的备忘录内容' }}
-              </p>
-            </div>
-            <span
-              v-if="modalMode === 'edit' && formData.pinned"
-              class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-600 dark:text-amber-400 rounded-full transition-all duration-200"
-            >
-              <u-icon
-                name="i-heroicons-star-solid"
-                class="w-3.5 h-3.5"
-              />
-              已置顶
-            </span>
-          </div>
-          <div class="flex items-center gap-2 ml-4">
-            <u-button
-              v-if="modalMode === 'edit'"
-              :icon="formData.pinned ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
-              :color="formData.pinned ? 'warning' : 'neutral'"
-              variant="ghost"
-              size="md"
-              :title="formData.pinned ? '取消置顶' : '置顶'"
-              class="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-              @click="togglePin"
-            />
-            <u-button
-              v-if="modalMode === 'edit'"
-              icon="i-heroicons-trash"
-              color="error"
-              variant="ghost"
-              size="md"
-              title="删除"
-              class="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
-              @click="showDeleteModal = true"
-            />
-            <div
-              v-if="modalMode === 'edit'"
-              class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1"
-            />
-            <u-button
-              icon="i-heroicons-x-mark"
-              color="neutral"
-              variant="ghost"
-              size="md"
-              class="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-              @click="close"
+    <u-modal
+      v-model:open="showMemoModal"
+      :title="modalMode === 'add' ? '新建备忘录' : '编辑备忘录'"
+      :ui="{
+        content:
+          'w-[calc(100vw-2rem)] max-w-3xl rounded-xl shadow-2xl ring ring-gray-200 dark:ring-gray-700 transition-all duration-200',
+        header: 'px-6 py-5 border-b border-gray-100 dark:border-gray-800',
+        body: 'p-0',
+        footer:
+          'px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50'
+      }"
+    >
+      <template #title>
+        <span class="sr-only">{{ modalMode === 'add' ? '新建备忘录' : '编辑备忘录' }}</span>
+      </template>
+      <template #header="{ close }">
+        <div class="flex items-center gap-4 flex-1 min-w-0">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 transition-colors duration-200"
+          >
+            <u-icon
+              :name="modalMode === 'add' ? 'i-heroicons-plus' : 'i-heroicons-document-text'"
+              class="w-5 h-5 text-indigo-600 dark:text-indigo-400"
             />
           </div>
-        </template>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
+              {{ modalMode === 'add' ? '新建备忘录' : formData.title || '无标题备忘录' }}
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              {{ modalMode === 'add' ? '创建新的备忘录' : '编辑您的备忘录内容' }}
+            </p>
+          </div>
+          <span
+            v-if="modalMode === 'edit' && formData.pinned"
+            class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-600 dark:text-amber-400 rounded-full transition-all duration-200"
+          >
+            <u-icon
+              name="i-heroicons-star-solid"
+              class="w-3.5 h-3.5"
+            />
+            已置顶
+          </span>
+        </div>
+        <div class="flex items-center gap-2 ml-4">
+          <u-button
+            v-if="modalMode === 'edit'"
+            :icon="formData.pinned ? 'i-heroicons-star-solid' : 'i-heroicons-star'"
+            :color="formData.pinned ? 'warning' : 'neutral'"
+            variant="ghost"
+            size="md"
+            :title="formData.pinned ? '取消置顶' : '置顶'"
+            class="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+            @click="togglePin"
+          />
+          <u-button
+            v-if="modalMode === 'edit'"
+            icon="i-heroicons-trash"
+            color="error"
+            variant="ghost"
+            size="md"
+            title="删除"
+            class="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
+            @click="showDeleteModal = true"
+          />
+          <div
+            v-if="modalMode === 'edit'"
+            class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1"
+          />
+          <u-button
+            icon="i-heroicons-x-mark"
+            color="neutral"
+            variant="ghost"
+            size="md"
+            class="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+            @click="close"
+          />
+        </div>
+      </template>
 
-        <template #body>
-          <div class="flex flex-col">
-            <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
-                标题
-              </label>
-              <u-input
-                v-model="formData.title"
-                placeholder="输入备忘录标题（可选）"
-                size="lg"
-                :ui="{
-                  base: 'text-base'
-                }"
-              />
-            </div>
+      <template #body>
+        <div class="flex flex-col">
+          <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
+              标题
+            </label>
+            <u-input
+              v-model="formData.title"
+              placeholder="输入备忘录标题（可选）"
+              size="lg"
+              :ui="{
+                base: 'text-base'
+              }"
+            />
+          </div>
 
-            <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
-                标签
-              </label>
-              <u-input-tags
-                v-model="formData.tags"
-                placeholder="Enter tags..."
-                :max-length="20"
-                :duplicate="false"
-                size="md"
-                variant="outline"
-                color="primary"
-              />
-            </div>
+          <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
+              标签
+            </label>
+            <u-input-tags
+              v-model="formData.tags"
+              placeholder="Enter tags..."
+              :max-length="20"
+              :duplicate="false"
+              size="md"
+              variant="outline"
+              color="primary"
+            />
+          </div>
 
-            <div class="px-6 py-5">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
-                内容
-              </label>
-              <div
-                class="flex flex-col rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/50 focus-within:border-indigo-500 transition-all duration-200"
+          <div class="px-6 py-5">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2.5">
+              内容
+            </label>
+            <div
+              class="flex flex-col rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/50 focus-within:border-indigo-500 transition-all duration-200"
+            >
+              <u-editor
+                v-model="formData.content"
+                content-type="markdown"
+                :editable="true"
+                class="min-h-[320px] max-h-[450px]"
               >
-                <u-editor
-                  v-model="formData.content"
-                  content-type="markdown"
-                  :editable="true"
-                  class="min-h-[320px] max-h-[450px]"
-                >
-                  <template #default="{ editor }">
-                    <div
-                      class="flex items-center gap-1.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 shrink-0 sticky top-0"
-                    >
-                      <u-editor-toolbar
-                        :editor="editor"
-                        :items="toolbarItems"
-                        layout="fixed"
-                      />
-                    </div>
-                  </template>
-                </u-editor>
-              </div>
-            </div>
-
-            <div class="px-6 py-5 border-t border-gray-100 dark:border-gray-800">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <u-switch
-                    v-model="formData.pinned"
-                    color="warning"
-                  />
-                  <div class="flex flex-col">
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">置顶</span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">添加到置顶列表</span>
+                <template #default="{ editor }">
+                  <div
+                    class="flex items-center gap-1.5 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 shrink-0 sticky top-0"
+                  >
+                    <u-editor-toolbar
+                      :editor="editor"
+                      :items="toolbarItems"
+                      layout="fixed"
+                    />
                   </div>
+                </template>
+              </u-editor>
+            </div>
+          </div>
+
+          <div class="px-6 py-5 border-t border-gray-100 dark:border-gray-800">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <u-switch
+                  v-model="formData.pinned"
+                  color="warning"
+                />
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">置顶</span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">添加到置顶列表</span>
                 </div>
               </div>
             </div>
           </div>
-        </template>
+        </div>
+      </template>
 
-        <template #footer="{ close }">
-          <div class="flex items-center justify-between w-full">
-            <p
-              v-if="modalMode === 'edit'"
-              class="text-sm text-gray-500 dark:text-gray-400"
-            >
-              <u-icon
-                name="i-heroicons-clock"
-                class="w-4 h-4 inline mr-1"
-              />
-              最后更新: {{ formData.updatedAt }}
-            </p>
-            <p
-              v-else
-              class="text-sm text-gray-500 dark:text-gray-400"
+      <template #footer="{ close }">
+        <div class="flex items-center justify-between w-full">
+          <p
+            v-if="modalMode === 'edit'"
+            class="text-sm text-gray-500 dark:text-gray-400"
+          >
+            <u-icon
+              name="i-heroicons-clock"
+              class="w-4 h-4 inline mr-1"
             />
-            <div class="flex items-center gap-3">
-              <u-button
-                color="neutral"
-                variant="outline"
-                size="md"
-                class="transition-colors duration-200"
-                @click="close"
-              >
-                取消
-              </u-button>
-              <u-button
-                color="primary"
-                variant="solid"
-                size="md"
-                class="transition-colors duration-200"
-                @click="handleSaveMemo"
-              >
-                <template #leading>
-                  <u-icon
-                    :name="modalMode === 'add' ? 'i-heroicons-plus' : 'i-heroicons-check'"
-                    class="w-4 h-4"
-                  />
-                </template>
-                {{ modalMode === 'add' ? '创建备忘录' : '保存更改' }}
-              </u-button>
-            </div>
-          </div>
-        </template>
-      </u-modal>
-
-      <u-modal
-        v-model:open="showDeleteModal"
-        title="删除备忘录"
-      >
-        <template #title>
-          <span class="sr-only">删除备忘录</span>
-        </template>
-        <template #body>
-          <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed text-center">
-            您确定要删除备忘录 "<strong class="text-gray-900 dark:text-white">{{
-              selectedMemo?.title || '无标题备忘录'
-            }}</strong>" 吗？
+            最后更新: {{ formData.updatedAt }}
           </p>
-        </template>
+          <p
+            v-else
+            class="text-sm text-gray-500 dark:text-gray-400"
+          />
+          <div class="flex items-center gap-3">
+            <u-button
+              color="neutral"
+              variant="outline"
+              size="md"
+              class="transition-colors duration-200"
+              @click="close"
+            >
+              取消
+            </u-button>
+            <u-button
+              color="primary"
+              variant="solid"
+              size="md"
+              class="transition-colors duration-200"
+              @click="handleSaveMemo"
+            >
+              <template #leading>
+                <u-icon
+                  :name="modalMode === 'add' ? 'i-heroicons-plus' : 'i-heroicons-check'"
+                  class="w-4 h-4"
+                />
+              </template>
+              {{ modalMode === 'add' ? '创建备忘录' : '保存更改' }}
+            </u-button>
+          </div>
+        </div>
+      </template>
+    </u-modal>
 
-        <template #footer="{ close }">
-          <u-button
-            color="neutral"
-            variant="outline"
-            @click="close"
-          >
-            取消
-          </u-button>
-          <u-button
-            color="error"
-            variant="solid"
-            @click="confirmDelete"
-          >
-            删除
-          </u-button>
-        </template>
-      </u-modal>
-    </div>
+    <u-modal
+      v-model:open="showDeleteModal"
+      title="删除备忘录"
+    >
+      <template #title>
+        <span class="sr-only">删除备忘录</span>
+      </template>
+      <template #body>
+        <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed text-center">
+          您确定要删除备忘录 "<strong class="text-gray-900 dark:text-white">{{
+            selectedMemo?.title || '无标题备忘录'
+          }}</strong>" 吗？
+        </p>
+      </template>
 
-    <!-- 右侧：标签卡片 (30%) - 仅桌面端 -->
-    <div class="hidden lg:block lg:flex-[0_0_30%]">
-      <div class="sticky top-6">
-        <tags-card
-          v-if="!pending && tags"
-          :tags="tags"
-          :selected-tags="selectedTags"
-          @update:selected-tags="selectedTags = $event"
-          @refresh-tags="refresh"
-        />
-      </div>
-    </div>
+      <template #footer="{ close }">
+        <u-button
+          color="neutral"
+          variant="outline"
+          @click="close"
+        >
+          取消
+        </u-button>
+        <u-button
+          color="error"
+          variant="solid"
+          @click="confirmDelete"
+        >
+          删除
+        </u-button>
+      </template>
+    </u-modal>
   </div>
 </template>
 
