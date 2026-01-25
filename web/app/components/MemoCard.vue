@@ -66,17 +66,7 @@
 
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
-
-interface Memo {
-  id: number
-  title: string
-  content: string
-  tags: string[]
-  category: string
-  pinned: boolean
-  createdAt: string
-  updatedAt: string
-}
+import type { Memo } from '~/api/types'
 
 const props = defineProps<{
   memo: Memo
@@ -89,7 +79,7 @@ const emit = defineEmits<{
 }>()
 
 const cardClasses = computed(() => {
-  const isPinned = props.memo.pinned
+  const isPinned = props.memo.isPinned
   const baseClasses = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
 
   if (isPinned) {
@@ -147,13 +137,14 @@ const contentClass = computed(() => {
 const displayTags = computed(() => {
   switch (props.viewMode) {
     case 'list':
-      return props.memo.tags.slice(0, 2)
+      return props.memo.tags.slice(0, 2).map(tag => tag.name)
     default:
-      return props.memo.tags.slice(0, 3)
+      return props.memo.tags.slice(0, 3).map(tag => tag.name)
   }
 })
 
-const formatDate = (date: string) => {
+const formatDate = (date: string | null) => {
+  if (!date) return ''
   const d = new Date(date)
   const year = d.getFullYear()
   const month = d.getMonth() + 1

@@ -6,7 +6,7 @@
           我的备忘录
         </h1>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          共 {{ filteredMemos.length }} 个备忘录
+          共 {{ total }} 个备忘录
         </p>
       </div>
 
@@ -44,14 +44,6 @@
             @click="setViewMode('list')"
           />
         </div>
-        <u-select
-          v-model="sortBy"
-          :items="sortOptions"
-          placeholder="排序"
-          :popper="{ strategy: 'fixed' }"
-          size="md"
-          class="shrink-0"
-        />
         <u-button
           icon="i-heroicons-plus"
           color="primary"
@@ -98,110 +90,141 @@
     </div>
 
     <u-scroll-area class="flex-1 min-h-0">
-      <div class="flex items-center gap-3 mb-6">
-        <u-button
-          :color="viewFilter === 'all' ? 'primary' : 'neutral'"
-          variant="soft"
-          size="sm"
-          @click="viewFilter = 'all'"
-        >
-          全部
-        </u-button>
-        <u-button
-          :color="viewFilter === 'pinned' ? 'primary' : 'neutral'"
-          variant="soft"
-          size="sm"
-          @click="viewFilter = 'pinned'"
-        >
-          <template #leading>
-            <u-icon
-              name="i-heroicons-star"
-              :class="{ 'text-amber-500': viewFilter === 'pinned' }"
-            />
-          </template>
-          已置顶
-        </u-button>
-      </div>
-
       <div
-        v-if="viewMode === 'masonry'"
-        class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+        v-if="loading"
+        class="flex justify-center py-16"
       >
-        <memo-card
-          v-for="memo in filteredMemos"
-          :key="memo.id"
-          :memo="memo"
-          view-mode="masonry"
-          @edit="openEditor"
+        <u-icon
+          name="i-heroicons-arrow-path"
+          class="w-8 h-8 animate-spin"
         />
       </div>
 
-      <div
-        v-else-if="viewMode === 'grid'"
-        class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
-      >
-        <memo-card
-          v-for="memo in filteredMemos"
-          :key="memo.id"
-          :memo="memo"
-          view-mode="grid"
-          @edit="openEditor"
-        />
-      </div>
-
-      <div
-        v-else
-        class="flex flex-col gap-2"
-      >
-        <memo-card
-          v-for="memo in filteredMemos"
-          :key="memo.id"
-          :memo="memo"
-          view-mode="list"
-          class="w-full"
-          @edit="openEditor"
-        />
-      </div>
-
-      <div
-        v-if="filteredMemos.length === 0"
-        class="flex flex-col items-center justify-center py-16 text-center"
-      >
+      <div v-else>
         <div
-          class="w-20 h-20 flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500"
+          v-if="viewMode === 'masonry'"
+          class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
         >
-          <u-icon
-            name="i-heroicons-document-text"
-            class="w-16 h-16"
+          <memo-card
+            v-for="memo in filteredMemos"
+            :key="memo.id"
+            :memo="memo"
+            view-mode="masonry"
+            @edit="openEditor"
+            @delete="openDeleteConfirm"
           />
         </div>
-        <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          暂无备忘录
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          开始创建您的第一个备忘录吧
-        </p>
+
+        <div
+          v-else-if="viewMode === 'grid'"
+          class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
+        >
+          <memo-card
+            v-for="memo in filteredMemos"
+            :key="memo.id"
+            :memo="memo"
+            view-mode="grid"
+            @edit="openEditor"
+            @delete="openDeleteConfirm"
+          />
+        </div>
+
+        <div
+          v-else
+          class="flex flex-col gap-2"
+        >
+          <memo-card
+            v-for="memo in filteredMemos"
+            :key="memo.id"
+            :memo="memo"
+            view-mode="list"
+            class="w-full"
+            @edit="openEditor"
+            @delete="openDeleteConfirm"
+          />
+        </div>
+
+        <u-empty v-if="filteredMemos.length === 0">
+          <template #icon>
+            <u-icon
+              name="i-heroicons-document-text"
+              class="size-16"
+            />
+          </template>
+          <template #title>
+            <span class="text-lg font-semibold text-gray-900 dark:text-white">暂无备忘录</span>
+          </template>
+          <template #description>
+            <span class="text-sm text-gray-500 dark:text-gray-400">开始创建您的第一个备忘录吧</span>
+          </template>
+        </u-empty>
       </div>
     </u-scroll-area>
+
+    <div
+      v-if="!loading && total > 0"
+      class="flex justify-center py-4 flex-shrink-0"
+    >
+      <u-pagination
+        v-model:page="page"
+        :total="total"
+        :items-per-page="perPage"
+        @update:page="handlePageChange"
+      />
+    </div>
+
+    <memo-modal
+      v-model="showMemoModal"
+      :memo="currentMemo"
+      :mode="modalMode"
+      @save="handleSave"
+      @close="closeModal"
+    />
+
+    <u-modal
+      v-model:open="showDeleteModal"
+      title="确认删除"
+    >
+      <template #body>
+        <p class="text-gray-700 dark:text-gray-300 mb-6">
+          确定要删除这条备忘录吗？此操作无法撤销。
+        </p>
+        <div class="flex justify-end gap-3">
+          <u-button
+            color="neutral"
+            variant="ghost"
+            @click="closeDeleteModal"
+          >
+            取消
+          </u-button>
+          <u-button
+            color="error"
+            @click="confirmDelete"
+          >
+            删除
+          </u-button>
+        </div>
+      </template>
+    </u-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useTags } from '~/composables/useTags'
+import { useHttpError } from '~/composables/useHttpError'
 import { tagsApi } from '~/api/tags'
-import type { Tag } from '~/api/types'
+import { memosApi } from '~/api/memos'
+import MemoModal from '~/components/MemoModal.vue'
+import type { Tag, Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
 
 definePageMeta({ layout: 'workspace' })
 
 const { selectedTags, removeTag, clearTags } = useTags()
+const { handleError } = useHttpError()
 
 const searchQuery = ref('')
 const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
-const viewFilter = ref<'all' | 'pinned'>('all')
-const sortBy = ref<'recent' | 'oldest' | 'name'>('recent')
-const selectedMemo = ref<{ id: number, title: string } | null>(null)
-const showDeleteModal = ref(false)
 
 const { data: tags } = await useAsyncData<Tag[]>(
   'memos-tags',
@@ -212,51 +235,32 @@ const { data: tags } = await useAsyncData<Tag[]>(
   }
 )
 
+const page = ref(1)
+const perPage = ref(20)
+
+const { data: paginationData, pending: loading, refresh: refreshMemos } = await useAsyncData(
+  `memos-page-${page.value}`,
+  () => memosApi.paginate(page.value, perPage.value),
+  {
+    default: () => ({
+      meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
+      data: []
+    })
+  }
+)
+
+const memos = computed(() => paginationData.value?.data || [])
+const total = computed(() => paginationData.value?.meta.total || 0)
+
 const showMemoModal = ref(false)
 const modalMode = ref<'add' | 'edit'>('add')
+const currentMemo = ref<Memo | null>(null)
+const showDeleteModal = ref(false)
+const memoToDelete = ref<Memo | null>(null)
 
-const formData = ref<{
-  id: number
-  title: string
-  content: string
-  category: string
-  tags: string[]
-  pinned: boolean
-  createdAt: string
-  updatedAt: string
-}>({
-  id: 0,
-  title: '',
-  content: '',
-  category: '',
-  tags: [],
-  pinned: false,
-  createdAt: '',
-  updatedAt: ''
+watch(showMemoModal, (newVal) => {
+  console.log('[memos.vue] showMemoModal changed to:', newVal)
 })
-
-const memos = ref([
-  {
-    id: 1,
-    title: '示例备忘录 1',
-    content: '这是一个示例备忘录内容。',
-    tags: ['示例'],
-    category: 'other',
-    pinned: true,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    id: 2,
-    title: '示例备忘录 2',
-    content: '另一个示例备忘录内容。',
-    tags: ['示例'],
-    category: 'work',
-    pinned: false,
-    createdAt: '2024-01-02',
-    updatedAt: '2024-01-02'
-  }
-])
 
 const filteredMemos = computed(() => {
   let result = memos.value
@@ -267,38 +271,16 @@ const filteredMemos = computed(() => {
       m =>
         m.title.toLowerCase().includes(query)
         || m.content.toLowerCase().includes(query)
-        || m.tags.some(tag => tag.toLowerCase().includes(query))
+        || m.tags.some(tag => tag.name.toLowerCase().includes(query))
     )
-  }
-
-  if (viewFilter.value === 'pinned') {
-    result = result.filter(m => m.pinned)
   }
 
   if (selectedTags.value.length > 0) {
-    result = result.filter(m => m.tags.some((t: string) => selectedTags.value.includes(parseInt(t))))
-  }
-
-  if (sortBy.value === 'recent') {
-    result = result.sort(
-      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    )
-  } else if (sortBy.value === 'oldest') {
-    result = result.sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    )
-  } else if (sortBy.value === 'name') {
-    result = result.sort((a, b) => a.title.localeCompare(b.title))
+    result = result.filter(m => m.tags.some(t => selectedTags.value.includes(t.id)))
   }
 
   return result
 })
-
-const sortOptions = [
-  { label: '最近更新', value: 'recent' },
-  { label: '最早创建', value: 'oldest' },
-  { label: '标题排序', value: 'name' }
-]
 
 const getTagName = (tagId: number) => {
   const tag = tags.value?.find(t => t.id === tagId)
@@ -310,78 +292,83 @@ const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
 }
 
 const openAddModal = () => {
+  console.log('openAddModal called')
   modalMode.value = 'add'
-  formData.value = {
-    id: 0,
-    title: '',
-    content: '',
-    category: '',
-    tags: [],
-    pinned: false,
-    createdAt: '',
-    updatedAt: ''
-  }
+  currentMemo.value = null
   showMemoModal.value = true
+  console.log('showMemoModal.value:', showMemoModal.value)
 }
 
-const openEditor = (memo: any) => {
+const openEditor = (memo: Memo) => {
   modalMode.value = 'edit'
-  formData.value = { ...memo }
-  selectedMemo.value = { ...memo }
+  currentMemo.value = memo
   showMemoModal.value = true
 }
 
-const _togglePin = () => {
-  if (formData.value) {
-    formData.value.pinned = !formData.value.pinned
-  }
-}
-
-const _handleSaveMemo = () => {
-  if (!formData.value.content && modalMode.value === 'add') {
-    return
-  }
-
-  const now = new Date().toISOString().split('T')[0] || ''
-
-  if (modalMode.value === 'add') {
-    const newMemo = {
-      id: memos.value.length + 1,
-      title: formData.value.title || '无标题备忘录',
-      content: formData.value.content,
-      category: formData.value.category,
-      tags: formData.value.tags,
-      pinned: formData.value.pinned || false,
-      createdAt: now,
-      updatedAt: now
-    }
-    memos.value.unshift(newMemo)
-    console.log('Mock: 新备忘录已添加（内存中）', newMemo)
-  } else {
-    const index = memos.value.findIndex(m => m.id === formData.value.id)
-    if (index !== -1) {
-      const existingMemo = memos.value[index]!
-      memos.value[index] = {
-        id: existingMemo.id,
-        title: formData.value.title,
-        content: formData.value.content,
-        category: existingMemo.category,
-        tags: formData.value.tags,
-        pinned: formData.value.pinned,
-        createdAt: existingMemo.createdAt,
-        updatedAt: now
-      }
-      console.log('Mock: 备忘录已更新（内存中）', memos.value[index])
-    }
-  }
-
+const closeModal = () => {
   showMemoModal.value = false
+  currentMemo.value = null
 }
 
-const _confirmDelete = () => {
-  console.log('Mock: 删除备忘录（仅演示，不实际删除）')
+const handleSave = async (data: CreateMemoRequest | UpdateMemoRequest) => {
+  try {
+    if (modalMode.value === 'add') {
+      await memosApi.create(data as CreateMemoRequest)
+    } else if (currentMemo.value) {
+      await memosApi.update(currentMemo.value.id, data as UpdateMemoRequest)
+    }
+    await refreshMemos()
+    showMemoModal.value = false
+    currentMemo.value = null
+  } catch (error) {
+    handleError(error)
+  }
+}
+
+const openDeleteConfirm = (memo: Memo) => {
+  memoToDelete.value = memo
+  showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
   showDeleteModal.value = false
-  showMemoModal.value = false
-  selectedMemo.value = null
+  memoToDelete.value = null
+}
+
+const confirmDelete = async () => {
+  try {
+    if (memoToDelete.value) {
+      await memosApi.delete(memoToDelete.value.id)
+      await refreshMemos()
+    }
+    showDeleteModal.value = false
+    memoToDelete.value = null
+  } catch (error) {
+    handleError(error)
+  }
+}
+
+const handlePageChange = (newPage: number) => {
+  page.value = newPage
 }
 </script>
+
+<style scoped>
+.active-filters {
+  padding: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgb(229 231 235 / 0.12);
+}
+
+.filters-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filter-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+</style>

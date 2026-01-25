@@ -2,11 +2,18 @@ import { request } from '~/lib/request'
 import type { Memo, CreateMemoRequest, UpdateMemoRequest, PaginatedResponse } from './types'
 
 export const memosApi = {
-  index: (params?: { page?: number, perPage?: number }) =>
-    request.get<PaginatedResponse<Memo>>('/memos', params),
+  paginate: (page: number = 1, perPage: number = 20) =>
+    request.get<PaginatedResponse<Memo>>('/memos/paginate', { page, perPage }),
+
+  index: () => request.get<PaginatedResponse<Memo>>('/memos'),
+
   show: (id: number) => request.get<Memo>(`/memos/${id}`),
+
   create: (data: CreateMemoRequest) => request.post<Memo>('/memos', data),
-  update: (id: number, data: UpdateMemoRequest) => request.put<Memo>(`/memos/${id}`, data),
+
+  update: (id: number, data: UpdateMemoRequest) =>
+    request.put<Memo>(`/memos/${id}`, data),
+
   delete: (id: number) => request.delete(`/memos/${id}`)
 }
 

@@ -91,27 +91,25 @@ export interface Memo {
   id: number
   title: string
   content: string
-  category: string
-  tags: string[]
-  pinned: boolean
+  isPinned: boolean
+  userId: number
+  tags: Tag[]
   createdAt: string
-  updatedAt: string
+  updatedAt: string | null
 }
 
 export interface CreateMemoRequest {
   title: string
   content: string
-  category: string
-  tags: string[]
-  pinned: boolean
+  isPinned?: boolean
+  tagIds?: number[]
 }
 
 export interface UpdateMemoRequest {
   title?: string
   content?: string
-  category?: string
-  tags?: string[]
-  pinned?: boolean
+  isPinned?: boolean
+  tagIds?: number[]
 }
 
 export interface PaginatedResponse<T> {
