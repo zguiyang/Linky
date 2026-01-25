@@ -57,11 +57,11 @@
 
     <div
       v-if="selectedTags.length > 0"
-      class="active-filters"
+      class="px-6 pb-6 border-b border-neutral-200/12 dark:border-neutral-700/12"
     >
-      <div class="filters-left">
-        <span class="text-sm text-gray-600 dark:text-gray-400">已选标签：</span>
-        <div class="filter-tags">
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-neutral-600 dark:text-neutral-400">已选标签：</span>
+        <div class="flex items-center gap-2">
           <u-badge
             v-for="tagId in selectedTags"
             :key="tagId"
@@ -435,23 +435,3 @@ onMounted(() => {
   })
 })
 </script>
-
-<style scoped>
-.active-filters {
-  padding: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgb(229 231 235 / 0.12);
-}
-
-.filters-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.filter-tags {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-</style>

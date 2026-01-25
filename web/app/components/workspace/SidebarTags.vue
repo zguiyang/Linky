@@ -1,7 +1,9 @@
 <template>
-  <div class="sidebar-tags">
-    <div class="section-header">
-      <span class="section-title">My Tags</span>
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center justify-between px-4 py-3">
+      <span class="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+        My Tags
+      </span>
       <u-dropdown-menu :items="headerMenuItems">
         <u-button
           icon="i-heroicons-plus"
@@ -13,69 +15,71 @@
 
     <div
       v-if="pending"
-      class="loading"
+      class="flex items-center justify-center py-8"
     >
       <u-icon
         name="i-heroicons-arrow-path"
-        class="animate-spin text-gray-400"
+        class="animate-spin text-neutral-400"
       />
     </div>
 
     <div
       v-else-if="!tags || tags.length === 0"
-      class="empty"
+      class="flex flex-col items-center justify-center py-16"
     >
-      <p class="text-sm text-gray-500 dark:text-gray-400">
+      <p class="text-sm text-neutral-500 dark:text-neutral-400">
         No tags yet
       </p>
     </div>
 
     <nav
       v-else
-      class="tag-list"
+      class="flex flex-col gap-1 px-2 py-1"
     >
       <template
         v-for="tag in tags"
         :key="tag.id"
       >
         <u-context-menu
-          v-if="!isMobile"
           :items="getContextMenuItems(tag)"
+          class="hidden lg:block"
         >
           <u-link
             :to="getTagLink(tag.id)"
-            class="tag-item"
-            :class="{ active: isSelected(tag.id) }"
+            class="flex items-center gap-2 px-2 py-2 rounded-md transition-all duration-200 ease-in-out text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+            :class="{ 'bg-primary-50 text-primary-600 shadow-sm dark:bg-primary-500/20 dark:text-primary-300': isSelected(tag.id) }"
           >
             <span
               v-if="tag.color"
-              class="color-dot"
+              class="size-2 rounded-full flex-shrink-0"
               :style="{ backgroundColor: tag.color }"
             />
-            <span class="tag-name">{{ tag.name }}</span>
-            <span class="tag-count">0</span>
+            <span class="flex-1 truncate">{{ tag.name }}</span>
+            <span class="text-xs text-neutral-400/50 flex-shrink-0">0</span>
           </u-link>
         </u-context-menu>
 
         <u-dropdown-menu
-          v-else
           :items="getContextMenuItems(tag)"
           :content="{ align: 'end' }"
+          class="lg:hidden"
         >
           <u-link
             :to="getTagLink(tag.id)"
-            class="tag-item mobile"
+            class="flex items-center justify-between gap-2 px-2 py-2 rounded-md transition-all duration-200 ease-in-out text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
           >
-            <span
-              v-if="tag.color"
-              class="color-dot"
-              :style="{ backgroundColor: tag.color }"
-            />
-            <span class="tag-name">{{ tag.name }}</span>
-            <span class="tag-count">0</span>
+            <div class="flex items-center gap-2">
+              <span
+                v-if="tag.color"
+                class="size-2 rounded-full flex-shrink-0"
+                :style="{ backgroundColor: tag.color }"
+              />
+              <span class="flex-1 truncate">{{ tag.name }}</span>
+              <span class="text-xs text-neutral-400/50 flex-shrink-0">0</span>
+            </div>
             <u-icon
               name="i-heroicons-ellipsis-vertical"
-              class="tag-menu-icon"
+              class="text-neutral-400/50 flex-shrink-0"
             />
           </u-link>
         </u-dropdown-menu>
@@ -89,8 +93,8 @@
       <template #body>
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-              Tag Name <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
+              Tag Name <span class="text-error-500">*</span>
             </label>
             <u-input
               v-model="tagForm.name"
@@ -99,14 +103,14 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
               Tag Color
             </label>
             <div class="flex items-center gap-2">
               <input
                 v-model="tagForm.color"
                 type="color"
-                class="w-10 h-10 rounded cursor-pointer border border-gray-200 dark:border-gray-600"
+                class="size-10 rounded cursor-pointer border border-neutral-200 dark:border-neutral-600"
               >
               <u-input
                 v-model="tagForm.color"
@@ -141,18 +145,18 @@
       <template #body>
         <div class="text-center space-y-4">
           <div class="flex justify-center">
-            <div class="w-16 h-16 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
+            <div class="size-16 rounded-full bg-error-50 dark:bg-error-900/20 flex items-center justify-center">
               <u-icon
                 name="i-heroicons-exclamation-triangle"
-                class="w-8 h-8 text-red-500"
+                class="size-8 text-error-500"
               />
             </div>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
               Are you sure you want to delete this tag?
             </h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
               Tag name: <strong>{{ contextTag?.name }}</strong>
             </p>
           </div>
@@ -177,7 +181,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { tagsApi } from '~/api/tags'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 import type { DropdownMenuItem, ContextMenuItem } from '@nuxt/ui'
@@ -194,7 +198,6 @@ const emit = defineEmits<{
 
 const { isSelected } = useTags()
 
-const isMobile = ref(false)
 const showModal = ref(false)
 const isEditing = ref(false)
 const showDeleteConfirm = ref(false)
@@ -202,19 +205,6 @@ const contextTag = ref<Tag | null>(null)
 const isSubmitting = ref(false)
 const isDeleting = ref(false)
 const tagForm = ref<{ name: string, color: string }>({ name: '', color: '' })
-
-onMounted(() => {
-  isMobile.value = window.innerWidth < 1024
-  window.addEventListener('resize', () => {
-    isMobile.value = window.innerWidth < 1024
-  })
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', () => {
-    isMobile.value = window.innerWidth < 1024
-  })
-})
 
 const headerMenuItems: DropdownMenuItem[][] = [[
   {
@@ -327,130 +317,3 @@ const handleDeleteTag = async (close?: () => void) => {
   }
 }
 </script>
-
-<style scoped>
-.sidebar-tags {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-
-.section-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgb(107 114 128);
-}
-
-.dark .section-title {
-  color: rgb(156 163 175);
-}
-
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-}
-
-.empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-top: 4rem;
-  padding-bottom: 4rem;
-}
-
-.tag-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-
-.tag-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  transition-property: background-color, color, box-shadow;
-  transition-duration: 200ms;
-  transition-timing-function: ease-in-out;
-  color: rgb(75 85 99);
-}
-
-.tag-item:hover {
-  background-color: rgb(243 244 246);
-}
-
-.tag-item.active {
-  background-color: rgb(238 242 255);
-  color: rgb(79 70 229);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.dark .tag-item {
-  color: rgb(209 213 219);
-}
-
-.dark .tag-item:hover {
-  background-color: rgb(31 41 55);
-}
-
-.dark .tag-item.active {
-  background-color: rgba(99, 102, 241, 0.2);
-  color: rgb(192, 132, 252);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.tag-item.mobile {
-  justify-content: space-between;
-}
-
-.tag-item.active {
-  background-color: rgb(239 246 255 / 0.95);
-  color: rgb(79 70 229 / 1);
-}
-
-.color-dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 9999px;
-  flex-shrink: 0;
-}
-
-.tag-name {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tag-count {
-  font-size: 0.75rem;
-  color: rgb(156  163 175 / 0.5);
-  flex-shrink: 0;
-}
-
-.tag-menu-icon {
-  flex-shrink: 0;
-  color: rgb(156  163 175 / 0.5);
-}
-</style>

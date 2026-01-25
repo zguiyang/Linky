@@ -20,8 +20,8 @@
             :key="item.to"
             :to="item.to"
             :inactive="false"
-            class="nav-item"
-            :class="{ active: $route.path === item.to }"
+            class="flex items-center gap-3 px-3 py-3 rounded-md transition-all duration-200 ease-in-out text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+            :class="{ 'bg-primary-50 text-primary-600 shadow-sm dark:bg-primary-500/20 dark:text-primary-300': $route.path === item.to }"
           >
             <u-icon
               :name="item.icon"
@@ -31,7 +31,7 @@
           </u-link>
         </nav>
 
-        <div class="mx-3 my-2 border-t border-gray-200 dark:border-gray-700" />
+        <div class="mx-3 my-2 border-t border-neutral-200 dark:border-neutral-700" />
 
         <div class="p-2">
           <sidebar-tags
@@ -92,63 +92,3 @@ const { data: tagsData, pending, refresh: refreshTags } = await useAsyncData<Tag
   default: () => []
 })
 </script>
-
-<style scoped>
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  transition-property: background-color, color, box-shadow;
-  transition-duration: 200ms;
-  transition-timing-function: ease-in-out;
-  color: rgb(75 85 99);
-}
-
-.nav-item:hover {
-  background-color: rgb(243 244 246);
-}
-
-.nav-item.active {
-  background-color: rgb(238 242 255);
-  color: rgb(79 70 229);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.dark .nav-item {
-  color: rgb(209 213 219);
-}
-
-.dark .nav-item:hover {
-  background-color: rgb(31 41 55);
-}
-
-.dark .nav-item.active {
-  background-color: rgba(99, 102, 241, 0.2);
-  color: rgb(192, 132, 252);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.nav-item:hover {
-  background-color: rgb(243 244 246);
-}
-
-.nav-item.active {
-  background-color: rgb(238 242 255);
-  color: rgb(79 70 229);
-}
-
-.dark .nav-item {
-  color: rgb(209 213 219);
-}
-
-.dark .nav-item:hover {
-  background-color: rgb(31 41 55);
-}
-
-.dark .nav-item.active {
-  background-color: rgba(55 48 163, 0.3);
-  color: rgb(165 180 252);
-}
-</style>

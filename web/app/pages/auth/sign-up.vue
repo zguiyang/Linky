@@ -1,11 +1,10 @@
 <template>
   <div class="w-full max-w-[400px] p-4">
     <u-card
-      class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-[40px] border border-gray-200 dark:border-gray-700"
       variant="outline"
     >
       <template #header>
-        <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
+        <h2 class="text-2xl font-bold text-center">
           系统注册
         </h2>
       </template>
@@ -57,7 +56,7 @@
           type="submit"
           block
           :loading="loading"
-          class="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-white"
+          color="primary"
         >
           注册
         </u-button>
@@ -66,7 +65,7 @@
       <div class="text-center mt-4">
         <nuxt-link
           to="/auth/sign-in"
-          class="text-[var(--color-primary-500)] dark:text-[var(--color-primary-300)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-primary-200)] hover:underline"
+          class="text-primary font-medium transition-all duration-200 ease hover:text-primary/80 hover:underline"
         >
           已有账号？去登录
         </nuxt-link>

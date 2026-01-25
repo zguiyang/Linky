@@ -51,24 +51,24 @@
       :ui="{ container: 'flex flex-col lg:grid py-20 sm:py-24 lg:py-32 gap-8 sm:gap-16' }"
     />
 
-    <section class="cta-section">
-      <div class="container">
-        <div class="cta-card">
-          <div class="cta-content">
+    <section class="py-[60px] sm:py-[100px] px-5 relative overflow-hidden">
+      <div class="max-w-[1200px] mx-auto relative">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center p-12 rounded-3xl border border-neutral-200 dark:border-neutral-700 bg-white/70 dark:bg-neutral-900/70 backdrop-blur-xl relative overflow-hidden">
+          <div class="relative z-10">
             <u-badge
               label="Free"
               size="lg"
               color="primary"
               variant="soft"
-              class="cta-badge"
+              class="mb-5 inline-flex"
             />
-            <h2 class="cta-title">
+            <h2 class="text-[3rem] font-bold leading-tight mb-4 font-outfit text-neutral-900 dark:text-neutral-50">
               准备好开始整理您的知识了吗？
             </h2>
-            <p class="cta-description">
+            <p class="text-lg leading-[1.7] mb-7 text-neutral-600 dark:text-neutral-300">
               立即登录，开始使用 Linky 打造属于您的个人知识管理空间
             </p>
-            <div class="cta-buttons">
+            <div class="flex flex-wrap gap-4">
               <u-button
                 :to="entryButton.to"
                 size="xl"
@@ -107,81 +107,3 @@ const entryButton = computed(() => ({
   to: user.value ? '/workspace/bookmarks' : '/auth/sign-in'
 }))
 </script>
-
-<style scoped>
-.cta-section {
-  padding: 60px 20px;
-  position: relative;
-  overflow: hidden;
-}
-
-@media (min-width: 640px) {
-  .cta-section {
-    padding: 100px 20px;
-  }
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.cta-card {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: center;
-  padding: 48px;
-  position: relative;
-  overflow: hidden;
-  background: var(--color-glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(229, 231, 235, 1);
-  border-radius: 24px;
-}
-
-.dark .cta-card {
-  background: var(--dark-color-glass-bg);
-}
-
-.cta-content {
-  position: relative;
-  z-index: 1;
-}
-
-.cta-badge {
-  margin-bottom: 20px;
-  display: inline-flex;
-}
-
-.cta-title {
-  font-size: 3rem;
-  font-weight: 700;
-  font-family: 'Outfit', sans-serif;
-  color: var(--color-gray-900);
-  line-height: 1.2;
-  margin-bottom: 16px;
-}
-
-.dark .cta-title {
-  color: var(--color-gray-50);
-}
-
-.cta-description {
-  font-size: 1.125rem;
-  color: var(--color-gray-600);
-  line-height: 1.7;
-  margin-bottom: 28px;
-}
-
-.dark .cta-description {
-  color: var(--color-gray-300);
-}
-
-.cta-buttons {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-</style>
