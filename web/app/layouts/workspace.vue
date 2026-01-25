@@ -100,13 +100,55 @@ const { data: tagsData, pending, refresh: refreshTags } = await useAsyncData<Tag
   gap: 0.75rem;
   padding: 0.75rem;
   border-radius: 0.5rem;
-  transition-property: background-color, color, transform, box-shadow;
+  transition-property: background-color, color, box-shadow;
   transition-duration: 200ms;
-  color: rgb(55 65 81 / 0.7);
+  transition-timing-function: ease-in-out;
+  color: rgb(75 85 99);
+}
+
+.nav-item:hover {
+  background-color: rgb(243 244 246);
 }
 
 .nav-item.active {
-  background-color: rgb(239 246 255 / 0.95);
-  color: rgb(79 70 229 / 1);
+  background-color: rgb(238 242 255);
+  color: rgb(79 70 229);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark .nav-item {
+  color: rgb(209 213 219);
+}
+
+.dark .nav-item:hover {
+  background-color: rgb(31 41 55);
+}
+
+.dark .nav-item.active {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: rgb(192, 132, 252);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.nav-item:hover {
+  background-color: rgb(243 244 246);
+}
+
+.nav-item.active {
+  background-color: rgb(238 242 255);
+  color: rgb(79 70 229);
+}
+
+.dark .nav-item {
+  color: rgb(209 213 219);
+}
+
+.dark .nav-item:hover {
+  background-color: rgb(31 41 55);
+}
+
+.dark .nav-item.active {
+  background-color: rgba(55 48 163, 0.3);
+  color: rgb(165 180 252);
 }
 </style>

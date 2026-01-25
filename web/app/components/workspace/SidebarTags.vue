@@ -348,9 +348,13 @@ const handleDeleteTag = async (close?: () => void) => {
 .section-title {
   font-size: 0.75rem;
   font-weight: 600;
-  color: rgb(107 114 128 / 0.39);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  color: rgb(107 114 128);
+}
+
+.dark .section-title {
+  color: rgb(156 163 175);
 }
 
 .loading {
@@ -384,12 +388,36 @@ const handleDeleteTag = async (close?: () => void) => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem;
   padding: 0.5rem;
   border-radius: 0.5rem;
-  transition-property: background-color, color, transform, box-shadow;
+  transition-property: background-color, color, box-shadow;
   transition-duration: 200ms;
-  color: rgb(55 65 81 / 0.7);
+  transition-timing-function: ease-in-out;
+  color: rgb(75 85 99);
+}
+
+.tag-item:hover {
+  background-color: rgb(243 244 246);
+}
+
+.tag-item.active {
+  background-color: rgb(238 242 255);
+  color: rgb(79 70 229);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark .tag-item {
+  color: rgb(209 213 219);
+}
+
+.dark .tag-item:hover {
+  background-color: rgb(31 41 55);
+}
+
+.dark .tag-item.active {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: rgb(192, 132, 252);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .tag-item.mobile {
