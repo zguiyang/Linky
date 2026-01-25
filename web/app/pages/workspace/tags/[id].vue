@@ -51,140 +51,124 @@
       </div>
     </u-card>
 
-    <u-tabs v-model="activeTab">
-      <u-tab
-        value="bookmarks"
-        label="书签"
-      />
-      <u-tab
-        value="memos"
-        label="备忘录"
-      />
-      <u-tab
-        value="related"
-        label="关联标签"
-      />
+    <u-tabs v-model="activeTab" :items="tabItems" class="flex-1 min-h-0">
+      <template #bookmarks>
+        <div class="flex-1 min-h-0">
+          <div
+            v-if="loadingBookmarks"
+            class="flex justify-center py-16"
+          >
+            <u-icon
+              name="i-heroicons-arrow-path"
+              class="w-8 h-8 animate-spin text-gray-400"
+            />
+          </div>
+          <div
+            v-else
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
+            <bookmark-card
+              v-for="bookmark in bookmarks"
+              :key="bookmark.id"
+              :bookmark="bookmark"
+              view-mode="grid"
+            />
+            <div
+              v-if="bookmarks.length === 0"
+              class="col-span-full flex flex-col items-center justify-center py-16 text-gray-500"
+            >
+              <u-icon
+                name="i-heroicons-bookmark"
+                class="w-16 h-16 text-gray-300 dark:text-gray-600"
+              />
+              <p>
+                该标签下暂无书签
+              </p>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template #memos>
+        <div class="flex-1 min-h-0">
+          <div
+            v-if="loadingMemos"
+            class="flex justify-center py-16"
+          >
+            <u-icon
+              name="i-heroicons-arrow-path"
+              class="w-8 h-8 animate-spin text-gray-400"
+            />
+          </div>
+          <div
+            v-else
+            class="flex flex-col gap-3"
+          >
+            <memo-card
+              v-for="memo in memos"
+              :key="memo.id"
+              :memo="memo"
+            />
+            <div
+              v-if="memos.length === 0"
+              class="flex flex-col items-center justify-center py-16 text-gray-500"
+            >
+              <u-icon
+                name="i-heroicons-document-text"
+                class="w-16 h-16 text-gray-300 dark:text-gray-600"
+              />
+              <p>
+                该标签下暂无备忘录
+              </p>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template #related>
+        <div class="flex-1 min-h-0">
+          <div
+            v-if="loadingRelated"
+            class="flex justify-center py-16"
+          >
+            <u-icon
+              name="i-heroicons-arrow-path"
+              class="w-8 h-8 animate-spin text-gray-400"
+            />
+          </div>
+          <div
+            v-else
+            class="flex flex-wrap gap-3"
+          >
+            <u-badge
+              v-for="relatedTag in relatedTags"
+              :key="relatedTag.id"
+              :color="(relatedTag.color || 'neutral') as any"
+              size="lg"
+              class="cursor-pointer hover:opacity-80 transition-opacity"
+              @click="console.log('跳转到标签详情页:', relatedTag.id)"
+            >
+              {{ relatedTag.name }}
+              <span class="text-xs opacity-60 ml-1">
+                ({{ relatedTag.cooccurrenceCount }})
+              </span>
+            </u-badge>
+            <div
+              v-if="relatedTags.length === 0"
+              class="w-full flex flex-col items-center justify-center py-16 text-gray-500"
+            >
+              <u-icon
+                name="i-heroicons-tag"
+                class="w-16 h-16 text-gray-300 dark:text-gray-600"
+              />
+              <p>
+                暂无关联标签
+              </p>
+            </div>
+          </div>
+        </div>
+      </template>
     </u-tabs>
-
-    <div
-      v-if="activeTab === 'bookmarks'"
-      class="flex-1 min-h-0"
-    >
-      <div
-        v-if="loadingBookmarks"
-        class="flex justify-center py-16"
-      >
-        <u-icon
-          name="i-heroicons-arrow-path"
-          class="w-8 h-8 animate-spin text-gray-400"
-        />
-      </div>
-      <div
-        v-else
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-      >
-        <bookmark-card
-          v-for="bookmark in bookmarks"
-          :key="bookmark.id"
-          :bookmark="bookmark"
-          view-mode="grid"
-        />
-        <div
-          v-if="bookmarks.length === 0"
-          class="col-span-full flex flex-col items-center justify-center py-16 text-gray-500"
-        >
-          <u-icon
-            name="i-heroicons-bookmark"
-            class="w-16 h-16 text-gray-300 dark:text-gray-600"
-          />
-          <p>
-            该标签下暂无书签
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div
-      v-else-if="activeTab === 'memos'"
-      class="flex-1 min-h-0"
-    >
-      <div
-        v-if="loadingMemos"
-        class="flex justify-center py-16"
-      >
-        <u-icon
-          name="i-heroicons-arrow-path"
-          class="w-8 h-8 animate-spin text-gray-400"
-        />
-      </div>
-      <div
-        v-else
-        class="flex flex-col gap-3"
-      >
-        <memo-card
-          v-for="memo in memos"
-          :key="memo.id"
-          :memo="memo"
-        />
-        <div
-          v-if="memos.length === 0"
-          class="flex flex-col items-center justify-center py-16 text-gray-500"
-        >
-          <u-icon
-            name="i-heroicons-document-text"
-            class="w-16 h-16 text-gray-300 dark:text-gray-600"
-          />
-          <p>
-            该标签下暂无备忘录
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div
-      v-else-if="activeTab === 'related'"
-      class="flex-1 min-h-0"
-    >
-      <div
-        v-if="loadingRelated"
-        class="flex justify-center py-16"
-      >
-        <u-icon
-          name="i-heroicons-arrow-path"
-          class="w-8 h-8 animate-spin text-gray-400"
-        />
-      </div>
-      <div
-        v-else
-        class="flex flex-wrap gap-3"
-      >
-        <u-badge
-          v-for="relatedTag in relatedTags"
-          :key="relatedTag.id"
-          :color="(relatedTag.color || 'neutral') as any"
-          size="lg"
-          class="cursor-pointer hover:opacity-80 transition-opacity"
-          @click="console.log('跳转到标签详情页:', relatedTag.id)"
-        >
-          {{ relatedTag.name }}
-          <span class="text-xs opacity-60 ml-1">
-            ({{ relatedTag.cooccurrenceCount }})
-          </span>
-        </u-badge>
-        <div
-          v-if="relatedTags.length === 0"
-          class="w-full flex flex-col items-center justify-center py-16 text-gray-500"
-        >
-          <u-icon
-            name="i-heroicons-tag"
-            class="w-16 h-16 text-gray-300 dark:text-gray-600"
-          />
-          <p>
-            暂无关联标签
-          </p>
-        </div>
-      </div>
-    </div>
 
     <u-modal
       v-model:open="showModal"
@@ -300,7 +284,22 @@ if (!tag.value) {
   })
 }
 
-const activeTab = ref('bookmarks')
+const activeTab = ref(0)
+
+const tabItems = [
+  {
+    label: '书签',
+    slot: 'bookmarks'
+  },
+  {
+    label: '备忘录',
+    slot: 'memos'
+  },
+  {
+    label: '关联标签',
+    slot: 'related'
+  }
+]
 const loadingBookmarks = ref(false)
 const loadingMemos = ref(false)
 const loadingRelated = ref(false)
@@ -314,14 +313,6 @@ const memos = computed(() =>
 )
 
 const relatedTags = ref<MockRelatedTag[]>(mockRelatedTags)
-
-watch(activeTab, async (newTab) => {
-  if (newTab === 'related') {
-    loadingRelated.value = true
-    await new Promise(resolve => setTimeout(resolve, 500))
-    loadingRelated.value = false
-  }
-})
 
 const showModal = ref(false)
 const isEditing = ref(true)
