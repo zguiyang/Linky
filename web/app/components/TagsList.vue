@@ -1,5 +1,8 @@
 <template>
-  <u-card class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl">
+  <u-card
+    :class="$attrs.class"
+    class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl"
+  >
     <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
       <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
         我的标签
@@ -39,64 +42,68 @@
 
       <div
         v-else
-        class="space-y-2"
+        class="flex flex-wrap gap-2"
       >
-        <div
-          v-for="tag in tagsList"
-          :key="tag.id"
-          class="flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all duration-200 select-none"
-          :class="{
-            'border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20':
-              selectedTagsList.includes(tag.id),
-            'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800':
-              !selectedTagsList.includes(tag.id)
-          }"
-          @click="toggleTag(tag.id)"
-        >
-          <div class="flex items-center gap-3 flex-1 min-w-0">
-            <div
-              v-if="tag.color"
-              class="w-3 h-3 rounded-full flex-shrink-0"
-              :style="{ backgroundColor: tag.color }"
-            />
-            <div
-              v-else
-              class="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 flex-shrink-0"
-            />
-            <span
-              class="text-sm truncate"
-              :class="{
-                'text-indigo-600 dark:text-indigo-300':
-                  selectedTagsList.includes(tag.id),
-                'text-gray-700 dark:text-gray-200':
-                  !selectedTagsList.includes(tag.id)
-              }"
+        <template v-if="isMobile">
+          <div
+            v-for="tag in tagsList"
+            :key="tag.id"
+            class="flex items-center gap-1"
+          >
+            <u-button
+              :color="selectedTagsList.includes(tag.id) ? 'primary' : 'neutral'"
+              variant="soft"
+              size="sm"
+              @click="toggleTag(tag.id)"
             >
+              <template
+                v-if="tag.color"
+                #leading
+              >
+                <span
+                  class="w-2 h-2 rounded-full inline-block"
+                  :style="{ backgroundColor: tag.color }"
+                />
+              </template>
               {{ tag.name }}
-            </span>
-          </div>
+            </u-button>
 
-          <div class="flex items-center gap-1 ml-2">
-            <u-button
-              icon="i-heroicons-pencil"
-              variant="ghost"
-              size="xs"
-              color="neutral"
-              class="min-h-[44px] min-w-[44px]"
-              aria-label="编辑标签"
-              @click.stop="openEditModal(tag)"
-            />
-            <u-button
-              icon="i-heroicons-trash"
-              variant="ghost"
-              size="xs"
-              color="error"
-              class="min-h-[44px] min-w-[44px]"
-              aria-label="删除标签"
-              @click.stop="openDeleteConfirm(tag)"
-            />
+            <u-dropdown-menu :items="getTagMenuItems(tag)">
+              <u-button
+                icon="i-heroicons-ellipsis-horizontal"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+              />
+            </u-dropdown-menu>
           </div>
-        </div>
+        </template>
+
+        <template v-else>
+          <u-context-menu
+            v-for="tag in tagsList"
+            :key="tag.id"
+            :items="getTagMenuItems(tag)"
+          >
+            <u-button
+              :color="selectedTagsList.includes(tag.id) ? 'primary' : 'neutral'"
+              variant="soft"
+              size="sm"
+              @click="toggleTag(tag.id)"
+            >
+              <template
+                v-if="tag.color"
+                #leading
+              >
+                <span
+                  class="w-2 h-2 rounded-full inline-block"
+                  :style="{ backgroundColor: tag.color }"
+                />
+              </template>
+              {{ tag.name }}
+            </u-button>
+          </u-context-menu>
+        </template>
       </div>
     </div>
   </u-card>
@@ -200,6 +207,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import type { ContextMenuItem } from '@nuxt/ui'
 import { tagsApi } from '~/api/tags'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 
@@ -227,6 +235,29 @@ const tagsList = computed(() => props.tags)
 const selectedTagsList = computed(() => props.selectedTags)
 
 const pendingValue = computed(() => false)
+
+const isMobile = computed(() => {
+  if (import.meta.server) return false
+  return window.innerWidth < 1024
+})
+
+const getTagMenuItems = (tag: Tag): ContextMenuItem[][] => {
+  return [
+    [
+      {
+        label: '编辑',
+        icon: 'i-heroicons-pencil',
+        onSelect: () => openEditModal(tag)
+      },
+      {
+        label: '删除',
+        icon: 'i-heroicons-trash',
+        color: 'error',
+        onSelect: () => openDeleteConfirm(tag)
+      }
+    ]
+  ]
+}
 
 const toggleTag = (tagId: number) => {
   const index = selectedTagsList.value.indexOf(tagId)

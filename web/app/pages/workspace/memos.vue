@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
-    <div class="flex items-center justify-between gap-4 flex-shrink-0">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
           我的备忘录
@@ -10,20 +10,21 @@
         </p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-2">
         <u-input
           v-model="searchQuery"
           icon="i-heroicons-magnifying-glass"
           placeholder="搜索备忘录..."
           size="md"
-          class="w-full sm:w-auto"
+          class="w-full sm:w-auto flex-grow-0"
         />
-        <div class="inline-flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+        <div class="inline-flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg shrink-0">
           <u-button
             :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
             :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
             size="sm"
             icon="i-heroicons-view-columns"
+            title="瀑布流"
             @click="setViewMode('masonry')"
           />
           <u-button
@@ -31,6 +32,7 @@
             :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
             size="sm"
             icon="i-heroicons-squares-2x2"
+            title="网格"
             @click="setViewMode('grid')"
           />
           <u-button
@@ -38,29 +40,25 @@
             :variant="viewMode === 'list' ? 'solid' : 'ghost'"
             size="sm"
             icon="i-heroicons-list-bullet"
+            title="列表"
             @click="setViewMode('list')"
           />
         </div>
         <u-select
           v-model="sortBy"
           :items="sortOptions"
-          placeholder="排序方式"
+          placeholder="排序"
           :popper="{ strategy: 'fixed' }"
           size="md"
+          class="shrink-0"
         />
         <u-button
+          icon="i-heroicons-plus"
           color="primary"
           size="md"
+          title="新建备忘录"
           @click="openAddModal"
-        >
-          <template #leading>
-            <u-icon
-              name="i-heroicons-plus"
-              class="w-4 h-4"
-            />
-          </template>
-          新建备忘录
-        </u-button>
+        />
       </div>
     </div>
 
@@ -95,12 +93,13 @@
             </u-button>
           </div>
 
-          <tags-pills
-            v-if="!pending && tags && tags.length > 0"
+          <tags-list
+            v-if="!pending && tags"
             :tags="tags"
             :selected-tags="selectedTags"
             class="lg:hidden mb-6"
-            @toggle:tag="toggleTag"
+            @update:selected-tags="selectedTags = $event"
+            @refresh-tags="refresh"
           />
 
           <div
@@ -167,7 +166,7 @@
 
       <div class="hidden lg:block lg:flex-[0_0_20%] min-h-0">
         <div class="sticky top-0 pr-6">
-          <tags-card
+          <tags-list
             v-if="!pending && tags"
             :tags="tags"
             :selected-tags="selectedTags"
@@ -651,15 +650,6 @@ const toolbarItems = [
     { kind: 'orderedList', icon: 'i-lucide-list-ordered', tooltip: { text: '有序列表' } }
   ]
 ] satisfies EditorToolbarItem[][]
-
-const toggleTag = (tagId: number) => {
-  const index = selectedTags.value.indexOf(tagId)
-  if (index > -1) {
-    selectedTags.value.splice(index, 1)
-  } else {
-    selectedTags.value.push(tagId)
-  }
-}
 
 const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
   viewMode.value = mode
