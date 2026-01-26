@@ -36,12 +36,44 @@ export class BookmarkService {
       .orderBy('created_at', 'desc')
   }
 
-  async paginate(userId: number, page: number = 1, perPage: number = 20) {
-    return await Bookmark.query()
-      .where('user_id', userId)
-      .preload('tags')
-      .orderBy('created_at', 'desc')
-      .paginate(page, perPage)
+  async paginate(
+    userId: number,
+    options: {
+      page?: number
+      perPage?: number
+      search?: string
+      tagIds?: number[]
+      sortBy?: 'createdAt' | 'updatedAt'
+      sortOrder?: 'asc' | 'desc'
+    } = {}
+  ) {
+    const {
+      page = 1,
+      perPage = 20,
+      search,
+      tagIds,
+      sortBy = 'updatedAt',
+      sortOrder = 'desc',
+    } = options
+
+    let query = Bookmark.query().where('user_id', userId)
+
+    if (search) {
+      const pattern = `%${search}%`
+      query = query.where((q) => {
+        q.whereILike('title', pattern)
+          .orWhereILike('url', pattern)
+          .orWhereILike('description', pattern)
+      })
+    }
+
+    if (tagIds && tagIds.length > 0) {
+      query = query.whereHas('tags', (q) => {
+        q.whereIn('id', tagIds)
+      })
+    }
+
+    return await query.preload('tags').orderBy(sortBy, sortOrder).paginate(page, perPage)
   }
 
   async findById(userId: number, bookmarkId: number) {

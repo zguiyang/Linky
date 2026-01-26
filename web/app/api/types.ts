@@ -68,6 +68,15 @@ export interface Bookmark {
   updatedAt: string | null
 }
 
+export interface BookmarkPaginationParams {
+  page?: number
+  perPage?: number
+  search?: string
+  tagIds?: number[]
+  sortBy?: 'createdAt' | 'updatedAt'
+  sortOrder?: 'asc' | 'desc'
+}
+
 export interface CreateBookmarkRequest {
   title: string
   url: string

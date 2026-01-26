@@ -18,6 +18,21 @@
           size="md"
           class="w-full sm:w-auto flex-grow-0"
         />
+        <u-select-menu
+          v-model="selectedSort"
+          :options="sortOptions"
+          value-key="value"
+          placeholder="排序"
+          size="md"
+          class="w-44"
+        >
+          <template #leading>
+            <u-icon
+              name="i-heroicons-funnel"
+              class="w-4 h-4"
+            />
+          </template>
+        </u-select-menu>
         <div class="inline-flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg shrink-0">
           <u-button
             :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
@@ -96,7 +111,7 @@
         class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
       >
         <bookmark-card
-          v-for="bookmark in filteredBookmarks"
+          v-for="bookmark in bookmarks"
           :key="bookmark.id"
           :bookmark="bookmark"
           view-mode="masonry"
@@ -111,7 +126,7 @@
         class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
       >
         <bookmark-card
-          v-for="bookmark in filteredBookmarks"
+          v-for="bookmark in bookmarks"
           :key="bookmark.id"
           :bookmark="bookmark"
           view-mode="grid"
@@ -126,7 +141,7 @@
         class="flex flex-col gap-3"
       >
         <bookmark-card
-          v-for="bookmark in filteredBookmarks"
+          v-for="bookmark in bookmarks"
           :key="bookmark.id"
           :bookmark="bookmark"
           view-mode="list"
@@ -136,7 +151,7 @@
         />
       </div>
 
-      <u-empty v-if="filteredBookmarks.length === 0">
+      <u-empty v-if="bookmarks.length === 0">
         <template #icon>
           <u-icon
             name="i-heroicons-bookmark-slash"
@@ -264,7 +279,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import { useTags } from '~/composables/useTags'
 import { bookmarksApi } from '~/api/bookmarks'
 import type { Bookmark, Tag } from '~/api/types'
@@ -275,15 +290,39 @@ const { tags, selectedTags, removeTag, clearTags, fetchTags } = useTags()
 await fetchTags()
 
 const viewMode = useState('view-mode', () => 'masonry' as 'masonry' | 'grid' | 'list')
+
+const sortOptions = [
+  { label: '更新时间（最新）', value: { sortBy: 'updatedAt', sortOrder: 'desc' } },
+  { label: '更新时间（最早）', value: { sortBy: 'updatedAt', sortOrder: 'asc' } },
+  { label: '创建时间（最新）', value: { sortBy: 'createdAt', sortOrder: 'desc' } },
+  { label: '创建时间（最早）', value: { sortBy: 'createdAt', sortOrder: 'asc' } }
+]
+
+const selectedSort = ref({
+  sortBy: 'updatedAt' as const,
+  sortOrder: 'desc' as const
+})
+
+const sortBy = computed(() => selectedSort.value.sortBy)
+const sortOrder = computed(() => selectedSort.value.sortOrder)
+
 const searchQuery = ref('')
 
 const page = ref(1)
 const perPage = ref(20)
 
 const { data: paginationData, pending: bookmarksPending, refresh: refreshBookmarks } = await useAsyncData(
-  'bookmarks-page-1',
-  () => bookmarksApi.paginate(page.value, perPage.value),
+  computed(() => `bookmarks-${page.value}-${perPage.value}-${searchQuery.value}-${selectedTags.value.join(',')}-${sortBy.value}-${sortOrder.value}`),
+  () => bookmarksApi.paginate({
+    page: page.value,
+    perPage: perPage.value,
+    search: searchQuery.value || undefined,
+    tagIds: selectedTags.value.length > 0 ? selectedTags.value : undefined,
+    sortBy: sortBy.value,
+    sortOrder: sortOrder.value
+  }),
   {
+    watch: [page, selectedTags, sortBy, sortOrder],
     default: () => ({
       meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
       data: []
@@ -293,6 +332,10 @@ const { data: paginationData, pending: bookmarksPending, refresh: refreshBookmar
 
 const bookmarks = computed(() => paginationData.value?.data || [])
 const total = computed(() => paginationData.value?.meta.total || 0)
+
+watch(searchQuery, () => {
+  page.value = 1
+})
 
 const showBookmarkModal = ref(false)
 const isEditing = ref(false)
@@ -315,26 +358,6 @@ const tagSelectItems = computed(() => {
     value: tag.id,
     ...(tag.color && { color: tag.color })
   }))
-})
-
-const filteredBookmarks = computed(() => {
-  let result = bookmarks.value
-
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter((b: Bookmark) =>
-      b.title.toLowerCase().includes(query)
-      || b.description?.toLowerCase().includes(query)
-    )
-  }
-
-  if (selectedTags.value.length > 0) {
-    result = result.filter((b: Bookmark) =>
-      b.tags.some((t: Tag) => selectedTags.value.includes(t.id))
-    )
-  }
-
-  return result
 })
 
 const getTagName = (tagId: number) => {

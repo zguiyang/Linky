@@ -1,9 +1,9 @@
 import { request } from '~/lib/request'
-import type { Bookmark, CreateBookmarkRequest, UpdateBookmarkRequest, PaginatedResponse } from './types'
+import type { Bookmark, CreateBookmarkRequest, UpdateBookmarkRequest, PaginatedResponse, BookmarkPaginationParams } from './types'
 
 export const bookmarksApi = {
-  paginate: (page: number = 1, perPage: number = 20) =>
-    request.get<PaginatedResponse<Bookmark>>('/bookmarks/paginate', { page, perPage }),
+  paginate: (params: BookmarkPaginationParams = {}) =>
+    request.get<PaginatedResponse<Bookmark>>('/bookmarks/paginate', params),
 
   index: () => request.get<Bookmark[]>('/bookmarks'),
 

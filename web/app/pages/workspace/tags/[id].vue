@@ -51,7 +51,11 @@
       </div>
     </u-card>
 
-    <u-tabs v-model="activeTab" :items="tabItems" class="flex-1 min-h-0">
+    <u-tabs
+      v-model="activeTab"
+      :items="tabItems"
+      class="flex-1 min-h-0"
+    >
       <template #bookmarks>
         <div class="flex-1 min-h-0">
           <div
@@ -265,7 +269,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, navigateTo } from '#app'
 import { createError } from 'h3'
 import { mockTags, mockBookmarks, mockMemos, mockRelatedTags, type MockTag, type MockRelatedTag } from '~/mocks/tags.mock'
