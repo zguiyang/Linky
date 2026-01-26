@@ -1,3 +1,13 @@
+/**
+ * Bookmark Parser Worker
+ *
+ * TODO: Future optimizations
+ * 1. Replace local queue with Redis queue (support for multi-instance deployment)
+ * 2. Add task persistence (tasks survive service restart)
+ * 3. Add task priority and retry mechanism
+ * 4. Add WebSocket real-time progress and result push
+ */
+
 import { parentPort, isMainThread, workerData, Worker } from 'node:worker_threads'
 import { fileURLToPath } from 'node:url'
 import { JSDOM } from 'jsdom'
@@ -175,7 +185,7 @@ if (!isMainThread && port && workerData) {
 
 const PARSE_TIMEOUT_MS = 30000
 
-export async function parseInWorker(htmlContent: string): Promise<ParseResult> {
+function runWorker(htmlContent: string): Promise<ParseResult> {
   const workerPath = fileURLToPath(import.meta.url)
 
   return new Promise((resolve, reject) => {
@@ -190,6 +200,7 @@ export async function parseInWorker(htmlContent: string): Promise<ParseResult> {
 
     worker.on('message', (message: WorkerMessage) => {
       clearTimeout(timeoutId)
+      worker.terminate()
       if (message.success && message.data) {
         resolve(message.data)
       } else {
@@ -199,6 +210,7 @@ export async function parseInWorker(htmlContent: string): Promise<ParseResult> {
 
     worker.on('error', (error: Error) => {
       clearTimeout(timeoutId)
+      worker.terminate()
       reject(error)
     })
 
@@ -208,5 +220,46 @@ export async function parseInWorker(htmlContent: string): Promise<ParseResult> {
         reject(new Error(`Worker 退出，退出码: ${code}`))
       }
     })
+  })
+}
+
+const MAX_CONCURRENT_WORKERS = 4
+let activeWorkers = 0
+const pendingQueue: Array<{
+  htmlContent: string
+  resolve: (v: ParseResult) => void
+  reject: (e: Error) => void
+}> = []
+
+async function processQueue() {
+  while (pendingQueue.length > 0 && activeWorkers < MAX_CONCURRENT_WORKERS) {
+    const task = pendingQueue.shift()
+    if (task) {
+      activeWorkers++
+      runWorker(task.htmlContent)
+        .then(task.resolve)
+        .catch(task.reject)
+        .finally(() => {
+          activeWorkers--
+          processQueue()
+        })
+    }
+  }
+}
+
+export async function parseInWorker(htmlContent: string): Promise<ParseResult> {
+  if (activeWorkers < MAX_CONCURRENT_WORKERS) {
+    activeWorkers++
+    try {
+      return await runWorker(htmlContent)
+    } finally {
+      activeWorkers--
+      processQueue()
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    pendingQueue.push({ htmlContent, resolve, reject })
+    processQueue()
   })
 }
