@@ -19,16 +19,20 @@
           class="w-full sm:w-auto flex-grow-0"
         />
         <u-select-menu
-          v-model="selectedSort"
-          :options="sortOptions"
-          value-key="value"
-          placeholder="排序"
+          v-model="selectedSortBy"
+          :items="sortByOptions"
           size="md"
-          class="w-44"
+          class="w-32"
+        />
+        <u-select-menu
+          v-model="selectedSortOrder"
+          :items="sortOrderOptions"
+          size="md"
+          class="w-24"
         >
           <template #leading>
             <u-icon
-              name="i-heroicons-funnel"
+              :name="sortOrderIcon"
               class="w-4 h-4"
             />
           </template>
@@ -291,20 +295,27 @@ await fetchTags()
 
 const viewMode = useState('view-mode', () => 'masonry' as 'masonry' | 'grid' | 'list')
 
-const sortOptions = [
-  { label: '更新时间（最新）', value: { sortBy: 'updatedAt', sortOrder: 'desc' } },
-  { label: '更新时间（最早）', value: { sortBy: 'updatedAt', sortOrder: 'asc' } },
-  { label: '创建时间（最新）', value: { sortBy: 'createdAt', sortOrder: 'desc' } },
-  { label: '创建时间（最早）', value: { sortBy: 'createdAt', sortOrder: 'asc' } }
+const sortByOptions = [
+  { label: '更新时间', value: 'updatedAt' },
+  { label: '创建时间', value: 'createdAt' }
 ]
 
-const selectedSort = ref({
-  sortBy: 'updatedAt' as const,
-  sortOrder: 'desc' as const
-})
+const sortOrderOptions = [
+  { label: '倒序', value: 'desc' },
+  { label: '正序', value: 'asc' }
+]
 
-const sortBy = computed(() => selectedSort.value.sortBy)
-const sortOrder = computed(() => selectedSort.value.sortOrder)
+interface SortOption {
+  label: string
+  value: string
+}
+
+const selectedSortBy = ref(sortByOptions[0] as SortOption)
+const selectedSortOrder = ref(sortOrderOptions[0] as SortOption)
+
+const sortBy = computed(() => selectedSortBy.value?.value as 'createdAt' | 'updatedAt' | undefined)
+const sortOrder = computed(() => selectedSortOrder.value?.value as 'desc' | 'asc' | undefined)
+const sortOrderIcon = computed(() => selectedSortOrder.value?.value === 'asc' ? 'i-heroicons-arrow-up' : 'i-heroicons-arrow-down')
 
 const searchQuery = ref('')
 
