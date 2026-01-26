@@ -1,9 +1,11 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { Exception } from '@adonisjs/core/exceptions'
-import { registerValidator } from '#validators/register'
-import { loginValidator } from '#validators/login'
-import { resetPasswordValidator } from '#validators/reset_password'
+import {
+  registerValidator,
+  loginValidator,
+  resetPasswordValidator,
+} from '#validators/auth_validator'
 import { AuthService } from '#services/auth_service'
 
 @inject()

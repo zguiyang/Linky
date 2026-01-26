@@ -1,8 +1,10 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { createBookmarkValidator } from '#validators/create_bookmark'
-import { updateBookmarkValidator } from '#validators/update_bookmark'
-import { bookmarkPaginationValidator } from '#validators/bookmark_pagination'
+import {
+  createBookmarkValidator,
+  updateBookmarkValidator,
+  bookmarkPaginationValidator,
+} from '#validators/bookmark_validator'
 import { BookmarkService } from '#services/bookmark_service'
 
 @inject()

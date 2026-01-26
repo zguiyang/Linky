@@ -20,7 +20,7 @@
     </div>
 
     <div
-      class="flex items-center justify-center flex-shrink-0 bg-white dark:bg-gray-700 rounded-xl overflow-hidden"
+      class="flex items-center justify-center flex-shrink-0 bg-white dark:bg-neutral-700 rounded-xl overflow-hidden"
       :class="iconContainerClasses"
     >
       <img
@@ -39,7 +39,7 @@
       :class="contentClasses"
     >
       <h3
-        class="font-semibold text-gray-900 dark:text-white"
+        class="font-semibold text-neutral-900 dark:text-neutral-50"
         :class="titleClasses"
       >
         {{ bookmark.title }}
@@ -47,7 +47,7 @@
 
       <template v-if="viewMode === 'masonry'">
         <p
-          class="text-base text-gray-500 dark:text-gray-400"
+          class="text-base text-neutral-500 dark:text-neutral-400"
           :class="descriptionClasses"
         >
           {{ bookmark.description }}
@@ -57,7 +57,7 @@
       <template v-else-if="viewMode === 'grid'">
         <u-tooltip :text="bookmark.description ?? undefined">
           <p
-            class="text-base text-gray-500 dark:text-gray-400 truncate"
+            class="text-base text-neutral-500 dark:text-neutral-400 truncate"
             :class="descriptionClasses"
           >
             {{ bookmark.description }}
@@ -67,7 +67,7 @@
 
       <template v-else-if="viewMode === 'list'">
         <p
-          class="text-sm text-gray-500 dark:text-gray-400"
+          class="text-sm text-neutral-500 dark:text-neutral-400"
           :class="descriptionClasses"
         >
           {{ bookmark.description }}
@@ -91,7 +91,7 @@
             </u-badge>
           </div>
           <div
-            class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
+            class="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400"
             :class="visitCountClasses"
           >
             <u-icon
@@ -105,7 +105,7 @@
 
       <template v-else>
         <div
-          class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
+          class="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400"
           :class="visitCountClasses"
         >
           <u-icon
@@ -172,7 +172,7 @@ const cardClasses = computed(() => {
     case 'masonry':
       return 'p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl break-inside-avoid'
     case 'grid':
-      return 'flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl before:absolute before:inset-0 before:bg-gradient-to-br before:from-[var(--color-primary-10)] before:to-[var(--color-primary-10)] before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600'
+      return 'flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl before:absolute before:inset-0 before:bg-gradient-to-br before:from-[var(--color-primary-10)] before:to-[var(--color-primary-10)] before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 hover:bg-neutral-100 dark:hover:bg-neutral-700/80 hover:border-neutral-300 dark:hover:border-neutral-600'
     case 'list':
       return 'flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl'
     default:

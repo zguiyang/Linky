@@ -55,7 +55,7 @@
           />
         </div>
 
-        <div class="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex justify-end gap-2 pt-4 border-t border-neutral-200 dark:border-neutral-700">
           <u-button
             color="neutral"
             variant="ghost"
@@ -101,11 +101,9 @@ await fetchTags()
 
 const isOpen = computed({
   get: () => {
-    console.log('[MemoModal] isOpen.get, props.modelValue:', props.modelValue)
     return props.modelValue
   },
   set: (value) => {
-    console.log('[MemoModal] isOpen.set, value:', value)
     emit('update:modelValue', value)
   }
 })

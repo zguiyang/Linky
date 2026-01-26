@@ -39,10 +39,10 @@
       </template>
 
       <template #footer>
-        <div class="border-t border-gray-200 dark:border-gray-700 w-full">
+        <div class="border-t border-neutral-200 dark:border-neutral-700 w-full">
           <u-link
             to="/workspace/settings"
-            class="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+            class="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
           >
             <u-icon
               name="i-heroicons-cog-6-tooth"

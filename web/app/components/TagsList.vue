@@ -1,10 +1,10 @@
 <template>
   <u-card
     :class="$attrs.class"
-    class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl"
+    class="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl"
   >
-    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-      <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-neutral-200 dark:border-neutral-700">
+      <h3 class="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
         我的标签
       </h3>
       <u-button
@@ -35,7 +35,7 @@
           name="i-heroicons-tag"
           class="w-12 h-12 text-gray-300 dark:text-gray-600"
         />
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+        <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
           暂无标签
         </p>
       </div>
@@ -70,7 +70,7 @@
                 <template #trailing>
                   <u-icon
                     name="i-heroicons-ellipsis-horizontal"
-                    class="text-gray-500 dark:text-gray-400"
+                    class="text-neutral-500 dark:text-neutral-400"
                     @click.stop
                   />
                 </template>
@@ -179,10 +179,10 @@
           </div>
         </div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
             确定要删除这个标签吗？
           </h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
             标签名称: <strong>{{ contextTag?.name }}</strong>
           </p>
         </div>

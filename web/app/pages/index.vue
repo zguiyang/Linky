@@ -99,7 +99,6 @@ import { computed, ref } from 'vue'
 
 definePageMeta({ layout: 'marketing' })
 
-// TODO: Replace with actual auth state
 const user = ref<{ fullName: string | null, email: string } | null>(null)
 
 const entryButton = computed(() => ({

@@ -4,7 +4,7 @@
     :content="{ align: 'end' }"
   >
     <template #default="{ open }">
-      <div class="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+      <div class="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
         <u-avatar
           :alt="user?.fullName || user?.email || 'User'"
           size="md"
@@ -14,13 +14,13 @@
           </template>
         </u-avatar>
         <div class="flex flex-col flex-1 min-w-0">
-          <span class="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
+          <span class="font-medium text-sm text-neutral-900 dark:text-neutral-100 truncate">
             {{ user?.fullName || user?.email }}
           </span>
         </div>
         <u-icon
           name="i-heroicons-chevron-down"
-          class="size-4 text-gray-500 transition-transform duration-200"
+          class="size-4 text-neutral-500 transition-transform duration-200"
           :class="{ 'rotate-180': open }"
         />
       </div>

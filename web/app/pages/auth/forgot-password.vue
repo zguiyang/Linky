@@ -1,11 +1,11 @@
 <template>
   <div class="w-full max-w-[400px] p-4">
     <u-card
-      class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-[40px] border border-gray-200 dark:border-gray-700"
+      class="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-[40px] border border-neutral-200 dark:border-neutral-700"
       variant="outline"
     >
       <template #header>
-        <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
+        <h2 class="text-2xl font-bold text-center text-neutral-900 dark:text-neutral-100">
           忘记密码
         </h2>
       </template>
@@ -32,7 +32,7 @@
           type="submit"
           block
           :loading="loading"
-          class="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-white"
+          class="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-primary-foreground"
         >
           发送重置链接
         </u-button>

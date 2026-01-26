@@ -2,10 +2,10 @@
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
           标签管理
         </h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
           管理您的所有标签
         </p>
       </div>
@@ -63,10 +63,10 @@
           name="i-heroicons-tag"
           class="w-20 h-20 text-gray-300 dark:text-gray-600"
         />
-        <p class="text-lg font-semibold text-gray-900 dark:text-white mt-6">
+        <p class="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mt-6">
           {{ searchQuery ? '未找到匹配的标签' : '暂无标签' }}
         </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+        <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
           {{ searchQuery ? '尝试其他搜索关键词' : '创建您的第一个标签吧' }}
         </p>
       </div>
@@ -122,10 +122,10 @@
                   class="w-3 h-3 rounded-full shrink-0"
                   :style="{ backgroundColor: tag.color }"
                 />
-                <span class="font-medium text-gray-900 dark:text-white text-base">{{ tag.name }}</span>
+                <span class="font-medium text-neutral-900 dark:text-neutral-50 text-base">{{ tag.name }}</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500 dark:text-gray-400">关联内容</span>
+                <span class="text-sm text-neutral-500 dark:text-neutral-400">关联内容</span>
                 <span class="px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs font-medium">
                   {{ tag.bookmarksCount + tag.memosCount }}
                 </span>
@@ -153,7 +153,7 @@
 
     <div
       v-if="batchMode && selectedTagsForBatch.length > 0"
-      class="sticky bottom-4 bg-white dark:bg-gray-900 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10"
+      class="sticky bottom-4 bg-white dark:bg-gray-900 p-4 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 z-10"
     >
       <div class="flex items-center gap-2">
         <u-checkbox
@@ -186,7 +186,7 @@
       <template #body>
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
               标签名称 <span class="text-red-500">*</span>
             </label>
             <u-input
@@ -196,7 +196,7 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
               标签颜色
             </label>
             <div class="flex items-center gap-2">
@@ -246,10 +246,10 @@
             </div>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
               确定要删除这个标签吗？
             </h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
               标签名称: <strong>{{ contextTag?.name }}</strong>
             </p>
           </div>
@@ -286,10 +286,10 @@
             </div>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
               确定要删除这 {{ selectedTagsForBatch.length }} 个标签吗？
             </h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
               此操作无法撤销
             </p>
           </div>
@@ -316,12 +316,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { ContextMenuItem } from '@nuxt/ui'
-import type { MockTag } from '~/mocks/tags.mock'
-import { mockTags } from '~/mocks/tags.mock'
+import type { Tag } from '~/api/types'
+import { tagsApi } from '~/api/tags'
+import { useTags } from '~/composables/useTags'
 
 definePageMeta({ layout: 'workspace' })
 
-const tags = ref(mockTags)
+const { tags, fetchTags } = useTags()
+await fetchTags()
+
+const tagsList = computed(() => tags.value || [])
 const pending = ref(false)
 
 const searchQuery = ref('')
@@ -335,7 +339,7 @@ const sortOptions = [
 ]
 
 const filteredTags = computed(() => {
-  let result = tags.value
+  let result = tagsList.value
 
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
@@ -400,23 +404,23 @@ const showModal = ref(false)
 const isEditing = ref(false)
 const showDeleteConfirm = ref(false)
 const showBatchDeleteConfirm = ref(false)
-const contextTag = ref<MockTag | null>(null)
+const contextTag = ref<Tag | null>(null)
 const isSubmitting = ref(false)
 const isDeleting = ref(false)
 const tagForm = ref<{ name: string, color: string }>({ name: '', color: '' })
 
 const navigateToTagDetail = (tagId: number) => {
   if (!batchMode.value) {
-    console.log('跳转到标签详情页:', tagId)
+    navigateTo(`/workspace/bookmarks?tag=${tagId}`)
   }
 }
 
-const getContextMenuItems = (tag: MockTag): ContextMenuItem[][] => [[
+const getContextMenuItems = (tag: Tag): ContextMenuItem[][] => [[
   {
     label: '查看详情',
     icon: 'i-heroicons-eye',
     onSelect: () => {
-      console.log('查看详情:', tag.id)
+      navigateToTagDetail(tag.id)
     }
   },
   {
@@ -439,14 +443,14 @@ const openAddModal = () => {
   showModal.value = true
 }
 
-const openEditModal = (tag: MockTag) => {
+const openEditModal = (tag: Tag) => {
   isEditing.value = true
   tagForm.value = { name: tag.name, color: tag.color || '' }
   contextTag.value = tag
   showModal.value = true
 }
 
-const openDeleteConfirm = (tag: MockTag) => {
+const openDeleteConfirm = (tag: Tag) => {
   contextTag.value = tag
   showDeleteConfirm.value = true
 }
@@ -462,18 +466,8 @@ const handleCreateTag = async (close?: () => void) => {
 
   try {
     isSubmitting.value = true
-    console.log('创建标签:', tagForm.value)
-    const newTag: MockTag = {
-      id: Math.max(...tags.value.map(t => t.id)) + 1,
-      name: tagForm.value.name.trim(),
-      color: tagForm.value.color || null,
-      userId: 1,
-      bookmarksCount: 0,
-      memosCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: null
-    }
-    tags.value.push(newTag)
+    await tagsApi.create({ name: tagForm.value.name.trim(), color: tagForm.value.color || undefined })
+    await fetchTags()
     close?.()
     showModal.value = false
     tagForm.value = { name: '', color: '' }
@@ -489,21 +483,8 @@ const handleUpdateTag = async (close?: () => void) => {
 
   try {
     isSubmitting.value = true
-    console.log('更新标签:', contextTag.value.id, tagForm.value)
-    const index = tags.value.findIndex(t => t.id === contextTag.value!.id)
-    if (index > -1 && tags.value[index]) {
-      const existingTag = tags.value[index]
-      tags.value[index] = {
-        id: existingTag.id,
-        name: tagForm.value.name.trim(),
-        color: tagForm.value.color || null,
-        userId: existingTag.userId,
-        bookmarksCount: existingTag.bookmarksCount,
-        memosCount: existingTag.memosCount,
-        createdAt: existingTag.createdAt,
-        updatedAt: new Date().toISOString()
-      }
-    }
+    await tagsApi.update(contextTag.value!.id, { name: tagForm.value.name.trim(), color: tagForm.value.color || undefined })
+    await fetchTags()
     close?.()
     showModal.value = false
     tagForm.value = { name: '', color: '' }
@@ -522,11 +503,8 @@ const handleDeleteTag = async (close?: () => void) => {
 
   try {
     isDeleting.value = true
-    console.log('删除标签:', deletedTagId)
-    const index = tags.value.findIndex(t => t.id === deletedTagId)
-    if (index > -1) {
-      tags.value.splice(index, 1)
-    }
+    await tagsApi.delete(deletedTagId)
+    await fetchTags()
     close?.()
     showDeleteConfirm.value = false
     contextTag.value = null
@@ -538,8 +516,9 @@ const handleDeleteTag = async (close?: () => void) => {
 const handleBatchDelete = async (close?: () => void) => {
   try {
     isDeleting.value = true
-    console.log('批量删除标签:', selectedTagsForBatch.value)
-    tags.value = tags.value.filter(t => !selectedTagsForBatch.value.includes(t.id))
+    const deletePromises = selectedTagsForBatch.value.map(id => tagsApi.delete(id))
+    await Promise.all(deletePromises)
+    await fetchTags()
     selectedTagsForBatch.value = []
     batchMode.value = false
     close?.()

@@ -1,7 +1,6 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { createMemoValidator } from '#validators/create_memo'
-import { updateMemoValidator } from '#validators/update_memo'
+import { createMemoValidator, updateMemoValidator } from '#validators/memo_validator'
 import { MemoService } from '#services/memo_service'
 
 @inject()

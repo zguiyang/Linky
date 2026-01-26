@@ -2,10 +2,10 @@
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
           我的书签
         </h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
           共 {{ total }} 个书签
         </p>
       </div>
@@ -37,7 +37,7 @@
             />
           </template>
         </u-select-menu>
-        <div class="inline-flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg shrink-0">
+        <div class="inline-flex items-center p-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg shrink-0">
           <u-button
             :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
             :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
@@ -163,10 +163,10 @@
           />
         </template>
         <template #title>
-          <span class="text-lg font-semibold text-gray-900 dark:text-white">暂无书签</span>
+          <span class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">暂无书签</span>
         </template>
         <template #description>
-          <span class="text-sm text-gray-500 dark:text-gray-400">开始添加您的第一个书签吧</span>
+          <span class="text-sm text-neutral-500 dark:text-neutral-400">开始添加您的第一个书签吧</span>
         </template>
       </u-empty>
     </u-scroll-area>
@@ -190,14 +190,14 @@
       <template #body>
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标题 <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">标题 <span class="text-red-500">*</span></label>
             <u-input
               v-model="bookmarkForm.title"
               placeholder="输入书签标题"
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">URL <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">URL <span class="text-red-500">*</span></label>
             <u-input
               v-model="bookmarkForm.url"
               type="url"
@@ -205,7 +205,7 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">描述</label>
+            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">描述</label>
             <u-textarea
               v-model="bookmarkForm.description"
               placeholder="添加简短描述（可选）"
@@ -213,7 +213,7 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标签</label>
+            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">标签</label>
             <u-select-menu
               v-model="bookmarkForm.tagIds"
               :items="tagSelectItems"
@@ -255,10 +255,10 @@
             </div>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
               确定要删除这个书签吗？
             </h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
               书签名称: <strong>{{ contextBookmark?.title }}</strong>
             </p>
           </div>
