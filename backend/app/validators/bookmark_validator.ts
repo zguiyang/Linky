@@ -32,7 +32,7 @@ export const bookmarkPaginationValidator = vine.compile(
 export const importBookmarkValidator = vine.compile(
   vine.object({
     file: vine.file({
-      size: '10mb',
+      size: '2mb',
       extnames: ['html', 'htm'],
     }),
     createTags: vine.boolean().optional(),
