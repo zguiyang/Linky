@@ -37,6 +37,7 @@ router
     router.get('/bookmarks/paginate', '#controllers/bookmarks_controller.paginate')
     router.get('/bookmarks/:id', '#controllers/bookmarks_controller.show')
     router.post('/bookmarks', '#controllers/bookmarks_controller.store')
+    router.post('/bookmarks/import', '#controllers/bookmarks_controller.import')
     router.put('/bookmarks/:id', '#controllers/bookmarks_controller.update')
     router.delete('/bookmarks/:id', '#controllers/bookmarks_controller.destroy')
 

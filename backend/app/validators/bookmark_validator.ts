@@ -29,6 +29,18 @@ export const bookmarkPaginationValidator = vine.compile(
   })
 )
 
+export const importBookmarkValidator = vine.compile(
+  vine.object({
+    file: vine.file({
+      size: '10mb',
+      extnames: ['html', 'htm'],
+    }),
+    createTags: vine.boolean().optional(),
+    skipDuplicates: vine.boolean().optional(),
+  })
+)
+
 export type CreateBookmarkValidator = typeof createBookmarkValidator
 export type UpdateBookmarkValidator = typeof updateBookmarkValidator
 export type BookmarkPaginationValidator = typeof bookmarkPaginationValidator
+export type ImportBookmarkValidator = typeof importBookmarkValidator

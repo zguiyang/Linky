@@ -71,6 +71,14 @@
           title="添加书签"
           @click="openAddModal"
         />
+        <u-button
+          icon="i-heroicons-arrow-down-tray"
+          color="secondary"
+          variant="outline"
+          size="md"
+          title="导入书签"
+          @click="openImportModal"
+        />
       </div>
     </div>
 
@@ -279,6 +287,11 @@
         />
       </template>
     </u-modal>
+
+    <import-bookmarks-modal
+      v-model="showImportModal"
+      @imported="handleImportComplete"
+    />
   </div>
 </template>
 
@@ -287,6 +300,7 @@ import { computed, ref, onMounted, watch } from 'vue'
 import { useTags } from '~/composables/useTags'
 import { bookmarksApi } from '~/api/bookmarks'
 import type { Bookmark, Tag } from '~/api/types'
+import ImportBookmarksModal from '~/components/ImportBookmarksModal.vue'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -452,6 +466,17 @@ const handleDeleteBookmark = async (close?: () => void) => {
 
 const handlePageChange = (newPage: number) => {
   page.value = newPage
+}
+
+const showImportModal = ref(false)
+
+const openImportModal = () => {
+  showImportModal.value = true
+}
+
+const handleImportComplete = async () => {
+  await refreshBookmarks()
+  await fetchTags()
 }
 
 onMounted(() => {
