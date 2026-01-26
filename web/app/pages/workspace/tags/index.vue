@@ -45,7 +45,7 @@
     </div>
 
     <div
-      v-if="isPending"
+      v-if="pending"
       class="flex items-center justify-center py-16"
     >
       <u-icon
@@ -55,7 +55,7 @@
     </div>
 
     <div
-      v-else-if="!filteredTags || filteredTags.length === 0"
+      v-else-if="!tags || tags.length === 0"
       class="flex flex-col items-center justify-center"
     >
       <div class="flex flex-col items-center justify-center py-16">
@@ -76,10 +76,9 @@
       v-else
       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
     >
-      <u-context-menu
-        v-for="tag in filteredTags"
+      <div
+        v-for="tag in tags"
         :key="tag.id"
-        :items="getContextMenuItems(tag)"
       >
         <u-card
           class="hover:shadow-md transition-shadow duration-200"
@@ -89,51 +88,52 @@
           @click="navigateToTagDetail(tag.id)"
         >
           <div class="flex flex-col gap-3">
-            <div
-              v-if="batchMode"
-              class="flex items-start justify-between"
-            >
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span
+                    v-if="tag.color"
+                    class="w-3 h-3 rounded-full shrink-0"
+                    :style="{ backgroundColor: tag.color }"
+                  />
+                  <span class="font-medium text-neutral-900 dark:text-neutral-50 text-base">{{ tag.name }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm text-neutral-500 dark:text-neutral-400">关联内容</span>
+                  <span class="px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs font-medium">
+                    {{ tag.bookmarksCount + tag.memosCount }}
+                  </span>
+                </div>
+              </div>
               <u-checkbox
+                v-if="batchMode"
                 :model-value="selectedTagsForBatch.includes(tag.id)"
+                class="ml-2"
                 @change="toggleBatchSelection(tag.id)"
                 @click.stop
               />
-              <div class="flex items-center gap-2">
-                <u-icon
-                  name="i-heroicons-pencil"
-                  class="text-gray-400 hover:text-gray-600 cursor-pointer"
-                  @click.stop="openEditModal(tag)"
-                />
-                <u-icon
-                  name="i-heroicons-trash"
-                  class="text-gray-400 hover:text-red-500 cursor-pointer"
-                  @click.stop="openDeleteConfirm(tag)"
-                />
-              </div>
             </div>
-
-            <div
-              v-else
-              class="flex-1"
-            >
-              <div class="flex items-center gap-2 mb-2">
-                <span
-                  v-if="tag.color"
-                  class="w-3 h-3 rounded-full shrink-0"
-                  :style="{ backgroundColor: tag.color }"
-                />
-                <span class="font-medium text-neutral-900 dark:text-neutral-50 text-base">{{ tag.name }}</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="text-sm text-neutral-500 dark:text-neutral-400">关联内容</span>
-                <span class="px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs font-medium">
-                  {{ tag.bookmarksCount + tag.memosCount }}
-                </span>
-              </div>
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-neutral-100 dark:border-neutral-700">
+              <u-button
+                icon="i-heroicons-pencil"
+                size="xs"
+                variant="ghost"
+                color="neutral"
+                :disabled="batchMode"
+                @click.stop="openEditModal(tag)"
+              />
+              <u-button
+                icon="i-heroicons-trash"
+                size="xs"
+                variant="ghost"
+                color="error"
+                :disabled="batchMode"
+                @click.stop="openDeleteConfirm(tag)"
+              />
             </div>
           </div>
         </u-card>
-      </u-context-menu>
+      </div>
     </div>
 
     <div
@@ -300,26 +300,15 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { ContextMenuItem } from '@nuxt/ui'
 import type { Tag } from '~/api/types'
 import { tagsApi } from '~/api/tags'
 import { useTags } from '~/composables/useTags'
 
 definePageMeta({ layout: 'workspace' })
 
-const { tags, fetchTags } = useTags()
+const { tags, pending, fetchTags } = useTags()
 
-const { data: tagsData, pending: isPending } = await useAsyncData(
-  'tags-list',
-  async () => {
-    const data = await tagsApi.index()
-    tags.value = data
-    return data
-  }
-)
-
-const tagsList = computed(() => tagsData.value || [])
-
+fetchTags()
 const searchQuery = ref('')
 const sortOption = ref('usage-desc')
 
@@ -329,34 +318,6 @@ const sortOptions = [
   { label: '名称（A-Z）', value: 'name-asc' },
   { label: '名称（Z-A）', value: 'name-desc' }
 ]
-
-const filteredTags = computed(() => {
-  let result = [...(tagsList.value || [])]
-
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter(tag =>
-      tag.name.toLowerCase().includes(query)
-    )
-  }
-
-  result.sort((a, b) => {
-    switch (sortOption.value) {
-      case 'usage-desc':
-        return (b.bookmarksCount + b.memosCount) - (a.bookmarksCount + a.memosCount)
-      case 'usage-asc':
-        return (a.bookmarksCount + a.memosCount) - (b.bookmarksCount + b.memosCount)
-      case 'name-asc':
-        return a.name.localeCompare(b.name)
-      case 'name-desc':
-        return b.name.localeCompare(a.name)
-      default:
-        return 0
-    }
-  })
-
-  return result
-})
 
 const batchMode = ref(false)
 const selectedTagsForBatch = ref<number[]>([])
@@ -380,15 +341,15 @@ const clearBatchSelection = () => {
 }
 
 const isAllSelected = computed(() =>
-  filteredTags.value.length > 0
-  && selectedTagsForBatch.value.length === filteredTags.value.length
+  tags.value.length > 0
+  && selectedTagsForBatch.value.length === tags.value.length
 )
 
 const toggleSelectAll = () => {
   if (isAllSelected.value) {
     selectedTagsForBatch.value = []
   } else {
-    selectedTagsForBatch.value = filteredTags.value.map(t => t.id)
+    selectedTagsForBatch.value = tags.value.map(t => t.id)
   }
 }
 
@@ -406,27 +367,6 @@ const navigateToTagDetail = (tagId: number) => {
     navigateTo(`/workspace/bookmarks?tag=${tagId}`)
   }
 }
-
-const getContextMenuItems = (tag: Tag): ContextMenuItem[][] => [[
-  {
-    label: '查看详情',
-    icon: 'i-heroicons-eye',
-    onSelect: () => {
-      navigateToTagDetail(tag.id)
-    }
-  },
-  {
-    label: '编辑',
-    icon: 'i-heroicons-pencil',
-    onSelect: () => openEditModal(tag)
-  },
-  {
-    label: '删除',
-    icon: 'i-heroicons-trash',
-    color: 'error',
-    onSelect: () => openDeleteConfirm(tag)
-  }
-]]
 
 const openAddModal = () => {
   isEditing.value = false
