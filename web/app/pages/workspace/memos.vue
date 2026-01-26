@@ -229,20 +229,30 @@ const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
 
 const page = ref(1)
 const perPage = ref(20)
+const loading = ref(false)
 
-const { data: paginationData, pending: loading, refresh: refreshMemos } = await useAsyncData(
-  `memos-page-${page.value}`,
-  () => memosApi.paginate(page.value, perPage.value),
-  {
-    default: () => ({
-      meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
-      data: []
-    })
+const fetchMemos = async () => {
+  loading.value = true
+  try {
+    const data = await memosApi.paginate(page.value, perPage.value)
+    paginationData.value = data
+  } finally {
+    loading.value = false
   }
-)
+}
 
-const memos = computed(() => paginationData.value?.data || [])
-const total = computed(() => paginationData.value?.meta.total || 0)
+const paginationData = ref<{
+  meta: { currentPage: number, perPage: number, total: number, lastPage: number }
+  data: Memo[]
+}>({
+  meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
+  data: []
+})
+
+await fetchMemos()
+
+const memos = computed(() => paginationData.value.data || [])
+const total = computed(() => paginationData.value.meta.total || 0)
 
 const showMemoModal = ref(false)
 const modalMode = ref<'add' | 'edit'>('add')
@@ -303,7 +313,7 @@ const handleSave = async (data: CreateMemoRequest | UpdateMemoRequest) => {
     } else if (currentMemo.value) {
       await memosApi.update(currentMemo.value.id, data as UpdateMemoRequest)
     }
-    await refreshMemos()
+    await fetchMemos()
     showMemoModal.value = false
     currentMemo.value = null
   } catch (error) {
@@ -325,7 +335,7 @@ const confirmDelete = async () => {
   try {
     if (memoToDelete.value) {
       await memosApi.delete(memoToDelete.value.id)
-      await refreshMemos()
+      await fetchMemos()
     }
     showDeleteModal.value = false
     memoToDelete.value = null
@@ -336,5 +346,6 @@ const confirmDelete = async () => {
 
 const handlePageChange = (newPage: number) => {
   page.value = newPage
+  fetchMemos()
 }
 </script>
