@@ -45,7 +45,7 @@
     </div>
 
     <div
-      v-if="pending"
+      v-if="isPending"
       class="flex items-center justify-center py-16"
     >
       <u-icon
@@ -130,21 +130,6 @@
                   {{ tag.bookmarksCount + tag.memosCount }}
                 </span>
               </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-sm text-gray-500">已选择 {{ selectedTagsForBatch.length }} 个标签</span>
-              <div class="flex-1" />
-              <u-button
-                label="批量删除"
-                color="error"
-                icon="i-heroicons-trash"
-                @click="openBatchDelete"
-              />
-              <u-button
-                label="取消"
-                variant="ghost"
-                @click="clearBatchSelection"
-              />
             </div>
           </div>
         </u-card>
@@ -323,10 +308,17 @@ import { useTags } from '~/composables/useTags'
 definePageMeta({ layout: 'workspace' })
 
 const { tags, fetchTags } = useTags()
-await fetchTags()
 
-const tagsList = computed(() => tags.value || [])
-const pending = ref(false)
+const { data: tagsData, pending: isPending } = await useAsyncData(
+  'tags-list',
+  async () => {
+    const data = await tagsApi.index()
+    tags.value = data
+    return data
+  }
+)
+
+const tagsList = computed(() => tagsData.value || [])
 
 const searchQuery = ref('')
 const sortOption = ref('usage-desc')
@@ -339,7 +331,7 @@ const sortOptions = [
 ]
 
 const filteredTags = computed(() => {
-  let result = tagsList.value
+  let result = [...(tagsList.value || [])]
 
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
