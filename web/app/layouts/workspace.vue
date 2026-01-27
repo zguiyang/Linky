@@ -20,7 +20,7 @@
             :key="item.to"
             :to="item.to"
             :inactive="false"
-            class="flex items-center gap-3 px-3 py-3 rounded-md transition-all duration-200 ease-in-out text-muted-foreground hover:bg-secondary dark:text-muted-foreground dark:hover:bg-secondary"
+            class="flex items-center gap-3 px-3 py-3 rounded-md transition-all duration-200 ease-in-out text-muted hover:bg-muted dark:text-muted dark:hover:bg-muted"
             :class="{ 'bg-primary-50 text-primary-600 shadow-sm dark:bg-primary-500/20 dark:text-primary-300': $route.path === item.to }"
           >
             <u-icon
@@ -31,7 +31,7 @@
           </u-link>
         </nav>
 
-        <div class="mx-3 my-2 border-t border-border" />
+        <div class="mx-3 my-2 border-t border-muted" />
 
         <div class="p-2">
           <sidebar-tags />
@@ -39,10 +39,10 @@
       </template>
 
       <template #footer>
-        <div class="border-t border-border w-full">
+        <div class="border-t border-muted w-full">
           <u-link
             to="/workspace/settings"
-            class="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-secondary dark:hover:bg-secondary text-foreground dark:text-foreground"
+            class="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted dark:hover:bg-muted text-default dark:text-default"
           >
             <u-icon
               name="i-heroicons-cog-6-tooth"

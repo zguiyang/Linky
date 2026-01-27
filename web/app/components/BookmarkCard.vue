@@ -20,7 +20,7 @@
     </div>
 
     <div
-      class="flex items-center justify-center flex-shrink-0 bg-card dark:bg-card rounded-xl overflow-hidden"
+      class="flex items-center justify-center flex-shrink-0 bg-muted dark:bg-muted rounded-xl overflow-hidden"
       :class="iconContainerClasses"
     >
       <img
@@ -39,7 +39,7 @@
       :class="contentClasses"
     >
       <h3
-        class="font-semibold text-foreground dark:text-foreground"
+        class="font-semibold text-default dark:text-default"
         :class="titleClasses"
       >
         {{ bookmark.title }}
@@ -47,7 +47,7 @@
 
       <template v-if="viewMode === 'masonry'">
         <p
-          class="text-base text-muted-foreground dark:text-muted-foreground"
+          class="text-base text-muted dark:text-muted"
           :class="descriptionClasses"
         >
           {{ bookmark.description }}
@@ -171,11 +171,11 @@ const menuItems = [
 const cardClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'p-5 bg-secondary dark:bg-secondary border border-border rounded-2xl break-inside-avoid'
+      return 'p-5 bg-muted dark:bg-muted border border-default rounded-2xl break-inside-avoid'
     case 'grid':
-      return 'flex gap-4 p-5 bg-secondary dark:bg-secondary border border-border rounded-2xl before:absolute before:inset-0 before:bg-gradient-to-br before:from-[var(--color-primary-10)] before:to-[var(--color-primary-10)] before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 hover:bg-secondary/80 dark:hover:bg-secondary/80 hover:border-neutral-300 dark:hover:border-neutral-600'
+      return 'flex gap-4 p-5 bg-muted dark:bg-muted border border-default rounded-2xl before:absolute before:inset-0 before:bg-gradient-to-br before:from-[var(--color-primary-10)] before:to-[var(--color-primary-10)] before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 hover:bg-muted/80 dark:hover:bg-muted/80 hover:border-default'
     case 'list':
-      return 'flex items-center gap-3 p-4 bg-secondary dark:bg-secondary border border-border rounded-xl'
+      return 'flex items-center gap-3 p-4 bg-muted dark:bg-muted border border-default rounded-xl'
     default:
       return ''
   }

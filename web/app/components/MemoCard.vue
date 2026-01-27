@@ -10,7 +10,7 @@
     >
       <div class="flex items-center justify-between gap-4 mb-1.5">
         <h3
-          class="font-semibold text-foreground dark:text-foreground truncate"
+          class="font-semibold text-default dark:text-default truncate"
           :class="titleClass"
         >
           {{ memo.title || '无标题备忘录' }}
@@ -18,14 +18,14 @@
       </div>
 
       <p
-        class="text-sm text-muted-foreground dark:text-muted-foreground leading-relaxed mb-3"
+        class="text-sm text-muted dark:text-muted leading-relaxed mb-3"
         :class="contentClass"
       >
         {{ memo.content }}
       </p>
 
       <div class="flex flex-col gap-2">
-        <span class="text-xs text-muted-foreground dark:text-muted-foreground">
+        <span class="text-xs text-muted dark:text-muted">
           {{ formatDate(memo.updatedAt) }}
         </span>
         <div class="flex flex-wrap gap-1.5">
@@ -40,7 +40,7 @@
           </u-badge>
           <span
             v-if="displayTags.length === 0"
-            class="text-xs text-muted-foreground"
+            class="text-xs text-muted"
           > 暂无标签 </span>
         </div>
       </div>
@@ -81,7 +81,7 @@ const emit = defineEmits<{
 
 const cardClasses = computed(() => {
   const isPinned = props.memo.isPinned
-  const baseClasses = 'bg-card dark:bg-card border-border'
+  const baseClasses = 'bg-default dark:bg-default border-default'
 
   if (isPinned) {
     switch (props.viewMode) {
@@ -98,13 +98,13 @@ const cardClasses = computed(() => {
 
   switch (props.viewMode) {
     case 'masonry':
-      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-secondary/80 dark:hover:bg-secondary/80 hover:border-border break-inside-avoid`
+      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-muted/80 dark:hover:bg-muted/80 hover:border-default break-inside-avoid`
     case 'grid':
-      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-secondary/80 dark:hover:bg-secondary/80 hover:border-border`
+      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-muted/80 dark:hover:bg-muted/80 hover:border-default`
     case 'list':
-      return `${baseClasses} rounded-lg shadow-sm hover:bg-secondary/80 dark:hover:bg-secondary/80 hover:border-border p-4`
+      return `${baseClasses} rounded-lg shadow-sm hover:bg-muted/80 dark:hover:bg-muted/80 hover:border-default p-4`
     default:
-      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-secondary/80 dark:hover:bg-secondary/80 hover:border-border`
+      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-muted/80 dark:hover:bg-muted/80 hover:border-default`
   }
 })
 

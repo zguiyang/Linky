@@ -2,10 +2,10 @@
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
       <div>
-        <h1 class="text-2xl font-bold text-foreground dark:text-foreground">
+        <h1 class="text-2xl font-bold text-default dark:text-default">
           我的备忘录
         </h1>
-        <p class="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
+        <p class="text-sm text-muted dark:text-muted mt-1">
           共 {{ total }} 个备忘录
         </p>
       </div>
@@ -18,7 +18,7 @@
           size="md"
           class="w-full sm:w-auto flex-grow-0"
         />
-        <div class="inline-flex items-center p-1 bg-secondary dark:bg-secondary rounded-lg shrink-0">
+        <div class="inline-flex items-center p-1 bg-muted dark:bg-muted rounded-lg shrink-0">
           <u-button
             :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
             :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
@@ -56,10 +56,10 @@
 
     <div
       v-if="selectedTags.length > 0"
-      class="px-6 pb-6 border-b border-border/12 dark:border-border/12"
+      class="px-6 pb-6 border-b border-muted/12 dark:border-muted/12"
     >
       <div class="flex items-center gap-3">
-        <span class="text-sm text-muted-foreground dark:text-muted-foreground">已选标签：</span>
+        <span class="text-sm text-muted dark:text-muted">已选标签：</span>
         <div class="flex items-center gap-2">
           <u-badge
             v-for="tagId in selectedTags"
@@ -186,7 +186,7 @@
       title="确认删除"
     >
       <template #body>
-        <p class="text-foreground dark:text-foreground mb-6">
+        <p class="text-default dark:text-default mb-6">
           确定要删除这条备忘录吗？此操作无法撤销。
         </p>
         <div class="flex justify-end gap-3">
