@@ -9,6 +9,7 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import env from '#start/env'
 
 const AuthController = () => import('#controllers/auth_controller')
 const TagsController = () => import('#controllers/tags_controller')
@@ -59,3 +60,24 @@ router
   })
   .prefix('api')
   .middleware(middleware.auth())
+
+// Jobs Dashboard（GUI 界面）- 仅管理员可访问
+router.jobs('/jobs').use(async (ctx, next) => {
+  if (env.get('NODE_ENV') === 'development') {
+    return next()
+  }
+
+  const adminSecret = env.get('ADMIN_SECRET')
+
+  if (!adminSecret) {
+    return ctx.response.forbidden({ errors: [{ message: 'Dashboard access not configured' }] })
+  }
+
+  const requestSecret = ctx.request.header('x-admin-secret')
+
+  if (requestSecret !== adminSecret) {
+    return ctx.response.forbidden({ errors: [{ message: 'Access denied' }] })
+  }
+
+  return next()
+})
