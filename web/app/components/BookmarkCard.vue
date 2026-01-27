@@ -98,7 +98,7 @@
               name="i-heroicons-eye"
               class="size-4"
             />
-            <span>{{ bookmark.visitCount }}次访问</span>
+            <span>{{ bookmark.visit_count }}次访问</span>
           </div>
         </div>
       </template>
@@ -112,7 +112,7 @@
             name="i-heroicons-eye"
             class="size-4"
           />
-          <span>{{ bookmark.visitCount }}次访问</span>
+          <span>{{ bookmark.visit_count }}次访问</span>
         </div>
         <div
           class="flex flex-wrap gap-2"

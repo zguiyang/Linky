@@ -64,11 +64,11 @@ export interface Bookmark {
   title: string
   url: string
   description: string | undefined | null
-  visitCount: number
-  userId: number
+  visit_count: number
+  user_id: number
   tags: Tag[]
-  createdAt: string
-  updatedAt: string | null
+  created_at: string
+  updated_at: string | null
 }
 
 export interface BookmarkPaginationParams {
@@ -81,10 +81,11 @@ export interface BookmarkPaginationParams {
 }
 
 export interface CreateBookmarkRequest {
-  title: string
   url: string
-  description?: string
+  title?: string | null
+  description?: string | null
   tagIds?: number[]
+  autoFetch?: boolean
 }
 
 export interface UpdateBookmarkRequest {

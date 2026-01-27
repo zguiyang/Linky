@@ -198,25 +198,26 @@
       <template #body>
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-default dark:text-default mb-1.5">标题 <span class="text-red-500">*</span></label>
-            <u-input
-              v-model="bookmarkForm.title"
-              placeholder="输入书签标题"
-            />
-          </div>
-          <div>
             <label class="block text-sm font-medium text-default dark:text-default mb-1.5">URL <span class="text-red-500">*</span></label>
             <u-input
               v-model="bookmarkForm.url"
               type="url"
               placeholder="https://example.com"
+              icon="i-heroicons-globe-alt"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-default dark:text-default mb-1.5">标题</label>
+            <u-input
+              v-model="bookmarkForm.title"
+              placeholder="留空将自动从网页获取"
             />
           </div>
           <div>
             <label class="block text-sm font-medium text-default dark:text-default mb-1.5">描述</label>
             <u-textarea
               v-model="bookmarkForm.description"
-              placeholder="添加简短描述（可选）"
+              placeholder="留空将自动从网页获取"
               :rows="3"
             />
           </div>
@@ -422,7 +423,7 @@ const openDeleteConfirm = (bookmark: Bookmark) => {
 }
 
 const handleSaveBookmark = async (close?: () => void) => {
-  if (!bookmarkForm.value.title || !bookmarkForm.value.url) {
+  if (!bookmarkForm.value.url) {
     return
   }
 
