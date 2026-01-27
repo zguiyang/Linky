@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import { VALIDATION } from '#constants/index'
+import { VALIDATION, ORDER_BY, SORT_ORDER } from '#constants/index'
 
 export const createBookmarkValidator = vine.compile(
   vine.object({
@@ -30,8 +30,8 @@ export const bookmarkPaginationValidator = vine.compile(
     perPage: vine.number().optional(),
     search: vine.string().optional(),
     tagIds: vine.array(vine.number()).optional(),
-    sortBy: vine.enum([VALIDATION.SORT_BY_CREATED_AT, VALIDATION.SORT_BY_UPDATED_AT]).optional(),
-    sortOrder: vine.enum([VALIDATION.SORT_ORDER_ASC, VALIDATION.SORT_ORDER_DESC]).optional(),
+    sortBy: vine.enum([ORDER_BY.CREATED_AT, ORDER_BY.UPDATED_AT]).optional(),
+    sortOrder: vine.enum([SORT_ORDER.ASC, SORT_ORDER.DESC]).optional(),
   })
 )
 

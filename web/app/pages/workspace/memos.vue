@@ -2,10 +2,10 @@
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
       <div>
-        <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
+        <h1 class="text-2xl font-bold text-foreground dark:text-foreground">
           我的备忘录
         </h1>
-        <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+        <p class="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
           共 {{ total }} 个备忘录
         </p>
       </div>
@@ -18,7 +18,7 @@
           size="md"
           class="w-full sm:w-auto flex-grow-0"
         />
-        <div class="inline-flex items-center p-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg shrink-0">
+        <div class="inline-flex items-center p-1 bg-secondary dark:bg-secondary rounded-lg shrink-0">
           <u-button
             :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
             :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
@@ -56,10 +56,10 @@
 
     <div
       v-if="selectedTags.length > 0"
-      class="px-6 pb-6 border-b border-neutral-200/12 dark:border-neutral-700/12"
+      class="px-6 pb-6 border-b border-border/12 dark:border-border/12"
     >
       <div class="flex items-center gap-3">
-        <span class="text-sm text-neutral-600 dark:text-neutral-400">已选标签：</span>
+        <span class="text-sm text-muted-foreground dark:text-muted-foreground">已选标签：</span>
         <div class="flex items-center gap-2">
           <u-badge
             v-for="tagId in selectedTags"
@@ -152,10 +152,10 @@
             />
           </template>
           <template #title>
-            <span class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">暂无备忘录</span>
+            <span class="text-lg font-semibold text-foreground dark:text-foreground">暂无备忘录</span>
           </template>
           <template #description>
-            <span class="text-sm text-neutral-500 dark:text-neutral-400">开始创建您的第一个备忘录吧</span>
+            <span class="text-sm text-muted-foreground dark:text-muted-foreground">开始创建您的第一个备忘录吧</span>
           </template>
         </u-empty>
       </div>
@@ -186,7 +186,7 @@
       title="确认删除"
     >
       <template #body>
-        <p class="text-neutral-700 dark:text-neutral-300 mb-6">
+        <p class="text-foreground dark:text-foreground mb-6">
           确定要删除这条备忘录吗？此操作无法撤销。
         </p>
         <div class="flex justify-end gap-3">
@@ -216,6 +216,7 @@ import { useHttpError } from '~/composables/useHttpError'
 import { memosApi } from '~/api/memos'
 import MemoModal from '~/components/MemoModal.vue'
 import type { Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
+import { VIEW_MODE, type ViewMode } from '~/constants'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -225,7 +226,7 @@ await fetchTags()
 const { handleError } = useHttpError()
 
 const searchQuery = ref('')
-const viewMode = ref<'masonry' | 'grid' | 'list'>('masonry')
+const viewMode = ref<ViewMode>(VIEW_MODE.MASONRY)
 
 const page = ref(1)
 const perPage = ref(20)
@@ -285,7 +286,7 @@ const getTagName = (tagId: number) => {
   return tag?.name || ''
 }
 
-const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
+const setViewMode = (mode: ViewMode) => {
   viewMode.value = mode
 }
 

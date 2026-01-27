@@ -2,10 +2,10 @@
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
       <div>
-        <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
+        <h1 class="text-2xl font-bold text-foreground dark:text-foreground">
           我的书签
         </h1>
-        <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+        <p class="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
           共 {{ total }} 个书签
         </p>
       </div>
@@ -37,7 +37,7 @@
             />
           </template>
         </u-select-menu>
-        <div class="inline-flex items-center p-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg shrink-0">
+        <div class="inline-flex items-center p-1 bg-secondary dark:bg-secondary rounded-lg shrink-0">
           <u-button
             :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
             :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
@@ -84,10 +84,10 @@
 
     <div
       v-if="selectedTags.length > 0"
-      class="px-6 pb-6 border-b border-neutral-200/12 dark:border-neutral-700/12"
+      class="px-6 pb-6 border-b border-border/12 dark:border-border/12"
     >
       <div class="flex items-center gap-3">
-        <span class="text-sm text-neutral-600 dark:text-neutral-400">已选标签：</span>
+        <span class="text-sm text-muted-foreground dark:text-muted-foreground">已选标签：</span>
         <div class="flex items-center gap-2">
           <u-badge
             v-for="tagId in selectedTags"
@@ -171,10 +171,10 @@
           />
         </template>
         <template #title>
-          <span class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">暂无书签</span>
+          <span class="text-lg font-semibold text-foreground dark:text-foreground">暂无书签</span>
         </template>
         <template #description>
-          <span class="text-sm text-neutral-500 dark:text-neutral-400">开始添加您的第一个书签吧</span>
+          <span class="text-sm text-muted-foreground dark:text-muted-foreground">开始添加您的第一个书签吧</span>
         </template>
       </u-empty>
     </u-scroll-area>
@@ -198,14 +198,14 @@
       <template #body>
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">标题 <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-foreground dark:text-foreground mb-1.5">标题 <span class="text-red-500">*</span></label>
             <u-input
               v-model="bookmarkForm.title"
               placeholder="输入书签标题"
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">URL <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-foreground dark:text-foreground mb-1.5">URL <span class="text-red-500">*</span></label>
             <u-input
               v-model="bookmarkForm.url"
               type="url"
@@ -213,7 +213,7 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">描述</label>
+            <label class="block text-sm font-medium text-foreground dark:text-foreground mb-1.5">描述</label>
             <u-textarea
               v-model="bookmarkForm.description"
               placeholder="添加简短描述（可选）"
@@ -221,7 +221,7 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">标签</label>
+            <label class="block text-sm font-medium text-foreground dark:text-foreground mb-1.5">标签</label>
             <u-select-menu
               v-model="bookmarkForm.tagIds"
               :items="tagSelectItems"
@@ -255,18 +255,18 @@
       <template #body>
         <div class="text-center space-y-4">
           <div class="flex justify-center">
-            <div class="w-16 h-16 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
+            <div class="w-16 h-16 rounded-full bg-error-50 dark:bg-error-900/20 flex items-center justify-center">
               <u-icon
                 name="i-heroicons-exclamation-triangle"
-                class="w-8 h-8 text-red-500"
+                class="w-8 h-8 text-error"
               />
             </div>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
+            <h3 class="text-lg font-semibold text-foreground dark:text-foreground">
               确定要删除这个书签吗？
             </h3>
-            <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+            <p class="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
               书签名称: <strong>{{ contextBookmark?.title }}</strong>
             </p>
           </div>
@@ -301,23 +301,17 @@ import { useTags } from '~/composables/useTags'
 import { bookmarksApi } from '~/api/bookmarks'
 import type { Bookmark, Tag } from '~/api/types'
 import ImportBookmarksModal from '~/components/ImportBookmarksModal.vue'
+import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS, VIEW_MODE, type ViewMode } from '~/constants'
 
 definePageMeta({ layout: 'workspace' })
 
 const { tags, selectedTags, removeTag, clearTags, fetchTags } = useTags()
 await fetchTags()
 
-const viewMode = useState('view-mode', () => 'masonry' as 'masonry' | 'grid' | 'list')
+const viewMode = useState<ViewMode>('view-mode', () => VIEW_MODE.MASONRY)
 
-const sortByOptions = [
-  { label: '更新时间', value: 'updatedAt' },
-  { label: '创建时间', value: 'createdAt' }
-]
-
-const sortOrderOptions = [
-  { label: '倒序', value: 'desc' },
-  { label: '正序', value: 'asc' }
-]
+const sortByOptions = SORT_BY_OPTIONS
+const sortOrderOptions = SORT_ORDER_OPTIONS
 
 interface SortOption {
   label: string
@@ -390,7 +384,7 @@ const getTagName = (tagId: number) => {
   return tag?.name || ''
 }
 
-const setViewMode = (mode: 'masonry' | 'grid' | 'list') => {
+const setViewMode = (mode: ViewMode) => {
   viewMode.value = mode
 }
 

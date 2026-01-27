@@ -53,7 +53,7 @@
 
     <section class="py-[60px] sm:py-[100px] px-5 relative overflow-hidden">
       <div class="max-w-[1200px] mx-auto relative">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center p-12 rounded-3xl border border-neutral-200 dark:border-neutral-700 bg-white/70 dark:bg-neutral-900/70 backdrop-blur-xl relative overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center p-12 rounded-3xl border border-border bg-white/70 dark:bg-neutral-900/70 backdrop-blur-xl relative overflow-hidden">
           <div class="relative z-10">
             <u-badge
               label="Free"
@@ -62,10 +62,10 @@
               variant="soft"
               class="mb-5 inline-flex"
             />
-            <h2 class="text-[3rem] font-bold leading-tight mb-4 font-outfit text-neutral-900 dark:text-neutral-50">
+            <h2 class="text-4xl font-bold leading-tight mb-4 text-foreground dark:text-foreground">
               准备好开始整理您的知识了吗？
             </h2>
-            <p class="text-lg leading-[1.7] mb-7 text-neutral-600 dark:text-neutral-300">
+            <p class="text-lg leading-relaxed mb-7 text-muted-foreground dark:text-muted-foreground">
               立即登录，开始使用 Linky 打造属于您的个人知识管理空间
             </p>
             <div class="flex flex-wrap gap-4">

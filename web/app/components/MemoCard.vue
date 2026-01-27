@@ -10,7 +10,7 @@
     >
       <div class="flex items-center justify-between gap-4 mb-1.5">
         <h3
-          class="font-semibold text-neutral-900 dark:text-neutral-50 truncate"
+          class="font-semibold text-foreground dark:text-foreground truncate"
           :class="titleClass"
         >
           {{ memo.title || '无标题备忘录' }}
@@ -18,14 +18,14 @@
       </div>
 
       <p
-        class="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed mb-3"
+        class="text-sm text-muted-foreground dark:text-muted-foreground leading-relaxed mb-3"
         :class="contentClass"
       >
         {{ memo.content }}
       </p>
 
       <div class="flex flex-col gap-2">
-        <span class="text-xs text-neutral-500 dark:text-neutral-400">
+        <span class="text-xs text-muted-foreground dark:text-muted-foreground">
           {{ formatDate(memo.updatedAt) }}
         </span>
         <div class="flex flex-wrap gap-1.5">
@@ -40,7 +40,7 @@
           </u-badge>
           <span
             v-if="displayTags.length === 0"
-            class="text-xs text-neutral-400"
+            class="text-xs text-muted-foreground"
           > 暂无标签 </span>
         </div>
       </div>
@@ -67,10 +67,11 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
 import type { Memo } from '~/api/types'
+import type { ViewMode } from '~/constants'
 
 const props = defineProps<{
   memo: Memo
-  viewMode?: 'masonry' | 'grid' | 'list'
+  viewMode?: ViewMode
 }>()
 
 const emit = defineEmits<{
@@ -80,7 +81,7 @@ const emit = defineEmits<{
 
 const cardClasses = computed(() => {
   const isPinned = props.memo.isPinned
-  const baseClasses = 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700'
+  const baseClasses = 'bg-card dark:bg-card border-border'
 
   if (isPinned) {
     switch (props.viewMode) {
@@ -97,13 +98,13 @@ const cardClasses = computed(() => {
 
   switch (props.viewMode) {
     case 'masonry':
-      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-neutral-50 dark:hover:bg-neutral-700/80 hover:border-neutral-300 dark:hover:border-neutral-600 break-inside-avoid`
+      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-secondary/80 dark:hover:bg-secondary/80 hover:border-border break-inside-avoid`
     case 'grid':
-      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-neutral-50 dark:hover:bg-neutral-700/80 hover:border-neutral-300 dark:hover:border-neutral-600`
+      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-secondary/80 dark:hover:bg-secondary/80 hover:border-border`
     case 'list':
-      return `${baseClasses} rounded-lg shadow-sm hover:bg-neutral-50 dark:hover:bg-neutral-700/80 hover:border-neutral-300 dark:hover:border-neutral-600 p-4`
+      return `${baseClasses} rounded-lg shadow-sm hover:bg-secondary/80 dark:hover:bg-secondary/80 hover:border-border p-4`
     default:
-      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-neutral-50 dark:hover:bg-neutral-700/80 hover:border-neutral-300 dark:hover:border-neutral-600`
+      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-secondary/80 dark:hover:bg-secondary/80 hover:border-border`
   }
 })
 

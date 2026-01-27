@@ -1,6 +1,6 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { createTagValidator, updateTagValidator } from '#validators/update_tag'
+import { createTagValidator, updateTagValidator } from '#validators/tag_validator'
 import { TagService } from '#services/tag_service'
 
 @inject()

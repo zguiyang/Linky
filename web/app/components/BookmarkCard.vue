@@ -20,7 +20,7 @@
     </div>
 
     <div
-      class="flex items-center justify-center flex-shrink-0 bg-white dark:bg-neutral-700 rounded-xl overflow-hidden"
+      class="flex items-center justify-center flex-shrink-0 bg-card dark:bg-card rounded-xl overflow-hidden"
       :class="iconContainerClasses"
     >
       <img
@@ -39,7 +39,7 @@
       :class="contentClasses"
     >
       <h3
-        class="font-semibold text-neutral-900 dark:text-neutral-50"
+        class="font-semibold text-foreground dark:text-foreground"
         :class="titleClasses"
       >
         {{ bookmark.title }}
@@ -47,7 +47,7 @@
 
       <template v-if="viewMode === 'masonry'">
         <p
-          class="text-base text-neutral-500 dark:text-neutral-400"
+          class="text-base text-muted-foreground dark:text-muted-foreground"
           :class="descriptionClasses"
         >
           {{ bookmark.description }}
@@ -57,7 +57,7 @@
       <template v-else-if="viewMode === 'grid'">
         <u-tooltip :text="bookmark.description ?? undefined">
           <p
-            class="text-base text-neutral-500 dark:text-neutral-400 truncate"
+            class="text-base text-muted-foreground dark:text-muted-foreground truncate"
             :class="descriptionClasses"
           >
             {{ bookmark.description }}
@@ -67,7 +67,7 @@
 
       <template v-else-if="viewMode === 'list'">
         <p
-          class="text-sm text-neutral-500 dark:text-neutral-400"
+          class="text-sm text-muted-foreground dark:text-muted-foreground"
           :class="descriptionClasses"
         >
           {{ bookmark.description }}
@@ -91,7 +91,7 @@
             </u-badge>
           </div>
           <div
-            class="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400"
+            class="flex items-center gap-1.5 text-sm text-muted-foreground dark:text-muted-foreground"
             :class="visitCountClasses"
           >
             <u-icon
@@ -105,7 +105,7 @@
 
       <template v-else>
         <div
-          class="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400"
+          class="flex items-center gap-1.5 text-sm text-muted-foreground dark:text-muted-foreground"
           :class="visitCountClasses"
         >
           <u-icon
@@ -135,10 +135,11 @@
 
 <script setup lang="ts">
 import type { Bookmark } from '~/api/types'
+import type { ViewMode } from '~/constants'
 
 const props = defineProps<{
   bookmark: Bookmark
-  viewMode: 'masonry' | 'grid' | 'list'
+  viewMode: ViewMode
 }>()
 
 const emit = defineEmits<{
@@ -170,11 +171,11 @@ const menuItems = [
 const cardClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl break-inside-avoid'
+      return 'p-5 bg-secondary dark:bg-secondary border border-border rounded-2xl break-inside-avoid'
     case 'grid':
-      return 'flex gap-4 p-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl before:absolute before:inset-0 before:bg-gradient-to-br before:from-[var(--color-primary-10)] before:to-[var(--color-primary-10)] before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 hover:bg-neutral-100 dark:hover:bg-neutral-700/80 hover:border-neutral-300 dark:hover:border-neutral-600'
+      return 'flex gap-4 p-5 bg-secondary dark:bg-secondary border border-border rounded-2xl before:absolute before:inset-0 before:bg-gradient-to-br before:from-[var(--color-primary-10)] before:to-[var(--color-primary-10)] before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 hover:bg-secondary/80 dark:hover:bg-secondary/80 hover:border-neutral-300 dark:hover:border-neutral-600'
     case 'list':
-      return 'flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl'
+      return 'flex items-center gap-3 p-4 bg-secondary dark:bg-secondary border border-border rounded-xl'
     default:
       return ''
   }
