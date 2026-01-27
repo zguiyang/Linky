@@ -4,6 +4,7 @@ import type { Bookmark, CreateBookmarkRequest, UpdateBookmarkRequest, PaginatedR
 export interface ImportOptions {
   createTags?: boolean
   skipDuplicates?: boolean
+  autoFetch?: boolean
 }
 
 export interface ImportResult {
@@ -75,6 +76,9 @@ export const bookmarksApi = {
     }
     if (options.skipDuplicates !== undefined) {
       formData.append('skipDuplicates', String(options.skipDuplicates))
+    }
+    if (options.autoFetch !== undefined) {
+      formData.append('autoFetch', String(options.autoFetch))
     }
     return request.post<ImportResult | AsyncImportResponse>('/bookmarks/import', formData)
   },

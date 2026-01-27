@@ -84,6 +84,12 @@
           </p>
           <div class="flex items-center gap-3">
             <u-checkbox
+              v-model="autoFetch"
+              label="自动获取元数据（标题、描述、图片）"
+            />
+          </div>
+          <div class="flex items-center gap-3">
+            <u-checkbox
               v-model="createTags"
               label="将文件夹名称转换为标签"
             />
@@ -261,6 +267,7 @@ let pollInterval: ReturnType<typeof setInterval> | null = null
 
 const createTags = ref(true)
 const skipDuplicates = ref(true)
+const autoFetch = ref(true)
 
 const handleDrop = (event: DragEvent) => {
   isDragging.value = false
@@ -337,7 +344,8 @@ const startImport = async () => {
   try {
     const response = await bookmarksApi.import(selectedFile.value, {
       createTags: createTags.value,
-      skipDuplicates: skipDuplicates.value
+      skipDuplicates: skipDuplicates.value,
+      autoFetch: autoFetch.value
     })
 
     if (response.mode === 'sync') {
@@ -371,6 +379,7 @@ const resetState = () => {
   isAsyncMode.value = false
   createTags.value = true
   skipDuplicates.value = true
+  autoFetch.value = true
 }
 
 onUnmounted(() => {

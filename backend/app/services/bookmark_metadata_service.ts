@@ -62,7 +62,11 @@ export class BookmarkMetadataService {
     }
   }
 
-  async updateBookmarkMetadata(bookmarkId: number, metadata: BookmarkMetadata): Promise<void> {
+  async updateBookmarkMetadata(
+    bookmarkId: number,
+    metadata: BookmarkMetadata,
+    forceUpdate: boolean = false
+  ): Promise<void> {
     const bookmark = await Bookmark.find(bookmarkId)
 
     if (!bookmark) {
@@ -75,35 +79,52 @@ export class BookmarkMetadataService {
     console.log(`[BookmarkMetadataService] Current description: "${bookmark.description}"`)
     console.log(`[BookmarkMetadataService] Metadata ogTitle: "${metadata.ogTitle}"`)
     console.log(`[BookmarkMetadataService] Metadata ogDescription: "${metadata.ogDescription}"`)
+    console.log(`[BookmarkMetadataService] forceUpdate: ${forceUpdate}`)
 
-    const shouldUpdateTitle = !bookmark.title || bookmark.title.trim() === ''
-    const shouldUpdateDescription = !bookmark.description || bookmark.description?.trim() === ''
-
-    console.log(`[BookmarkMetadataService] shouldUpdateTitle: ${shouldUpdateTitle}`)
-    console.log(`[BookmarkMetadataService] shouldUpdateDescription: ${shouldUpdateDescription}`)
-
-    const updates: { title?: string; description?: string | null; metadata?: BookmarkMetadata } = {
+    const updates: { title?: string; description: string | null; metadata?: BookmarkMetadata } = {
       metadata,
+      description: bookmark.description,
     }
 
-    if (shouldUpdateTitle && metadata.ogTitle) {
-      console.log(`[BookmarkMetadataService] Will update title to: "${metadata.ogTitle}"`)
-      updates.title = metadata.ogTitle
+    if (forceUpdate) {
+      if (metadata.ogTitle) {
+        console.log(
+          `[BookmarkMetadataService] forceUpdate: Will update title to: "${metadata.ogTitle}"`
+        )
+        updates.title = metadata.ogTitle
+      }
+      if (metadata.ogDescription) {
+        console.log(
+          `[BookmarkMetadataService] forceUpdate: Will update description to: "${metadata.ogDescription}"`
+        )
+        updates.description = metadata.ogDescription
+      }
     } else {
-      console.log(
-        `[BookmarkMetadataService] Title not updated. shouldUpdateTitle: ${shouldUpdateTitle}, ogTitle: ${metadata.ogTitle}`
-      )
-    }
+      const shouldUpdateTitle = !bookmark.title || bookmark.title.trim() === ''
+      const shouldUpdateDescription = !bookmark.description || bookmark.description?.trim() === ''
 
-    if (shouldUpdateDescription && metadata.ogDescription) {
-      console.log(
-        `[BookmarkMetadataService] Will update description to: "${metadata.ogDescription}"`
-      )
-      updates.description = metadata.ogDescription
-    } else {
-      console.log(
-        `[BookmarkMetadataService] Description not updated. shouldUpdateDescription: ${shouldUpdateDescription}, ogDescription: ${metadata.ogDescription}`
-      )
+      console.log(`[BookmarkMetadataService] shouldUpdateTitle: ${shouldUpdateTitle}`)
+      console.log(`[BookmarkMetadataService] shouldUpdateDescription: ${shouldUpdateDescription}`)
+
+      if (shouldUpdateTitle && metadata.ogTitle) {
+        console.log(`[BookmarkMetadataService] Will update title to: "${metadata.ogTitle}"`)
+        updates.title = metadata.ogTitle
+      } else {
+        console.log(
+          `[BookmarkMetadataService] Title not updated. shouldUpdateTitle: ${shouldUpdateTitle}, ogTitle: ${metadata.ogTitle}`
+        )
+      }
+
+      if (shouldUpdateDescription && metadata.ogDescription) {
+        console.log(
+          `[BookmarkMetadataService] Will update description to: "${metadata.ogDescription}"`
+        )
+        updates.description = metadata.ogDescription
+      } else {
+        console.log(
+          `[BookmarkMetadataService] Description not updated. shouldUpdateDescription: ${shouldUpdateDescription}, ogDescription: ${metadata.ogDescription}`
+        )
+      }
     }
 
     console.log(`[BookmarkMetadataService] Updates object:`, updates)
@@ -122,7 +143,11 @@ export class BookmarkMetadataService {
     }
   }
 
-  async fetchAndUpdate(bookmarkId: number, url: string): Promise<BookmarkMetadata> {
+  async fetchAndUpdate(
+    bookmarkId: number,
+    url: string,
+    forceUpdate: boolean = false
+  ): Promise<BookmarkMetadata> {
     const fetchResult = await this.fetch({ url })
 
     const metadata: BookmarkMetadata = {
@@ -135,7 +160,7 @@ export class BookmarkMetadataService {
 
     console.log(`[BookmarkMetadataService] fetchAndUpdate result:`, metadata)
 
-    await this.updateBookmarkMetadata(bookmarkId, metadata)
+    await this.updateBookmarkMetadata(bookmarkId, metadata, forceUpdate)
 
     return metadata
   }

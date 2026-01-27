@@ -171,9 +171,13 @@ export class BookmarkParserService {
     }
   }
 
-  private async scheduleMetadataFetch(bookmarkId: number, url: string): Promise<void> {
+  private async scheduleMetadataFetch(
+    bookmarkId: number,
+    url: string,
+    forceUpdate: boolean = false
+  ): Promise<void> {
     const { default: FetchBookmarkMetadata } = await import('#jobs/fetch_bookmark_metadata')
-    await FetchBookmarkMetadata.dispatch({ bookmarkId, url })
+    await FetchBookmarkMetadata.dispatch({ bookmarkId, url, forceUpdate })
   }
 
   async processImport(
@@ -182,7 +186,8 @@ export class BookmarkParserService {
     {
       createTags = true,
       skipDuplicates = true,
-    }: { createTags?: boolean; skipDuplicates?: boolean } = {}
+      autoFetch = true,
+    }: { createTags?: boolean; skipDuplicates?: boolean; autoFetch?: boolean } = {}
   ): Promise<ImportResult> {
     const importResult: ImportResult = {
       total: parsedBookmarks.length,
@@ -268,7 +273,9 @@ export class BookmarkParserService {
           visitCount: 0,
         })
 
-        await this.scheduleMetadataFetch(newBookmark.id, bookmark.url)
+        if (autoFetch) {
+          await this.scheduleMetadataFetch(newBookmark.id, bookmark.url, true)
+        }
 
         if (tagIds.length > 0) {
           const bookmarkWithTags = await Bookmark.query()

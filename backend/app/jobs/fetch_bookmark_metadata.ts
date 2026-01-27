@@ -5,6 +5,7 @@ import { METADATA_FETCH } from '#constants/index'
 export type FetchBookmarkMetadataPayload = {
   bookmarkId: number
   url: string
+  forceUpdate?: boolean
 }
 
 export type FetchBookmarkMetadataResult = {
@@ -16,11 +17,12 @@ export default class FetchBookmarkMetadata extends Job {
   private metadataService = new BookmarkMetadataService()
 
   async handle(payload: FetchBookmarkMetadataPayload): Promise<FetchBookmarkMetadataResult> {
-    const { bookmarkId, url } = payload
+    const { bookmarkId, url, forceUpdate = false } = payload
 
     console.log(`[FetchBookmarkMetadata] Starting fetch for bookmark ${bookmarkId}: ${url}`)
+    console.log(`[FetchBookmarkMetadata] forceUpdate: ${forceUpdate}`)
 
-    const metadata = await this.metadataService.fetchAndUpdate(bookmarkId, url)
+    const metadata = await this.metadataService.fetchAndUpdate(bookmarkId, url, forceUpdate)
 
     if (!metadata.success) {
       console.error(`[FetchBookmarkMetadata] Failed for bookmark ${bookmarkId}: ${metadata.error}`)

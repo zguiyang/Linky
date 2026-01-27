@@ -57,6 +57,7 @@ export const importBookmarkValidator = vine.compile(
     }),
     createTags: vine.boolean().optional(),
     skipDuplicates: vine.boolean().optional(),
+    autoFetch: vine.boolean().optional(),
   })
 )
 

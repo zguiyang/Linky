@@ -197,6 +197,12 @@
     >
       <template #body>
         <div class="space-y-4">
+          <u-form-field
+            label="自动获取元数据"
+            direction="row"
+          >
+            <u-switch v-model="autoFetch" />
+          </u-form-field>
           <div>
             <label class="block text-sm font-medium text-default dark:text-default mb-1.5">URL <span class="text-red-500">*</span></label>
             <u-input
@@ -206,32 +212,34 @@
               icon="i-heroicons-globe-alt"
             />
           </div>
-          <div>
-            <label class="block text-sm font-medium text-default dark:text-default mb-1.5">标题</label>
-            <u-input
-              v-model="bookmarkForm.title"
-              placeholder="留空将自动从网页获取"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-default dark:text-default mb-1.5">描述</label>
-            <u-textarea
-              v-model="bookmarkForm.description"
-              placeholder="留空将自动从网页获取"
-              :rows="3"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-default dark:text-default mb-1.5">标签</label>
-            <u-select-menu
-              v-model="bookmarkForm.tagIds"
-              :items="tagSelectItems"
-              multiple
-              value-key="value"
-              label-key="label"
-              placeholder="选择标签"
-            />
-          </div>
+          <template v-if="!autoFetch">
+            <div>
+              <label class="block text-sm font-medium text-default dark:text-default mb-1.5">标题</label>
+              <u-input
+                v-model="bookmarkForm.title"
+                placeholder="留空将自动从网页获取"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-default dark:text-default mb-1.5">描述</label>
+              <u-textarea
+                v-model="bookmarkForm.description"
+                placeholder="留空将自动从网页获取"
+                :rows="3"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-default dark:text-default mb-1.5">标签</label>
+              <u-select-menu
+                v-model="bookmarkForm.tagIds"
+                :items="tagSelectItems"
+                multiple
+                value-key="value"
+                label-key="label"
+                placeholder="选择标签"
+              />
+            </div>
+          </template>
         </div>
       </template>
       <template #footer="{ close }">
@@ -371,6 +379,8 @@ const bookmarkForm = ref({
   tagIds: [] as number[]
 })
 
+const autoFetch = ref(true)
+
 const tagSelectItems = computed(() => {
   if (!tags.value) return []
   return tags.value.map(tag => ({
@@ -396,6 +406,7 @@ const openBookmark = (bookmark: Bookmark) => {
 const openAddModal = () => {
   isEditing.value = false
   editingBookmarkId.value = null
+  autoFetch.value = true
   bookmarkForm.value = {
     title: '',
     url: '',
@@ -408,6 +419,7 @@ const openAddModal = () => {
 const openEditModal = (bookmark: Bookmark) => {
   isEditing.value = true
   editingBookmarkId.value = bookmark.id
+  autoFetch.value = false
   bookmarkForm.value = {
     title: bookmark.title,
     url: bookmark.url,
@@ -430,12 +442,20 @@ const handleSaveBookmark = async (close?: () => void) => {
   if (isEditing.value && editingBookmarkId.value) {
     await bookmarksApi.update(editingBookmarkId.value, bookmarkForm.value)
   } else {
-    await bookmarksApi.create(bookmarkForm.value)
+    if (autoFetch.value) {
+      await bookmarksApi.create({
+        url: bookmarkForm.value.url,
+        autoFetch: true
+      })
+    } else {
+      await bookmarksApi.create(bookmarkForm.value)
+    }
   }
 
   await refreshBookmarks()
   close?.()
   showBookmarkModal.value = false
+  autoFetch.value = true
   bookmarkForm.value = {
     title: '',
     url: '',
