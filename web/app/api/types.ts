@@ -4,6 +4,9 @@ export interface User {
   email: string
   emailVerifiedAt: string | null
   verificationEmailSentAt: string | null
+  verificationToken: string | null
+  resetPasswordToken: string | null
+  resetPasswordExpiresAt: string | null
   createdAt: string
   updatedAt: string | null
 }
@@ -126,4 +129,18 @@ export interface UpdateMemoRequest {
 export interface PaginatedResponse<T> {
   meta: PaginatorMeta
   data: T[]
+}
+
+export interface ImportStatusResponse {
+  jobId: string
+  status: 'waiting' | 'active' | 'completed' | 'failed'
+  progress: number
+  total?: number
+  imported?: number
+  skipped?: number
+  errors?: number
+  tagsCreated?: number
+  errorsList?: string[]
+  completedAt?: string
+  error?: string
 }

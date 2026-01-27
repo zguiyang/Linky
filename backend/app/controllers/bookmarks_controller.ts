@@ -128,7 +128,6 @@ export default class BookmarksController {
 
   async importStatus({ params }: HttpContext) {
     const { jobId } = params
-
     const { default: redis } = await import('@adonisjs/redis/services/main')
 
     const statusJson = await redis.get(`import:status:${jobId}`)
@@ -141,44 +140,33 @@ export default class BookmarksController {
         if (resultJson) {
           const result = JSON.parse(resultJson)
           return {
-            success: true,
-            data: {
-              jobId,
-              status: 'completed',
-              progress: 100,
-              data: {
-                total: result.total,
-                imported: result.imported,
-                skipped: result.skipped,
-                errors: result.errors,
-                tagsCreated: result.tagsCreated,
-                errorsList: result.errorsList,
-                completedAt: result.completedAt,
-              },
-            },
+            jobId,
+            status: 'completed',
+            progress: 100,
+            total: result.total,
+            imported: result.imported,
+            skipped: result.skipped,
+            errors: result.errors,
+            tagsCreated: result.tagsCreated,
+            errorsList: result.errorsList,
+            completedAt: result.completedAt,
           }
         }
       }
 
       if (status.status === 'failed') {
         return {
-          success: true,
-          data: {
-            jobId,
-            status: 'failed',
-            progress: status.progress,
-            error: status.error,
-          },
+          jobId,
+          status: 'failed',
+          progress: status.progress,
+          error: status.error,
         }
       }
 
       return {
-        success: true,
-        data: {
-          jobId,
-          status: status.status,
-          progress: status.progress,
-        },
+        jobId,
+        status: status.status,
+        progress: status.progress,
       }
     }
 
@@ -187,31 +175,23 @@ export default class BookmarksController {
     if (resultJson) {
       const result = JSON.parse(resultJson)
       return {
-        success: true,
-        data: {
-          jobId,
-          status: 'completed',
-          progress: 100,
-          data: {
-            total: result.total,
-            imported: result.imported,
-            skipped: result.skipped,
-            errors: result.errors,
-            tagsCreated: result.tagsCreated,
-            errorsList: result.errorsList,
-            completedAt: result.completedAt,
-          },
-        },
+        jobId,
+        status: 'completed',
+        progress: 100,
+        total: result.total,
+        imported: result.imported,
+        skipped: result.skipped,
+        errors: result.errors,
+        tagsCreated: result.tagsCreated,
+        errorsList: result.errorsList,
+        completedAt: result.completedAt,
       }
     }
 
     return {
-      success: true,
-      data: {
-        jobId,
-        status: 'waiting',
-        progress: 0,
-      },
+      jobId,
+      status: 'waiting',
+      progress: 0,
     }
   }
 }

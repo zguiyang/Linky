@@ -1,19 +1,25 @@
 import vine from '@vinejs/vine'
+import { VALIDATION } from '#constants/index'
 
 export const createBookmarkValidator = vine.compile(
   vine.object({
-    title: vine.string().trim().minLength(1).maxLength(200),
+    title: vine.string().trim().minLength(VALIDATION.TITLE_MIN).maxLength(VALIDATION.TITLE_MAX),
     url: vine.string().trim().url(),
-    description: vine.string().trim().maxLength(500).optional(),
+    description: vine.string().trim().maxLength(VALIDATION.DESCRIPTION_MAX).optional(),
     tagIds: vine.array(vine.number()).minLength(1).optional(),
   })
 )
 
 export const updateBookmarkValidator = vine.compile(
   vine.object({
-    title: vine.string().trim().minLength(1).maxLength(200).optional(),
+    title: vine
+      .string()
+      .trim()
+      .minLength(VALIDATION.TITLE_MIN)
+      .maxLength(VALIDATION.TITLE_MAX)
+      .optional(),
     url: vine.string().trim().url().optional(),
-    description: vine.string().trim().maxLength(500).optional(),
+    description: vine.string().trim().maxLength(VALIDATION.DESCRIPTION_MAX).optional(),
     tagIds: vine.array(vine.number()).minLength(1).optional(),
   })
 )
@@ -24,8 +30,8 @@ export const bookmarkPaginationValidator = vine.compile(
     perPage: vine.number().optional(),
     search: vine.string().optional(),
     tagIds: vine.array(vine.number()).optional(),
-    sortBy: vine.enum(['createdAt', 'updatedAt']).optional(),
-    sortOrder: vine.enum(['asc', 'desc']).optional(),
+    sortBy: vine.enum([VALIDATION.SORT_BY_CREATED_AT, VALIDATION.SORT_BY_UPDATED_AT]).optional(),
+    sortOrder: vine.enum([VALIDATION.SORT_ORDER_ASC, VALIDATION.SORT_ORDER_DESC]).optional(),
   })
 )
 

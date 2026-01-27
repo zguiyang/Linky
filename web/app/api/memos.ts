@@ -5,7 +5,7 @@ export const memosApi = {
   paginate: (page: number = 1, perPage: number = 20) =>
     request.get<PaginatedResponse<Memo>>('/memos/paginate', { page, perPage }),
 
-  index: () => request.get<PaginatedResponse<Memo>>('/memos'),
+  index: () => request.get<Memo[]>('/memos'),
 
   show: (id: number) => request.get<Memo>(`/memos/${id}`),
 

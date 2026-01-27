@@ -7,7 +7,6 @@ export interface ImportOptions {
 }
 
 export interface ImportResult {
-  success: boolean
   mode: 'sync'
   data: {
     total: number
@@ -24,18 +23,15 @@ export interface ImportResult {
 }
 
 export interface AsyncImportResponse {
-  success: boolean
   mode: 'async'
   data: {
     jobId: string
     status: 'waiting'
     progress: number
-    statusUrl: string
   }
 }
 
 export interface ImportStatusResponse {
-  success: boolean
   data: {
     jobId: string
     status: 'waiting' | 'active' | 'completed'
