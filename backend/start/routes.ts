@@ -10,50 +10,52 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
+const AuthController = () => import('#controllers/auth_controller')
+const TagsController = () => import('#controllers/tags_controller')
+const BookmarksController = () => import('#controllers/bookmarks_controller')
+const MemosController = () => import('#controllers/memos_controller')
+
 // API路由组
 router
   .group(() => {
     // 认证API
-    router.post('/auth/register', '#controllers/auth_controller.register')
-    router.post('/auth/login', '#controllers/auth_controller.login')
-    router.post('/auth/logout', '#controllers/auth_controller.logout').middleware(middleware.auth())
-    router.post('/auth/forgot-password', '#controllers/auth_controller.forgotPassword')
-    router.post('/auth/reset-password', '#controllers/auth_controller.resetPassword')
-    router.get('/auth/verify-email', '#controllers/auth_controller.verifyEmail')
+    router.post('/auth/register', [AuthController, 'register'])
+    router.post('/auth/login', [AuthController, 'login'])
+    router.post('/auth/logout', [AuthController, 'logout']).middleware(middleware.auth())
+    router.post('/auth/forgot-password', [AuthController, 'forgotPassword'])
+    router.post('/auth/reset-password', [AuthController, 'resetPassword'])
+    router.get('/auth/verify-email', [AuthController, 'verifyEmail'])
     router
-      .post('/auth/resend-verification', '#controllers/auth_controller.resendVerification')
+      .post('/auth/resend-verification', [AuthController, 'resendVerification'])
       .middleware(middleware.auth())
-    router.get('/auth/me', '#controllers/auth_controller.me').middleware(middleware.auth())
+    router.get('/auth/me', [AuthController, 'me']).middleware(middleware.auth())
 
     // 标签 API（所有路由需要认证）
-    router.get('/tags', '#controllers/tags_controller.index')
-    router.get('/tags/:id', '#controllers/tags_controller.show')
-    router.post('/tags', '#controllers/tags_controller.store')
-    router.put('/tags/:id', '#controllers/tags_controller.update')
-    router.delete('/tags/:id', '#controllers/tags_controller.destroy')
+    router.get('/tags', [TagsController, 'index'])
+    router.get('/tags/:id', [TagsController, 'show'])
+    router.post('/tags', [TagsController, 'store'])
+    router.put('/tags/:id', [TagsController, 'update'])
+    router.delete('/tags/:id', [TagsController, 'destroy'])
 
     // 书签 API（所有路由需要认证）
-    router.get('/bookmarks', '#controllers/bookmarks_controller.index')
-    router.get('/bookmarks/paginate', '#controllers/bookmarks_controller.paginate')
-    router.get('/bookmarks/:id', '#controllers/bookmarks_controller.show')
-    router.post('/bookmarks', '#controllers/bookmarks_controller.store')
-    router.post('/bookmarks/by-url', '#controllers/bookmarks_controller.createByUrl')
-    router.post(
-      '/bookmarks/:id/refresh-metadata',
-      '#controllers/bookmarks_controller.refreshMetadata'
-    )
-    router.post('/bookmarks/import', '#controllers/bookmarks_controller.import')
-    router.get('/bookmarks/import/:jobId/status', '#controllers/bookmarks_controller.importStatus')
-    router.put('/bookmarks/:id', '#controllers/bookmarks_controller.update')
-    router.delete('/bookmarks/:id', '#controllers/bookmarks_controller.destroy')
+    router.get('/bookmarks', [BookmarksController, 'index'])
+    router.get('/bookmarks/paginate', [BookmarksController, 'paginate'])
+    router.get('/bookmarks/:id', [BookmarksController, 'show'])
+    router.post('/bookmarks', [BookmarksController, 'store'])
+    router.post('/bookmarks/by-url', [BookmarksController, 'createByUrl'])
+    router.post('/bookmarks/:id/refresh-metadata', [BookmarksController, 'refreshMetadata'])
+    router.post('/bookmarks/import', [BookmarksController, 'import'])
+    router.get('/bookmarks/import/:jobId/status', [BookmarksController, 'importStatus'])
+    router.put('/bookmarks/:id', [BookmarksController, 'update'])
+    router.delete('/bookmarks/:id', [BookmarksController, 'destroy'])
 
     // 备忘录 API（所有路由需要认证）
-    router.get('/memos', '#controllers/memos_controller.index')
-    router.get('/memos/paginate', '#controllers/memos_controller.paginate')
-    router.get('/memos/:id', '#controllers/memos_controller.show')
-    router.post('/memos', '#controllers/memos_controller.store')
-    router.put('/memos/:id', '#controllers/memos_controller.update')
-    router.delete('/memos/:id', '#controllers/memos_controller.destroy')
+    router.get('/memos', [MemosController, 'index'])
+    router.get('/memos/paginate', [MemosController, 'paginate'])
+    router.get('/memos/:id', [MemosController, 'show'])
+    router.post('/memos', [MemosController, 'store'])
+    router.put('/memos/:id', [MemosController, 'update'])
+    router.delete('/memos/:id', [MemosController, 'destroy'])
   })
   .prefix('api')
   .middleware(middleware.auth())
