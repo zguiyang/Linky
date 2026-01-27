@@ -1,7 +1,9 @@
 import { inject } from '@adonisjs/core'
 import { Exception } from '@adonisjs/core/exceptions'
 import type { HttpContext } from '@adonisjs/core/http'
-import { readFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
+import { mkdir } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
 import {
   createBookmarkValidator,
   updateBookmarkValidator,
@@ -10,6 +12,9 @@ import {
 } from '#validators/bookmark_validator'
 import { BookmarkService } from '#services/bookmark_service'
 import { BookmarkParserService } from '#services/bookmark_parser_service'
+import ImportBookmark from '#jobs/import_bookmark'
+
+const ASYNC_SIZE_THRESHOLD = 500 * 1024
 
 @inject()
 export default class BookmarksController {
@@ -67,27 +72,145 @@ export default class BookmarksController {
       throw new Exception('文件上传失败', { status: 400 })
     }
 
-    const htmlContent = await readFile(file.tmpPath, { encoding: 'utf-8' })
-    const parseResult = await this.bookmarkParserService.parseHtml(htmlContent)
+    const fileSize = file.size || 0
 
-    const importResult = await this.bookmarkParserService.processImport(
-      user.id,
-      parseResult.bookmarks,
-      {
-        createTags: createTags ?? true,
-        skipDuplicates: skipDuplicates ?? true,
+    if (fileSize <= ASYNC_SIZE_THRESHOLD) {
+      const htmlContent = await readFile(file.tmpPath, { encoding: 'utf-8' })
+      const parseResult = await this.bookmarkParserService.parseHtml(htmlContent)
+
+      const importResult = await this.bookmarkParserService.processImport(
+        user.id,
+        parseResult.bookmarks,
+        {
+          createTags: createTags ?? true,
+          skipDuplicates: skipDuplicates ?? true,
+        }
+      )
+
+      return {
+        mode: 'sync',
+        data: {
+          total: importResult.total,
+          imported: importResult.imported,
+          skipped: importResult.skipped,
+          errors: importResult.errors,
+          tagsCreated: importResult.tagsCreated,
+          errorsList: importResult.errorsList.slice(0, 50),
+        },
       }
-    )
+    }
+
+    const jobId = randomUUID()
+    const tempDir = '/tmp/linky-imports'
+    const tempPath = `${tempDir}/${jobId}.html`
+
+    await mkdir(tempDir, { recursive: true })
+    const htmlContent = await readFile(file.tmpPath, { encoding: 'utf-8' })
+    await writeFile(tempPath, htmlContent)
+
+    await ImportBookmark.dispatch({
+      jobId,
+      userId: user.id,
+      filePath: tempPath,
+      createTags: createTags ?? true,
+      skipDuplicates: skipDuplicates ?? true,
+    })
+
+    return {
+      mode: 'async',
+      data: {
+        jobId,
+        status: 'waiting',
+        progress: 0,
+      },
+    }
+  }
+
+  async importStatus({ params }: HttpContext) {
+    const { jobId } = params
+
+    const { default: redis } = await import('@adonisjs/redis/services/main')
+
+    const statusJson = await redis.get(`import:status:${jobId}`)
+
+    if (statusJson) {
+      const status = JSON.parse(statusJson)
+
+      if (status.status === 'completed') {
+        const resultJson = await redis.get(`import:result:${jobId}`)
+        if (resultJson) {
+          const result = JSON.parse(resultJson)
+          return {
+            success: true,
+            data: {
+              jobId,
+              status: 'completed',
+              progress: 100,
+              data: {
+                total: result.total,
+                imported: result.imported,
+                skipped: result.skipped,
+                errors: result.errors,
+                tagsCreated: result.tagsCreated,
+                errorsList: result.errorsList,
+                completedAt: result.completedAt,
+              },
+            },
+          }
+        }
+      }
+
+      if (status.status === 'failed') {
+        return {
+          success: true,
+          data: {
+            jobId,
+            status: 'failed',
+            progress: status.progress,
+            error: status.error,
+          },
+        }
+      }
+
+      return {
+        success: true,
+        data: {
+          jobId,
+          status: status.status,
+          progress: status.progress,
+        },
+      }
+    }
+
+    const resultJson = await redis.get(`import:result:${jobId}`)
+
+    if (resultJson) {
+      const result = JSON.parse(resultJson)
+      return {
+        success: true,
+        data: {
+          jobId,
+          status: 'completed',
+          progress: 100,
+          data: {
+            total: result.total,
+            imported: result.imported,
+            skipped: result.skipped,
+            errors: result.errors,
+            tagsCreated: result.tagsCreated,
+            errorsList: result.errorsList,
+            completedAt: result.completedAt,
+          },
+        },
+      }
+    }
 
     return {
       success: true,
       data: {
-        total: importResult.total,
-        imported: importResult.imported,
-        skipped: importResult.skipped,
-        errors: importResult.errors,
-        tagsCreated: importResult.tagsCreated,
-        errorsList: importResult.errorsList.slice(0, 50),
+        jobId,
+        status: 'waiting',
+        progress: 0,
       },
     }
   }

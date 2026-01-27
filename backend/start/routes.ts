@@ -38,6 +38,7 @@ router
     router.get('/bookmarks/:id', '#controllers/bookmarks_controller.show')
     router.post('/bookmarks', '#controllers/bookmarks_controller.store')
     router.post('/bookmarks/import', '#controllers/bookmarks_controller.import')
+    router.get('/bookmarks/import/:jobId/status', '#controllers/bookmarks_controller.importStatus')
     router.put('/bookmarks/:id', '#controllers/bookmarks_controller.update')
     router.delete('/bookmarks/:id', '#controllers/bookmarks_controller.destroy')
 

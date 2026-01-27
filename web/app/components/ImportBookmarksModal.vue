@@ -104,16 +104,17 @@
         <div class="text-center space-y-4">
           <div class="flex justify-center">
             <u-progress
+              :model-value="progress"
               color="primary"
               size="lg"
             />
           </div>
           <div>
             <p class="text-lg font-medium text-neutral-900 dark:text-neutral-50">
-              正在导入书签...
+              {{ isAsyncMode ? '正在后台导入书签...' : '正在导入书签...' }}
             </p>
             <p class="text-sm text-neutral-500 dark:text-neutral-400">
-              解析文件并创建书签，请稍候
+              {{ isAsyncMode ? `进度: ${progress}%` : '解析文件并创建书签，请稍候' }}
             </p>
           </div>
         </div>
@@ -124,13 +125,13 @@
         class="space-y-6"
       >
         <div
-          v-if="importResult?.data"
+          v-if="importResult"
           class="space-y-4"
         >
           <div class="grid grid-cols-2 gap-4">
             <div class="bg-success-50 dark:bg-success-900/20 rounded-lg p-4 text-center">
               <p class="text-2xl font-bold text-success-600 dark:text-success-400">
-                {{ importResult.data.imported }}
+                {{ importResult.imported }}
               </p>
               <p class="text-sm text-success-700 dark:text-success-300">
                 成功导入
@@ -138,7 +139,7 @@
             </div>
             <div class="bg-warning-50 dark:bg-warning-900/20 rounded-lg p-4 text-center">
               <p class="text-2xl font-bold text-warning-600 dark:text-warning-400">
-                {{ importResult.data.skipped }}
+                {{ importResult.skipped }}
               </p>
               <p class="text-sm text-warning-700 dark:text-warning-300">
                 跳过重复
@@ -146,7 +147,7 @@
             </div>
             <div class="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-4 text-center">
               <p class="text-2xl font-bold text-neutral-600 dark:text-neutral-400">
-                {{ importResult.data.total }}
+                {{ importResult.total }}
               </p>
               <p class="text-sm text-neutral-700 dark:text-neutral-300">
                 总计书签
@@ -154,7 +155,7 @@
             </div>
             <div class="bg-error-50 dark:bg-error-900/20 rounded-lg p-4 text-center">
               <p class="text-2xl font-bold text-error-600 dark:text-error-400">
-                {{ importResult.data.errors }}
+                {{ importResult.errors }}
               </p>
               <p class="text-sm text-error-700 dark:text-error-300">
                 导入失败
@@ -163,25 +164,25 @@
           </div>
 
           <div
-            v-if="importResult.data.tagsCreated > 0"
+            v-if="importResult.tagsCreated > 0"
             class="text-center"
           >
             <p class="text-sm text-neutral-500 dark:text-neutral-400">
-              已创建 {{ importResult.data.tagsCreated }} 个标签
+              已创建 {{ importResult.tagsCreated }} 个标签
             </p>
           </div>
 
           <div
-            v-if="importResult.data.errorsList.length > 0"
+            v-if="importResult.errorsList.length > 0"
             class="space-y-2"
           >
             <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              失败详情 ({{ importResult.data.errorsList.length }} 项)：
+              失败详情 ({{ importResult.errorsList.length }} 项)：
             </p>
             <u-scroll-area class="h-48 border border-neutral-200 dark:border-neutral-700 rounded-lg">
               <div class="p-3 space-y-2">
                 <div
-                  v-for="(error, index) in importResult.data.errorsList"
+                  v-for="(error, index) in importResult.errorsList"
                   :key="index"
                   class="text-xs p-2 bg-error-50 dark:bg-error-900/20 rounded"
                 >
@@ -228,8 +229,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { bookmarksApi, type ImportResult } from '~/api/bookmarks'
+
+type ImportResultData = ImportResult['data']
 
 const props = defineProps<{
   modelValue: boolean
@@ -250,7 +253,11 @@ const fileInputRef = ref<HTMLInputElement | null>(null)
 const isDragging = ref(false)
 const selectedFile = ref<File | null>(null)
 const isImporting = ref(false)
-const importResult = ref<ImportResult | null>(null)
+const importResult = ref<ImportResultData | null>(null)
+const progress = ref(0)
+const isAsyncMode = ref(false)
+
+let pollInterval: ReturnType<typeof setInterval> | null = null
 
 const createTags = ref(true)
 const skipDuplicates = ref(true)
@@ -290,22 +297,60 @@ const formatFileSize = (bytes: number): string => {
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
+const stopPolling = () => {
+  if (pollInterval) {
+    clearInterval(pollInterval)
+    pollInterval = null
+  }
+}
+
+const pollImportStatus = async (jobId: string) => {
+  pollInterval = setInterval(async () => {
+    try {
+      const response = await bookmarksApi.getImportStatus(jobId)
+      progress.value = response.data.progress
+
+      if (response.data.status === 'completed' && response.data.data) {
+        stopPolling()
+        importResult.value = response.data.data
+        step.value = 'result'
+        isImporting.value = false
+      } else if (response.data.status === 'waiting') {
+        progress.value = 0
+      }
+    } catch (error) {
+      console.error('Polling failed:', error)
+      stopPolling()
+      step.value = 'upload'
+      isImporting.value = false
+    }
+  }, 1000)
+}
+
 const startImport = async () => {
   if (!selectedFile.value) return
 
   isImporting.value = true
   step.value = 'importing'
+  progress.value = 0
 
   try {
-    const result = await bookmarksApi.import(selectedFile.value, {
+    const response = await bookmarksApi.import(selectedFile.value, {
       createTags: createTags.value,
       skipDuplicates: skipDuplicates.value
     })
-    importResult.value = result
-    step.value = 'result'
+
+    if (response.mode === 'sync') {
+      importResult.value = response.data
+      step.value = 'result'
+    } else {
+      isAsyncMode.value = true
+      pollImportStatus(response.data.jobId)
+    }
   } catch (error) {
     console.error('Import failed:', error)
     step.value = 'upload'
+    isImporting.value = false
   } finally {
     isImporting.value = false
   }
@@ -318,10 +363,17 @@ const handleComplete = (close: () => void) => {
 }
 
 const resetState = () => {
+  stopPolling()
   step.value = 'upload'
   selectedFile.value = null
   importResult.value = null
+  progress.value = 0
+  isAsyncMode.value = false
   createTags.value = true
   skipDuplicates.value = true
 }
+
+onUnmounted(() => {
+  stopPolling()
+})
 </script>

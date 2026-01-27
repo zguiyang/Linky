@@ -8,15 +8,15 @@ const jobsConfig = defineConfig({
     password: env.get('REDIS_PASSWORD'),
   },
 
-  queue: env.get('REDIS_QUEUE', 'default'),
+  queue: env.get('REDIS_QUEUE', 'linky_jobs'),
 
-  queues: ['default'],
+  queues: [env.get('REDIS_QUEUE', 'linky_jobs')],
 
   options: {
     /**
      * The total number of attempts to try the job until it completes.
      */
-    attempts: 0,
+    attempts: 3,
 
     /**
      * Backoff setting for automatic retries if the job fails

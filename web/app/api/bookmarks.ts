@@ -8,6 +8,7 @@ export interface ImportOptions {
 
 export interface ImportResult {
   success: boolean
+  mode: 'sync'
   data: {
     total: number
     imported: number
@@ -19,6 +20,39 @@ export interface ImportResult {
       url: string
       reason: string
     }>
+  }
+}
+
+export interface AsyncImportResponse {
+  success: boolean
+  mode: 'async'
+  data: {
+    jobId: string
+    status: 'waiting'
+    progress: number
+    statusUrl: string
+  }
+}
+
+export interface ImportStatusResponse {
+  success: boolean
+  data: {
+    jobId: string
+    status: 'waiting' | 'active' | 'completed'
+    progress: number
+    data?: {
+      total: number
+      imported: number
+      skipped: number
+      errors: number
+      tagsCreated: number
+      errorsList: Array<{
+        title: string
+        url: string
+        reason: string
+      }>
+      completedAt: string
+    }
   }
 }
 
@@ -46,8 +80,11 @@ export const bookmarksApi = {
     if (options.skipDuplicates !== undefined) {
       formData.append('skipDuplicates', String(options.skipDuplicates))
     }
-    return request.post<ImportResult>('/bookmarks/import', formData)
-  }
+    return request.post<ImportResult | AsyncImportResponse>('/bookmarks/import', formData)
+  },
+
+  getImportStatus: (jobId: string) =>
+    request.get<ImportStatusResponse>(`/bookmarks/import/${jobId}/status`)
 }
 
 export default bookmarksApi
