@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import { VALIDATION, ORDER_BY, SORT_ORDER } from '#constants/index'
+import { VALIDATION, ORDER_BY, SORT_ORDER, IMPORT } from '#constants/index'
 
 export const createBookmarkValidator = vine.compile(
   vine.object({
@@ -52,7 +52,7 @@ export const bookmarkPaginationValidator = vine.compile(
 export const importBookmarkValidator = vine.compile(
   vine.object({
     file: vine.file({
-      size: '2mb',
+      size: IMPORT.MAX_FILE_SIZE,
       extnames: ['html', 'htm'],
     }),
     createTags: vine.boolean().optional(),

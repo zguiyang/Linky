@@ -8,7 +8,8 @@ export async function apiRequest<T = unknown, R extends NitroFetchRequest = Nitr
   url: R,
   options: ApiRequestOptions<R> = {}
 ): Promise<T> {
-  const { baseURL = 'http://localhost:3333/api', ...fetchOptions } = options
+  const config = useRuntimeConfig()
+  const { baseURL = config.public.apiBaseUrl, ...fetchOptions } = options
   const fetcher: typeof $fetch = import.meta.server ? (useRequestFetch() as any) : $fetch
 
   const token = useCookie('auth_token').value

@@ -14,8 +14,7 @@ import {
 import { BookmarkService } from '#services/bookmark_service'
 import { BookmarkParserService } from '#services/bookmark_parser_service'
 import ImportBookmark from '#jobs/import_bookmark'
-
-const ASYNC_SIZE_THRESHOLD = 500 * 1024
+import { IMPORT } from '#constants/index'
 
 @inject()
 export default class BookmarksController {
@@ -102,7 +101,7 @@ export default class BookmarksController {
 
     const fileSize = file.size || 0
 
-    if (fileSize <= ASYNC_SIZE_THRESHOLD) {
+    if (fileSize <= IMPORT.ASYNC_SIZE_THRESHOLD) {
       const htmlContent = await readFile(file.tmpPath, { encoding: 'utf-8' })
       const parseResult = await this.bookmarkParserService.parseHtml(htmlContent)
 
@@ -129,10 +128,9 @@ export default class BookmarksController {
     }
 
     const jobId = randomUUID()
-    const tempDir = '/tmp/linky-imports'
-    const tempPath = `${tempDir}/${jobId}.html`
+    const tempPath = `${IMPORT.TEMP_DIR}/${jobId}.html`
 
-    await mkdir(tempDir, { recursive: true })
+    await mkdir(IMPORT.TEMP_DIR, { recursive: true })
     const htmlContent = await readFile(file.tmpPath, { encoding: 'utf-8' })
     await writeFile(tempPath, htmlContent)
 

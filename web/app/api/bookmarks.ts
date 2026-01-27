@@ -53,6 +53,16 @@ export interface ImportStatusResponse {
   }
 }
 
+export interface CreateBookmarkByUrlRequest {
+  url: string
+  tagIds?: number[]
+  autoFetch?: boolean
+}
+
+export interface RefreshMetadataResponse {
+  message: string
+}
+
 export const bookmarksApi = {
   paginate: (params: BookmarkPaginationParams = {}) =>
     request.get<PaginatedResponse<Bookmark>>('/bookmarks/paginate', params),
@@ -63,10 +73,14 @@ export const bookmarksApi = {
 
   create: (data: CreateBookmarkRequest) => request.post<Bookmark>('/bookmarks', data),
 
+  createByUrl: (data: CreateBookmarkByUrlRequest) => request.post<Bookmark>('/bookmarks/create-by-url', data),
+
   update: (id: number, data: UpdateBookmarkRequest) =>
     request.put<Bookmark>(`/bookmarks/${id}`, data),
 
   delete: (id: number) => request.delete(`/bookmarks/${id}`),
+
+  refreshMetadata: (id: number) => request.post<RefreshMetadataResponse>(`/bookmarks/${id}/refresh-metadata`),
 
   import: (file: File, options: ImportOptions = {}) => {
     const formData = new FormData()

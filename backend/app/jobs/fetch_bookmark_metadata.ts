@@ -1,4 +1,5 @@
 import { Job } from 'adonisjs-jobs'
+import logger from '@adonisjs/core/services/logger'
 import { BookmarkMetadataService } from '#services/bookmark_metadata_service'
 import { METADATA_FETCH } from '#constants/index'
 
@@ -19,17 +20,17 @@ export default class FetchBookmarkMetadata extends Job {
   async handle(payload: FetchBookmarkMetadataPayload): Promise<FetchBookmarkMetadataResult> {
     const { bookmarkId, url, forceUpdate = false } = payload
 
-    console.log(`[FetchBookmarkMetadata] Starting fetch for bookmark ${bookmarkId}: ${url}`)
-    console.log(`[FetchBookmarkMetadata] forceUpdate: ${forceUpdate}`)
+    logger.info(`[FetchBookmarkMetadata] Starting fetch for bookmark ${bookmarkId}: ${url}`)
+    logger.info(`[FetchBookmarkMetadata] forceUpdate: ${forceUpdate}`)
 
     const metadata = await this.metadataService.fetchAndUpdate(bookmarkId, url, forceUpdate)
 
     if (!metadata.success) {
-      console.error(`[FetchBookmarkMetadata] Failed for bookmark ${bookmarkId}: ${metadata.error}`)
+      logger.error(`[FetchBookmarkMetadata] Failed for bookmark ${bookmarkId}: ${metadata.error}`)
       throw new Error(metadata.error ?? 'Failed to fetch metadata')
     }
 
-    console.log(`[FetchBookmarkMetadata] Completed for bookmark ${bookmarkId}`)
+    logger.info(`[FetchBookmarkMetadata] Completed for bookmark ${bookmarkId}`)
     return { success: true, bookmarkId }
   }
 

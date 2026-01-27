@@ -1,5 +1,5 @@
+import logger from '@adonisjs/core/services/logger'
 import ogs from 'open-graph-scraper'
-import { inject } from '@adonisjs/core'
 import Bookmark from '#models/bookmark'
 import { METADATA_FETCH } from '#constants/index'
 import type { BookmarkMetadata } from '#types/bookmark'
@@ -15,12 +15,11 @@ export interface FetchMetadataResult {
   error?: string
 }
 
-@inject()
 export class BookmarkMetadataService {
   async fetch(options: FetchMetadataOptions): Promise<FetchMetadataResult> {
     const { url, timeout = METADATA_FETCH.TIMEOUT } = options
 
-    console.log(`[BookmarkMetadataService] Fetching metadata for: ${url}`)
+    logger.info(`[BookmarkMetadataService] Fetching metadata for: ${url}`)
 
     try {
       const result = await ogs({
@@ -30,9 +29,9 @@ export class BookmarkMetadataService {
 
       const { result: ogData } = result
 
-      console.log(`[BookmarkMetadataService] ogTitle:`, ogData.ogTitle)
-      console.log(`[BookmarkMetadataService] ogDescription:`, ogData.ogDescription)
-      console.log(`[BookmarkMetadataService] ogImage:`, ogData.ogImage)
+      logger.info(`[BookmarkMetadataService] ogTitle: ${ogData.ogTitle}`)
+      logger.info(`[BookmarkMetadataService] ogDescription: ${ogData.ogDescription}`)
+      logger.info(`[BookmarkMetadataService] ogImage: ${ogData.ogImage}`)
 
       const ogImage = ogData.ogImage
 
@@ -54,7 +53,7 @@ export class BookmarkMetadataService {
         },
       }
     } catch (error) {
-      console.error(`[BookmarkMetadataService] Fetch error for ${url}:`, error)
+      logger.error({ err: error }, `[BookmarkMetadataService] Fetch error for ${url}`)
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -70,16 +69,16 @@ export class BookmarkMetadataService {
     const bookmark = await Bookmark.find(bookmarkId)
 
     if (!bookmark) {
-      console.error(`[BookmarkMetadataService] Bookmark not found: ${bookmarkId}`)
+      logger.error(`[BookmarkMetadataService] Bookmark not found: ${bookmarkId}`)
       return
     }
 
-    console.log(`[BookmarkMetadataService] Updating bookmark ${bookmarkId}`)
-    console.log(`[BookmarkMetadataService] Current title: "${bookmark.title}"`)
-    console.log(`[BookmarkMetadataService] Current description: "${bookmark.description}"`)
-    console.log(`[BookmarkMetadataService] Metadata ogTitle: "${metadata.ogTitle}"`)
-    console.log(`[BookmarkMetadataService] Metadata ogDescription: "${metadata.ogDescription}"`)
-    console.log(`[BookmarkMetadataService] forceUpdate: ${forceUpdate}`)
+    logger.info(`[BookmarkMetadataService] Updating bookmark ${bookmarkId}`)
+    logger.info(`[BookmarkMetadataService] Current title: "${bookmark.title}"`)
+    logger.info(`[BookmarkMetadataService] Current description: "${bookmark.description}"`)
+    logger.info(`[BookmarkMetadataService] Metadata ogTitle: "${metadata.ogTitle}"`)
+    logger.info(`[BookmarkMetadataService] Metadata ogDescription: "${metadata.ogDescription}"`)
+    logger.info(`[BookmarkMetadataService] forceUpdate: ${forceUpdate}`)
 
     const updates: { title?: string; description: string | null; metadata?: BookmarkMetadata } = {
       metadata,
@@ -88,13 +87,13 @@ export class BookmarkMetadataService {
 
     if (forceUpdate) {
       if (metadata.ogTitle) {
-        console.log(
+        logger.info(
           `[BookmarkMetadataService] forceUpdate: Will update title to: "${metadata.ogTitle}"`
         )
         updates.title = metadata.ogTitle
       }
       if (metadata.ogDescription) {
-        console.log(
+        logger.info(
           `[BookmarkMetadataService] forceUpdate: Will update description to: "${metadata.ogDescription}"`
         )
         updates.description = metadata.ogDescription
@@ -103,43 +102,43 @@ export class BookmarkMetadataService {
       const shouldUpdateTitle = !bookmark.title || bookmark.title.trim() === ''
       const shouldUpdateDescription = !bookmark.description || bookmark.description?.trim() === ''
 
-      console.log(`[BookmarkMetadataService] shouldUpdateTitle: ${shouldUpdateTitle}`)
-      console.log(`[BookmarkMetadataService] shouldUpdateDescription: ${shouldUpdateDescription}`)
+      logger.info(`[BookmarkMetadataService] shouldUpdateTitle: ${shouldUpdateTitle}`)
+      logger.info(`[BookmarkMetadataService] shouldUpdateDescription: ${shouldUpdateDescription}`)
 
       if (shouldUpdateTitle && metadata.ogTitle) {
-        console.log(`[BookmarkMetadataService] Will update title to: "${metadata.ogTitle}"`)
+        logger.info(`[BookmarkMetadataService] Will update title to: "${metadata.ogTitle}"`)
         updates.title = metadata.ogTitle
       } else {
-        console.log(
+        logger.info(
           `[BookmarkMetadataService] Title not updated. shouldUpdateTitle: ${shouldUpdateTitle}, ogTitle: ${metadata.ogTitle}`
         )
       }
 
       if (shouldUpdateDescription && metadata.ogDescription) {
-        console.log(
+        logger.info(
           `[BookmarkMetadataService] Will update description to: "${metadata.ogDescription}"`
         )
         updates.description = metadata.ogDescription
       } else {
-        console.log(
+        logger.info(
           `[BookmarkMetadataService] Description not updated. shouldUpdateDescription: ${shouldUpdateDescription}, ogDescription: ${metadata.ogDescription}`
         )
       }
     }
 
-    console.log(`[BookmarkMetadataService] Updates object:`, updates)
-    console.log(
+    logger.info(`[BookmarkMetadataService] Updates object: ${JSON.stringify(updates)}`)
+    logger.info(
       `[BookmarkMetadataService] Object.keys(updates).length: ${Object.keys(updates).length}`
     )
 
     if (Object.keys(updates).length > 1) {
       bookmark.merge(updates)
       await bookmark.save()
-      console.log(`[BookmarkMetadataService] Bookmark ${bookmarkId} saved with updates`)
+      logger.info(`[BookmarkMetadataService] Bookmark ${bookmarkId} saved with updates`)
     } else {
       bookmark.metadata = metadata
       await bookmark.save()
-      console.log(`[BookmarkMetadataService] Bookmark ${bookmarkId} saved with metadata only`)
+      logger.info(`[BookmarkMetadataService] Bookmark ${bookmarkId} saved with metadata only`)
     }
   }
 
@@ -158,7 +157,7 @@ export class BookmarkMetadataService {
       fetchedAt: new Date().toISOString(),
     }
 
-    console.log(`[BookmarkMetadataService] fetchAndUpdate result:`, metadata)
+    logger.info(`[BookmarkMetadataService] fetchAndUpdate result: ${JSON.stringify(metadata)}`)
 
     await this.updateBookmarkMetadata(bookmarkId, metadata, forceUpdate)
 

@@ -14,11 +14,11 @@ export interface MockBookmark {
   title: string
   url: string
   description: string | null
-  visitCount: number
-  userId: number
+  visit_count: number
+  user_id: number
   tags: MockTag[]
-  createdAt: string
-  updatedAt: string | null
+  created_at: string
+  updated_at: string | null
 }
 
 export interface MockMemo {
@@ -122,66 +122,66 @@ const mockBookmarks: MockBookmark[] = [
     title: 'React 官方文档',
     url: 'https://react.dev',
     description: 'React 官方文档，学习 React 的最佳资源',
-    visitCount: 25,
-    userId: 1,
+    visit_count: 25,
+    user_id: 1,
     tags: [mockTags[0] as MockTag, mockTags[2] as MockTag],
-    createdAt: '2024-01-15T10:00:00.000Z',
-    updatedAt: null
+    created_at: '2024-01-15T10:00:00.000Z',
+    updated_at: null
   },
   {
     id: 2,
     title: 'Vue 3 官方文档',
     url: 'https://vuejs.org',
     description: 'Vue 3 官方文档，渐进式 JavaScript 框架',
-    visitCount: 18,
-    userId: 1,
+    visit_count: 18,
+    user_id: 1,
     tags: [mockTags[1] as MockTag, mockTags[2] as MockTag],
-    createdAt: '2024-01-18T14:20:00.000Z',
-    updatedAt: null
+    created_at: '2024-01-18T14:20:00.000Z',
+    updated_at: null
   },
   {
     id: 3,
     title: 'TypeScript 官方文档',
     url: 'https://www.typescriptlang.org/',
     description: 'TypeScript 官方文档，JavaScript 的超集',
-    visitCount: 30,
-    userId: 1,
+    visit_count: 30,
+    user_id: 1,
     tags: [mockTags[2] as MockTag],
-    createdAt: '2024-01-20T09:00:00.000Z',
-    updatedAt: null
+    created_at: '2024-01-20T09:00:00.000Z',
+    updated_at: null
   },
   {
     id: 4,
     title: 'Figma 设计工具',
     url: 'https://www.figma.com',
     description: '协作式界面设计工具',
-    visitCount: 15,
-    userId: 1,
+    visit_count: 15,
+    user_id: 1,
     tags: [mockTags[3] as MockTag],
-    createdAt: '2024-01-22T16:45:00.000Z',
-    updatedAt: null
+    created_at: '2024-01-22T16:45:00.000Z',
+    updated_at: null
   },
   {
     id: 5,
     title: 'Notion 笔记工具',
     url: 'https://www.notion.so',
     description: 'All-in-one 工作空间',
-    visitCount: 22,
-    userId: 1,
+    visit_count: 22,
+    user_id: 1,
     tags: [mockTags[4] as MockTag],
-    createdAt: '2024-01-25T08:30:00.000Z',
-    updatedAt: null
+    created_at: '2024-01-25T08:30:00.000Z',
+    updated_at: null
   },
   {
     id: 6,
     title: 'OpenAI 官网',
     url: 'https://openai.com',
     description: 'OpenAI 官方网站，了解最新的 AI 技术',
-    visitCount: 35,
-    userId: 1,
+    visit_count: 35,
+    user_id: 1,
     tags: [mockTags[5] as MockTag],
-    createdAt: '2024-01-28T13:15:00.000Z',
-    updatedAt: null
+    created_at: '2024-01-28T13:15:00.000Z',
+    updated_at: null
   }
 ]
 

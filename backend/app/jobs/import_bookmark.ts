@@ -1,4 +1,5 @@
 import { Job } from 'adonisjs-jobs'
+import logger from '@adonisjs/core/services/logger'
 import { readFile, unlink } from 'node:fs/promises'
 import { BookmarkParserService, parseHtml } from '#services/bookmark_parser_service'
 
@@ -43,42 +44,42 @@ export default class ImportBookmark extends Job {
   async handle(payload: ImportBookmarkPayload) {
     const { jobId, userId, filePath, createTags, skipDuplicates } = payload
 
-    console.log(`[ImportBookmark] Job started: ${jobId}`)
+    logger.info(`[ImportBookmark] Job started: ${jobId}`)
     await this.updateStatus(jobId, 'processing', 0)
 
     try {
       await this.updateProgress(10)
       await this.updateStatus(jobId, 'processing', 10)
-      console.log(`[ImportBookmark] Progress: 10%`)
+      logger.info(`[ImportBookmark] Progress: 10%`)
 
       const htmlContent = await readFile(filePath, { encoding: 'utf-8' })
-      console.log(`[ImportBookmark] File read, size: ${htmlContent.length}`)
+      logger.info(`[ImportBookmark] File read, size: ${htmlContent.length}`)
       await this.updateProgress(30)
       await this.updateStatus(jobId, 'processing', 30)
-      console.log(`[ImportBookmark] Progress: 30%`)
+      logger.info(`[ImportBookmark] Progress: 30%`)
 
       const parseResult = await parseHtml(htmlContent)
-      console.log(`[ImportBookmark] Parsed bookmarks: ${parseResult.bookmarks.length}`)
+      logger.info(`[ImportBookmark] Parsed bookmarks: ${parseResult.bookmarks.length}`)
       await this.updateProgress(50)
       await this.updateStatus(jobId, 'processing', 50)
-      console.log(`[ImportBookmark] Progress: 50%`)
+      logger.info(`[ImportBookmark] Progress: 50%`)
 
       const result = await this.bookmarkParserService.processImport(userId, parseResult.bookmarks, {
         createTags,
         skipDuplicates,
       })
-      console.log(`[ImportBookmark] Import result:`, result)
+      logger.info(`[ImportBookmark] Import result: ${JSON.stringify(result)}`)
       await this.updateProgress(100)
       await this.updateStatus(jobId, 'processing', 100)
-      console.log(`[ImportBookmark] Progress: 100%`)
+      logger.info(`[ImportBookmark] Progress: 100%`)
 
       await this.storeResult(jobId, result)
       await this.cleanupFile(filePath)
 
-      console.log(`[ImportBookmark] Job completed: ${jobId}`)
+      logger.info(`[ImportBookmark] Job completed: ${jobId}`)
       return result
     } catch (error) {
-      console.error(`[ImportBookmark] Job failed: ${jobId}`, error)
+      logger.error({ err: error }, `[ImportBookmark] Job failed: ${jobId}`)
       await this.updateStatus(
         jobId,
         'failed',
@@ -112,7 +113,7 @@ export default class ImportBookmark extends Job {
 
     const key = `import:status:${jobId}`
     await redis.setex(key, 86400, JSON.stringify(jobStatus))
-    console.log(`[ImportBookmark] Redis SET ${key}:`, JSON.stringify(jobStatus))
+    logger.info(`[ImportBookmark] Redis SET ${key}: ${JSON.stringify(jobStatus)}`)
   }
 
   private async storeResult(jobId: string, result: ImportResult) {
@@ -133,7 +134,7 @@ export default class ImportBookmark extends Job {
     try {
       await unlink(filePath)
     } catch (error) {
-      console.error(`Failed to cleanup file: ${filePath}`, error)
+      logger.error({ err: error }, `[ImportBookmark] Failed to cleanup file: ${filePath}`)
     }
   }
 }

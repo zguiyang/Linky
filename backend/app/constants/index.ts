@@ -49,5 +49,13 @@ const METADATA_FETCH = {
 
 type MetadataFetch = (typeof METADATA_FETCH)[keyof typeof METADATA_FETCH]
 
-export { ORDER_BY, PAGINATION, BOOKMARK_STATUS, SORT_ORDER, VALIDATION, METADATA_FETCH }
-export type { OrderBy, Pagination, BookmarkStatus, SortOrder, Validation, MetadataFetch }
+const IMPORT = {
+  ASYNC_SIZE_THRESHOLD: 512 * 1024,
+  MAX_FILE_SIZE: '2mb',
+  TEMP_DIR: '/tmp/linky-imports',
+} as const
+
+type Import = (typeof IMPORT)[keyof typeof IMPORT]
+
+export { ORDER_BY, PAGINATION, BOOKMARK_STATUS, SORT_ORDER, VALIDATION, METADATA_FETCH, IMPORT }
+export type { OrderBy, Pagination, BookmarkStatus, SortOrder, Validation, MetadataFetch, Import }
