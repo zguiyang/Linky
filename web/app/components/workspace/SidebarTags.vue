@@ -207,13 +207,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 import type { DropdownMenuItem, ContextMenuItem } from '@nuxt/ui'
 import { useTags } from '~/composables/useTags'
 
 const { tags, pending, createTag, updateTag, deleteTag, fetchTags, isSelected } = useTags()
-await fetchTags()
+
+onMounted(() => {
+  fetchTags()
+})
 
 const showModal = ref(false)
 const isEditing = ref(false)

@@ -299,7 +299,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import type { Tag } from '~/api/types'
 import { tagsApi } from '~/api/tags'
 import { useTags } from '~/composables/useTags'
@@ -308,7 +308,9 @@ definePageMeta({ layout: 'workspace' })
 
 const { tags, pending, fetchTags } = useTags()
 
-fetchTags()
+onMounted(() => {
+  fetchTags()
+})
 const searchQuery = ref('')
 const sortOption = ref('usage-desc')
 

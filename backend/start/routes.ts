@@ -37,6 +37,11 @@ router
     router.get('/bookmarks/paginate', '#controllers/bookmarks_controller.paginate')
     router.get('/bookmarks/:id', '#controllers/bookmarks_controller.show')
     router.post('/bookmarks', '#controllers/bookmarks_controller.store')
+    router.post('/bookmarks/by-url', '#controllers/bookmarks_controller.createByUrl')
+    router.post(
+      '/bookmarks/:id/refresh-metadata',
+      '#controllers/bookmarks_controller.refreshMetadata'
+    )
     router.post('/bookmarks/import', '#controllers/bookmarks_controller.import')
     router.get('/bookmarks/import/:jobId/status', '#controllers/bookmarks_controller.importStatus')
     router.put('/bookmarks/:id', '#controllers/bookmarks_controller.update')

@@ -1,10 +1,19 @@
+import { inject } from '@adonisjs/core'
 import Bookmark from '#models/bookmark'
 import { Exception } from '@adonisjs/core/exceptions'
+import type { BookmarkMetadata } from '#types/bookmark'
 
+@inject()
 export class BookmarkService {
   async create(
     userId: number,
-    data: { title: string; url: string; description?: string; tagIds?: number[] }
+    data: {
+      url: string
+      title?: string | null
+      description?: string | null
+      tagIds?: number[]
+      autoFetch?: boolean
+    }
   ) {
     const existingBookmark = await Bookmark.query()
       .where('user_id', userId)
@@ -16,9 +25,9 @@ export class BookmarkService {
     }
 
     const bookmark = await Bookmark.create({
-      title: data.title,
+      title: data.title || '',
       url: data.url,
-      description: data.description || null,
+      description: data.description ?? null,
       userId,
     })
 
@@ -26,7 +35,60 @@ export class BookmarkService {
       await bookmark.related('tags').sync(data.tagIds)
     }
 
+    if (data.autoFetch !== false) {
+      await this.scheduleMetadataFetch(bookmark.id, data.url)
+    }
+
     return bookmark
+  }
+
+  async createByUrl(
+    userId: number,
+    data: {
+      url: string
+      tagIds?: number[]
+      autoFetch?: boolean
+    }
+  ) {
+    return await this.create(userId, {
+      url: data.url,
+      title: null,
+      description: null,
+      tagIds: data.tagIds,
+      autoFetch: data.autoFetch,
+    })
+  }
+
+  private async scheduleMetadataFetch(bookmarkId: number, url: string): Promise<void> {
+    const { default: FetchBookmarkMetadata } = await import('#jobs/fetch_bookmark_metadata')
+    await FetchBookmarkMetadata.dispatch({ bookmarkId, url })
+  }
+
+  async updateMetadata(
+    userId: number,
+    bookmarkId: number,
+    metadata: BookmarkMetadata
+  ): Promise<Bookmark> {
+    const bookmark = await Bookmark.query().where('id', bookmarkId).where('user_id', userId).first()
+
+    if (!bookmark) {
+      throw new Exception('书签不存在', { status: 404 })
+    }
+
+    bookmark.metadata = metadata
+    await bookmark.save()
+
+    return bookmark
+  }
+
+  async refreshMetadata(userId: number, bookmarkId: number): Promise<void> {
+    const bookmark = await Bookmark.query().where('id', bookmarkId).where('user_id', userId).first()
+
+    if (!bookmark) {
+      throw new Exception('书签不存在', { status: 404 })
+    }
+
+    await this.scheduleMetadataFetch(bookmarkId, bookmark.url)
   }
 
   async findAll(userId: number) {
@@ -116,8 +178,10 @@ export class BookmarkService {
     const updateData: {
       title?: string
       url?: string
-      description?: string | null
-    } = {}
+      description: string | null
+    } = {
+      description: bookmark.description,
+    }
 
     if (data.title !== undefined) {
       updateData.title = data.title

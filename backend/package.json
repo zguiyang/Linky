@@ -67,6 +67,7 @@
     "edge.js": "^6.4.0",
     "jsdom": "^27.4.0",
     "luxon": "^3.7.2",
+    "open-graph-scraper": "^6.11.0",
     "pg": "^8.17.2",
     "reflect-metadata": "^0.2.2"
   },

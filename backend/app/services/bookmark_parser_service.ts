@@ -171,6 +171,11 @@ export class BookmarkParserService {
     }
   }
 
+  private async scheduleMetadataFetch(bookmarkId: number, url: string): Promise<void> {
+    const { default: FetchBookmarkMetadata } = await import('#jobs/fetch_bookmark_metadata')
+    await FetchBookmarkMetadata.dispatch({ bookmarkId, url })
+  }
+
   async processImport(
     userId: number,
     parsedBookmarks: ParsedBookmark[],
@@ -255,7 +260,7 @@ export class BookmarkParserService {
           }
         }
 
-        await Bookmark.create({
+        const newBookmark = await Bookmark.create({
           title: bookmark.title,
           url: bookmark.url,
           description: null,
@@ -263,14 +268,16 @@ export class BookmarkParserService {
           visitCount: 0,
         })
 
+        await this.scheduleMetadataFetch(newBookmark.id, bookmark.url)
+
         if (tagIds.length > 0) {
-          const newBookmark = await Bookmark.query()
+          const bookmarkWithTags = await Bookmark.query()
             .where('user_id', userId)
             .where('url', bookmark.url)
             .first()
 
-          if (newBookmark) {
-            await newBookmark.related('tags').sync(tagIds)
+          if (bookmarkWithTags) {
+            await bookmarkWithTags.related('tags').sync(tagIds)
           }
         }
 

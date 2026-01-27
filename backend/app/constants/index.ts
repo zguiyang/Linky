@@ -35,11 +35,19 @@ const VALIDATION = {
   TAG_NAME_MIN: 1,
   TAG_NAME_MAX: 100,
   COLOR_HEX_LENGTH: 7,
-  PAGINATION_DEFAULT_PER_PAGE: 20,
+  METADATA_MAX_SIZE: 65535,
 } as const
 
 type Validation = (typeof VALIDATION)[keyof typeof VALIDATION]
 
-export { ORDER_BY, PAGINATION, BOOKMARK_STATUS, SORT_ORDER, VALIDATION }
+const METADATA_FETCH = {
+  ATTEMPTS: 3,
+  RETRY_DELAY_MIN: 5000,
+  RETRY_DELAY_MAX: 10000,
+  TIMEOUT: 10000,
+} as const
 
-export type { OrderBy, Pagination, BookmarkStatus, SortOrder, Validation }
+type MetadataFetch = (typeof METADATA_FETCH)[keyof typeof METADATA_FETCH]
+
+export { ORDER_BY, PAGINATION, BOOKMARK_STATUS, SORT_ORDER, VALIDATION, METADATA_FETCH }
+export type { OrderBy, Pagination, BookmarkStatus, SortOrder, Validation, MetadataFetch }

@@ -3,10 +3,24 @@ import { VALIDATION, ORDER_BY, SORT_ORDER } from '#constants/index'
 
 export const createBookmarkValidator = vine.compile(
   vine.object({
-    title: vine.string().trim().minLength(VALIDATION.TITLE_MIN).maxLength(VALIDATION.TITLE_MAX),
     url: vine.string().trim().url(),
+    title: vine
+      .string()
+      .trim()
+      .minLength(VALIDATION.TITLE_MIN)
+      .maxLength(VALIDATION.TITLE_MAX)
+      .optional(),
     description: vine.string().trim().maxLength(VALIDATION.DESCRIPTION_MAX).optional(),
-    tagIds: vine.array(vine.number()).minLength(1).optional(),
+    tagIds: vine.array(vine.number()).nullable().optional(),
+    autoFetch: vine.boolean().optional(),
+  })
+)
+
+export const createBookmarkByUrlValidator = vine.compile(
+  vine.object({
+    url: vine.string().trim().url(),
+    tagIds: vine.array(vine.number()).nullable().optional(),
+    autoFetch: vine.boolean().optional(),
   })
 )
 
@@ -20,7 +34,7 @@ export const updateBookmarkValidator = vine.compile(
       .optional(),
     url: vine.string().trim().url().optional(),
     description: vine.string().trim().maxLength(VALIDATION.DESCRIPTION_MAX).optional(),
-    tagIds: vine.array(vine.number()).minLength(1).optional(),
+    tagIds: vine.array(vine.number()).nullable().optional(),
   })
 )
 
@@ -47,6 +61,7 @@ export const importBookmarkValidator = vine.compile(
 )
 
 export type CreateBookmarkValidator = typeof createBookmarkValidator
+export type CreateBookmarkByUrlValidator = typeof createBookmarkByUrlValidator
 export type UpdateBookmarkValidator = typeof updateBookmarkValidator
 export type BookmarkPaginationValidator = typeof bookmarkPaginationValidator
 export type ImportBookmarkValidator = typeof importBookmarkValidator

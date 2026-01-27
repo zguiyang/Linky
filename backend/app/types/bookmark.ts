@@ -31,3 +31,19 @@ export interface WorkerMessage {
   data?: ParseResult
   error?: string
 }
+
+export interface BookmarkMetadata {
+  ogTitle?: string | null
+  ogDescription?: string | null
+  ogImage?: {
+    url?: string | null
+    width?: number | null
+    height?: number | null
+    type?: string | null
+  } | null
+  favicon?: string | null
+  requestUrl: string
+  success: boolean
+  error?: string | null
+  fetchedAt: string | null
+}

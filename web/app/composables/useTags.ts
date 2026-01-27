@@ -1,32 +1,21 @@
-import { useState } from '#app'
+import { ref } from 'vue'
 import { tagsApi } from '~/api/tags'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 
 export const useTags = () => {
-  const tags = useState<Tag[]>('global-tags', () => [])
-  const pending = useState('global-tags-pending', () => false)
-  const error = useState<string | null>('global-tags-error', () => null)
+  const tags = ref<Tag[]>([])
+  const pending = ref(false)
+  const error = ref<string | null>(null)
 
-  const fetchTags = async (forceRefresh = false) => {
-    if (tags.value.length > 0 && !forceRefresh) {
-      return tags.value
-    }
-
-    if (pending.value) {
-      return tags.value
-    }
-
+  const fetchTags = async () => {
     pending.value = true
     error.value = null
 
     try {
-      const data = await tagsApi.index()
-      tags.value = data
-      return data
-    } catch (e) {
+      tags.value = await tagsApi.index()
+    } catch {
       error.value = 'Failed to load tags'
       tags.value = []
-      throw e
     } finally {
       pending.value = false
     }
@@ -34,24 +23,20 @@ export const useTags = () => {
 
   const createTag = async (data: CreateTagRequest) => {
     await tagsApi.create(data)
-    await fetchTags(true)
+    await fetchTags()
   }
 
   const updateTag = async (id: number, data: UpdateTagRequest) => {
     await tagsApi.update(id, data)
-    await fetchTags(true)
+    await fetchTags()
   }
 
   const deleteTag = async (id: number) => {
     await tagsApi.delete(id)
-    await fetchTags(true)
+    await fetchTags()
   }
 
-  const refreshTags = async () => {
-    return await fetchTags(true)
-  }
-
-  const selectedTags = useState('selectedTags', () => [] as number[])
+  const selectedTags = ref<number[]>([])
 
   const toggleTag = (tagId: number) => {
     const index = selectedTags.value.indexOf(tagId)
@@ -85,7 +70,6 @@ export const useTags = () => {
     createTag,
     updateTag,
     deleteTag,
-    refreshTags,
     selectedTags,
     toggleTag,
     clearTags,

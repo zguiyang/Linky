@@ -6,6 +6,7 @@ import { mkdir } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
 import {
   createBookmarkValidator,
+  createBookmarkByUrlValidator,
   updateBookmarkValidator,
   bookmarkPaginationValidator,
   importBookmarkValidator,
@@ -49,18 +50,45 @@ export default class BookmarksController {
   async store({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
     const data = await request.validateUsing(createBookmarkValidator)
-    return await this.bookmarkService.create(user.id, data)
+    return await this.bookmarkService.create(user.id, {
+      url: data.url,
+      title: data.title ?? null,
+      description: data.description ?? null,
+      tagIds: data.tagIds ?? undefined,
+      autoFetch: data.autoFetch,
+    })
+  }
+
+  async createByUrl({ auth, request }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const data = await request.validateUsing(createBookmarkByUrlValidator)
+    return await this.bookmarkService.createByUrl(user.id, {
+      url: data.url,
+      tagIds: data.tagIds ?? undefined,
+      autoFetch: data.autoFetch,
+    })
   }
 
   async update({ auth, params, request }: HttpContext) {
     const user = auth.getUserOrFail()
     const data = await request.validateUsing(updateBookmarkValidator)
-    return await this.bookmarkService.update(user.id, params.id, data)
+    return await this.bookmarkService.update(user.id, params.id, {
+      title: data.title,
+      url: data.url,
+      description: data.description,
+      tagIds: data.tagIds ?? undefined,
+    })
   }
 
   async destroy({ auth, params }: HttpContext) {
     const user = auth.getUserOrFail()
     await this.bookmarkService.delete(user.id, params.id)
+  }
+
+  async refreshMetadata({ auth, params }: HttpContext) {
+    const user = auth.getUserOrFail()
+    await this.bookmarkService.refreshMetadata(user.id, params.id)
+    return { message: 'Metadata refresh queued' }
   }
 
   async import({ auth, request }: HttpContext) {
