@@ -61,6 +61,11 @@ export class TagService {
 
   async delete(userId: number, tagId: number) {
     const tag = await this.findById(userId, tagId)
+
+    if (tag.bookmarksCount > 0 || tag.memosCount > 0) {
+      throw new Exception('该标签有关联的书签或备忘录，无法删除', { status: 409 })
+    }
+
     await tag.delete()
   }
 }
