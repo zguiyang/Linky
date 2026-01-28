@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/icon'],
+  modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/icon', '@pinia/nuxt', '@vueuse/nuxt'],
 
   devtools: {
     enabled: true
@@ -34,5 +34,8 @@ export default defineNuxtConfig({
     serverBundle: {
       collections: ['lucide', 'heroicons']
     }
+  },
+  pinia: {
+    storesDirs: ['app/stores/**']
   }
 })
