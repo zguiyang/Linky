@@ -30,6 +30,7 @@ export class BookmarkService {
       url: data.url,
       description: data.description ?? null,
       userId,
+      status: data.autoFetch !== false ? BOOKMARK_STATUS.FETCHING : BOOKMARK_STATUS.ACTIVE,
     })
 
     if (data.tagIds && data.tagIds.length > 0) {
