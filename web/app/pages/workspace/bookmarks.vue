@@ -479,7 +479,7 @@ const openImportModal = () => {
 
 const handleImportComplete = async () => {
   await refreshBookmarks()
-  await tagsStore.fetchTags()
+  await tagsStore.refreshTags()
 }
 
 onMounted(() => {

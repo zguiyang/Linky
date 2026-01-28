@@ -32,6 +32,9 @@ export const useTagsStore = defineStore('tags', () => {
   })
 
   const fetchTags = async () => {
+    if (tags.value.length > 0) {
+      return
+    }
     pending.value = true
     error.value = null
     try {
@@ -44,25 +47,37 @@ export const useTagsStore = defineStore('tags', () => {
     }
   }
 
+  const refreshTags = async () => {
+    pending.value = true
+    error.value = null
+    try {
+      tags.value = await tagsApi.index()
+    } catch {
+      error.value = 'Failed to load tags'
+    } finally {
+      pending.value = false
+    }
+  }
+
   const createTag = async (data: CreateTagRequest) => {
     await tagsApi.create(data)
-    await fetchTags()
+    await refreshTags()
   }
 
   const updateTag = async (id: number, data: UpdateTagRequest) => {
     await tagsApi.update(id, data)
-    await fetchTags()
+    await refreshTags()
   }
 
   const deleteTag = async (id: number) => {
     await tagsApi.delete(id)
-    await fetchTags()
+    await refreshTags()
   }
 
   const batchDelete = async (ids: number[]) => {
     const deletePromises = ids.map(id => tagsApi.delete(id))
     await Promise.all(deletePromises)
-    await fetchTags()
+    await refreshTags()
   }
 
   const toggleTag = (tagId: number) => {
@@ -103,6 +118,7 @@ export const useTagsStore = defineStore('tags', () => {
     getTagById,
     tagSelectItems,
     fetchTags,
+    refreshTags,
     createTag,
     updateTag,
     deleteTag,
