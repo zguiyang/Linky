@@ -55,26 +55,26 @@
     </div>
 
     <div
-      v-if="selectedTags.length > 0"
+      v-if="tagsStore.selectedTags.length > 0"
       class="px-6 pb-6 border-b border-muted/12 dark:border-muted/12"
     >
       <div class="flex items-center gap-3">
         <span class="text-sm text-muted dark:text-muted">已选标签：</span>
         <div class="flex items-center gap-2">
           <u-badge
-            v-for="tagId in selectedTags"
+            v-for="tagId in tagsStore.selectedTags"
             :key="tagId"
             color="primary"
             variant="soft"
             size="md"
           >
-            {{ getTagName(tagId) }}
+            {{ tagsStore.getTagName(tagId) }}
             <u-button
               icon="i-heroicons-x-mark"
               size="xs"
               variant="ghost"
               color="neutral"
-              @click="removeTag(tagId)"
+              @click="tagsStore.removeTag(tagId)"
             />
           </u-badge>
         </div>
@@ -82,7 +82,7 @@
           size="sm"
           variant="ghost"
           color="neutral"
-          @click="clearTags"
+          @click="tagsStore.clearTags"
         >
           清除筛选
         </u-button>
@@ -211,7 +211,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useTags } from '~/composables/useTags'
+import { useTagsStore } from '~/stores/tags'
 import { useHttpError } from '~/composables/useHttpError'
 import { memosApi } from '~/api/memos'
 import MemoModal from '~/components/MemoModal.vue'
@@ -220,8 +220,8 @@ import { VIEW_MODE, type ViewMode } from '~/constants'
 
 definePageMeta({ layout: 'workspace' })
 
-const { tags, selectedTags, removeTag, clearTags, fetchTags } = useTags()
-await fetchTags()
+const tagsStore = useTagsStore()
+await tagsStore.fetchTags()
 
 const { handleError } = useHttpError()
 
@@ -274,17 +274,12 @@ const filteredMemos = computed(() => {
     )
   }
 
-  if (selectedTags.value.length > 0) {
-    result = result.filter(m => m.tags.some(t => selectedTags.value.includes(t.id)))
+  if (tagsStore.selectedTags.length > 0) {
+    result = result.filter(m => m.tags.some(t => tagsStore.selectedTags.includes(t.id)))
   }
 
   return result
 })
-
-const getTagName = (tagId: number) => {
-  const tag = tags.value?.find(t => t.id === tagId)
-  return tag?.name || ''
-}
 
 const setViewMode = (mode: ViewMode) => {
   viewMode.value = mode

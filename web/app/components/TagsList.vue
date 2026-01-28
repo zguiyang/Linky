@@ -209,7 +209,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import type { ContextMenuItem } from '@nuxt/ui'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
-import { useTags } from '~/composables/useTags'
+import { useTagsStore } from '~/stores/tags'
 
 const props = defineProps<{
   selectedTags: number[]
@@ -219,8 +219,8 @@ const emit = defineEmits<{
   'update:selectedTags': [selectedTags: number[]]
 }>()
 
-const { tags, createTag, updateTag, deleteTag, fetchTags } = useTags()
-await fetchTags()
+const tagsStore = useTagsStore()
+await tagsStore.fetchTags()
 
 const showTagModal = ref(false)
 const isEditMode = ref(false)
@@ -233,10 +233,10 @@ const isSubmitting = ref(false)
 const isDeleting = ref(false)
 const isMobile = ref(false)
 
-const tagsList = computed(() => tags.value)
+const tagsList = computed(() => tagsStore.tags)
 const selectedTagsList = computed(() => props.selectedTags)
 
-const pendingValue = computed(() => false)
+const pendingValue = computed(() => tagsStore.pending)
 
 onMounted(() => {
   isMobile.value = window.innerWidth < 1024
@@ -308,7 +308,7 @@ const handleCreateTag = async (close?: () => void) => {
       name: tagForm.value.name.trim(),
       color: tagForm.value.color || undefined
     }
-    await createTag(data)
+    await tagsStore.createTag(data)
 
     close?.()
     showTagModal.value = false
@@ -329,7 +329,7 @@ const handleUpdateTag = async (close?: () => void) => {
       name: tagForm.value.name.trim(),
       color: tagForm.value.color || undefined
     }
-    await updateTag(contextTag.value.id, data)
+    await tagsStore.updateTag(contextTag.value.id, data)
 
     close?.()
     showTagModal.value = false
@@ -351,7 +351,7 @@ const handleDeleteTag = async (close?: () => void) => {
     isDeleting.value = true
     const newSelectedTags = selectedTagsList.value.filter(id => id !== deletedTagId)
     emit('update:selectedTags', newSelectedTags)
-    await deleteTag(deletedTagId)
+    await tagsStore.deleteTag(deletedTagId)
 
     close?.()
     showDeleteConfirm.value = false

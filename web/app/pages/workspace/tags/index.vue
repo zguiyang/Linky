@@ -45,7 +45,7 @@
     </div>
 
     <div
-      v-if="pending"
+      v-if="tagsStore.pending"
       class="flex items-center justify-center py-16"
     >
       <u-icon
@@ -55,7 +55,7 @@
     </div>
 
     <div
-      v-else-if="!tags || tags.length === 0"
+      v-else-if="!tagsStore.tags || tagsStore.tags.length === 0"
       class="flex flex-col items-center justify-center"
     >
       <div class="flex flex-col items-center justify-center py-16">
@@ -77,7 +77,7 @@
       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
     >
       <div
-        v-for="tag in tags"
+        v-for="tag in tagsStore.tags"
         :key="tag.id"
       >
         <u-card
@@ -301,16 +301,16 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import type { Tag } from '~/api/types'
-import { tagsApi } from '~/api/tags'
-import { useTags } from '~/composables/useTags'
+import { useTagsStore } from '~/stores/tags'
 
 definePageMeta({ layout: 'workspace' })
 
-const { tags, pending, fetchTags } = useTags()
+const tagsStore = useTagsStore()
 
 onMounted(() => {
-  fetchTags()
+  tagsStore.fetchTags()
 })
+
 const searchQuery = ref('')
 const sortOption = ref('usage-desc')
 
@@ -343,15 +343,15 @@ const clearBatchSelection = () => {
 }
 
 const isAllSelected = computed(() =>
-  tags.value.length > 0
-  && selectedTagsForBatch.value.length === tags.value.length
+  tagsStore.tags.length > 0
+  && selectedTagsForBatch.value.length === tagsStore.tags.length
 )
 
 const toggleSelectAll = () => {
   if (isAllSelected.value) {
     selectedTagsForBatch.value = []
   } else {
-    selectedTagsForBatch.value = tags.value.map(t => t.id)
+    selectedTagsForBatch.value = tagsStore.tags.map(t => t.id)
   }
 }
 
@@ -400,8 +400,7 @@ const handleCreateTag = async (close?: () => void) => {
 
   try {
     isSubmitting.value = true
-    await tagsApi.create({ name: tagForm.value.name.trim(), color: tagForm.value.color || undefined })
-    await fetchTags()
+    await tagsStore.createTag({ name: tagForm.value.name.trim(), color: tagForm.value.color || undefined })
     close?.()
     showModal.value = false
     tagForm.value = { name: '', color: '' }
@@ -417,8 +416,7 @@ const handleUpdateTag = async (close?: () => void) => {
 
   try {
     isSubmitting.value = true
-    await tagsApi.update(contextTag.value!.id, { name: tagForm.value.name.trim(), color: tagForm.value.color || undefined })
-    await fetchTags()
+    await tagsStore.updateTag(contextTag.value!.id, { name: tagForm.value.name.trim(), color: tagForm.value.color || undefined })
     close?.()
     showModal.value = false
     tagForm.value = { name: '', color: '' }
@@ -437,8 +435,7 @@ const handleDeleteTag = async (close?: () => void) => {
 
   try {
     isDeleting.value = true
-    await tagsApi.delete(deletedTagId)
-    await fetchTags()
+    await tagsStore.deleteTag(deletedTagId)
     close?.()
     showDeleteConfirm.value = false
     contextTag.value = null
@@ -450,9 +447,7 @@ const handleDeleteTag = async (close?: () => void) => {
 const handleBatchDelete = async (close?: () => void) => {
   try {
     isDeleting.value = true
-    const deletePromises = selectedTagsForBatch.value.map(id => tagsApi.delete(id))
-    await Promise.all(deletePromises)
-    await fetchTags()
+    await tagsStore.batchDelete(selectedTagsForBatch.value)
     selectedTagsForBatch.value = []
     batchMode.value = false
     close?.()

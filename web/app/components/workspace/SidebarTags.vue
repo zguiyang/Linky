@@ -26,7 +26,7 @@
     </div>
 
     <div
-      v-if="pending"
+      v-if="tagsStore.pending"
       class="flex items-center justify-center py-8"
     >
       <u-icon
@@ -36,7 +36,7 @@
     </div>
 
     <div
-      v-else-if="!tags || tags.length === 0"
+      v-else-if="!tagsStore.tags || tagsStore.tags.length === 0"
       class="flex flex-col items-center justify-center py-16"
     >
       <p class="text-sm text-neutral-500 dark:text-neutral-400">
@@ -45,7 +45,7 @@
     </div>
 
     <nav
-      v-show="!pending && tags && tags.length > 0"
+      v-show="!tagsStore.pending && tagsStore.tags && tagsStore.tags.length > 0"
       class="flex flex-wrap gap-2 px-2 py-1 overflow-hidden transition-all duration-300 ease-in-out"
       :class="{
         'max-h-0 opacity-0': !isExpanded,
@@ -53,7 +53,7 @@
       }"
     >
       <template
-        v-for="tag in tags"
+        v-for="tag in tagsStore.tags"
         :key="tag.id"
       >
         <u-context-menu
@@ -64,7 +64,7 @@
             :to="getTagLink(tag.id)"
             class="inline-flex items-center px-2.5 py-1 rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100/80 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800/80 dark:text-neutral-300 dark:hover:bg-neutral-700 transition-all duration-200 whitespace-nowrap"
             :class="{
-              'bg-primary-100 text-primary-700 border-primary-200 dark:bg-primary-500/20 dark:text-primary-300 dark:border-primary-500/30 shadow-sm ring-2 ring-primary-500/20': isSelected(tag.id)
+              'bg-primary-100 text-primary-700 border-primary-200 dark:bg-primary-500/20 dark:text-primary-300 dark:border-primary-500/30 shadow-sm ring-2 ring-primary-500/20': tagsStore.isSelected(tag.id)
             }"
           >
             <div class="inline-flex items-center gap-1 pr-2">
@@ -210,12 +210,12 @@
 import { ref, onMounted } from 'vue'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 import type { DropdownMenuItem, ContextMenuItem } from '@nuxt/ui'
-import { useTags } from '~/composables/useTags'
+import { useTagsStore } from '~/stores/tags'
 
-const { tags, pending, createTag, updateTag, deleteTag, fetchTags, isSelected } = useTags()
+const tagsStore = useTagsStore()
 
 onMounted(() => {
-  fetchTags()
+  tagsStore.fetchTags()
 })
 
 const showModal = ref(false)
@@ -291,7 +291,7 @@ const handleCreateTag = async (close?: () => void) => {
       name: tagForm.value.name.trim(),
       color: tagForm.value.color || undefined
     }
-    await createTag(data)
+    await tagsStore.createTag(data)
     close?.()
     showModal.value = false
     tagForm.value = { name: '', color: '' }
@@ -311,7 +311,7 @@ const handleUpdateTag = async (close?: () => void) => {
       name: tagForm.value.name.trim(),
       color: tagForm.value.color || undefined
     }
-    await updateTag(contextTag.value.id, data)
+    await tagsStore.updateTag(contextTag.value.id, data)
     close?.()
     showModal.value = false
     tagForm.value = { name: '', color: '' }
@@ -326,11 +326,9 @@ const handleDeleteTag = async (close?: () => void) => {
     return
   }
 
-  const deletedTagId = contextTag.value.id
-
   try {
     isDeleting.value = true
-    await deleteTag(deletedTagId)
+    await tagsStore.deleteTag(contextTag.value.id)
     close?.()
     showDeleteConfirm.value = false
     contextTag.value = null

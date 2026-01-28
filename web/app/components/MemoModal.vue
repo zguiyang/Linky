@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import type { Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
-import { useTags } from '~/composables/useTags'
+import { useTagsStore } from '~/stores/tags'
 
 interface Props {
   modelValue: boolean
@@ -96,8 +96,8 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const { tags, fetchTags } = useTags()
-await fetchTags()
+const tagsStore = useTagsStore()
+await tagsStore.fetchTags()
 
 const isOpen = computed({
   get: () => {
@@ -132,13 +132,7 @@ const errors = ref<{
 
 const isSubmitting = ref(false)
 
-const tagSelectItems = computed(() => {
-  if (!tags.value) return []
-  return tags.value.map(tag => ({
-    label: tag.name,
-    value: tag.id
-  }))
-})
+const tagSelectItems = computed(() => tagsStore.tagSelectItems)
 
 const validate = (): boolean => {
   errors.value.title = ''

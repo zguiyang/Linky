@@ -83,26 +83,26 @@
     </div>
 
     <div
-      v-if="selectedTags.length > 0"
+      v-if="tagsStore.selectedTags.length > 0"
       class="px-6 pb-6 border-b border-muted/12 dark:border-muted/12"
     >
       <div class="flex items-center gap-3">
         <span class="text-sm text-muted dark:text-muted">已选标签：</span>
         <div class="flex items-center gap-2">
           <u-badge
-            v-for="tagId in selectedTags"
+            v-for="tagId in tagsStore.selectedTags"
             :key="tagId"
             color="primary"
             variant="soft"
             size="md"
           >
-            {{ getTagName(tagId) }}
+            {{ tagsStore.getTagName(tagId) }}
             <u-button
               icon="i-heroicons-x-mark"
               size="xs"
               variant="ghost"
               color="neutral"
-              @click="removeTag(tagId)"
+              @click="tagsStore.removeTag(tagId)"
             />
           </u-badge>
         </div>
@@ -110,7 +110,7 @@
           size="sm"
           variant="ghost"
           color="neutral"
-          @click="clearTags"
+          @click="tagsStore.clearTags"
         >
           清除筛选
         </u-button>
@@ -306,7 +306,7 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from 'vue'
-import { useTags } from '~/composables/useTags'
+import { useTagsStore } from '~/stores/tags'
 import { bookmarksApi } from '~/api/bookmarks'
 import type { Bookmark, Tag } from '~/api/types'
 import ImportBookmarksModal from '~/components/ImportBookmarksModal.vue'
@@ -314,8 +314,8 @@ import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS, VIEW_MODE, type ViewMode } from '~
 
 definePageMeta({ layout: 'workspace' })
 
-const { tags, selectedTags, removeTag, clearTags, fetchTags } = useTags()
-await fetchTags()
+const tagsStore = useTagsStore()
+await tagsStore.fetchTags()
 
 const viewMode = useState<ViewMode>('view-mode', () => VIEW_MODE.MASONRY)
 
@@ -340,17 +340,17 @@ const page = ref(1)
 const perPage = ref(20)
 
 const { data: paginationData, pending: bookmarksPending, refresh: refreshBookmarks } = await useAsyncData(
-  computed(() => `bookmarks-${page.value}-${perPage.value}-${searchQuery.value}-${selectedTags.value.join(',')}-${sortBy.value}-${sortOrder.value}`),
+  computed(() => `bookmarks-${page.value}-${perPage.value}-${searchQuery.value}-${tagsStore.selectedTags.join(',')}-${sortBy.value}-${sortOrder.value}`),
   () => bookmarksApi.paginate({
     page: page.value,
     perPage: perPage.value,
     search: searchQuery.value || undefined,
-    tagIds: selectedTags.value.length > 0 ? selectedTags.value : undefined,
+    tagIds: tagsStore.selectedTags.length > 0 ? tagsStore.selectedTags : undefined,
     sortBy: sortBy.value,
     sortOrder: sortOrder.value
   }),
   {
-    watch: [page, selectedTags, sortBy, sortOrder],
+    watch: [page, tagsStore.selectedTags, sortBy, sortOrder],
     default: () => ({
       meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
       data: []
@@ -381,19 +381,7 @@ const bookmarkForm = ref({
 
 const autoFetch = ref(true)
 
-const tagSelectItems = computed(() => {
-  if (!tags.value) return []
-  return tags.value.map(tag => ({
-    label: tag.name,
-    value: tag.id,
-    ...(tag.color && { color: tag.color })
-  }))
-})
-
-const getTagName = (tagId: number) => {
-  const tag = tags.value?.find(t => t.id === tagId)
-  return tag?.name || ''
-}
+const tagSelectItems = computed(() => tagsStore.tagSelectItems)
 
 const setViewMode = (mode: ViewMode) => {
   viewMode.value = mode
@@ -491,7 +479,7 @@ const openImportModal = () => {
 
 const handleImportComplete = async () => {
   await refreshBookmarks()
-  await fetchTags()
+  await tagsStore.fetchTags()
 }
 
 onMounted(() => {
