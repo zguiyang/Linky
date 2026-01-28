@@ -1,7 +1,7 @@
 import logger from '@adonisjs/core/services/logger'
 import ogs from 'open-graph-scraper'
 import Bookmark from '#models/bookmark'
-import { METADATA_FETCH } from '#constants/index'
+import { METADATA_FETCH, BOOKMARK_STATUS } from '#constants/index'
 import type { BookmarkMetadata } from '#types/bookmark'
 
 export interface FetchMetadataOptions {
@@ -74,15 +74,22 @@ export class BookmarkMetadataService {
     }
 
     logger.info(`[BookmarkMetadataService] Updating bookmark ${bookmarkId}`)
+    logger.info(`[BookmarkMetadataService] Current status: "${bookmark.status}"`)
     logger.info(`[BookmarkMetadataService] Current title: "${bookmark.title}"`)
     logger.info(`[BookmarkMetadataService] Current description: "${bookmark.description}"`)
     logger.info(`[BookmarkMetadataService] Metadata ogTitle: "${metadata.ogTitle}"`)
     logger.info(`[BookmarkMetadataService] Metadata ogDescription: "${metadata.ogDescription}"`)
     logger.info(`[BookmarkMetadataService] forceUpdate: ${forceUpdate}`)
 
-    const updates: { title?: string; description: string | null; metadata?: BookmarkMetadata } = {
+    const updates: {
+      title?: string
+      description: string | null
+      metadata?: BookmarkMetadata
+      status?: string
+    } = {
       metadata,
       description: bookmark.description,
+      status: BOOKMARK_STATUS.ACTIVE,
     }
 
     if (forceUpdate) {
@@ -127,17 +134,23 @@ export class BookmarkMetadataService {
     }
 
     logger.info(`[BookmarkMetadataService] Updates object: ${JSON.stringify(updates)}`)
-    logger.info(
-      `[BookmarkMetadataService] Object.keys(updates).length: ${Object.keys(updates).length}`
-    )
+    logger.info(`[BookmarkMetadataService] Updates keys count: ${Object.keys(updates).length}`)
 
     if (Object.keys(updates).length > 1) {
       bookmark.merge(updates)
-      await bookmark.save()
-      logger.info(`[BookmarkMetadataService] Bookmark ${bookmarkId} saved with updates`)
     } else {
       bookmark.metadata = metadata
-      await bookmark.save()
+    }
+
+    await bookmark.save()
+
+    logger.info(
+      `[BookmarkMetadataService] Bookmark ${bookmarkId} saved, current status: ${bookmark.status}`
+    )
+
+    if (Object.keys(updates).length > 1) {
+      logger.info(`[BookmarkMetadataService] Bookmark ${bookmarkId} saved with updates`)
+    } else {
       logger.info(`[BookmarkMetadataService] Bookmark ${bookmarkId} saved with metadata only`)
     }
   }

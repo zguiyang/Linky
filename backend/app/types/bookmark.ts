@@ -47,3 +47,5 @@ export interface BookmarkMetadata {
   error?: string | null
   fetchedAt: string | null
 }
+
+export type BookmarkStatus = 'fetching' | 'active' | 'archived'

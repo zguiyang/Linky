@@ -28,6 +28,9 @@ export default class Bookmark extends BaseModel {
   @column()
   declare userId: number
 
+  @column()
+  declare status: string
+
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
 
@@ -54,6 +57,7 @@ export default class Bookmark extends BaseModel {
       description: this.description,
       visit_count: this.visitCount,
       metadata: this.metadata,
+      status: this.status,
       user_id: this.userId,
       tags: tags?.map((tag) => ({ id: tag.id, name: tag.name })) ?? [],
       created_at: this.createdAt.toISO(),

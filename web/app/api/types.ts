@@ -59,6 +59,8 @@ export interface UpdateTagRequest {
   color?: string
 }
 
+export type BookmarkStatus = 'fetching' | 'active' | 'archived'
+
 export interface Bookmark {
   id: number
   title: string
@@ -67,6 +69,7 @@ export interface Bookmark {
   visit_count: number
   user_id: number
   tags: Tag[]
+  status: BookmarkStatus
   created_at: string
   updated_at: string | null
 }

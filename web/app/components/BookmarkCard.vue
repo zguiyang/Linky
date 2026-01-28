@@ -8,12 +8,14 @@
       <u-dropdown-menu
         :items="menuItems"
         :content="{ align: 'end' }"
+        :disabled="bookmark.status === 'fetching'"
       >
         <u-button
           icon="i-heroicons-ellipsis-horizontal"
           color="neutral"
           variant="ghost"
           size="sm"
+          :disabled="bookmark.status === 'fetching'"
           @click.stop
         />
       </u-dropdown-menu>
@@ -129,17 +131,27 @@
           </u-badge>
         </div>
       </template>
+
+      <template v-if="bookmark.status === 'fetching'">
+        <div class="flex items-center gap-2 text-muted text-sm mt-2">
+          <u-icon
+            name="i-heroicons-arrow-path"
+            class="animate-spin"
+          />
+          <span>元数据获取中...</span>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Bookmark } from '~/api/types'
-import type { ViewMode } from '~/constants'
+import { BOOKMARK_STATUS } from '~/constants'
 
 const props = defineProps<{
   bookmark: Bookmark
-  viewMode: ViewMode
+  viewMode: 'masonry' | 'grid' | 'list'
 }>()
 
 const emit = defineEmits<{
@@ -148,11 +160,14 @@ const emit = defineEmits<{
   delete: [bookmark: Bookmark]
 }>()
 
-const menuItems = [
+const isFetching = computed(() => props.bookmark.status === BOOKMARK_STATUS.FETCHING)
+
+const menuItems = computed(() => [
   [
     {
       label: '编辑',
       icon: 'i-heroicons-pencil',
+      disabled: isFetching.value,
       onSelect: () => {
         emit('edit', props.bookmark)
       }
@@ -161,12 +176,13 @@ const menuItems = [
       label: '删除',
       icon: 'i-heroicons-trash',
       color: 'error',
+      disabled: isFetching.value,
       onSelect: () => {
         emit('delete', props.bookmark)
       }
     }
   ]
-]
+])
 
 const cardClasses = computed(() => {
   switch (props.viewMode) {

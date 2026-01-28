@@ -17,6 +17,7 @@ export interface MockBookmark {
   visit_count: number
   user_id: number
   tags: MockTag[]
+  status: 'fetching' | 'active' | 'archived'
   created_at: string
   updated_at: string | null
 }
@@ -125,6 +126,7 @@ const mockBookmarks: MockBookmark[] = [
     visit_count: 25,
     user_id: 1,
     tags: [mockTags[0] as MockTag, mockTags[2] as MockTag],
+    status: 'active',
     created_at: '2024-01-15T10:00:00.000Z',
     updated_at: null
   },
@@ -136,6 +138,7 @@ const mockBookmarks: MockBookmark[] = [
     visit_count: 18,
     user_id: 1,
     tags: [mockTags[1] as MockTag, mockTags[2] as MockTag],
+    status: 'active',
     created_at: '2024-01-18T14:20:00.000Z',
     updated_at: null
   },
@@ -147,6 +150,7 @@ const mockBookmarks: MockBookmark[] = [
     visit_count: 30,
     user_id: 1,
     tags: [mockTags[2] as MockTag],
+    status: 'active',
     created_at: '2024-01-20T09:00:00.000Z',
     updated_at: null
   },
@@ -158,6 +162,7 @@ const mockBookmarks: MockBookmark[] = [
     visit_count: 15,
     user_id: 1,
     tags: [mockTags[3] as MockTag],
+    status: 'active',
     created_at: '2024-01-22T16:45:00.000Z',
     updated_at: null
   },
@@ -169,6 +174,7 @@ const mockBookmarks: MockBookmark[] = [
     visit_count: 22,
     user_id: 1,
     tags: [mockTags[4] as MockTag],
+    status: 'active',
     created_at: '2024-01-25T08:30:00.000Z',
     updated_at: null
   },
@@ -180,6 +186,7 @@ const mockBookmarks: MockBookmark[] = [
     visit_count: 35,
     user_id: 1,
     tags: [mockTags[5] as MockTag],
+    status: 'active',
     created_at: '2024-01-28T13:15:00.000Z',
     updated_at: null
   }

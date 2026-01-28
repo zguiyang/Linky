@@ -36,13 +36,20 @@ const SORT_ORDER_OPTIONS = [
   { label: '正序', value: 'asc' }
 ]
 
+const BOOKMARK_STATUS = {
+  FETCHING: 'fetching',
+  ACTIVE: 'active',
+  ARCHIVED: 'archived'
+} as const
+
 export {
   ORDER_BY,
   VIEW_MODE,
   SORT_ORDER,
   PAGINATION,
   SORT_BY_OPTIONS,
-  SORT_ORDER_OPTIONS
+  SORT_ORDER_OPTIONS,
+  BOOKMARK_STATUS
 }
 
 export type {

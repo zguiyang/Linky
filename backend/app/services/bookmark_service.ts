@@ -2,6 +2,7 @@ import { inject } from '@adonisjs/core'
 import Bookmark from '#models/bookmark'
 import { Exception } from '@adonisjs/core/exceptions'
 import type { BookmarkMetadata } from '#types/bookmark'
+import { BOOKMARK_STATUS } from '#constants/index'
 
 @inject()
 export class BookmarkService {
@@ -163,6 +164,10 @@ export class BookmarkService {
       throw new Exception('书签不存在', { status: 404 })
     }
 
+    if (bookmark.status === BOOKMARK_STATUS.FETCHING) {
+      throw new Exception('书签正在抓取元数据，请稍后再试', { status: 400 })
+    }
+
     if (data.url && data.url !== bookmark.url) {
       const existingBookmark = await Bookmark.query()
         .where('user_id', userId)
@@ -208,6 +213,10 @@ export class BookmarkService {
 
     if (!bookmark) {
       throw new Exception('书签不存在', { status: 404 })
+    }
+
+    if (bookmark.status === BOOKMARK_STATUS.FETCHING) {
+      throw new Exception('书签正在抓取元数据，请稍后再试', { status: 400 })
     }
 
     await bookmark.delete()
