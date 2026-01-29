@@ -16,6 +16,7 @@ const TagsController = () => import('#controllers/tags_controller')
 const BookmarksController = () => import('#controllers/bookmarks_controller')
 const MemosController = () => import('#controllers/memos_controller')
 const SettingsController = () => import('#controllers/settings_controller')
+const AiController = () => import('#controllers/ai_controller')
 
 // API路由组
 router
@@ -63,6 +64,10 @@ router
     // 设置 API
     router.get('/settings/ai', [SettingsController, 'getAiConfig'])
     router.put('/settings/ai', [SettingsController, 'updateAiConfig'])
+
+    // AI API
+    router.get('/ai/config', [AiController, 'getConfig'])
+    router.post('/ai/chat', [AiController, 'chat'])
   })
   .prefix('api')
   .middleware(middleware.auth())
