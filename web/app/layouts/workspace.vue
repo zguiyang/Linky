@@ -34,7 +34,9 @@
         <div class="mx-3 my-2 border-t border-muted" />
 
         <div class="p-2">
-          <sidebar-tags />
+          <client-only>
+            <sidebar-tags />
+          </client-only>
         </div>
       </template>
 
