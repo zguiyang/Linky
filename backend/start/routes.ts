@@ -18,29 +18,34 @@ const MemosController = () => import('#controllers/memos_controller')
 const SettingsController = () => import('#controllers/settings_controller')
 const AiController = () => import('#controllers/ai_controller')
 
-// API路由组
+// 公开认证路由组（不需要认证）
 router
   .group(() => {
-    // 认证API
     router.post('/auth/register', [AuthController, 'register'])
     router.post('/auth/login', [AuthController, 'login'])
-    router.post('/auth/logout', [AuthController, 'logout']).middleware(middleware.auth())
     router.post('/auth/forgot-password', [AuthController, 'forgotPassword'])
     router.post('/auth/reset-password', [AuthController, 'resetPassword'])
     router.get('/auth/verify-email', [AuthController, 'verifyEmail'])
+  })
+  .prefix('api')
+
+// 受保护 API 路由组（需要认证）
+router
+  .group(() => {
+    router.post('/auth/logout', [AuthController, 'logout']).middleware(middleware.auth())
     router
       .post('/auth/resend-verification', [AuthController, 'resendVerification'])
       .middleware(middleware.auth())
     router.get('/auth/me', [AuthController, 'me']).middleware(middleware.auth())
 
-    // 标签 API（所有路由需要认证）
+    // 标签 API
     router.get('/tags', [TagsController, 'index'])
     router.get('/tags/:id', [TagsController, 'show'])
     router.post('/tags', [TagsController, 'store'])
     router.put('/tags/:id', [TagsController, 'update'])
     router.delete('/tags/:id', [TagsController, 'destroy'])
 
-    // 书签 API（所有路由需要认证）
+    // 书签 API
     router.get('/bookmarks', [BookmarksController, 'index'])
     router.get('/bookmarks/paginate', [BookmarksController, 'paginate'])
     router.get('/bookmarks/fetching-count', [BookmarksController, 'fetchingCount'])
@@ -53,7 +58,7 @@ router
     router.put('/bookmarks/:id', [BookmarksController, 'update'])
     router.delete('/bookmarks/:id', [BookmarksController, 'destroy'])
 
-    // 备忘录 API（所有路由需要认证）
+    // 备忘录 API
     router.get('/memos', [MemosController, 'index'])
     router.get('/memos/paginate', [MemosController, 'paginate'])
     router.get('/memos/:id', [MemosController, 'show'])
