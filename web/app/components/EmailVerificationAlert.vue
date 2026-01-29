@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { useAuth } from '~/composables/useAuth'
+import { authApi } from '~/api/auth'
 
 interface User {
   emailVerifiedAt: string | null
@@ -40,7 +40,6 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
-const { resendVerification } = useAuth()
 const showAlert = computed(() => props.user && !props.user.emailVerifiedAt)
 const userClosed = ref(false)
 
@@ -56,14 +55,25 @@ const handleClose = () => {
 const handleResend = async () => {
   if (sending.value || isCooldown.value) return
 
+  const toast = useToast()
   sending.value = true
 
   try {
-    await resendVerification()
+    await authApi.resendVerification()
     startCooldown()
     emit('refresh')
-  } catch (error) {
-    console.error('Failed to resend verification email:', error)
+    toast.add({
+      title: '验证邮件已发送',
+      description: '请检查您的邮箱',
+      color: 'success',
+      icon: 'i-heroicons-envelope'
+    })
+  } catch (err: any) {
+    toast.add({
+      title: '发送失败',
+      description: err.data?.message || '请稍后重试',
+      color: 'error'
+    })
   } finally {
     sending.value = false
   }

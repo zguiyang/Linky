@@ -86,14 +86,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from '#app'
-import { useAuth } from '~/composables/useAuth'
+import { useAuthStore } from '~/stores/auth'
+import { authApi } from '~/api/auth'
 
 definePageMeta({ layout: 'auth' })
 
 const route = useRoute()
-const { verifyEmail, loading } = useAuth()
+const authStore = useAuthStore()
+const loading = computed(() => authStore.loading)
 
 const success = ref(false)
 const error = ref('')
@@ -101,16 +103,30 @@ const error = ref('')
 const token = (route.query.token as string) || ''
 
 onMounted(async () => {
+  const toast = useToast()
+  const lastPath = useCookie('lastPath')
+  const redirectPath = lastPath.value || '/workspace/bookmarks'
+
   if (!token) {
     error.value = '验证链接无效，缺少验证令牌'
     return
   }
 
   try {
-    await verifyEmail(token)
+    await authApi.verifyEmail(token)
+    await authStore.fetchUser()
     success.value = true
+    lastPath.value = null
+    setTimeout(() => {
+      navigateTo(redirectPath)
+    }, 2000)
   } catch (err: any) {
-    error.value = err.message || '验证失败，请重试'
+    error.value = err.data?.message || '验证失败，请重试'
+    toast.add({
+      title: '验证失败',
+      description: error.value,
+      color: 'error'
+    })
   }
 })
 </script>

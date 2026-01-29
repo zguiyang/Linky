@@ -62,12 +62,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { useAuth } from '~/composables/useAuth'
+import { reactive, ref } from 'vue'
+import { authApi } from '~/api/auth'
 
 definePageMeta({ layout: 'auth' })
 
-const { forgotPassword, loading } = useAuth()
+const loading = ref(false)
 
 const state = reactive({
   email: ''
@@ -76,11 +76,30 @@ const state = reactive({
 const success = ref(false)
 
 const onSubmit = async () => {
+  const toast = useToast()
+  loading.value = true
   success.value = false
-  await forgotPassword(state)
-  success.value = true
-  setTimeout(() => {
-    navigateTo('/auth/sign-in')
-  }, 3000)
+
+  try {
+    await authApi.forgotPassword({ email: state.email })
+    success.value = true
+    toast.add({
+      title: '发送成功',
+      description: '重置邮件已发送，请检查您的邮箱',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
+    setTimeout(() => {
+      navigateTo('/auth/sign-in')
+    }, 3000)
+  } catch {
+    toast.add({
+      title: '发送失败',
+      description: '请检查邮箱地址是否正确',
+      color: 'error'
+    })
+  } finally {
+    loading.value = false
+  }
 }
 </script>

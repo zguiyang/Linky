@@ -30,9 +30,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useAuth } from '~/composables/useAuth'
+import { useAuthStore } from '~/stores/auth'
 
-const { user, logout } = useAuth()
+const authStore = useAuthStore()
+const user = computed(() => authStore.user)
 
 const menuItems = computed(() => [
   [
@@ -58,6 +59,13 @@ const menuItems = computed(() => [
 ])
 
 const handleLogout = async () => {
-  await logout()
+  await authStore.logout()
+  const toast = useToast()
+  toast.add({
+    title: '已退出登录',
+    color: 'neutral',
+    icon: 'i-heroicons-arrow-right-on-rectangle'
+  })
+  await navigateTo('/auth/sign-in')
 }
 </script>

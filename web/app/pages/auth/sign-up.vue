@@ -75,12 +75,13 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { useAuth } from '~/composables/useAuth'
+import { reactive, computed } from 'vue'
+import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({ layout: 'auth' })
 
-const { register, loading } = useAuth()
+const authStore = useAuthStore()
+const loading = computed(() => authStore.loading)
 
 const state = reactive({
   email: '',
@@ -89,6 +90,20 @@ const state = reactive({
 })
 
 const onSubmit = async () => {
-  await register(state)
+  const toast = useToast()
+  const lastPath = useCookie('lastPath')
+  const redirectPath = lastPath.value || '/workspace/bookmarks'
+
+  try {
+    await authStore.register(state.email, state.password, state.name)
+    lastPath.value = null
+    await navigateTo(redirectPath)
+  } catch (err: any) {
+    toast.add({
+      title: '注册失败',
+      description: err.data?.message || '请检查输入信息',
+      color: 'error'
+    })
+  }
 }
 </script>

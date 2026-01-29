@@ -98,15 +98,17 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { useRoute } from '#app'
-import { useAuth } from '~/composables/useAuth'
+import { useAuthStore } from '~/stores/auth'
+import { authApi } from '~/api/auth'
 
 definePageMeta({ layout: 'auth' })
 
 const route = useRoute()
-const { resetPassword, loading } = useAuth()
-const formRef = ref()
+const authStore = useAuthStore()
+const loading = computed(() => authStore.loading)
+
 const success = ref(false)
 const error = ref('')
 const showRetryLink = ref(false)
@@ -120,18 +122,37 @@ const state = reactive({
 })
 
 const onSubmit = async () => {
+  const toast = useToast()
   error.value = ''
   success.value = false
   showRetryLink.value = false
 
+  if (state.password !== state.passwordConfirmation) {
+    error.value = '两次输入的密码不一致'
+    return
+  }
+
   try {
-    await resetPassword(state)
+    const { user: userData, token: newToken } = await authApi.resetPassword({
+      token: state.token,
+      password: state.password,
+      passwordConfirmation: state.passwordConfirmation
+    })
+    authStore.setUser(userData)
+    authStore.setToken(newToken)
+
     success.value = true
+    toast.add({
+      title: '密码重置成功',
+      description: '已自动登录',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
     setTimeout(() => {
       navigateTo('/workspace/bookmarks')
     }, 2000)
   } catch (err: any) {
-    const errorMessage = err.message || '重置失败，请重试'
+    const errorMessage = err.data?.message || '重置失败，请重试'
     error.value = errorMessage
 
     if (errorMessage.includes('过期') || errorMessage.includes('无效')) {
