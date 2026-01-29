@@ -166,3 +166,12 @@ export interface ImportStatusResponse {
   completedAt?: string
   error?: string
 }
+
+export interface UserSettings {
+  aiBaseUrl: string | null
+}
+
+export interface UpdateSettingsRequest {
+  aiBaseUrl?: string | null
+  aiApiKey?: string
+}
