@@ -98,6 +98,15 @@ export class BookmarkService {
     return { queued: true }
   }
 
+  async getFetchingCount(userId: number): Promise<number> {
+    const result = await Bookmark.query()
+      .where('user_id', userId)
+      .andWhere('status', BOOKMARK_STATUS.FETCHING)
+      .count('* as total')
+
+    return Number(result[0].$extras.total || 0)
+  }
+
   async findAll(userId: number) {
     return await Bookmark.query()
       .where('user_id', userId)

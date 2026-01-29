@@ -90,6 +90,12 @@ export default class BookmarksController {
     return { message: 'Metadata refresh queued' }
   }
 
+  async fetchingCount({ auth }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const count = await this.bookmarkService.getFetchingCount(user.id)
+    return { count }
+  }
+
   async import({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
     const { file, createTags, skipDuplicates } =

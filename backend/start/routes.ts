@@ -41,6 +41,7 @@ router
     // 书签 API（所有路由需要认证）
     router.get('/bookmarks', [BookmarksController, 'index'])
     router.get('/bookmarks/paginate', [BookmarksController, 'paginate'])
+    router.get('/bookmarks/fetching-count', [BookmarksController, 'fetchingCount'])
     router.get('/bookmarks/:id', [BookmarksController, 'show'])
     router.post('/bookmarks', [BookmarksController, 'store'])
     router.post('/bookmarks/by-url', [BookmarksController, 'createByUrl'])

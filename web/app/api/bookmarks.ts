@@ -63,6 +63,10 @@ export interface RefreshMetadataResponse {
   message: string
 }
 
+export interface FetchingCountResponse {
+  count: number
+}
+
 export const bookmarksApi = {
   paginate: (params: BookmarkPaginationParams = {}) =>
     request.get<PaginatedResponse<Bookmark>>('/bookmarks/paginate', params),
@@ -81,6 +85,8 @@ export const bookmarksApi = {
   delete: (id: number) => request.delete(`/bookmarks/${id}`),
 
   refreshMetadata: (id: number) => request.post<RefreshMetadataResponse>(`/bookmarks/${id}/refresh-metadata`),
+
+  getFetchingCount: () => request.get<FetchingCountResponse>('/bookmarks/fetching-count'),
 
   import: (file: File, options: ImportOptions = {}) => {
     const formData = new FormData()
