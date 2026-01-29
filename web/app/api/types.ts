@@ -169,9 +169,13 @@ export interface ImportStatusResponse {
 
 export interface UserSettings {
   aiBaseUrl: string | null
+  aiModelName: string | null
+  aiEnabled: boolean
 }
 
 export interface UpdateSettingsRequest {
   aiBaseUrl?: string | null
   aiApiKey?: string
+  aiModelName?: string | null
+  aiEnabled?: boolean
 }

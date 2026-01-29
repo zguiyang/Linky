@@ -13,8 +13,14 @@ export default class UserConfig extends BaseModel {
   @column()
   declare aiBaseUrl: string | null
 
-  @column({ serializeAs: null })
+  @column()
   declare aiApiKey: string | null
+
+  @column()
+  declare aiModelName: string | null
+
+  @column()
+  declare aiEnabled: boolean
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

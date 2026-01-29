@@ -9,12 +9,19 @@ export class SettingService {
     const config = await UserConfig.findBy('userId', userId)
     return {
       aiBaseUrl: config?.aiBaseUrl ?? null,
+      aiModelName: config?.aiModelName ?? null,
+      aiEnabled: config?.aiEnabled ?? false,
     }
   }
 
   async updateAiConfig(
     userId: number,
-    data: { aiBaseUrl?: string | null; aiApiKey?: string | null }
+    data: {
+      aiBaseUrl?: string | null
+      aiApiKey?: string | null
+      aiModelName?: string | null
+      aiEnabled?: boolean
+    }
   ) {
     let config = await UserConfig.findBy('userId', userId)
 
@@ -35,12 +42,22 @@ export class SettingService {
       }
     }
 
+    if (data.aiModelName !== undefined) {
+      config.aiModelName = data.aiModelName
+    }
+
+    if (data.aiEnabled !== undefined) {
+      config.aiEnabled = data.aiEnabled
+    }
+
     await config.save()
 
     logger.info('User AI config updated for user %s', userId)
 
     return {
       aiBaseUrl: config.aiBaseUrl,
+      aiModelName: config.aiModelName,
+      aiEnabled: config.aiEnabled,
     }
   }
 

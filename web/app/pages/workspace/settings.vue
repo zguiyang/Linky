@@ -16,6 +16,21 @@
         </template>
 
         <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="font-medium text-gray-900 dark:text-white">
+                启用 AI 功能
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                开启后将可以使用 AI 相关功能
+              </p>
+            </div>
+            <u-switch
+              v-model="form.aiEnabled"
+              color="primary"
+            />
+          </div>
+
           <u-form-field
             label="AI Base URL"
             help="AI 服务的基础地址"
@@ -23,6 +38,17 @@
             <u-input
               v-model="form.aiBaseUrl"
               placeholder="https://api.openai.com/v1"
+              size="lg"
+            />
+          </u-form-field>
+
+          <u-form-field
+            label="AI 模型名称"
+            help="AI 模型名称，如 gpt-4o、gpt-3.5-turbo"
+          >
+            <u-input
+              v-model="form.aiModelName"
+              placeholder="gpt-4o"
               size="lg"
             />
           </u-form-field>
@@ -63,14 +89,18 @@ definePageMeta({ layout: 'workspace' })
 
 const saving = ref(false)
 const form = reactive({
+  aiEnabled: false,
   aiBaseUrl: '',
+  aiModelName: '',
   aiApiKey: ''
 })
 
 onMounted(async () => {
   try {
     const data = await settingsApi.getAiConfig()
+    form.aiEnabled = data.aiEnabled
     form.aiBaseUrl = data.aiBaseUrl || ''
+    form.aiModelName = data.aiModelName || ''
   } catch {
     // handle error
   }
@@ -80,7 +110,9 @@ const saveSettings = async () => {
   saving.value = true
   try {
     await settingsApi.updateAiConfig({
+      aiEnabled: form.aiEnabled,
       aiBaseUrl: form.aiBaseUrl || null,
+      aiModelName: form.aiModelName || null,
       aiApiKey: form.aiApiKey || undefined
     })
     form.aiApiKey = ''
