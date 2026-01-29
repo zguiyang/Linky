@@ -83,14 +83,19 @@ export class BookmarkService {
     return bookmark
   }
 
-  async refreshMetadata(userId: number, bookmarkId: number): Promise<void> {
+  async refreshMetadata(userId: number, bookmarkId: number): Promise<{ queued: boolean }> {
     const bookmark = await Bookmark.query().where('id', bookmarkId).where('user_id', userId).first()
 
     if (!bookmark) {
       throw new Exception('书签不存在', { status: 404 })
     }
 
+    if (bookmark.status === BOOKMARK_STATUS.FETCHING) {
+      throw new Exception('书签正在抓取元数据，请稍后再试', { status: 400 })
+    }
+
     await this.scheduleMetadataFetch(bookmarkId, bookmark.url)
+    return { queued: true }
   }
 
   async findAll(userId: number) {

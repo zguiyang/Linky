@@ -130,6 +130,7 @@
           @click="openBookmark"
           @edit="openEditModal"
           @delete="openDeleteConfirm"
+          @refresh="handleRefresh"
         />
       </div>
 
@@ -145,6 +146,7 @@
           @click="openBookmark"
           @edit="openEditModal"
           @delete="openDeleteConfirm"
+          @refresh="handleRefresh"
         />
       </div>
 
@@ -160,6 +162,7 @@
           @click="openBookmark"
           @edit="openEditModal"
           @delete="openDeleteConfirm"
+          @refresh="handleRefresh"
         />
       </div>
 
@@ -480,6 +483,15 @@ const openImportModal = () => {
 const handleImportComplete = async () => {
   await refreshBookmarks()
   await tagsStore.refreshTags()
+}
+
+const handleRefresh = async (bookmark: Bookmark) => {
+  try {
+    await bookmarksApi.refreshMetadata(bookmark.id)
+    await refreshBookmarks()
+  } catch (error) {
+    console.error('Failed to refresh bookmark:', error)
+  }
 }
 
 onMounted(() => {

@@ -45,6 +45,7 @@ export interface BookmarkMetadata {
   requestUrl: string
   success: boolean
   error?: string | null
+  fetchError?: string | null
   fetchedAt: string | null
 }
 

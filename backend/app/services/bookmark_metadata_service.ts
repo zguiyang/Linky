@@ -167,6 +167,7 @@ export class BookmarkMetadataService {
       requestUrl: url,
       success: fetchResult.success,
       error: fetchResult.error ?? null,
+      fetchError: fetchResult.success ? null : fetchResult.error || '无法获取页面信息',
       fetchedAt: new Date().toISOString(),
     }
 

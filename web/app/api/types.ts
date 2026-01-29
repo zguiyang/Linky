@@ -61,6 +61,23 @@ export interface UpdateTagRequest {
 
 export type BookmarkStatus = 'fetching' | 'active' | 'archived'
 
+export interface BookmarkMetadata {
+  ogTitle?: string | null
+  ogDescription?: string | null
+  ogImage?: {
+    url?: string | null
+    width?: number | null
+    height?: number | null
+    type?: string | null
+  } | null
+  favicon?: string | null
+  requestUrl: string
+  success: boolean
+  error?: string | null
+  fetchError?: string | null
+  fetchedAt: string | null
+}
+
 export interface Bookmark {
   id: number
   title: string
@@ -70,6 +87,7 @@ export interface Bookmark {
   user_id: number
   tags: Tag[]
   status: BookmarkStatus
+  metadata?: BookmarkMetadata
   created_at: string
   updated_at: string | null
 }

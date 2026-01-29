@@ -15,16 +15,13 @@ const jobsConfig = defineConfig({
   options: {
     /**
      * The total number of attempts to try the job until it completes.
+     * Set to 1 for no automatic retries - user must manually refresh if fetch fails.
      */
-    attempts: 3,
+    attempts: 1,
 
     /**
-     * Backoff setting for automatic retries if the job fails
+     * Backoff setting removed - no automatic retries.
      */
-    backoff: {
-      type: 'exponential',
-      delay: 5000,
-    },
 
     /**
      * If true, removes the job when it successfully completes

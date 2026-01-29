@@ -42,10 +42,10 @@ const VALIDATION = {
 type Validation = (typeof VALIDATION)[keyof typeof VALIDATION]
 
 const METADATA_FETCH = {
-  ATTEMPTS: 3,
+  ATTEMPTS: 1,
   RETRY_DELAY_MIN: 5000,
   RETRY_DELAY_MAX: 10000,
-  TIMEOUT: 10000,
+  TIMEOUT: 3000,
 } as const
 
 type MetadataFetch = (typeof METADATA_FETCH)[keyof typeof METADATA_FETCH]

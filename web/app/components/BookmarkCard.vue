@@ -141,6 +141,23 @@
           <span>元数据获取中...</span>
         </div>
       </template>
+
+      <template v-else-if="bookmark.metadata?.success === false">
+        <div class="flex items-center gap-2 text-error text-sm mt-2">
+          <u-icon
+            name="i-heroicons-exclamation-circle"
+          />
+          <span>获取失败</span>
+          <u-button
+            size="xs"
+            variant="link"
+            color="error"
+            @click.stop="emit('refresh', bookmark)"
+          >
+            重试
+          </u-button>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -158,12 +175,21 @@ const emit = defineEmits<{
   click: [bookmark: Bookmark]
   edit: [bookmark: Bookmark]
   delete: [bookmark: Bookmark]
+  refresh: [bookmark: Bookmark]
 }>()
 
 const isFetching = computed(() => props.bookmark.status === BOOKMARK_STATUS.FETCHING)
 
 const menuItems = computed(() => [
   [
+    {
+      label: '刷新元数据',
+      icon: 'i-heroicons-arrow-path',
+      disabled: isFetching.value,
+      onSelect: () => {
+        emit('refresh', props.bookmark)
+      }
+    },
     {
       label: '编辑',
       icon: 'i-heroicons-pencil',
