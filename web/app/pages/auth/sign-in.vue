@@ -96,16 +96,17 @@ const onSubmit = async () => {
   const lastPath = useCookie('lastPath')
   const redirectPath = lastPath.value || '/workspace/bookmarks'
 
-  try {
-    await authStore.login(state.email, state.password)
-    lastPath.value = null
-    await navigateTo(redirectPath)
-  } catch (err: any) {
+  const { error } = await authStore.login(state.email, state.password)
+  if (error) {
     toast.add({
       title: '登录失败',
-      description: err.data?.message || '请检查邮箱和密码',
+      description: error.message,
       color: 'error'
     })
+    return
   }
+
+  lastPath.value = null
+  await navigateTo(redirectPath)
 }
 </script>

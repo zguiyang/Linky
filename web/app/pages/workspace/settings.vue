@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { settingsApi } from '~/api/settings'
+import { request } from '~/lib/request'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -96,30 +96,32 @@ const form = reactive({
 })
 
 onMounted(async () => {
-  try {
-    const data = await settingsApi.getAiConfig()
+  const { data } = await request.get<{ aiEnabled: boolean, aiBaseUrl: string | null, aiModelName: string | null }>('/settings/ai')
+  if (data) {
     form.aiEnabled = data.aiEnabled
     form.aiBaseUrl = data.aiBaseUrl || ''
     form.aiModelName = data.aiModelName || ''
-  } catch {
-    // handle error
   }
 })
 
 const saveSettings = async () => {
+  const toast = useToast()
   saving.value = true
-  try {
-    await settingsApi.updateAiConfig({
-      aiEnabled: form.aiEnabled,
-      aiBaseUrl: form.aiBaseUrl || null,
-      aiModelName: form.aiModelName || null,
-      aiApiKey: form.aiApiKey || undefined
-    })
-    form.aiApiKey = ''
-  } catch {
-    // handle error
-  } finally {
+
+  const { error } = await request.put('/settings/ai', {
+    aiEnabled: form.aiEnabled,
+    aiBaseUrl: form.aiBaseUrl || null,
+    aiModelName: form.aiModelName || null,
+    aiApiKey: form.aiApiKey || undefined
+  })
+
+  if (error) {
+    toast.add({ title: '保存失败', description: error.message, color: 'error' })
     saving.value = false
+    return
   }
+
+  form.aiApiKey = ''
+  saving.value = false
 }
 </script>

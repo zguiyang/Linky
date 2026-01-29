@@ -212,17 +212,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
-import { useHttpError } from '~/composables/useHttpError'
-import { memosApi } from '~/api/memos'
-import MemoModal from '~/components/MemoModal.vue'
+import { request } from '~/lib/request'
 import type { Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
+import MemoModal from '~/components/MemoModal.vue'
 import { VIEW_MODE, type ViewMode } from '~/constants'
 
 definePageMeta({ layout: 'workspace' })
 
 const tagsStore = useTagsStore()
-
-const { handleError } = useHttpError()
 
 const searchQuery = ref('')
 const viewMode = ref<ViewMode>(VIEW_MODE.MASONRY)
@@ -230,17 +227,6 @@ const viewMode = ref<ViewMode>(VIEW_MODE.MASONRY)
 const page = ref(1)
 const perPage = ref(20)
 const loading = ref(false)
-
-const fetchMemos = async () => {
-  loading.value = true
-  try {
-    const data = await memosApi.paginate(page.value, perPage.value)
-    paginationData.value = data
-  } finally {
-    loading.value = false
-  }
-}
-
 const paginationData = ref<{
   meta: { currentPage: number, perPage: number, total: number, lastPage: number }
   data: Memo[]
@@ -248,6 +234,25 @@ const paginationData = ref<{
   meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
   data: []
 })
+
+const fetchMemos = async () => {
+  loading.value = true
+  const { data, error } = await request.get<{ data: Memo[], meta: any }>('/memos/paginate', {
+    page: page.value,
+    perPage: perPage.value
+  })
+
+  if (error) {
+    loading.value = false
+    return
+  }
+
+  paginationData.value = {
+    meta: data?.meta || { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
+    data: data?.data || []
+  }
+  loading.value = false
+}
 
 await fetchMemos()
 
@@ -302,18 +307,25 @@ const closeModal = () => {
 }
 
 const handleSave = async (data: CreateMemoRequest | UpdateMemoRequest) => {
-  try {
-    if (modalMode.value === 'add') {
-      await memosApi.create(data as CreateMemoRequest)
-    } else if (currentMemo.value) {
-      await memosApi.update(currentMemo.value.id, data as UpdateMemoRequest)
+  const toast = useToast()
+
+  if (modalMode.value === 'add') {
+    const { error } = await request.post<Memo>('/memos', data as CreateMemoRequest)
+    if (error) {
+      toast.add({ title: '创建失败', description: error.message, color: 'error' })
+      return
     }
-    await fetchMemos()
-    showMemoModal.value = false
-    currentMemo.value = null
-  } catch (error) {
-    handleError(error)
+  } else if (currentMemo.value) {
+    const { error } = await request.put<Memo>(`/memos/${currentMemo.value.id}`, data as UpdateMemoRequest)
+    if (error) {
+      toast.add({ title: '更新失败', description: error.message, color: 'error' })
+      return
+    }
   }
+
+  await fetchMemos()
+  showMemoModal.value = false
+  currentMemo.value = null
 }
 
 const openDeleteConfirm = (memo: Memo) => {
@@ -327,16 +339,18 @@ const closeDeleteModal = () => {
 }
 
 const confirmDelete = async () => {
-  try {
-    if (memoToDelete.value) {
-      await memosApi.delete(memoToDelete.value.id)
-      await fetchMemos()
-    }
-    showDeleteModal.value = false
-    memoToDelete.value = null
-  } catch (error) {
-    handleError(error)
+  const toast = useToast()
+  if (!memoToDelete.value) return
+
+  const { error } = await request.delete(`/memos/${memoToDelete.value.id}`)
+  if (error) {
+    toast.add({ title: '删除失败', description: error.message, color: 'error' })
+    return
   }
+
+  await fetchMemos()
+  showDeleteModal.value = false
+  memoToDelete.value = null
 }
 
 const handlePageChange = (newPage: number) => {

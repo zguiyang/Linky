@@ -80,26 +80,27 @@ const onSubmit = async () => {
   loading.value = true
   success.value = false
 
-  try {
-    await authApi.forgotPassword({ email: state.email })
-    success.value = true
-    toast.add({
-      title: '发送成功',
-      description: '重置邮件已发送，请检查您的邮箱',
-      color: 'success',
-      icon: 'i-heroicons-check-circle'
-    })
-    setTimeout(() => {
-      navigateTo('/auth/sign-in')
-    }, 3000)
-  } catch {
+  const { error } = await authApi.forgotPassword({ email: state.email })
+  if (error) {
     toast.add({
       title: '发送失败',
-      description: '请检查邮箱地址是否正确',
+      description: error.message,
       color: 'error'
     })
-  } finally {
     loading.value = false
+    return
   }
+
+  success.value = true
+  toast.add({
+    title: '发送成功',
+    description: '重置邮件已发送，请检查您的邮箱',
+    color: 'success',
+    icon: 'i-heroicons-check-circle'
+  })
+  setTimeout(() => {
+    navigateTo('/auth/sign-in')
+  }, 3000)
+  loading.value = false
 }
 </script>

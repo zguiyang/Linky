@@ -103,7 +103,6 @@ const error = ref('')
 const token = (route.query.token as string) || ''
 
 onMounted(async () => {
-  const toast = useToast()
   const lastPath = useCookie('lastPath')
   const redirectPath = lastPath.value || '/workspace/bookmarks'
 
@@ -112,21 +111,18 @@ onMounted(async () => {
     return
   }
 
-  try {
-    await authApi.verifyEmail(token)
-    await authStore.fetchUser()
-    success.value = true
-    lastPath.value = null
-    setTimeout(() => {
-      navigateTo(redirectPath)
-    }, 2000)
-  } catch (err: any) {
-    error.value = err.data?.message || '验证失败，请重试'
-    toast.add({
-      title: '验证失败',
-      description: error.value,
-      color: 'error'
-    })
+  const { error: apiError } = await authApi.verifyEmail(token)
+
+  if (apiError) {
+    error.value = apiError.message
+    return
   }
+
+  await authStore.fetchUser()
+  success.value = true
+  lastPath.value = null
+  setTimeout(() => {
+    navigateTo(redirectPath)
+  }, 2000)
 })
 </script>

@@ -18,44 +18,47 @@ export const useAuthStore = defineStore('auth', () => {
   const isEmailVerified = computed(() => user.value?.emailVerifiedAt !== null)
 
   const fetchUser = async () => {
-    try {
-      user.value = await authApi.me()
-    } catch {
+    const { data, error } = await authApi.me()
+    if (error) {
       user.value = null
+      return { data: null, error }
     }
+    user.value = data
+    return { data, error: null }
   }
 
   const login = async (email: string, password: string) => {
     loading.value = true
-    try {
-      const { user: userData, token: newToken } = await authApi.login({ email, password })
-      user.value = userData
-      tokenCookie.value = newToken
-    } finally {
+    const { data, error } = await authApi.login({ email, password })
+    if (error) {
       loading.value = false
+      return { data: null, error }
     }
+    user.value = data!.user
+    tokenCookie.value = data!.token
+    loading.value = false
+    return { data: data!.user, error: null }
   }
 
   const register = async (email: string, password: string, fullName: string) => {
     loading.value = true
-    try {
-      const { user: userData, token: newToken } = await authApi.register({ email, password, name: fullName })
-      user.value = userData
-      tokenCookie.value = newToken
-    } finally {
+    const { data, error } = await authApi.register({ email, password, name: fullName })
+    if (error) {
       loading.value = false
+      return { data: null, error }
     }
+    user.value = data!.user
+    tokenCookie.value = data!.token
+    loading.value = false
+    return { data: data!.user, error: null }
   }
 
   const logout = async () => {
     loading.value = true
-    try {
-      await authApi.logout()
-    } finally {
-      user.value = null
-      tokenCookie.value = null
-      loading.value = false
-    }
+    await authApi.logout()
+    user.value = null
+    tokenCookie.value = null
+    loading.value = false
   }
 
   const setUser = (userData: User | null) => {

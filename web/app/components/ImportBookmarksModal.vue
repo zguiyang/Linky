@@ -148,15 +148,7 @@
                 {{ importResult.skipped }}
               </p>
               <p class="text-sm text-warning-700 dark:text-warning-300">
-                跳过重复
-              </p>
-            </div>
-            <div class="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-4 text-center">
-              <p class="text-2xl font-bold text-neutral-600 dark:text-neutral-400">
-                {{ importResult.total }}
-              </p>
-              <p class="text-sm text-neutral-700 dark:text-neutral-300">
-                总计书签
+                跳过
               </p>
             </div>
             <div class="bg-error-50 dark:bg-error-900/20 rounded-lg p-4 text-center">
@@ -164,63 +156,46 @@
                 {{ importResult.errors }}
               </p>
               <p class="text-sm text-error-700 dark:text-error-300">
-                导入失败
+                失败
+              </p>
+            </div>
+            <div class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4 text-center">
+              <p class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                {{ importResult.tagsCreated }}
+              </p>
+              <p class="text-sm text-primary-700 dark:text-primary-300">
+                新建标签
               </p>
             </div>
           </div>
 
           <div
-            v-if="importResult.tagsCreated > 0"
-            class="text-center"
+            v-if="importResult.errorsList && importResult.errorsList.length > 0"
+            class="mt-4"
           >
-            <p class="text-sm text-neutral-500 dark:text-neutral-400">
-              已创建 {{ importResult.tagsCreated }} 个标签
+            <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+              失败的导入：
             </p>
-          </div>
-
-          <div
-            v-if="importResult.errorsList.length > 0"
-            class="space-y-2"
-          >
-            <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              失败详情 ({{ importResult.errorsList.length }} 项)：
-            </p>
-            <u-scroll-area class="h-48 border border-neutral-200 dark:border-neutral-700 rounded-lg">
-              <div class="p-3 space-y-2">
-                <div
-                  v-for="(error, index) in importResult.errorsList"
-                  :key="index"
-                  class="text-xs p-2 bg-error-50 dark:bg-error-900/20 rounded"
-                >
-                  <p class="font-medium text-error-700 dark:text-error-300 truncate">
-                    {{ error.title }}
-                  </p>
-                  <p class="text-error-600 dark:text-error-400 truncate">
-                    {{ error.url }}
-                  </p>
-                  <p class="text-error-500 dark:text-error-500 mt-1">
-                    {{ error.reason }}
-                  </p>
-                </div>
-              </div>
-            </u-scroll-area>
+            <div class="max-h-40 overflow-y-auto space-y-1 text-sm">
+              <p
+                v-for="(item, index) in importResult.errorsList"
+                :key="index"
+                class="text-neutral-600 dark:text-neutral-400"
+              >
+                {{ item.title }}: {{ item.reason }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </template>
 
-    <template #footer="{ close }">
-      <u-button
-        label="取消"
-        color="neutral"
-        variant="outline"
-        @click="close"
-      />
+    <template #footer>
       <u-button
         v-if="step === 'upload'"
-        label="开始导入"
+        label="导入"
         color="primary"
-        :disabled="!selectedFile"
+        :disabled="!selectedFile || isImporting"
         :loading="isImporting"
         @click="startImport"
       />
@@ -228,7 +203,7 @@
         v-if="step === 'result'"
         label="完成"
         color="primary"
-        @click="handleComplete(close)"
+        @click="handleComplete"
       />
     </template>
   </u-modal>
@@ -236,9 +211,26 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { bookmarksApi, type ImportResult } from '~/api/bookmarks'
+import { request } from '~/lib/request'
 
-type ImportResultData = ImportResult['data']
+type ImportResultData = {
+  total: number
+  imported: number
+  skipped: number
+  errors: number
+  tagsCreated: number
+  errorsList: Array<{
+    title: string
+    url: string
+    reason: string
+  }>
+}
+
+type AsyncImportResponseData = {
+  jobId: string
+  status: 'waiting' | 'active' | 'completed'
+  progress: number
+}
 
 const props = defineProps<{
   modelValue: boolean
@@ -313,23 +305,28 @@ const stopPolling = () => {
 
 const pollImportStatus = async (jobId: string) => {
   pollInterval = setInterval(async () => {
-    try {
-      const response = await bookmarksApi.getImportStatus(jobId)
-      progress.value = response.data.progress
+    const response = await request.get<AsyncImportResponseData>(`/bookmarks/import/${jobId}/status`)
 
-      if (response.data.status === 'completed' && response.data.data) {
-        stopPolling()
-        importResult.value = response.data.data
-        step.value = 'result'
-        isImporting.value = false
-      } else if (response.data.status === 'waiting') {
-        progress.value = 0
-      }
-    } catch (error) {
-      console.error('Polling failed:', error)
+    if (response.error) {
+      console.error('Polling failed:', response.error)
       stopPolling()
       step.value = 'upload'
       isImporting.value = false
+      return
+    }
+
+    const data = response.data
+    if (data) {
+      progress.value = data.progress
+
+      if (data.status === 'completed' && (data as any).data) {
+        stopPolling()
+        importResult.value = (data as any).data
+        step.value = 'result'
+        isImporting.value = false
+      } else if (data.status === 'waiting') {
+        progress.value = 0
+      }
     }
   }, 1000)
 }
@@ -341,32 +338,43 @@ const startImport = async () => {
   step.value = 'importing'
   progress.value = 0
 
-  try {
-    const response = await bookmarksApi.import(selectedFile.value, {
-      createTags: createTags.value,
-      skipDuplicates: skipDuplicates.value,
-      autoFetch: autoFetch.value
-    })
+  const formData = new FormData()
+  formData.append('file', selectedFile.value)
+  if (createTags.value !== undefined) {
+    formData.append('createTags', String(createTags.value))
+  }
+  if (skipDuplicates.value !== undefined) {
+    formData.append('skipDuplicates', String(skipDuplicates.value))
+  }
+  if (autoFetch.value !== undefined) {
+    formData.append('autoFetch', String(autoFetch.value))
+  }
 
-    if (response.mode === 'sync') {
-      importResult.value = response.data
-      step.value = 'result'
-    } else {
-      isAsyncMode.value = true
-      pollImportStatus(response.data.jobId)
-    }
-  } catch (error) {
-    console.error('Import failed:', error)
+  const response = await request.post<{ data: ImportResultData | AsyncImportResponseData }>('/bookmarks/import', formData)
+
+  if (response.error) {
+    console.error('Import failed:', response.error)
     step.value = 'upload'
     isImporting.value = false
-  } finally {
-    isImporting.value = false
+    return
   }
+
+  const data = response.data?.data as any
+
+  if (data && 'total' in data) {
+    importResult.value = data
+    step.value = 'result'
+  } else if (data && 'jobId' in data) {
+    isAsyncMode.value = true
+    pollImportStatus(data.jobId)
+  }
+
+  isImporting.value = false
 }
 
-const handleComplete = (close: () => void) => {
+const handleComplete = () => {
   emit('imported')
-  close()
+  open.value = false
   resetState()
 }
 

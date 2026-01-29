@@ -53,30 +53,32 @@ const handleClose = () => {
 }
 
 const handleResend = async () => {
+  const toast = useToast()
   if (sending.value || isCooldown.value) return
 
-  const toast = useToast()
   sending.value = true
 
-  try {
-    await authApi.resendVerification()
-    startCooldown()
-    emit('refresh')
-    toast.add({
-      title: '验证邮件已发送',
-      description: '请检查您的邮箱',
-      color: 'success',
-      icon: 'i-heroicons-envelope'
-    })
-  } catch (err: any) {
+  const { error } = await authApi.resendVerification()
+
+  if (error) {
     toast.add({
       title: '发送失败',
-      description: err.data?.message || '请稍后重试',
+      description: error.message,
       color: 'error'
     })
-  } finally {
     sending.value = false
+    return
   }
+
+  startCooldown()
+  emit('refresh')
+  toast.add({
+    title: '验证邮件已发送',
+    description: '请检查您的邮箱',
+    color: 'success',
+    icon: 'i-heroicons-envelope'
+  })
+  sending.value = false
 }
 
 const startCooldown = () => {

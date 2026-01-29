@@ -310,7 +310,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from 'vue'
 import { useTagsStore } from '~/stores/tags'
-import { bookmarksApi } from '~/api/bookmarks'
+import { request } from '~/lib/request'
 import type { Bookmark, Tag } from '~/api/types'
 import ImportBookmarksModal from '~/components/ImportBookmarksModal.vue'
 import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS, VIEW_MODE, type ViewMode } from '~/constants'
@@ -341,16 +341,30 @@ const searchQuery = ref('')
 const page = ref(1)
 const perPage = ref(20)
 
-const { data: paginationData, pending: bookmarksPending, refresh: refreshBookmarks } = await useAsyncData(
-  computed(() => `bookmarks-${page.value}-${perPage.value}-${searchQuery.value}-${tagsStore.selectedTags.join(',')}-${sortBy.value}-${sortOrder.value}`),
-  () => bookmarksApi.paginate({
+const fetchBookmarks = async () => {
+  const { data, error } = await request.get<{ data: Bookmark[], meta: { total: number } }>('/bookmarks/paginate', {
     page: page.value,
     perPage: perPage.value,
     search: searchQuery.value || undefined,
     tagIds: tagsStore.selectedTags.length > 0 ? tagsStore.selectedTags : undefined,
     sortBy: sortBy.value,
     sortOrder: sortOrder.value
-  }),
+  })
+
+  if (error) {
+    return { data: null, error }
+  }
+
+  return { data: data?.data || [], meta: data?.meta, error: null }
+}
+
+const { data: paginationData, pending: bookmarksPending, refresh: refreshBookmarks } = await useAsyncData(
+  computed(() => `bookmarks-${page.value}-${perPage.value}-${searchQuery.value}-${tagsStore.selectedTags.join(',')}-${sortBy.value}-${sortOrder.value}`),
+  async () => {
+    const result = await fetchBookmarks()
+    if (result.error) throw result.error
+    return { data: result.data, meta: result.meta }
+  },
   {
     watch: [page, tagsStore.selectedTags, sortBy, sortOrder],
     default: () => ({
@@ -361,7 +375,7 @@ const { data: paginationData, pending: bookmarksPending, refresh: refreshBookmar
 )
 
 const bookmarks = computed(() => paginationData.value?.data || [])
-const total = computed(() => paginationData.value?.meta.total || 0)
+const total = computed(() => paginationData.value?.meta?.total || 0)
 
 watch(searchQuery, () => {
   page.value = 1
@@ -425,21 +439,21 @@ const openDeleteConfirm = (bookmark: Bookmark) => {
 }
 
 const handleSaveBookmark = async (close?: () => void) => {
+  const toast = useToast()
+
   if (!bookmarkForm.value.url) {
     return
   }
 
-  if (isEditing.value && editingBookmarkId.value) {
-    await bookmarksApi.update(editingBookmarkId.value, bookmarkForm.value)
-  } else {
-    if (autoFetch.value) {
-      await bookmarksApi.create({
-        url: bookmarkForm.value.url,
-        autoFetch: true
-      })
-    } else {
-      await bookmarksApi.create(bookmarkForm.value)
-    }
+  const { error } = isEditing.value && editingBookmarkId.value
+    ? await request.put<Bookmark>(`/bookmarks/${editingBookmarkId.value}`, bookmarkForm.value)
+    : autoFetch.value
+      ? await request.post<Bookmark>('/bookmarks', { url: bookmarkForm.value.url, autoFetch: true })
+      : await request.post<Bookmark>('/bookmarks', bookmarkForm.value)
+
+  if (error) {
+    toast.add({ title: '保存失败', description: error.message, color: 'error' })
+    return
   }
 
   await refreshBookmarks()
@@ -455,18 +469,23 @@ const handleSaveBookmark = async (close?: () => void) => {
 }
 
 const handleDeleteBookmark = async (close?: () => void) => {
+  const toast = useToast()
   if (!contextBookmark.value) return
 
-  try {
-    isDeleting.value = true
-    await bookmarksApi.delete(contextBookmark.value.id)
-    await refreshBookmarks()
-    close?.()
-    showDeleteConfirm.value = false
-    contextBookmark.value = null
-  } finally {
+  isDeleting.value = true
+  const { error } = await request.delete(`/bookmarks/${contextBookmark.value.id}`)
+
+  if (error) {
+    toast.add({ title: '删除失败', description: error.message, color: 'error' })
     isDeleting.value = false
+    return
   }
+
+  await refreshBookmarks()
+  close?.()
+  showDeleteConfirm.value = false
+  contextBookmark.value = null
+  isDeleting.value = false
 }
 
 const handlePageChange = (newPage: number) => {
@@ -485,12 +504,12 @@ const handleImportComplete = async () => {
 }
 
 const handleRefresh = async (bookmark: Bookmark) => {
-  try {
-    await bookmarksApi.refreshMetadata(bookmark.id)
-    await refreshBookmarks()
-  } catch (error) {
+  const { error } = await request.post(`/bookmarks/${bookmark.id}/refresh-metadata`)
+  if (error) {
     console.error('Failed to refresh bookmark:', error)
+    return
   }
+  await refreshBookmarks()
 }
 
 onMounted(() => {

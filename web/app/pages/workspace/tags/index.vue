@@ -398,62 +398,79 @@ const handleCreateTag = async (close?: () => void) => {
     return
   }
 
-  try {
-    isSubmitting.value = true
-    await tagsStore.createTag({ name: tagForm.value.name.trim(), color: tagForm.value.color || undefined })
-    close?.()
-    showModal.value = false
-    tagForm.value = { name: '', color: '' }
-  } finally {
+  const toast = useToast()
+  isSubmitting.value = true
+
+  const { error } = await tagsStore.createTag({ name: tagForm.value.name.trim(), color: tagForm.value.color || undefined })
+
+  if (error) {
+    toast.add({ title: '创建失败', description: error.message, color: 'error' })
     isSubmitting.value = false
+    return
   }
+
+  close?.()
+  showModal.value = false
+  tagForm.value = { name: '', color: '' }
+  isSubmitting.value = false
 }
 
 const handleUpdateTag = async (close?: () => void) => {
+  const toast = useToast()
   if (!contextTag.value || !tagForm.value.name.trim()) {
     return
   }
 
-  try {
-    isSubmitting.value = true
-    await tagsStore.updateTag(contextTag.value!.id, { name: tagForm.value.name.trim(), color: tagForm.value.color || undefined })
-    close?.()
-    showModal.value = false
-    tagForm.value = { name: '', color: '' }
-    contextTag.value = null
-  } finally {
-    isSubmitting.value = false
-  }
-}
+  isSubmitting.value = true
+  const { error } = await tagsStore.updateTag(contextTag.value!.id, { name: tagForm.value.name.trim(), color: tagForm.value.color || undefined })
 
-const handleDeleteTag = async (close?: () => void) => {
-  if (!contextTag.value) {
+  if (error) {
+    toast.add({ title: '更新失败', description: error.message, color: 'error' })
+    isSubmitting.value = false
     return
   }
 
-  const deletedTagId = contextTag.value.id
+  close?.()
+  showModal.value = false
+  tagForm.value = { name: '', color: '' }
+  contextTag.value = null
+  isSubmitting.value = false
+}
 
-  try {
-    isDeleting.value = true
-    await tagsStore.deleteTag(deletedTagId)
-    close?.()
-    showDeleteConfirm.value = false
-    contextTag.value = null
-  } finally {
+const handleDeleteTag = async (close?: () => void) => {
+  const toast = useToast()
+  if (!contextTag.value) return
+
+  isDeleting.value = true
+  const { error } = await tagsStore.deleteTag(contextTag.value.id)
+
+  if (error) {
+    toast.add({ title: '删除失败', description: error.message, color: 'error' })
     isDeleting.value = false
+    return
   }
+
+  close?.()
+  showDeleteConfirm.value = false
+  contextTag.value = null
+  isDeleting.value = false
 }
 
 const handleBatchDelete = async (close?: () => void) => {
-  try {
-    isDeleting.value = true
-    await tagsStore.batchDelete(selectedTagsForBatch.value)
-    selectedTagsForBatch.value = []
-    batchMode.value = false
-    close?.()
-    showBatchDeleteConfirm.value = false
-  } finally {
+  const toast = useToast()
+  isDeleting.value = true
+  const { error } = await tagsStore.batchDelete(selectedTagsForBatch.value)
+
+  if (error) {
+    toast.add({ title: '批量删除失败', description: error.message, color: 'error' })
     isDeleting.value = false
+    return
   }
+
+  selectedTagsForBatch.value = []
+  batchMode.value = false
+  close?.()
+  showBatchDeleteConfirm.value = false
+  isDeleting.value = false
 }
 </script>

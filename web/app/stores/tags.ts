@@ -33,51 +33,72 @@ export const useTagsStore = defineStore('tags', () => {
 
   const fetchTags = async () => {
     if (tags.value.length > 0) {
-      return
+      return { data: tags.value, error: null }
     }
     pending.value = true
     error.value = null
-    try {
-      tags.value = await tagsApi.index()
-    } catch {
+    const { data, error: apiError } = await tagsApi.index()
+    if (apiError) {
       error.value = 'Failed to load tags'
       tags.value = []
-    } finally {
       pending.value = false
+      return { data: null, error: apiError }
     }
+    tags.value = data || []
+    pending.value = false
+    return { data: data || [], error: null }
   }
 
   const refreshTags = async () => {
     pending.value = true
     error.value = null
-    try {
-      tags.value = await tagsApi.index()
-    } catch {
+    const { data, error: apiError } = await tagsApi.index()
+    if (apiError) {
       error.value = 'Failed to load tags'
-    } finally {
       pending.value = false
+      return { data: null, error: apiError }
     }
+    tags.value = data || []
+    pending.value = false
+    return { data: data || [], error: null }
   }
 
   const createTag = async (data: CreateTagRequest) => {
-    await tagsApi.create(data)
+    const { error: apiError } = await tagsApi.create(data)
+    if (apiError) {
+      return { error: apiError }
+    }
     await refreshTags()
+    return { error: null }
   }
 
   const updateTag = async (id: number, data: UpdateTagRequest) => {
-    await tagsApi.update(id, data)
+    const { error: apiError } = await tagsApi.update(id, data)
+    if (apiError) {
+      return { error: apiError }
+    }
     await refreshTags()
+    return { error: null }
   }
 
   const deleteTag = async (id: number) => {
-    await tagsApi.delete(id)
+    const { error: apiError } = await tagsApi.delete(id)
+    if (apiError) {
+      return { error: apiError }
+    }
     await refreshTags()
+    return { error: null }
   }
 
   const batchDelete = async (ids: number[]) => {
     const deletePromises = ids.map(id => tagsApi.delete(id))
-    await Promise.all(deletePromises)
+    const results = await Promise.all(deletePromises)
+    const hasError = results.some(r => r.error)
+    if (hasError) {
+      return { error: results.find(r => r.error)?.error || null }
+    }
     await refreshTags()
+    return { error: null }
   }
 
   const toggleTag = (tagId: number) => {
