@@ -58,5 +58,27 @@ const IMPORT = {
 
 type Import = (typeof IMPORT)[keyof typeof IMPORT]
 
-export { ORDER_BY, PAGINATION, BOOKMARK_STATUS, SORT_ORDER, VALIDATION, METADATA_FETCH, IMPORT }
-export type { OrderBy, Pagination, BookmarkStatus, SortOrder, Validation, MetadataFetch, Import }
+const AI = {
+  DEFAULT_TIMEOUT: 30000,
+  DEFAULT_MAX_RETRIES: 3,
+  MAX_TOKENS_LIMIT: 4096,
+  TEMPERATURE_RANGE: {
+    MIN: 0,
+    MAX: 2,
+  },
+  MAX_CONTENT_LENGTH: 100000,
+} as const
+
+type Ai = (typeof AI)[keyof typeof AI]
+
+export { ORDER_BY, PAGINATION, BOOKMARK_STATUS, SORT_ORDER, VALIDATION, METADATA_FETCH, IMPORT, AI }
+export type {
+  OrderBy,
+  Pagination,
+  BookmarkStatus,
+  SortOrder,
+  Validation,
+  MetadataFetch,
+  Import,
+  Ai,
+}
