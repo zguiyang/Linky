@@ -2,6 +2,7 @@ import { Job } from 'adonisjs-jobs'
 import logger from '@adonisjs/core/services/logger'
 import { AiService } from '#services/ai_service'
 import { SettingService } from '#services/setting_service'
+import PromptService from '#services/prompt_service'
 import Bookmark from '#models/bookmark'
 import Tag from '#models/tag'
 import { AI_TAG } from '#constants/index'
@@ -26,6 +27,7 @@ interface AiTagSuggestion {
 
 export default class GenerateAiTags extends Job {
   private settingService = new SettingService()
+  private promptService = new PromptService()
 
   async handle(payload: GenerateAiTagsPayload): Promise<GenerateAiTagsResult> {
     const { bookmarkId, userId } = payload
@@ -69,10 +71,16 @@ export default class GenerateAiTags extends Job {
       const userTags = await Tag.query().where('userId', userId).exec()
       const existingTagNames = new Set(userTags.map((t) => t.name.toLowerCase().trim()))
 
-      const prompt = this.buildPrompt(bookmark)
+      const prompt = this.promptService.render('tag_generation', {
+        title: bookmark.title || '无',
+        description: bookmark.description || '无',
+        maxTags: AI_TAG.MAX_TAGS,
+        existingTags: Array.from(existingTagNames).join(', '),
+      })
+
       const response = await AiService.chat(aiServiceConfig, {
         messages: [
-          { role: 'system', content: AI_TAG.SYSTEM_PROMPT },
+          { role: 'system', content: this.promptService.render('system') },
           { role: 'user', content: prompt },
         ],
         model: aiConfig.aiModelName,
@@ -146,15 +154,6 @@ export default class GenerateAiTags extends Job {
       logger.error({ err: error }, `[GenerateAiTags] Error processing bookmark ${bookmarkId}`)
       return { success: false, tagsCreated: 0, tagsReused: 0, error: 'INTERNAL_ERROR' }
     }
-  }
-
-  private buildPrompt(bookmark: Bookmark): string {
-    const title = bookmark.title || '无'
-    const description = bookmark.description || '无'
-    return `书签信息：
-标题：${title}
-描述：${description}
-URL：${bookmark.url}`
   }
 
   private parseResponse(content: string): AiTagSuggestion[] {
