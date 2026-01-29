@@ -1,6 +1,7 @@
 import { Job } from 'adonisjs-jobs'
 import logger from '@adonisjs/core/services/logger'
 import { BookmarkMetadataService } from '#services/bookmark_metadata_service'
+import { SettingService } from '#services/setting_service'
 import { METADATA_FETCH } from '#constants/index'
 import GenerateAiTags from './generate_ai_tags.js'
 
@@ -18,6 +19,7 @@ export type FetchBookmarkMetadataResult = {
 
 export default class FetchBookmarkMetadata extends Job {
   private metadataService = new BookmarkMetadataService()
+  private settingService = new SettingService()
 
   async handle(payload: FetchBookmarkMetadataPayload): Promise<FetchBookmarkMetadataResult> {
     const { bookmarkId, url, forceUpdate = false, autoAiTag = true } = payload
@@ -37,17 +39,30 @@ export default class FetchBookmarkMetadata extends Job {
       const { default: BookmarkModel } = await import('#models/bookmark')
       const bookmark = await BookmarkModel.find(bookmarkId)
       const userId = bookmark?.userId
-      if (userId) {
-        GenerateAiTags.dispatch({
-          bookmarkId,
-          userId,
-        }).catch((err) => {
-          logger.error(
-            { err },
-            `[FetchBookmarkMetadata] Failed to schedule AI tags for bookmark ${bookmarkId}`
-          )
-        })
+
+      if (!userId) {
+        logger.warn(`[FetchBookmarkMetadata] No userId for bookmark ${bookmarkId}`)
+        return { success: true, bookmarkId }
       }
+
+      const aiConfig = await this.settingService.getAiConfig(userId)
+
+      if (!aiConfig.aiEnabled) {
+        logger.info(
+          `[FetchBookmarkMetadata] AI not enabled for user ${userId}, skip tag generation for bookmark ${bookmarkId}`
+        )
+        return { success: true, bookmarkId }
+      }
+
+      GenerateAiTags.dispatch({
+        bookmarkId,
+        userId,
+      }).catch((err) => {
+        logger.error(
+          { err },
+          `[FetchBookmarkMetadata] Failed to schedule AI tags for bookmark ${bookmarkId}`
+        )
+      })
     }
 
     logger.info(`[FetchBookmarkMetadata] Completed for bookmark ${bookmarkId}`)
