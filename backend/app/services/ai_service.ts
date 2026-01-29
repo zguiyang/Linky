@@ -1,4 +1,6 @@
 import { OpenAI } from 'openai'
+import { Readable } from 'node:stream'
+import type { ReadableStream as NodeReadableStream } from 'node:stream/web'
 import type {
   UserAiConfig,
   AiChatParams,
@@ -6,9 +8,11 @@ import type {
   AiStreamChunk,
   AiStreamHandler,
   AiChatResponseError,
+  AiChatSuccessResponse,
 } from '#types/ai'
 import { AI } from '#constants'
 import logger from '@adonisjs/core/services/logger'
+import type { HttpContext } from '@adonisjs/core/http'
 
 export class AiService {
   static async chat(userConfig: UserAiConfig, params: AiChatParams): Promise<AiChatResponse> {
@@ -165,6 +169,56 @@ export class AiService {
       logger.error({ err: error }, 'AI stream request failed')
       handler.onError(this.formatOpenAiError(error))
     }
+  }
+
+  static async streamToSse(
+    userConfig: UserAiConfig,
+    params: AiChatParams,
+    response: HttpContext['response']
+  ): Promise<void> {
+    response.header('Content-Type', 'text/event-stream')
+    response.header('Cache-Control', 'no-cache')
+    response.header('Connection', 'keep-alive')
+
+    let completeResponse: AiChatSuccessResponse | null = null
+    let hasError = false
+
+    const sendEvent = (
+      controller: ReadableStreamDefaultController,
+      event: string,
+      eventData: unknown
+    ) => {
+      const encoder = new TextEncoder()
+      const message = `event: ${event}\ndata: ${JSON.stringify(eventData)}\n\n`
+      controller.enqueue(encoder.encode(message))
+    }
+
+    const webStream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        await AiService.streamChat(userConfig, params, {
+          onChunk: (chunk: AiStreamChunk) => {
+            sendEvent(controller, 'chunk', chunk)
+          },
+          onComplete: (resp: AiChatSuccessResponse) => {
+            completeResponse = resp
+            sendEvent(controller, 'complete', resp)
+          },
+          onError: (error: AiChatResponse) => {
+            hasError = true
+            sendEvent(controller, 'error', error)
+          },
+        })
+
+        if (!hasError && completeResponse && completeResponse.usage) {
+          sendEvent(controller, 'usage', completeResponse.usage)
+        }
+
+        controller.close()
+      },
+    })
+
+    const nodeReadable = Readable.fromWeb(webStream as unknown as NodeReadableStream)
+    return response.stream(nodeReadable)
   }
 
   private static formatOpenAiError(error: any): AiChatResponseError {
