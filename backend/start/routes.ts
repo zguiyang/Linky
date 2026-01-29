@@ -73,6 +73,7 @@ router
     // AI API
     router.get('/ai/config', [AiController, 'getConfig'])
     router.post('/ai/chat', [AiController, 'chat'])
+    router.post('/ai/chat/stream', [AiController, 'stream'])
   })
   .prefix('api')
   .middleware(middleware.auth())
