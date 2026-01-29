@@ -71,6 +71,7 @@
     "open-graph-scraper": "^6.11.0",
     "openai": "^6.17.0",
     "pg": "^8.17.2",
+    "pino-roll": "^4.0.0",
     "reflect-metadata": "^0.2.2"
   },
   "hotHook": {

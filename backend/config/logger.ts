@@ -13,11 +13,20 @@ const loggerConfig = defineConfig({
     app: {
       enabled: true,
       name: env.get('APP_NAME'),
-      level: env.get('LOG_LEVEL'),
+      level: env.get('LOG_LEVEL', 'info'),
       transport: {
         targets: targets()
           .pushIf(!app.inProduction, targets.pretty())
-          .pushIf(app.inProduction, targets.file({ destination: 1 }))
+          .pushIf(app.inProduction, {
+            target: 'pino-roll',
+            level: 'info',
+            options: {
+              file: './logs/app.log',
+              frequency: '7d',
+              mkdir: true,
+              limit: 1,
+            }
+          })
           .toArray(),
       },
     },
