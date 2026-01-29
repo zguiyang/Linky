@@ -34,9 +34,7 @@
         <div class="mx-3 my-2 border-t border-muted" />
 
         <div class="p-2">
-          <client-only>
-            <sidebar-tags />
-          </client-only>
+          <sidebar-tags />
         </div>
       </template>
 
@@ -76,10 +74,17 @@
 <script setup lang="ts">
 import WorkspaceUserDropdown from '~/components/workspace/UserDropdown.vue'
 import SidebarTags from '~/components/workspace/SidebarTags.vue'
+import { useTagsStore } from '~/stores/tags'
 
 const navItems = [
   { label: '书签', to: '/workspace/bookmarks', icon: 'i-heroicons-bookmark' },
   { label: '备忘录', to: '/workspace/memos', icon: 'i-heroicons-document-text' },
   { label: '标签管理', to: '/workspace/tags', icon: 'i-heroicons-tag' }
 ]
+
+await useAsyncData('sidebar-tags', async () => {
+  const tagsStore = useTagsStore()
+  await tagsStore.fetchTags()
+  return tagsStore.tags
+})
 </script>
