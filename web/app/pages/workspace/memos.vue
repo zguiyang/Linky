@@ -307,20 +307,10 @@ const closeModal = () => {
 }
 
 const handleSave = async (data: CreateMemoRequest | UpdateMemoRequest) => {
-  const toast = useToast()
-
   if (modalMode.value === 'add') {
-    const { error } = await request.post<Memo>('/memos', data as CreateMemoRequest)
-    if (error) {
-      toast.add({ title: '创建失败', description: error.message, color: 'error' })
-      return
-    }
+    await request.post<Memo>('/memos', data as CreateMemoRequest)
   } else if (currentMemo.value) {
-    const { error } = await request.put<Memo>(`/memos/${currentMemo.value.id}`, data as UpdateMemoRequest)
-    if (error) {
-      toast.add({ title: '更新失败', description: error.message, color: 'error' })
-      return
-    }
+    await request.put<Memo>(`/memos/${currentMemo.value.id}`, data as UpdateMemoRequest)
   }
 
   await fetchMemos()
@@ -339,14 +329,9 @@ const closeDeleteModal = () => {
 }
 
 const confirmDelete = async () => {
-  const toast = useToast()
   if (!memoToDelete.value) return
 
-  const { error } = await request.delete(`/memos/${memoToDelete.value.id}`)
-  if (error) {
-    toast.add({ title: '删除失败', description: error.message, color: 'error' })
-    return
-  }
+  await request.delete(`/memos/${memoToDelete.value.id}`)
 
   await fetchMemos()
   showDeleteModal.value = false

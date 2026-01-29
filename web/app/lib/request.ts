@@ -1,4 +1,5 @@
 import type { NitroFetchOptions, NitroFetchRequest } from 'nitropack'
+import { useHttpError } from '~/composables/useHttpError'
 
 export type ApiError = {
   status: number
@@ -38,21 +39,6 @@ function parseError(error: unknown): ApiError {
   }
 }
 
-function handle401(_error: ApiError) {
-  const isLoggingOut = useState('isLoggingOut', () => false)
-  if (isLoggingOut.value) return
-
-  isLoggingOut.value = true
-  const tokenCookie = useCookie('auth_token')
-  tokenCookie.value = null
-
-  setTimeout(() => {
-    isLoggingOut.value = false
-  }, 1000)
-
-  navigateTo('/auth/sign-in')
-}
-
 async function apiRequest<T = unknown, R extends NitroFetchRequest = NitroFetchRequest>(
   url: R,
   options: ApiRequestOptions<R> = {}
@@ -84,9 +70,7 @@ async function apiRequest<T = unknown, R extends NitroFetchRequest = NitroFetchR
       return { data: null, error: apiError }
     }
 
-    if (apiError.status === 401) {
-      handle401(apiError)
-    }
+    useHttpError().handleError(error)
 
     return { data: null, error: apiError }
   }

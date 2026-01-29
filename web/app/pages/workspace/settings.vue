@@ -105,21 +105,14 @@ onMounted(async () => {
 })
 
 const saveSettings = async () => {
-  const toast = useToast()
   saving.value = true
 
-  const { error } = await request.put('/settings/ai', {
+  await request.put('/settings/ai', {
     aiEnabled: form.aiEnabled,
     aiBaseUrl: form.aiBaseUrl || null,
     aiModelName: form.aiModelName || null,
     aiApiKey: form.aiApiKey || undefined
   })
-
-  if (error) {
-    toast.add({ title: '保存失败', description: error.message, color: 'error' })
-    saving.value = false
-    return
-  }
 
   form.aiApiKey = ''
   saving.value = false

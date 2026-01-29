@@ -439,21 +439,16 @@ const openDeleteConfirm = (bookmark: Bookmark) => {
 }
 
 const handleSaveBookmark = async (close?: () => void) => {
-  const toast = useToast()
-
   if (!bookmarkForm.value.url) {
     return
   }
 
-  const { error } = isEditing.value && editingBookmarkId.value
-    ? await request.put<Bookmark>(`/bookmarks/${editingBookmarkId.value}`, bookmarkForm.value)
-    : autoFetch.value
-      ? await request.post<Bookmark>('/bookmarks', { url: bookmarkForm.value.url, autoFetch: true })
-      : await request.post<Bookmark>('/bookmarks', bookmarkForm.value)
-
-  if (error) {
-    toast.add({ title: '保存失败', description: error.message, color: 'error' })
-    return
+  if (isEditing.value && editingBookmarkId.value) {
+    await request.put<Bookmark>(`/bookmarks/${editingBookmarkId.value}`, bookmarkForm.value)
+  } else if (autoFetch.value) {
+    await request.post<Bookmark>('/bookmarks', { url: bookmarkForm.value.url, autoFetch: true })
+  } else {
+    await request.post<Bookmark>('/bookmarks', bookmarkForm.value)
   }
 
   await refreshBookmarks()
@@ -469,17 +464,10 @@ const handleSaveBookmark = async (close?: () => void) => {
 }
 
 const handleDeleteBookmark = async (close?: () => void) => {
-  const toast = useToast()
   if (!contextBookmark.value) return
 
   isDeleting.value = true
-  const { error } = await request.delete(`/bookmarks/${contextBookmark.value.id}`)
-
-  if (error) {
-    toast.add({ title: '删除失败', description: error.message, color: 'error' })
-    isDeleting.value = false
-    return
-  }
+  await request.delete(`/bookmarks/${contextBookmark.value.id}`)
 
   await refreshBookmarks()
   close?.()

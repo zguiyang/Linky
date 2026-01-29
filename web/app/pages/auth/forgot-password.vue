@@ -82,11 +82,6 @@ const onSubmit = async () => {
 
   const { error } = await authApi.forgotPassword({ email: state.email })
   if (error) {
-    toast.add({
-      title: '发送失败',
-      description: error.message,
-      color: 'error'
-    })
     loading.value = false
     return
   }

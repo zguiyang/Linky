@@ -61,11 +61,6 @@ const handleResend = async () => {
   const { error } = await authApi.resendVerification()
 
   if (error) {
-    toast.add({
-      title: '发送失败',
-      description: error.message,
-      color: 'error'
-    })
     sending.value = false
     return
   }

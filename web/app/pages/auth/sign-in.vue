@@ -97,16 +97,10 @@ const onSubmit = async () => {
   const redirectPath = lastPath.value || '/workspace/bookmarks'
 
   const { error } = await authStore.login(state.email, state.password)
-  if (error) {
-    toast.add({
-      title: '登录失败',
-      description: error.message,
-      color: 'error'
-    })
-    return
-  }
+  if (error) return
 
   lastPath.value = null
+  toast.add({ title: '登录成功', color: 'success' })
   await navigateTo(redirectPath)
 }
 </script>
