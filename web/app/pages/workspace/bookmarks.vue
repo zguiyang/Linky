@@ -318,7 +318,6 @@ import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS, VIEW_MODE, type ViewMode } from '~
 definePageMeta({ layout: 'workspace' })
 
 const tagsStore = useTagsStore()
-await tagsStore.fetchTags()
 
 const viewMode = useState<ViewMode>('view-mode', () => VIEW_MODE.MASONRY)
 

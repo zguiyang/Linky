@@ -221,7 +221,6 @@ import { VIEW_MODE, type ViewMode } from '~/constants'
 definePageMeta({ layout: 'workspace' })
 
 const tagsStore = useTagsStore()
-await tagsStore.fetchTags()
 
 const { handleError } = useHttpError()
 
