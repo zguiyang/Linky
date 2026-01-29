@@ -356,6 +356,7 @@ const handleUpdateTag = async (close?: () => void) => {
         name: tagForm.value.name.trim(),
         color: tagForm.value.color || null,
         userId: existingTag.userId,
+        isAiGenerated: existingTag.isAiGenerated,
         bookmarksCount: existingTag.bookmarksCount,
         memosCount: existingTag.memosCount,
         createdAt: existingTag.createdAt,

@@ -14,6 +14,7 @@ export class BookmarkService {
       description?: string | null
       tagIds?: number[]
       autoFetch?: boolean
+      autoAiTag?: boolean
     }
   ) {
     const existingBookmark = await Bookmark.query()
@@ -38,7 +39,7 @@ export class BookmarkService {
     }
 
     if (data.autoFetch !== false) {
-      await this.scheduleMetadataFetch(bookmark.id, data.url)
+      await this.scheduleMetadataFetch(bookmark.id, data.url, data.autoAiTag)
     }
 
     return bookmark
@@ -50,6 +51,7 @@ export class BookmarkService {
       url: string
       tagIds?: number[]
       autoFetch?: boolean
+      autoAiTag?: boolean
     }
   ) {
     return await this.create(userId, {
@@ -58,12 +60,17 @@ export class BookmarkService {
       description: null,
       tagIds: data.tagIds,
       autoFetch: data.autoFetch,
+      autoAiTag: data.autoAiTag,
     })
   }
 
-  private async scheduleMetadataFetch(bookmarkId: number, url: string): Promise<void> {
+  private async scheduleMetadataFetch(
+    bookmarkId: number,
+    url: string,
+    autoAiTag?: boolean
+  ): Promise<void> {
     const { default: FetchBookmarkMetadata } = await import('#jobs/fetch_bookmark_metadata')
-    await FetchBookmarkMetadata.dispatch({ bookmarkId, url })
+    await FetchBookmarkMetadata.dispatch({ bookmarkId, url, autoAiTag: autoAiTag !== false })
   }
 
   async updateMetadata(
@@ -94,7 +101,7 @@ export class BookmarkService {
       throw new Exception('书签正在抓取元数据，请稍后再试', { status: 400 })
     }
 
-    await this.scheduleMetadataFetch(bookmarkId, bookmark.url)
+    await this.scheduleMetadataFetch(bookmarkId, bookmark.url, true)
     return { queued: true }
   }
 

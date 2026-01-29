@@ -86,9 +86,18 @@
               v-for="tag in bookmark.tags"
               :key="tag.id"
               color="primary"
-              variant="outline"
+              :variant="tag.isAiGenerated ? 'soft' : 'outline'"
               size="md"
             >
+              <span
+                v-if="tag.isAiGenerated"
+                class="flex items-center gap-1"
+              >
+                <u-icon
+                  name="i-heroicons-sparkles"
+                  class="size-3"
+                />
+              </span>
               {{ tag.name }}
             </u-badge>
           </div>
@@ -124,9 +133,18 @@
             v-for="tag in bookmark.tags"
             :key="tag.id"
             color="primary"
-            variant="outline"
+            :variant="tag.isAiGenerated ? 'soft' : 'outline'"
             size="md"
           >
+            <span
+              v-if="tag.isAiGenerated"
+              class="flex items-center gap-1"
+            >
+              <u-icon
+                name="i-heroicons-sparkles"
+                class="size-3"
+              />
+            </span>
             {{ tag.name }}
           </u-badge>
         </div>

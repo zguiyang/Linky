@@ -5,6 +5,7 @@ export interface ImportOptions {
   createTags?: boolean
   skipDuplicates?: boolean
   autoFetch?: boolean
+  autoAiTag?: boolean // 新增
 }
 
 export interface ImportResult {
@@ -99,6 +100,9 @@ export const bookmarksApi = {
     }
     if (options.autoFetch !== undefined) {
       formData.append('autoFetch', String(options.autoFetch))
+    }
+    if (options.autoAiTag !== undefined) {
+      formData.append('autoAiTag', String(options.autoAiTag))
     }
     return request.post<ImportResult | AsyncImportResponse>('/bookmarks/import', formData)
   },

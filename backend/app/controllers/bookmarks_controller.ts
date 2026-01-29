@@ -55,6 +55,7 @@ export default class BookmarksController {
       description: data.description ?? null,
       tagIds: data.tagIds ?? undefined,
       autoFetch: data.autoFetch,
+      autoAiTag: data.autoAiTag,
     })
   }
 
@@ -65,6 +66,7 @@ export default class BookmarksController {
       url: data.url,
       tagIds: data.tagIds ?? undefined,
       autoFetch: data.autoFetch,
+      autoAiTag: data.autoAiTag,
     })
   }
 
@@ -98,7 +100,7 @@ export default class BookmarksController {
 
   async import({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
-    const { file, createTags, skipDuplicates } =
+    const { file, createTags, skipDuplicates, autoAiTag } =
       await request.validateUsing(importBookmarkValidator)
 
     if (!file.tmpPath) {
@@ -117,6 +119,7 @@ export default class BookmarksController {
         {
           createTags: createTags ?? true,
           skipDuplicates: skipDuplicates ?? true,
+          autoAiTag: autoAiTag ?? true,
         }
       )
 
@@ -146,6 +149,7 @@ export default class BookmarksController {
       filePath: tempPath,
       createTags: createTags ?? true,
       skipDuplicates: skipDuplicates ?? true,
+      autoAiTag: autoAiTag ?? true,
     })
 
     return {

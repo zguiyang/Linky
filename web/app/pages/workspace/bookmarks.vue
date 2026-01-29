@@ -206,6 +206,12 @@
           >
             <u-switch v-model="autoFetch" />
           </u-form-field>
+          <u-form-field
+            label="✨ 自动使用 AI 生成标签"
+            direction="row"
+          >
+            <u-switch v-model="autoAiTag" />
+          </u-form-field>
           <div>
             <label class="block text-sm font-medium text-default dark:text-default mb-1.5">URL <span class="text-red-500">*</span></label>
             <u-input
@@ -396,6 +402,7 @@ const bookmarkForm = ref({
 })
 
 const autoFetch = ref(true)
+const autoAiTag = ref(true)
 
 const tagSelectItems = computed(() => tagsStore.tagSelectItems)
 
@@ -411,6 +418,7 @@ const openAddModal = () => {
   isEditing.value = false
   editingBookmarkId.value = null
   autoFetch.value = true
+  autoAiTag.value = true
   bookmarkForm.value = {
     title: '',
     url: '',
@@ -424,6 +432,7 @@ const openEditModal = (bookmark: Bookmark) => {
   isEditing.value = true
   editingBookmarkId.value = bookmark.id
   autoFetch.value = false
+  autoAiTag.value = false
   bookmarkForm.value = {
     title: bookmark.title,
     url: bookmark.url,
@@ -446,15 +455,16 @@ const handleSaveBookmark = async (close?: () => void) => {
   if (isEditing.value && editingBookmarkId.value) {
     await request.put<Bookmark>(`/bookmarks/${editingBookmarkId.value}`, bookmarkForm.value)
   } else if (autoFetch.value) {
-    await request.post<Bookmark>('/bookmarks', { url: bookmarkForm.value.url, autoFetch: true })
+    await request.post<Bookmark>('/bookmarks', { url: bookmarkForm.value.url, autoFetch: true, autoAiTag: autoAiTag.value })
   } else {
-    await request.post<Bookmark>('/bookmarks', bookmarkForm.value)
+    await request.post<Bookmark>('/bookmarks', { ...bookmarkForm.value, autoAiTag: autoAiTag.value })
   }
 
   await refreshBookmarks()
   close?.()
   showBookmarkModal.value = false
   autoFetch.value = true
+  autoAiTag.value = true
   bookmarkForm.value = {
     title: '',
     url: '',

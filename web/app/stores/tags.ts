@@ -38,6 +38,7 @@ export const useTagsStore = defineStore('tags', () => {
     pending.value = true
     error.value = null
     const { data, error: apiError } = await tagsApi.index()
+    console.log('Fetched tags:', data, apiError)
     if (apiError) {
       error.value = 'Failed to load tags'
       tags.value = []

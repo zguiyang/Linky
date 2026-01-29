@@ -100,6 +100,12 @@
               label="跳过已存在的书签"
             />
           </div>
+          <div class="flex items-center gap-3">
+            <u-checkbox
+              v-model="autoAiTag"
+              label="✨ 自动使用 AI 生成标签"
+            />
+          </div>
         </div>
       </div>
 
@@ -260,6 +266,7 @@ let pollInterval: ReturnType<typeof setInterval> | null = null
 const createTags = ref(true)
 const skipDuplicates = ref(true)
 const autoFetch = ref(true)
+const autoAiTag = ref(true)
 
 const handleDrop = (event: DragEvent) => {
   isDragging.value = false
@@ -349,6 +356,9 @@ const startImport = async () => {
   if (autoFetch.value !== undefined) {
     formData.append('autoFetch', String(autoFetch.value))
   }
+  if (autoAiTag.value !== undefined) {
+    formData.append('autoAiTag', String(autoAiTag.value))
+  }
 
   const response = await request.post<{ data: ImportResultData | AsyncImportResponseData }>('/bookmarks/import', formData)
 
@@ -388,6 +398,7 @@ const resetState = () => {
   createTags.value = true
   skipDuplicates.value = true
   autoFetch.value = true
+  autoAiTag.value = true
 }
 
 onUnmounted(() => {

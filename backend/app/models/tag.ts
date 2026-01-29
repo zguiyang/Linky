@@ -18,6 +18,9 @@ export default class Tag extends BaseModel {
   @column()
   declare userId: number
 
+  @column()
+  declare isAiGenerated: boolean
+
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
 

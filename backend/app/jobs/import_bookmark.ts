@@ -9,6 +9,7 @@ export interface ImportBookmarkPayload {
   filePath: string
   createTags: boolean
   skipDuplicates: boolean
+  autoAiTag: boolean
 }
 
 export interface ImportResult {
@@ -42,7 +43,7 @@ export default class ImportBookmark extends Job {
   private bookmarkParserService = new BookmarkParserService()
 
   async handle(payload: ImportBookmarkPayload) {
-    const { jobId, userId, filePath, createTags, skipDuplicates } = payload
+    const { jobId, userId, filePath, createTags, skipDuplicates, autoAiTag } = payload
 
     logger.info(`[ImportBookmark] Job started: ${jobId}`)
     await this.updateStatus(jobId, 'processing', 0)
@@ -67,6 +68,7 @@ export default class ImportBookmark extends Job {
       const result = await this.bookmarkParserService.processImport(userId, parseResult.bookmarks, {
         createTags,
         skipDuplicates,
+        autoAiTag,
       })
       logger.info(`[ImportBookmark] Import result: ${JSON.stringify(result)}`)
       await this.updateProgress(100)

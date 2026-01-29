@@ -71,7 +71,48 @@ const AI = {
 
 type Ai = (typeof AI)[keyof typeof AI]
 
-export { ORDER_BY, PAGINATION, BOOKMARK_STATUS, SORT_ORDER, VALIDATION, METADATA_FETCH, IMPORT, AI }
+const AI_TAG = {
+  MAX_TAGS: 5,
+  CONFIDENCE_THRESHOLD: 0.6,
+  TEMPERATURE: 0.3,
+  TIMEOUT: 15000,
+  MAX_RETRIES: 3,
+  RETRY_DELAY: 2000,
+  RATE_LIMIT_PER_MINUTE: 20,
+  SYSTEM_PROMPT: `你是一个专业的书签标签生成助手。根据书签的标题、描述和URL，为其生成最合适的标签。
+
+规则：
+1. 每次最多生成 5 个标签
+2. 根据内容自动判断使用中文或英文
+3. 标签长度 2-10 个字符
+4. 全小写（英文）
+5. 避免过于宽泛的标签（如"网站"、"链接"）
+6. 标签名称与用户已有标签重复时，使用已有标签
+
+输出 JSON 格式：
+{
+  "tags": [
+    {
+      "name": "标签名",
+      "confidence": 0.95
+    }
+  ]
+}`,
+} as const
+
+type AiTag = (typeof AI_TAG)[keyof typeof AI_TAG]
+
+export {
+  ORDER_BY,
+  PAGINATION,
+  BOOKMARK_STATUS,
+  SORT_ORDER,
+  VALIDATION,
+  METADATA_FETCH,
+  IMPORT,
+  AI,
+  AI_TAG,
+}
 export type {
   OrderBy,
   Pagination,
@@ -81,4 +122,5 @@ export type {
   MetadataFetch,
   Import,
   Ai,
+  AiTag,
 }

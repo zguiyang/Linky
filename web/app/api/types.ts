@@ -43,6 +43,7 @@ export interface Tag {
   name: string
   color: string | null
   userId: number
+  isAiGenerated: boolean // 新增
   bookmarksCount: number
   memosCount: number
   createdAt: string
@@ -107,6 +108,14 @@ export interface CreateBookmarkRequest {
   description?: string | null
   tagIds?: number[]
   autoFetch?: boolean
+  autoAiTag?: boolean // 新增
+}
+
+export interface CreateBookmarkByUrlRequest {
+  url: string
+  tagIds?: number[]
+  autoFetch?: boolean
+  autoAiTag?: boolean // 新增
 }
 
 export interface UpdateBookmarkRequest {
