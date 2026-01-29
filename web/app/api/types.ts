@@ -83,7 +83,7 @@ export interface Bookmark {
   id: number
   title: string
   url: string
-  description: string | undefined | null
+  description: string | null
   visit_count: number
   user_id: number
   tags: Tag[]

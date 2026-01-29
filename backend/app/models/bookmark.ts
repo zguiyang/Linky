@@ -22,7 +22,7 @@ export default class Bookmark extends BaseModel {
   @column({ columnName: 'visit_count' })
   declare visitCount: number
 
-  @column({ columnName: 'metadata', serializeAs: null })
+  @column({ columnName: 'metadata' })
   declare metadata: BookmarkMetadata | null
 
   @column()
@@ -46,22 +46,4 @@ export default class Bookmark extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
-
-  public serialize() {
-    const tags = this.$preloaded?.tags as Tag[] | undefined
-
-    return {
-      id: this.id,
-      title: this.title,
-      url: this.url,
-      description: this.description,
-      visit_count: this.visitCount,
-      metadata: this.metadata,
-      status: this.status,
-      user_id: this.userId,
-      tags: tags?.map((tag) => ({ id: tag.id, name: tag.name })) ?? [],
-      created_at: this.createdAt.toISO(),
-      updated_at: this.updatedAt?.toISO(),
-    }
-  }
 }
