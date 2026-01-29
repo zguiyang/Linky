@@ -1,5 +1,6 @@
 import Tag from '#models/tag'
 import { Exception } from '@adonisjs/core/exceptions'
+import Database from '@adonisjs/lucid/services/db'
 
 export class TagService {
   async create(userId: number, data: { name: string; color?: string }) {
@@ -19,8 +20,19 @@ export class TagService {
   async findAll(userId: number) {
     return await Tag.query()
       .where('user_id', userId)
-      .withCount('bookmarks')
-      .withCount('memos')
+      .select(
+        '*',
+        Database.from('bookmark_tags')
+          .count('*')
+          .whereColumn('bookmark_tags.tag_id', 'tags.id')
+          .as('bookmarks_count')
+      )
+      .select(
+        Database.from('memo_tags')
+          .count('*')
+          .whereColumn('memo_tags.tag_id', 'tags.id')
+          .as('memos_count')
+      )
       .orderBy('name', 'asc')
   }
 
@@ -28,8 +40,19 @@ export class TagService {
     const tag = await Tag.query()
       .where('id', tagId)
       .where('user_id', userId)
-      .withCount('bookmarks')
-      .withCount('memos')
+      .select(
+        '*',
+        Database.from('bookmark_tags')
+          .count('*')
+          .whereColumn('bookmark_tags.tag_id', 'tags.id')
+          .as('bookmarks_count')
+      )
+      .select(
+        Database.from('memo_tags')
+          .count('*')
+          .whereColumn('memo_tags.tag_id', 'tags.id')
+          .as('memos_count')
+      )
       .first()
 
     if (!tag) {
