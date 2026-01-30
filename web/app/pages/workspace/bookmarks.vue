@@ -521,6 +521,7 @@ const handleUpdatedBookmark = (bookmark: Bookmark) => {
   // if (index !== -1) {
   //   bookmarks.value[index] = bookmark
   // }
+  // TODO: Better way to update the bookmark in the list
   refreshBookmarks()
 }
 
