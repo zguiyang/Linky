@@ -58,6 +58,7 @@ router
     router.get('/bookmarks/import/:jobId/status', [BookmarksController, 'importStatus'])
     router.put('/bookmarks/:id', [BookmarksController, 'update'])
     router.delete('/bookmarks/:id', [BookmarksController, 'destroy'])
+    router.post('/bookmarks/transmit/test', [BookmarksController, 'transmitTest'])
 
     // 备忘录 API
     router.get('/memos', [MemosController, 'index'])
@@ -100,5 +101,14 @@ router.jobs('/jobs').use(async (ctx, next) => {
   return next()
 })
 
-// Register Transmit routes
+// Register Transmit routes (no auth middleware needed for events endpoint)
+// Authorization is handled by transmit.authorize() for each channel
 transmit.registerRoutes()
+
+// Configure channel authorization
+transmit.authorize('bookmarks/:userId', (ctx, { userId }) => {
+  if (!ctx.auth.isAuthenticated) {
+    return false
+  }
+  return ctx.auth.user?.id === Number(userId)
+})

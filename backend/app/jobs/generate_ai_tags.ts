@@ -26,6 +26,17 @@ interface AiTagSuggestion {
 }
 
 export default class GenerateAiTags extends Job {
+  /**
+   * Note: Services are manually instantiated because the adonisjs-jobs package
+   * does not support dependency injection.
+   *
+   * TODO: When jobs package supports DI, change to:
+   * @inject()
+   * constructor(
+   *   private settingService: SettingService,
+   *   private promptService: PromptService
+   * ) {}
+   */
   private settingService = new SettingService()
   private promptService = new PromptService()
 

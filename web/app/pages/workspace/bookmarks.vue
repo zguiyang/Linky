@@ -320,10 +320,14 @@ import { request } from '~/lib/request'
 import type { Bookmark, Tag } from '~/api/types'
 import ImportBookmarksModal from '~/components/ImportBookmarksModal.vue'
 import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS, VIEW_MODE, type ViewMode } from '~/constants'
+import { useTransmit } from '~/composables/useTransmit'
+import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({ layout: 'workspace' })
 
 const tagsStore = useTagsStore()
+const authStore = useAuthStore()
+const { subscribeBookmarks, events: _events } = useTransmit()
 
 const viewMode = useState<ViewMode>('view-mode', () => VIEW_MODE.MASONRY)
 
@@ -514,5 +518,10 @@ onMounted(() => {
   window.addEventListener('add-bookmark', () => {
     openAddModal()
   })
+
+  console.log (authStore.user)
+  if (authStore.user?.id) {
+    subscribeBookmarks(authStore.user.id)
+  }
 })
 </script>

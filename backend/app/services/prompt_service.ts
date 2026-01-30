@@ -1,16 +1,22 @@
+import { inject } from '@adonisjs/core'
 import { Edge } from 'edge.js'
 import app from '@adonisjs/core/services/app'
 import logger from '@adonisjs/core/services/logger'
 
-const edge = new Edge()
+const PROMPTS_PATH = 'resources/prompts'
 
-const promptsPath = app.makePath('resources/prompts')
-edge.mount(promptsPath)
-
+@inject()
 export default class PromptService {
+  private edge: Edge
+
+  constructor() {
+    this.edge = new Edge()
+    this.edge.mount(app.makePath(PROMPTS_PATH))
+  }
+
   render(name: string, data: Record<string, any> = {}): string {
     try {
-      return edge.renderSync(`${name}`, data)
+      return this.edge.renderSync(`${name}`, data)
     } catch (error) {
       logger.error({ err: error }, `[PromptService] Failed to render: ${name}`)
       throw error

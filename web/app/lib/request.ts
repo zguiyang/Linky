@@ -52,7 +52,7 @@ async function apiRequest<T = unknown, R extends NitroFetchRequest = NitroFetchR
   try {
     const response = await fetcher<T>(url as any, {
       ...fetchOptions,
-      baseURL,
+      baseURL: `${baseURL}${config.public.apiPrefix}`,
       timeout: 10000,
       credentials: 'include',
       headers: {

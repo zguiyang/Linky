@@ -18,6 +18,17 @@ export type FetchBookmarkMetadataResult = {
 }
 
 export default class FetchBookmarkMetadata extends Job {
+  /**
+   * Note: Services are manually instantiated because the adonisjs-jobs package
+   * does not support dependency injection.
+   *
+   * TODO: When jobs package supports DI, change to:
+   * @inject()
+   * constructor(
+   *   private metadataService: BookmarkMetadataService,
+   *   private settingService: SettingService
+   * ) {}
+   */
   private metadataService = new BookmarkMetadataService()
   private settingService = new SettingService()
 

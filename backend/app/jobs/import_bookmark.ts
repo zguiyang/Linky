@@ -40,6 +40,18 @@ interface ImportJobStatus {
 }
 
 export default class ImportBookmark extends Job {
+  /**
+   * Note: Services are manually instantiated because the adonisjs-jobs package
+   * does not support dependency injection.
+   *
+   * TODO: When jobs package supports DI, change to:
+   * @inject()
+   * constructor(
+   *   private settingService: SettingService,
+   *   private promptService: PromptService
+   * ) {}
+   */
+
   private bookmarkParserService = new BookmarkParserService()
 
   async handle(payload: ImportBookmarkPayload) {

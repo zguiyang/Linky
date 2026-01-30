@@ -4,6 +4,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { readFile, writeFile } from 'node:fs/promises'
 import { mkdir } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
+import transmit from '@adonisjs/transmit/services/main'
+import logger from '@adonisjs/core/services/logger'
 import {
   createBookmarkValidator,
   createBookmarkByUrlValidator,
@@ -228,6 +230,31 @@ export default class BookmarksController {
       jobId,
       status: 'waiting',
       progress: 0,
+    }
+  }
+
+  async transmitTest({ auth }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const channel = `bookmarks:${user.id}`
+
+    logger.info(`[TransmitTest] Broadcasting to channel: ${channel}`)
+
+    transmit.broadcast(channel, {
+      event: 'bookmark:test',
+      data: {
+        message: 'Transmit 连通性测试成功！',
+        timestamp: new Date().toISOString(),
+        testId: randomUUID().slice(0, 8),
+      },
+      timestamp: new Date().toISOString(),
+    })
+
+    logger.info(`[TransmitTest] Broadcast sent to channel: ${channel}`)
+
+    return {
+      success: true,
+      channel,
+      message: '测试事件已发送，请检查前端控制台',
     }
   }
 }
