@@ -58,7 +58,6 @@ router
     router.get('/bookmarks/import/:jobId/status', [BookmarksController, 'importStatus'])
     router.put('/bookmarks/:id', [BookmarksController, 'update'])
     router.delete('/bookmarks/:id', [BookmarksController, 'destroy'])
-    router.post('/bookmarks/transmit/test', [BookmarksController, 'transmitTest'])
 
     // 备忘录 API
     router.get('/memos', [MemosController, 'index'])
