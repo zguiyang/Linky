@@ -316,7 +316,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
-import type { Bookmark, Tag } from '~/api/types'
+import type { Bookmark, Tag, PaginatedResponse } from '~/api/types'
 import ImportBookmarksModal from '~/components/ImportBookmarksModal.vue'
 import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS, VIEW_MODE, type ViewMode } from '~/constants'
 import { usePush } from '~/composables/usePush'
@@ -351,19 +351,7 @@ const searchQueryParam = computed(() => searchQuery.value || undefined)
 const page = ref(1)
 const perPage = ref(20)
 
-interface PaginationMeta {
-  currentPage: number
-  perPage: number
-  total: number
-  lastPage: number
-}
-
-interface PaginationData {
-  meta: PaginationMeta
-  data: Bookmark[]
-}
-
-const { data: paginationData, pending, refresh } = await useApi<PaginationData>(
+const { data: paginationData, pending, refresh } = await useApi<PaginatedResponse<Bookmark>>(
   '/bookmarks/paginate',
   {
     method: 'get',
@@ -378,8 +366,8 @@ const { data: paginationData, pending, refresh } = await useApi<PaginationData>(
   }
 )
 
-const bookmarks = computed(() => (paginationData.value as PaginationData | null)?.data || [])
-const total = computed(() => (paginationData.value as PaginationData | null)?.meta.total || 0)
+const bookmarks = computed(() => (paginationData.value as PaginatedResponse<Bookmark> | null)?.data || [])
+const total = computed(() => (paginationData.value as PaginatedResponse<Bookmark> | null)?.meta.total || 0)
 
 const showBookmarkModal = ref(false)
 const isEditing = ref(false)

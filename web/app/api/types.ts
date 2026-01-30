@@ -188,3 +188,5 @@ export interface UpdateSettingsRequest {
   aiModelName?: string | null
   aiEnabled?: boolean
 }
+
+export type PaginationData<T> = PaginatedResponse<T>

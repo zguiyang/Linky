@@ -212,7 +212,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
-import type { Memo, CreateMemoRequest, UpdateMemoRequest, Tag } from '~/api/types'
+import type { Memo, CreateMemoRequest, UpdateMemoRequest, Tag, PaginatedResponse } from '~/api/types'
 import MemoModal from '~/components/MemoModal.vue'
 import { VIEW_MODE, type ViewMode } from '~/constants'
 
@@ -226,19 +226,7 @@ const viewMode = ref<ViewMode>(VIEW_MODE.MASONRY)
 const page = ref(1)
 const perPage = ref(20)
 
-interface PaginationMeta {
-  currentPage: number
-  perPage: number
-  total: number
-  lastPage: number
-}
-
-interface PaginationData {
-  meta: PaginationMeta
-  data: Memo[]
-}
-
-const { data: paginationData, pending, refresh } = await useApi<PaginationData>(
+const { data: paginationData, pending, refresh } = await useApi<PaginatedResponse<Memo>>(
   '/memos/paginate',
   {
     method: 'get',
@@ -247,8 +235,8 @@ const { data: paginationData, pending, refresh } = await useApi<PaginationData>(
   }
 )
 
-const memos = computed(() => (paginationData.value as PaginationData | null)?.data || [])
-const total = computed(() => (paginationData.value as PaginationData | null)?.meta.total || 0)
+const memos = computed(() => (paginationData.value as PaginatedResponse<Memo> | null)?.data || [])
+const total = computed(() => (paginationData.value as PaginatedResponse<Memo> | null)?.meta.total || 0)
 
 const showMemoModal = ref(false)
 const modalMode = ref<'add' | 'edit'>('add')
