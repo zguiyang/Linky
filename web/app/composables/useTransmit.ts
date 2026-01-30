@@ -1,5 +1,5 @@
 import { Transmit } from '@adonisjs/transmit-client'
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted, shallowRef } from 'vue'
 
 export interface TransmitEvent {
   event: string
@@ -47,11 +47,12 @@ function getTransmitClient(): Transmit | null {
 export function useTransmit() {
   const client = getTransmitClient()
   const events = ref<TransmitEvent[]>([])
-  const subscriptions = ref<Map<string, ReturnType<Transmit['subscription']>>>(new Map())
+  const subscriptions = shallowRef<Map<string, ReturnType<Transmit['subscription']>>>(new Map())
+  const isCleanedUp = ref(false)
 
   const subscribe = async (channel: string): Promise<void> => {
-    if (!client || subscriptions.value.has(channel)) {
-      console.log(`[Transmit] Skip subscribe: client=${!!client}, alreadySubscribed=${subscriptions.value.has(channel)}`)
+    if (isCleanedUp.value || !client || subscriptions.value.has(channel)) {
+      console.log(`[Transmit] Skip subscribe: cleanedUp=${isCleanedUp.value}, client=${!!client}, alreadySubscribed=${subscriptions.value.has(channel)}`)
       return
     }
 
@@ -74,22 +75,39 @@ export function useTransmit() {
   }
 
   const unsubscribe = async (channel: string): Promise<void> => {
+    if (isCleanedUp.value) return
+
     const subscription = subscriptions.value.get(channel)
     if (subscription) {
-      await subscription.delete()
-      subscriptions.value.delete(channel)
-      console.log(`[Transmit] Unsubscribed from: ${channel}`)
+      try {
+        await subscription.delete()
+        subscriptions.value.delete(channel)
+        console.log(`[Transmit] Unsubscribed from: ${channel}`)
+      } catch (error) {
+        console.warn(`[Transmit] Failed to unsubscribe from ${channel}:`, error)
+        subscriptions.value.delete(channel)
+      }
     }
   }
 
   const cleanup = (): void => {
-    subscriptions.value.forEach((subscription, channel) => {
+    if (isCleanedUp.value) {
+      console.log('[Transmit] Already cleaned up, skipping...')
+      return
+    }
+    isCleanedUp.value = true
+
+    for (const [channel, subscription] of subscriptions.value.entries()) {
       try {
-        subscription.delete()
+        if (subscription && typeof subscription.delete === 'function') {
+          subscription.delete().catch((error: unknown) => {
+            console.warn(`[Transmit] Failed to delete subscription for ${channel}:`, error)
+          })
+        }
       } catch (error) {
-        console.warn(`[Transmit] Failed to delete subscription for ${channel}:`, error)
+        console.warn(`[Transmit] Error during cleanup for ${channel}:`, error)
       }
-    })
+    }
     subscriptions.value.clear()
     events.value = []
     console.log('[Transmit] Cleanup completed')
