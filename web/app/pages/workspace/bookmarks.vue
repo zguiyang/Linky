@@ -183,7 +183,7 @@
     </u-scroll-area>
 
     <div
-      v-if="!bookmarksPending && total > 0"
+      v-if="!loading && total > 0"
       class="flex justify-center py-4 flex-shrink-0"
     >
       <u-pagination
@@ -350,9 +350,15 @@ const searchQuery = ref('')
 
 const page = ref(1)
 const perPage = ref(20)
+const loading = ref(false)
+const paginationData = ref<{ data: Bookmark[], meta: { currentPage: number, perPage: number, total: number, lastPage: number } }>({
+  data: [],
+  meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 }
+})
 
 const fetchBookmarks = async () => {
-  const { data, error } = await request.get<{ data: Bookmark[], meta: { total: number } }>('/bookmarks/paginate', {
+  loading.value = true
+  const { data, error } = await request.get<{ data: Bookmark[], meta: any }>('/bookmarks/paginate', {
     page: page.value,
     perPage: perPage.value,
     search: searchQuery.value || undefined,
@@ -362,33 +368,29 @@ const fetchBookmarks = async () => {
   })
 
   if (error) {
-    return { data: null, error }
+    loading.value = false
+    return
   }
 
-  return { data: data?.data || [], meta: data?.meta, error: null }
+  paginationData.value = {
+    meta: data?.meta || { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
+    data: data?.data || []
+  }
+  loading.value = false
 }
 
-const { data: paginationData, pending: bookmarksPending, refresh: refreshBookmarks } = await useAsyncData(
-  computed(() => `bookmarks-${page.value}-${perPage.value}-${searchQuery.value}-${tagsStore.selectedTags.join(',')}-${sortBy.value}-${sortOrder.value}`),
-  async () => {
-    const result = await fetchBookmarks()
-    if (result.error) throw result.error
-    return { data: result.data, meta: result.meta }
-  },
-  {
-    watch: [page, tagsStore.selectedTags, sortBy, sortOrder],
-    default: () => ({
-      meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
-      data: []
-    })
-  }
-)
+await fetchBookmarks()
 
-const bookmarks = computed(() => paginationData.value?.data || [])
-const total = computed(() => paginationData.value?.meta?.total || 0)
+const bookmarks = computed(() => paginationData.value.data || [])
+const total = computed(() => paginationData.value.meta.total || 0)
 
 watch(searchQuery, () => {
   page.value = 1
+  fetchBookmarks()
+})
+
+watch([page, tagsStore.selectedTags, sortBy, sortOrder], () => {
+  fetchBookmarks()
 })
 
 const showBookmarkModal = ref(false)
@@ -464,7 +466,7 @@ const handleSaveBookmark = async (close?: () => void) => {
     await request.post<Bookmark>('/bookmarks', { ...bookmarkForm.value, autoAiTag: autoAiTag.value })
   }
 
-  await refreshBookmarks()
+  await fetchBookmarks()
   close?.()
   showBookmarkModal.value = false
   autoFetch.value = true
@@ -483,7 +485,7 @@ const handleDeleteBookmark = async (close?: () => void) => {
   isDeleting.value = true
   await request.delete(`/bookmarks/${contextBookmark.value.id}`)
 
-  await refreshBookmarks()
+  await fetchBookmarks()
   close?.()
   showDeleteConfirm.value = false
   contextBookmark.value = null
@@ -501,7 +503,7 @@ const openImportModal = () => {
 }
 
 const handleImportComplete = async () => {
-  await refreshBookmarks()
+  await fetchBookmarks()
   await tagsStore.refreshTags()
 }
 
@@ -511,7 +513,7 @@ const handleRefresh = async (bookmark: Bookmark) => {
     console.error('Failed to refresh bookmark:', error)
     return
   }
-  await refreshBookmarks()
+  await fetchBookmarks()
 }
 
 const handleUpdatedBookmark = (bookmark: Bookmark) => {
@@ -522,7 +524,7 @@ const handleUpdatedBookmark = (bookmark: Bookmark) => {
   //   bookmarks.value[index] = bookmark
   // }
   // TODO: Better way to update the bookmark in the list
-  refreshBookmarks()
+  fetchBookmarks()
 }
 
 onMounted(() => {
