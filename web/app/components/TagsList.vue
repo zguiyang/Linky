@@ -18,17 +18,7 @@
 
     <div class="p-4">
       <div
-        v-if="pendingValue"
-        class="flex items-center justify-center py-8"
-      >
-        <u-icon
-          name="i-heroicons-arrow-path"
-          class="w-5 h-5 animate-spin text-gray-400"
-        />
-      </div>
-
-      <div
-        v-else-if="!tagsList || tagsList.length === 0"
+        v-if="!tagsList || tagsList.length === 0"
         class="text-center py-8"
       >
         <u-icon
@@ -235,8 +225,6 @@ const isMobile = ref(false)
 
 const tagsList = computed(() => tagsStore.tags)
 const selectedTagsList = computed(() => props.selectedTags)
-
-const pendingValue = computed(() => tagsStore.pending)
 
 onMounted(() => {
   isMobile.value = window.innerWidth < 1024

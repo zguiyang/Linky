@@ -1,16 +1,17 @@
 import { navigateTo } from '#app'
-import { request } from '~/lib/request'
 
 export const useHttpError = () => {
   const currentError = useState<unknown | null>('currentError', () => null)
   const isLoggingOut = useState('isLoggingOut', () => false)
 
-  const getError = () => {
-    return currentError.value
-  }
-
-  const clearError = () => {
-    currentError.value = null
+  const getErrorMessage = (error: unknown): string => {
+    if ((error as any)?.data?.message) {
+      return (error as any).data.message
+    }
+    if ((error as any)?.message) {
+      return (error as any).message
+    }
+    return '操作失败，请稍后重试'
   }
 
   const handle401 = () => {
@@ -20,7 +21,7 @@ export const useHttpError = () => {
     const toast = useToast()
     toast.add({
       title: '未登录或登录已过期',
-      description: request.getErrorMessage(currentError.value) || '请重新登录',
+      description: getErrorMessage(currentError.value),
       color: 'error',
       icon: 'i-heroicons-lock-closed'
     })
@@ -37,24 +38,18 @@ export const useHttpError = () => {
 
   const handleError = (error: unknown) => {
     currentError.value = error
-
     const toast = useToast()
     toast.add({
       title: '请求失败',
-      description: request.getErrorMessage(error),
+      description: getErrorMessage(error),
       color: 'error',
       icon: 'i-heroicons-x-mark'
     })
-
-    if ((error as any)?.status === 401) {
-      handle401()
-    }
   }
 
   return {
-    getError,
-    clearError,
-    handleError,
-    handle401
+    getErrorMessage,
+    handle401,
+    handleError
   }
 }

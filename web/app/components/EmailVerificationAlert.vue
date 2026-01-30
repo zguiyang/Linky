@@ -25,7 +25,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { authApi } from '~/api/auth'
 
 interface User {
   emailVerifiedAt: string | null
@@ -58,21 +57,20 @@ const handleResend = async () => {
 
   sending.value = true
 
-  const { error } = await authApi.resendVerification()
+  const { $api } = useNuxtApp()
+  const result = await $api('/auth/resend-verification', { method: 'post' })
 
-  if (error) {
-    sending.value = false
-    return
+  if (result) {
+    startCooldown()
+    emit('refresh')
+    toast.add({
+      title: '验证邮件已发送',
+      description: '请检查您的邮箱',
+      color: 'success',
+      icon: 'i-heroicons-envelope'
+    })
   }
 
-  startCooldown()
-  emit('refresh')
-  toast.add({
-    title: '验证邮件已发送',
-    description: '请检查您的邮箱',
-    color: 'success',
-    icon: 'i-heroicons-envelope'
-  })
   sending.value = false
 }
 

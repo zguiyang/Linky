@@ -101,7 +101,7 @@
 import { reactive, ref, computed } from 'vue'
 import { useRoute } from '#app'
 import { useAuthStore } from '~/stores/auth'
-import { authApi } from '~/api/auth'
+import type { AuthResponse } from '~/api/types'
 
 definePageMeta({ layout: 'auth' })
 
@@ -132,32 +132,39 @@ const onSubmit = async () => {
     return
   }
 
-  const { data, error: apiError } = await authApi.resetPassword({
-    token: state.token,
-    password: state.password,
-    passwordConfirmation: state.passwordConfirmation
+  const { data, error: apiError } = await useApi<AuthResponse>('/auth/reset-password', {
+    method: 'post',
+    body: {
+      token: state.token,
+      password: state.password,
+      passwordConfirmation: state.passwordConfirmation
+    }
   })
 
-  if (apiError) {
-    error.value = apiError.message
-    if (error.value.includes('过期') || error.value.includes('无效')) {
+  if (apiError.value) {
+    const errorMessage = apiError.value.message || ''
+    error.value = errorMessage
+    if (errorMessage.includes('过期') || errorMessage.includes('无效')) {
       showRetryLink.value = true
     }
     return
   }
 
-  authStore.setUser(data!.user)
-  authStore.setToken(data!.token)
+  if (data.value) {
+    const authData = data.value as AuthResponse
+    authStore.setUser(authData.user)
+    authStore.setToken(authData.token)
 
-  success.value = true
-  toast.add({
-    title: '密码重置成功',
-    description: '已自动登录',
-    color: 'success',
-    icon: 'i-heroicons-check-circle'
-  })
-  setTimeout(() => {
-    navigateTo('/workspace/bookmarks')
-  }, 2000)
+    success.value = true
+    toast.add({
+      title: '密码重置成功',
+      description: '已自动登录',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
+    setTimeout(() => {
+      navigateTo('/workspace/bookmarks')
+    }, 2000)
+  }
 }
 </script>

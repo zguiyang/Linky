@@ -183,7 +183,7 @@
     </u-scroll-area>
 
     <div
-      v-if="!loading && total > 0"
+      v-if="!pending && total > 0"
       class="flex justify-center py-4 flex-shrink-0"
     >
       <u-pagination
@@ -314,9 +314,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
-import { request } from '~/lib/request'
 import type { Bookmark, Tag } from '~/api/types'
 import ImportBookmarksModal from '~/components/ImportBookmarksModal.vue'
 import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS, VIEW_MODE, type ViewMode } from '~/constants'
@@ -350,48 +349,36 @@ const searchQuery = ref('')
 
 const page = ref(1)
 const perPage = ref(20)
-const loading = ref(false)
-const paginationData = ref<{ data: Bookmark[], meta: { currentPage: number, perPage: number, total: number, lastPage: number } }>({
-  data: [],
-  meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 }
-})
 
-const fetchBookmarks = async () => {
-  loading.value = true
-  const { data, error } = await request.get<{ data: Bookmark[], meta: any }>('/bookmarks/paginate', {
-    page: page.value,
-    perPage: perPage.value,
-    search: searchQuery.value || undefined,
-    tagIds: tagsStore.selectedTags.length > 0 ? tagsStore.selectedTags : undefined,
-    sortBy: sortBy.value,
-    sortOrder: sortOrder.value
-  })
-
-  if (error) {
-    loading.value = false
-    return
-  }
-
-  paginationData.value = {
-    meta: data?.meta || { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
-    data: data?.data || []
-  }
-  loading.value = false
+interface PaginationMeta {
+  currentPage: number
+  perPage: number
+  total: number
+  lastPage: number
 }
 
-await fetchBookmarks()
+interface PaginationData {
+  meta: PaginationMeta
+  data: Bookmark[]
+}
 
-const bookmarks = computed(() => paginationData.value.data || [])
-const total = computed(() => paginationData.value.meta.total || 0)
+const { data: paginationData, pending, refresh } = await useApi<PaginationData>(
+  '/bookmarks/paginate',
+  {
+    method: 'get',
+    params: {
+      page: page,
+      perPage: perPage,
+      search: () => searchQuery.value || undefined,
+      tagIds: () => tagsStore.selectedTags.length > 0 ? tagsStore.selectedTags : undefined,
+      sortBy: sortBy,
+      sortOrder: sortOrder
+    }
+  }
+)
 
-watch(searchQuery, () => {
-  page.value = 1
-  fetchBookmarks()
-})
-
-watch([page, tagsStore.selectedTags, sortBy, sortOrder], () => {
-  fetchBookmarks()
-})
+const bookmarks = computed(() => (paginationData.value as PaginationData | null)?.data || [])
+const total = computed(() => (paginationData.value as PaginationData | null)?.meta.total || 0)
 
 const showBookmarkModal = ref(false)
 const isEditing = ref(false)
@@ -458,15 +445,26 @@ const handleSaveBookmark = async (close?: () => void) => {
     return
   }
 
+  const { $api } = useNuxtApp()
+
   if (isEditing.value && editingBookmarkId.value) {
-    await request.put<Bookmark>(`/bookmarks/${editingBookmarkId.value}`, bookmarkForm.value)
+    await $api(`/bookmarks/${editingBookmarkId.value}`, {
+      method: 'put',
+      body: bookmarkForm.value
+    })
   } else if (autoFetch.value) {
-    await request.post<Bookmark>('/bookmarks', { url: bookmarkForm.value.url, autoFetch: true, autoAiTag: autoAiTag.value })
+    await $api('/bookmarks', {
+      method: 'post',
+      body: { url: bookmarkForm.value.url, autoFetch: true, autoAiTag: autoAiTag.value }
+    })
   } else {
-    await request.post<Bookmark>('/bookmarks', { ...bookmarkForm.value, autoAiTag: autoAiTag.value })
+    await $api('/bookmarks', {
+      method: 'post',
+      body: { ...bookmarkForm.value, autoAiTag: autoAiTag.value }
+    })
   }
 
-  await fetchBookmarks()
+  await refresh()
   close?.()
   showBookmarkModal.value = false
   autoFetch.value = true
@@ -482,10 +480,11 @@ const handleSaveBookmark = async (close?: () => void) => {
 const handleDeleteBookmark = async (close?: () => void) => {
   if (!contextBookmark.value) return
 
+  const { $api } = useNuxtApp()
   isDeleting.value = true
-  await request.delete(`/bookmarks/${contextBookmark.value.id}`)
+  await $api(`/bookmarks/${contextBookmark.value.id}`, { method: 'delete' })
 
-  await fetchBookmarks()
+  await refresh()
   close?.()
   showDeleteConfirm.value = false
   contextBookmark.value = null
@@ -503,28 +502,19 @@ const openImportModal = () => {
 }
 
 const handleImportComplete = async () => {
-  await fetchBookmarks()
+  await refresh()
   await tagsStore.refreshTags()
 }
 
 const handleRefresh = async (bookmark: Bookmark) => {
-  const { error } = await request.post(`/bookmarks/${bookmark.id}/refresh-metadata`)
-  if (error) {
-    console.error('Failed to refresh bookmark:', error)
-    return
-  }
-  await fetchBookmarks()
+  const { $api } = useNuxtApp()
+  await $api(`/bookmarks/${bookmark.id}/refresh-metadata`, { method: 'post' })
+  await refresh()
 }
 
 const handleUpdatedBookmark = (bookmark: Bookmark) => {
-  // const index = bookmarks.value.findIndex(b => b.id === bookmark.id)
   console.log('Received updated bookmark via push:', bookmark)
-  console.log('Current bookmarks before update:', bookmarks.value)
-  // if (index !== -1) {
-  //   bookmarks.value[index] = bookmark
-  // }
-  // TODO: Better way to update the bookmark in the list
-  fetchBookmarks()
+  refresh()
 }
 
 onMounted(() => {

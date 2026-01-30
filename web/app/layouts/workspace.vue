@@ -84,10 +84,6 @@ const navItems = [
 
 await useAsyncData('sidebar-tags', async () => {
   const tagsStore = useTagsStore()
-  const result = await tagsStore.fetchTags()
-  if (result.error) {
-    return []
-  }
-  return result.data || []
+  return await tagsStore.fetchTags()
 })
 </script>

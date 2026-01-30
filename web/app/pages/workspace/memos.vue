@@ -91,7 +91,7 @@
 
     <u-scroll-area class="flex-1 min-h-0">
       <div
-        v-if="loading"
+        v-if="pending"
         class="flex justify-center py-16"
       >
         <u-icon
@@ -162,7 +162,7 @@
     </u-scroll-area>
 
     <div
-      v-if="!loading && total > 0"
+      v-if="!pending && total > 0"
       class="flex justify-center py-4 flex-shrink-0"
     >
       <u-pagination
@@ -212,8 +212,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
-import { request } from '~/lib/request'
-import type { Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
+import type { Memo, CreateMemoRequest, UpdateMemoRequest, Tag } from '~/api/types'
 import MemoModal from '~/components/MemoModal.vue'
 import { VIEW_MODE, type ViewMode } from '~/constants'
 
@@ -226,38 +225,30 @@ const viewMode = ref<ViewMode>(VIEW_MODE.MASONRY)
 
 const page = ref(1)
 const perPage = ref(20)
-const loading = ref(false)
-const paginationData = ref<{
-  meta: { currentPage: number, perPage: number, total: number, lastPage: number }
-  data: Memo[]
-}>({
-  meta: { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
-  data: []
-})
 
-const fetchMemos = async () => {
-  loading.value = true
-  const { data, error } = await request.get<{ data: Memo[], meta: any }>('/memos/paginate', {
-    page: page.value,
-    perPage: perPage.value
-  })
-
-  if (error) {
-    loading.value = false
-    return
-  }
-
-  paginationData.value = {
-    meta: data?.meta || { currentPage: 1, perPage: 20, total: 0, lastPage: 1 },
-    data: data?.data || []
-  }
-  loading.value = false
+interface PaginationMeta {
+  currentPage: number
+  perPage: number
+  total: number
+  lastPage: number
 }
 
-await fetchMemos()
+interface PaginationData {
+  meta: PaginationMeta
+  data: Memo[]
+}
 
-const memos = computed(() => paginationData.value.data || [])
-const total = computed(() => paginationData.value.meta.total || 0)
+const { data: paginationData, pending, refresh } = await useApi<PaginationData>(
+  '/memos/paginate',
+  {
+    method: 'get',
+    params: { page: page, perPage: perPage },
+    watch: [page]
+  }
+)
+
+const memos = computed(() => (paginationData.value as PaginationData | null)?.data || [])
+const total = computed(() => (paginationData.value as PaginationData | null)?.meta.total || 0)
 
 const showMemoModal = ref(false)
 const modalMode = ref<'add' | 'edit'>('add')
@@ -271,15 +262,15 @@ const filteredMemos = computed(() => {
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(
-      m =>
+      (m: Memo) =>
         m.title.toLowerCase().includes(query)
         || m.content.toLowerCase().includes(query)
-        || m.tags.some(tag => tag.name.toLowerCase().includes(query))
+        || m.tags.some((tag: Tag) => tag.name.toLowerCase().includes(query))
     )
   }
 
   if (tagsStore.selectedTags.length > 0) {
-    result = result.filter(m => m.tags.some(t => tagsStore.selectedTags.includes(t.id)))
+    result = result.filter((m: Memo) => m.tags.some((t: Tag) => tagsStore.selectedTags.includes(t.id)))
   }
 
   return result
@@ -307,13 +298,15 @@ const closeModal = () => {
 }
 
 const handleSave = async (data: CreateMemoRequest | UpdateMemoRequest) => {
+  const { $api } = useNuxtApp()
+
   if (modalMode.value === 'add') {
-    await request.post<Memo>('/memos', data as CreateMemoRequest)
+    await $api('/memos', { method: 'post', body: data })
   } else if (currentMemo.value) {
-    await request.put<Memo>(`/memos/${currentMemo.value.id}`, data as UpdateMemoRequest)
+    await $api(`/memos/${currentMemo.value.id}`, { method: 'put', body: data })
   }
 
-  await fetchMemos()
+  await refresh()
   showMemoModal.value = false
   currentMemo.value = null
 }
@@ -331,15 +324,15 @@ const closeDeleteModal = () => {
 const confirmDelete = async () => {
   if (!memoToDelete.value) return
 
-  await request.delete(`/memos/${memoToDelete.value.id}`)
+  const { $api } = useNuxtApp()
+  await $api(`/memos/${memoToDelete.value.id}`, { method: 'delete' })
 
-  await fetchMemos()
+  await refresh()
   showDeleteModal.value = false
   memoToDelete.value = null
 }
 
 const handlePageChange = (newPage: number) => {
   page.value = newPage
-  fetchMemos()
 }
 </script>

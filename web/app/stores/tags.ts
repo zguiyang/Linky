@@ -1,12 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { tagsApi } from '~/api/tags'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 
 export const useTagsStore = defineStore('tags', () => {
   const tags = ref<Tag[]>([])
-  const pending = ref(false)
-  const error = ref<string | null>(null)
   const selectedTags = ref<number[]>([])
 
   const tagMap = computed(() => {
@@ -31,74 +28,45 @@ export const useTagsStore = defineStore('tags', () => {
     }))
   })
 
-  const fetchTags = async () => {
-    if (tags.value.length > 0) {
-      return { data: tags.value, error: null }
+  const fetchTags = async (): Promise<Tag[]> => {
+    if (tags.value.length > 0) return tags.value
+    const { data } = await useApi<Tag[]>('/tags')
+    if (data.value) {
+      tags.value = data.value
     }
-    pending.value = true
-    error.value = null
-    const { data, error: apiError } = await tagsApi.index()
-    if (apiError) {
-      error.value = 'Failed to load tags'
-      tags.value = []
-      pending.value = false
-      return { data: null, error: apiError }
-    }
-    tags.value = data || []
-    pending.value = false
-    return { data: data || [], error: null }
+    return tags.value
   }
 
-  const refreshTags = async () => {
-    pending.value = true
-    error.value = null
-    const { data, error: apiError } = await tagsApi.index()
-    if (apiError) {
-      error.value = 'Failed to load tags'
-      pending.value = false
-      return { data: null, error: apiError }
+  const refreshTags = async (): Promise<Tag[]> => {
+    const { data } = await useApi<Tag[]>('/tags')
+    if (data.value) {
+      tags.value = data.value
     }
-    tags.value = data || []
-    pending.value = false
-    return { data: data || [], error: null }
+    return tags.value
   }
 
   const createTag = async (data: CreateTagRequest) => {
-    const { error: apiError } = await tagsApi.create(data)
-    if (apiError) {
-      return { error: apiError }
-    }
+    const { $api } = useNuxtApp()
+    await $api('/tags', { method: 'post', body: data })
     await refreshTags()
-    return { error: null }
   }
 
   const updateTag = async (id: number, data: UpdateTagRequest) => {
-    const { error: apiError } = await tagsApi.update(id, data)
-    if (apiError) {
-      return { error: apiError }
-    }
+    const { $api } = useNuxtApp()
+    await $api(`/tags/${id}`, { method: 'put', body: data })
     await refreshTags()
-    return { error: null }
   }
 
   const deleteTag = async (id: number) => {
-    const { error: apiError } = await tagsApi.delete(id)
-    if (apiError) {
-      return { error: apiError }
-    }
+    const { $api } = useNuxtApp()
+    await $api(`/tags/${id}`, { method: 'delete' })
     await refreshTags()
-    return { error: null }
   }
 
   const batchDelete = async (ids: number[]) => {
-    const deletePromises = ids.map(id => tagsApi.delete(id))
-    const results = await Promise.all(deletePromises)
-    const hasError = results.some(r => r.error)
-    if (hasError) {
-      return { error: results.find(r => r.error)?.error || null }
-    }
+    const { $api } = useNuxtApp()
+    await Promise.all(ids.map(id => $api(`/tags/${id}`, { method: 'delete' })))
     await refreshTags()
-    return { error: null }
   }
 
   const toggleTag = (tagId: number) => {
@@ -131,8 +99,6 @@ export const useTagsStore = defineStore('tags', () => {
 
   return {
     tags,
-    pending,
-    error,
     selectedTags,
     tagMap,
     getTagName,

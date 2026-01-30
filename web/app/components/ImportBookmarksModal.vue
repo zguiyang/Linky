@@ -217,9 +217,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { request } from '~/lib/request'
 import { usePush } from '~/composables/usePush'
-import { useAuthStore } from '~/stores/auth'
 
 type ImportResultData = {
   total: number
@@ -266,7 +264,6 @@ const currentTitle = ref('')
 
 let pollInterval: ReturnType<typeof setInterval> | null = null
 
-const authStore = useAuthStore()
 const { onImportProgress } = usePush()
 
 const createTags = ref(true)
@@ -317,27 +314,20 @@ const stopPolling = () => {
 }
 
 const pollImportStatus = async (jobId: string) => {
+  const { $api } = useNuxtApp()
+
   pollInterval = setInterval(async () => {
-    const response = await request.get<AsyncImportResponseData>(`/bookmarks/import/${jobId}/status`)
+    const response = await $api<AsyncImportResponseData>(`/bookmarks/import/${jobId}/status`, { method: 'get' })
 
-    if (response.error) {
-      console.error('Polling failed:', response.error)
-      stopPolling()
-      step.value = 'upload'
-      isImporting.value = false
-      return
-    }
+    if (response) {
+      progress.value = response.progress
 
-    const data = response.data
-    if (data) {
-      progress.value = data.progress
-
-      if (data.status === 'completed' && (data as any).data) {
+      if (response.status === 'completed' && (response as any).data) {
         stopPolling()
-        importResult.value = (data as any).data
+        importResult.value = (response as any).data
         step.value = 'result'
         isImporting.value = false
-      } else if (data.status === 'waiting') {
+      } else if (response.status === 'waiting') {
         progress.value = 0
       }
     }
@@ -346,6 +336,8 @@ const pollImportStatus = async (jobId: string) => {
 
 const startImport = async () => {
   if (!selectedFile.value) return
+
+  const { $api } = useNuxtApp()
 
   isImporting.value = true
   step.value = 'importing'
@@ -366,27 +358,27 @@ const startImport = async () => {
     formData.append('autoAiTag', String(autoAiTag.value))
   }
 
-  const response = await request.post<{ data: ImportResultData | AsyncImportResponseData }>('/bookmarks/import', formData)
+  const data = await $api<ImportResultData | AsyncImportResponseData>('/bookmarks/import', {
+    method: 'post',
+    body: formData
+  })
 
-  if (response.error) {
-    console.error('Import failed:', response.error)
+  if (data) {
+    const resultData = data as any
+
+    if (resultData && 'total' in resultData) {
+      importResult.value = resultData
+      step.value = 'result'
+    } else if (resultData && 'jobId' in resultData) {
+      isAsyncMode.value = true
+      onImportProgress((data: any) => {
+        progress.value = data.progress
+        currentTitle.value = data.currentTitle || ''
+      })
+      pollImportStatus(resultData.jobId)
+    }
+  } else {
     step.value = 'upload'
-    isImporting.value = false
-    return
-  }
-
-  const data = response.data?.data as any
-
-  if (data && 'total' in data) {
-    importResult.value = data
-    step.value = 'result'
-  } else if (data && 'jobId' in data) {
-    isAsyncMode.value = true
-    onImportProgress((data: any) => {
-      progress.value = data.progress
-      currentTitle.value = data.currentTitle || ''
-    })
-    pollImportStatus(data.jobId)
   }
 
   isImporting.value = false

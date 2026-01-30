@@ -83,8 +83,6 @@
 </template>
 
 <script setup lang="ts">
-import { request } from '~/lib/request'
-
 definePageMeta({ layout: 'workspace' })
 
 const saving = ref(false)
@@ -96,7 +94,8 @@ const form = reactive({
 })
 
 onMounted(async () => {
-  const { data } = await request.get<{ aiEnabled: boolean, aiBaseUrl: string | null, aiModelName: string | null }>('/settings/ai')
+  const { $api } = useNuxtApp()
+  const data = await $api<{ aiEnabled: boolean, aiBaseUrl: string | null, aiModelName: string | null }>('/settings/ai', { method: 'get' })
   if (data) {
     form.aiEnabled = data.aiEnabled
     form.aiBaseUrl = data.aiBaseUrl || ''
@@ -105,13 +104,17 @@ onMounted(async () => {
 })
 
 const saveSettings = async () => {
+  const { $api } = useNuxtApp()
   saving.value = true
 
-  await request.put('/settings/ai', {
-    aiEnabled: form.aiEnabled,
-    aiBaseUrl: form.aiBaseUrl || null,
-    aiModelName: form.aiModelName || null,
-    aiApiKey: form.aiApiKey || undefined
+  await $api('/settings/ai', {
+    method: 'put',
+    body: {
+      aiEnabled: form.aiEnabled,
+      aiBaseUrl: form.aiBaseUrl || null,
+      aiModelName: form.aiModelName || null,
+      aiApiKey: form.aiApiKey || undefined
+    }
   })
 
   form.aiApiKey = ''

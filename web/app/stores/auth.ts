@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { authApi } from '~/api/auth'
-import type { User } from '~/api/types'
+import type { User, AuthResponse } from '~/api/types'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -16,44 +15,45 @@ export const useAuthStore = defineStore('auth', () => {
   const isEmailVerified = computed(() => user.value?.emailVerifiedAt !== null)
 
   const fetchUser = async () => {
-    const { data, error } = await authApi.me()
-    if (error) {
-      user.value = null
-      return { data: null, error }
+    const { data } = await useApi<User>('/auth/me')
+    if (data.value) {
+      user.value = data.value
     }
-    user.value = data
-    return { data, error: null }
+    return user.value
   }
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, rememberMe?: boolean) => {
     loading.value = true
-    const { data, error } = await authApi.login({ email, password })
-    if (error) {
-      loading.value = false
-      return { data: null, error }
+    const { data } = await useApi<AuthResponse>('/auth/login', {
+      method: 'post',
+      body: { email, password, rememberMe }
+    })
+    if (data.value) {
+      user.value = data.value.user
+      tokenCookie.value = data.value.token
     }
-    user.value = data!.user
-    tokenCookie.value = data!.token
     loading.value = false
-    return { data: data!.user, error: null }
+    return data.value
   }
 
   const register = async (email: string, password: string, fullName: string) => {
     loading.value = true
-    const { data, error } = await authApi.register({ email, password, name: fullName })
-    if (error) {
-      loading.value = false
-      return { data: null, error }
+    const { data } = await useApi<AuthResponse>('/auth/register', {
+      method: 'post',
+      body: { email, password, name: fullName }
+    })
+    if (data.value) {
+      user.value = data.value.user
+      tokenCookie.value = data.value.token
     }
-    user.value = data!.user
-    tokenCookie.value = data!.token
     loading.value = false
-    return { data: data!.user, error: null }
+    return data.value
   }
 
   const logout = async () => {
+    const { $api } = useNuxtApp()
     loading.value = true
-    await authApi.logout()
+    await $api('/auth/logout', { method: 'post' })
     user.value = null
     tokenCookie.value = null
     loading.value = false

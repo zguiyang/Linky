@@ -26,26 +26,16 @@
     </div>
 
     <div
-      v-if="tagsStore.pending"
-      class="flex items-center justify-center py-8"
-    >
-      <u-icon
-        name="i-heroicons-arrow-path"
-        class="animate-spin text-neutral-400"
-      />
-    </div>
-
-    <div
-      v-else-if="!tagsStore.tags || tagsStore.tags.length === 0"
+      v-if="!tagsStore.tags || tagsStore.tags.length === 0"
       class="flex flex-col items-center justify-center py-16"
     >
       <p class="text-sm text-neutral-500 dark:text-neutral-400">
-        暂无书签
+        暂无标签
       </p>
     </div>
 
     <nav
-      v-show="!tagsStore.pending && tagsStore.tags && tagsStore.tags.length > 0"
+      v-show="tagsStore.tags && tagsStore.tags.length > 0"
       class="flex flex-wrap gap-2 px-2 py-1 overflow-hidden transition-all duration-300 ease-in-out"
       :class="{
         'max-h-0 opacity-0': !isExpanded,

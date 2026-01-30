@@ -86,16 +86,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from '#app'
 import { useAuthStore } from '~/stores/auth'
-import { authApi } from '~/api/auth'
 
 definePageMeta({ layout: 'auth' })
 
 const route = useRoute()
 const authStore = useAuthStore()
-const loading = computed(() => authStore.loading)
+const loading = ref(true)
 
 const success = ref(false)
 const error = ref('')
@@ -108,20 +107,24 @@ onMounted(async () => {
 
   if (!token) {
     error.value = '验证链接无效，缺少验证令牌'
+    loading.value = false
     return
   }
 
-  const { error: apiError } = await authApi.verifyEmail(token)
+  const { $api } = useNuxtApp()
+  const result = await $api(token, { method: 'get' })
 
-  if (apiError) {
-    error.value = apiError.message
-    return
+  if (result) {
+    success.value = true
+    lastPath.value = null
+    await authStore.fetchUser()
+    setTimeout(() => {
+      navigateTo(redirectPath)
+    }, 2000)
+  } else {
+    error.value = '验证失败，请稍后重试'
   }
 
-  success.value = true
-  lastPath.value = null
-  setTimeout(() => {
-    navigateTo(redirectPath)
-  }, 2000)
+  loading.value = false
 })
 </script>

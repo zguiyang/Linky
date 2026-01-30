@@ -63,7 +63,6 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { authApi } from '~/api/auth'
 
 definePageMeta({ layout: 'auth' })
 
@@ -80,22 +79,25 @@ const onSubmit = async () => {
   loading.value = true
   success.value = false
 
-  const { error } = await authApi.forgotPassword({ email: state.email })
-  if (error) {
-    loading.value = false
-    return
+  const { $api } = useNuxtApp()
+  const result = await $api('/auth/forgot-password', {
+    method: 'post',
+    body: { email: state.email }
+  })
+
+  if (result) {
+    success.value = true
+    toast.add({
+      title: '发送成功',
+      description: '重置邮件已发送，请检查您的邮箱',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
+    setTimeout(() => {
+      navigateTo('/auth/sign-in')
+    }, 3000)
   }
 
-  success.value = true
-  toast.add({
-    title: '发送成功',
-    description: '重置邮件已发送，请检查您的邮箱',
-    color: 'success',
-    icon: 'i-heroicons-check-circle'
-  })
-  setTimeout(() => {
-    navigateTo('/auth/sign-in')
-  }, 3000)
   loading.value = false
 }
 </script>

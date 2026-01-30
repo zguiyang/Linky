@@ -96,8 +96,8 @@ const onSubmit = async () => {
   const lastPath = useCookie('lastPath')
   const redirectPath = lastPath.value || '/workspace/bookmarks'
 
-  const { error } = await authStore.login(state.email, state.password)
-  if (error) return
+  const result = await authStore.login(state.email, state.password, state.rememberMe)
+  if (!result) return
 
   lastPath.value = null
   toast.add({ title: '登录成功', color: 'success' })
