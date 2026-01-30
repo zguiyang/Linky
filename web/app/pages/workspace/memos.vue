@@ -169,7 +169,6 @@
         v-model:page="page"
         :total="total"
         :items-per-page="perPage"
-        @update:page="handlePageChange"
       />
     </div>
 
@@ -212,7 +211,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
-import type { Memo, CreateMemoRequest, UpdateMemoRequest, Tag, PaginatedResponse } from '~/api/types'
+import type { Memo, CreateMemoRequest, UpdateMemoRequest, Tag } from '~/api/types'
 import MemoModal from '~/components/MemoModal.vue'
 import { VIEW_MODE, type ViewMode } from '~/constants'
 
@@ -223,20 +222,13 @@ const tagsStore = useTagsStore()
 const searchQuery = ref('')
 const viewMode = ref<ViewMode>(VIEW_MODE.MASONRY)
 
-const page = ref(1)
-const perPage = ref(20)
-
-const { data: paginationData, pending, refresh } = await useApi<PaginatedResponse<Memo>>(
-  '/memos/paginate',
-  {
-    method: 'get',
-    query: { page: page, perPage: perPage },
-    watch: [page]
-  }
+const pagination = usePagination<Memo>(
+  '/memos/paginate'
 )
 
-const memos = computed(() => (paginationData.value as PaginatedResponse<Memo> | null)?.data || [])
-const total = computed(() => (paginationData.value as PaginatedResponse<Memo> | null)?.meta.total || 0)
+const { items: memos, total, pending, page, perPage } = pagination
+
+await pagination.execute()
 
 const showMemoModal = ref(false)
 const modalMode = ref<'add' | 'edit'>('add')
@@ -294,7 +286,7 @@ const handleSave = async (data: CreateMemoRequest | UpdateMemoRequest) => {
     await $api(`/memos/${currentMemo.value.id}`, { method: 'put', body: data })
   }
 
-  await refresh()
+  await pagination.execute()
   showMemoModal.value = false
   currentMemo.value = null
 }
@@ -315,12 +307,8 @@ const confirmDelete = async () => {
   const { $api } = useNuxtApp()
   await $api(`/memos/${memoToDelete.value.id}`, { method: 'delete' })
 
-  await refresh()
+  await pagination.execute()
   showDeleteModal.value = false
   memoToDelete.value = null
-}
-
-const handlePageChange = (newPage: number) => {
-  page.value = newPage
 }
 </script>

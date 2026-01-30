@@ -21,7 +21,9 @@ const SORT_ORDER = {
 type _SortOrder = (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
 
 const PAGINATION = {
-  DEFAULT_PER_PAGE: 20
+  DEFAULT_PAGE: 1,
+  DEFAULT_PER_PAGE: 20,
+  MAX_PER_PAGE: 100
 } as const
 
 type _Pagination = (typeof PAGINATION)[keyof typeof PAGINATION]

@@ -190,7 +190,6 @@
         v-model:page="page"
         :total="total"
         :items-per-page="perPage"
-        @update:page="handlePageChange"
       />
     </div>
 
@@ -316,10 +315,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
-import type { Bookmark, Tag, PaginatedResponse } from '~/api/types'
+import type { Bookmark, Tag } from '~/api/types'
 import ImportBookmarksModal from '~/components/ImportBookmarksModal.vue'
 import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS, VIEW_MODE, type ViewMode } from '~/constants'
-import { usePush } from '~/composables/usePush'
 import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({ layout: 'workspace' })
@@ -348,26 +346,21 @@ const sortOrderIcon = computed(() => selectedSortOrder.value?.value === 'asc' ? 
 const searchQuery = ref('')
 const searchQueryParam = computed(() => searchQuery.value || undefined)
 
-const page = ref(1)
-const perPage = ref(20)
-
-const { data: paginationData, pending, refresh } = await useApi<PaginatedResponse<Bookmark>>(
+const pagination = usePagination<Bookmark>(
   '/bookmarks/paginate',
   {
-    method: 'get',
-    query: {
-      page: page,
-      perPage: perPage,
-      search: searchQueryParam,
-      tagIds: computed(() => tagsStore.selectedTags.length > 0 ? tagsStore.selectedTags : undefined),
-      sortBy: sortBy,
-      sortOrder: sortOrder
-    }
+    query: computed(() => ({
+      search: searchQueryParam.value,
+      tagIds: tagsStore.selectedTags.length > 0 ? tagsStore.selectedTags : undefined,
+      sortBy: sortBy.value,
+      sortOrder: sortOrder.value
+    }))
   }
 )
 
-const bookmarks = computed(() => (paginationData.value as PaginatedResponse<Bookmark> | null)?.data || [])
-const total = computed(() => (paginationData.value as PaginatedResponse<Bookmark> | null)?.meta.total || 0)
+const { items: bookmarks, total, pending, page, perPage } = pagination
+
+await pagination.execute()
 
 const showBookmarkModal = ref(false)
 const isEditing = ref(false)
@@ -453,7 +446,7 @@ const handleSaveBookmark = async (close?: () => void) => {
     })
   }
 
-  await refresh()
+  await pagination.execute()
   close?.()
   showBookmarkModal.value = false
   autoFetch.value = true
@@ -473,15 +466,11 @@ const handleDeleteBookmark = async (close?: () => void) => {
   isDeleting.value = true
   await $api(`/bookmarks/${contextBookmark.value.id}`, { method: 'delete' })
 
-  await refresh()
+  await pagination.execute()
   close?.()
   showDeleteConfirm.value = false
   contextBookmark.value = null
   isDeleting.value = false
-}
-
-const handlePageChange = (newPage: number) => {
-  page.value = newPage
 }
 
 const showImportModal = ref(false)
@@ -491,19 +480,19 @@ const openImportModal = () => {
 }
 
 const handleImportComplete = async () => {
-  await refresh()
+  await pagination.execute()
   await tagsStore.refreshTags()
 }
 
 const handleRefresh = async (bookmark: Bookmark) => {
   const { $api } = useNuxtApp()
   await $api(`/bookmarks/${bookmark.id}/refresh-metadata`, { method: 'post' })
-  await refresh()
+  await pagination.execute()
 }
 
 const handleUpdatedBookmark = (bookmark: Bookmark) => {
   console.log('Received updated bookmark via push:', bookmark)
-  refresh()
+  pagination.execute()
 }
 
 onMounted(() => {
