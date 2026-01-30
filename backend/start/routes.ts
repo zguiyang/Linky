@@ -105,7 +105,9 @@ router.jobs('/jobs').use(async (ctx, next) => {
 transmit.registerRoutes()
 
 // Configure channel authorization
-transmit.authorize('bookmarks/:userId', (ctx, { userId }) => {
+transmit.authorize('global/:userId', (ctx, { userId }) => {
+  ctx.logger.info(ctx.request.headers())
+  ctx.logger.info('[Transmit] Authorizing channel for userId:', userId)
   if (!ctx.auth.isAuthenticated) {
     return false
   }

@@ -3,7 +3,7 @@ const ORDER_BY = {
   UPDATED_AT: 'updatedAt'
 } as const
 
-type OrderBy = (typeof ORDER_BY)[keyof typeof ORDER_BY]
+type _OrderBy = (typeof ORDER_BY)[keyof typeof ORDER_BY]
 
 const VIEW_MODE = {
   MASONRY: 'masonry',
@@ -11,20 +11,20 @@ const VIEW_MODE = {
   LIST: 'list'
 } as const
 
-type ViewMode = (typeof VIEW_MODE)[keyof typeof VIEW_MODE]
+type _ViewMode = (typeof VIEW_MODE)[keyof typeof VIEW_MODE]
 
 const SORT_ORDER = {
   ASC: 'asc',
   DESC: 'desc'
 } as const
 
-type SortOrder = (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
+type _SortOrder = (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
 
 const PAGINATION = {
   DEFAULT_PER_PAGE: 20
 } as const
 
-type Pagination = (typeof PAGINATION)[keyof typeof PAGINATION]
+type _Pagination = (typeof PAGINATION)[keyof typeof PAGINATION]
 
 const SORT_BY_OPTIONS = [
   { label: '更新时间', value: 'updatedAt' },
@@ -42,6 +42,11 @@ const BOOKMARK_STATUS = {
   ARCHIVED: 'archived'
 } as const
 
+const BOOKMARK_EVENTS = {
+  BOOKMARK_UPDATED: 'bookmark.updated',
+  IMPORT_PROGRESS: 'bookmark.import.progress'
+} as const
+
 export {
   ORDER_BY,
   VIEW_MODE,
@@ -49,12 +54,13 @@ export {
   PAGINATION,
   SORT_BY_OPTIONS,
   SORT_ORDER_OPTIONS,
-  BOOKMARK_STATUS
+  BOOKMARK_STATUS,
+  BOOKMARK_EVENTS
 }
 
 export type {
-  OrderBy,
-  ViewMode,
-  SortOrder,
-  Pagination
+  _OrderBy as OrderBy,
+  _ViewMode as ViewMode,
+  _SortOrder as SortOrder,
+  _Pagination as Pagination
 }

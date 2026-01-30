@@ -320,14 +320,14 @@ import { request } from '~/lib/request'
 import type { Bookmark, Tag } from '~/api/types'
 import ImportBookmarksModal from '~/components/ImportBookmarksModal.vue'
 import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS, VIEW_MODE, type ViewMode } from '~/constants'
-import { useTransmit } from '~/composables/useTransmit'
+import { usePush } from '~/composables/usePush'
 import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({ layout: 'workspace' })
 
 const tagsStore = useTagsStore()
 const authStore = useAuthStore()
-const { subscribeBookmarks, events: _events } = useTransmit()
+const { onBookmarkUpdated } = usePush()
 
 const viewMode = useState<ViewMode>('view-mode', () => VIEW_MODE.MASONRY)
 
@@ -520,7 +520,13 @@ onMounted(() => {
   })
 
   if (authStore.user?.id) {
-    subscribeBookmarks(authStore.user.id)
+    onBookmarkUpdated(authStore.user.id, (bookmark) => {
+      const updatedBookmark = bookmark as unknown as Bookmark
+      const index = bookmarks.value.findIndex(b => b.id === updatedBookmark.id)
+      if (index !== -1) {
+        bookmarks.value[index] = updatedBookmark
+      }
+    })
   }
 })
 </script>

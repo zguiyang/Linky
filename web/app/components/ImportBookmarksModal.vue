@@ -126,7 +126,7 @@
               {{ isAsyncMode ? '正在后台导入书签...' : '正在导入书签...' }}
             </p>
             <p class="text-sm text-neutral-500 dark:text-neutral-400">
-              {{ isAsyncMode ? `进度: ${progress}%` : '解析文件并创建书签，请稍候' }}
+              {{ isAsyncMode ? `进度: ${progress}%` + (currentTitle ? ` - ${currentTitle}` : '') : '解析文件并创建书签，请稍候' }}
             </p>
           </div>
         </div>
@@ -218,6 +218,8 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
 import { request } from '~/lib/request'
+import { usePush } from '~/composables/usePush'
+import { useAuthStore } from '~/stores/auth'
 
 type ImportResultData = {
   total: number
@@ -260,8 +262,12 @@ const isImporting = ref(false)
 const importResult = ref<ImportResultData | null>(null)
 const progress = ref(0)
 const isAsyncMode = ref(false)
+const currentTitle = ref('')
 
 let pollInterval: ReturnType<typeof setInterval> | null = null
+
+const authStore = useAuthStore()
+const { onImportProgress } = usePush()
 
 const createTags = ref(true)
 const skipDuplicates = ref(true)
@@ -376,6 +382,12 @@ const startImport = async () => {
     step.value = 'result'
   } else if (data && 'jobId' in data) {
     isAsyncMode.value = true
+    if (authStore.user?.id) {
+      onImportProgress(authStore.user.id, (data: any) => {
+        progress.value = data.progress
+        currentTitle.value = data.currentTitle || ''
+      })
+    }
     pollImportStatus(data.jobId)
   }
 

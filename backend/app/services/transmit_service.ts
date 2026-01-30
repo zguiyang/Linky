@@ -3,6 +3,6 @@ import type { TransmitEvent } from '#constants/index'
 
 export class TransmitService {
   async toUser(userId: number, event: TransmitEvent, data: any): Promise<void> {
-    await transmit.broadcast(`${userId}`, { event, data })
+    await transmit.broadcast(`global:${userId}`, { event, data })
   }
 }

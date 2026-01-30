@@ -82,12 +82,6 @@ export function useTransmit() {
     }
   }
 
-  const subscribeBookmarks = (userId: number): void => {
-    const channel = `bookmarks:${userId}`
-    console.log(`[Transmit] subscribeBookmarks called with userId: ${userId}, channel: ${channel}`)
-    subscribe(channel)
-  }
-
   const cleanup = (): void => {
     subscriptions.value.forEach((subscription) => {
       subscription.delete()
@@ -105,7 +99,6 @@ export function useTransmit() {
     events,
     subscribe,
     unsubscribe,
-    subscribeBookmarks,
     cleanup
   }
 }
