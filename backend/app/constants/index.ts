@@ -88,7 +88,13 @@ const BOOKMARK_EVENTS = {
   IMPORT_PROGRESS: 'bookmark.import.progress',
 } as const
 
-type TransmitEvent = (typeof BOOKMARK_EVENTS)[keyof typeof BOOKMARK_EVENTS]
+type BookmarkEvent = (typeof BOOKMARK_EVENTS)[keyof typeof BOOKMARK_EVENTS]
+
+const TRANSMIT_CHANNEL_NAMES = {
+  BOOKMARKS: 'bookmarks',
+} as const
+
+type TransmitEvent = BookmarkEvent
 
 export {
   ORDER_BY,
@@ -101,6 +107,7 @@ export {
   AI,
   AI_TAG,
   BOOKMARK_EVENTS,
+  TRANSMIT_CHANNEL_NAMES,
 }
 export type {
   OrderBy,
@@ -112,5 +119,6 @@ export type {
   Import,
   Ai,
   AiTag,
+  BookmarkEvent,
   TransmitEvent,
 }

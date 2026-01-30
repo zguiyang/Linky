@@ -12,6 +12,8 @@ import { middleware } from '#start/kernel'
 import env from '#start/env'
 import transmit from '@adonisjs/transmit/services/main'
 
+import { TRANSMIT_CHANNEL_NAMES } from '#constants/index'
+
 const AuthController = () => import('#controllers/auth_controller')
 const TagsController = () => import('#controllers/tags_controller')
 const BookmarksController = () => import('#controllers/bookmarks_controller')
@@ -105,11 +107,9 @@ router.jobs('/jobs').use(async (ctx, next) => {
 transmit.registerRoutes()
 
 // Configure channel authorization
-transmit.authorize('global/:userId', (ctx, { userId }) => {
-  ctx.logger.info(ctx.request.headers())
-  ctx.logger.info('[Transmit] Authorizing channel for userId:', userId)
+transmit.authorize(`${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:userId`, (ctx, { userId }) => {
   if (!ctx.auth.isAuthenticated) {
     return false
   }
-  return ctx.auth.user?.id === Number(userId)
+  return Number(ctx.auth.user?.id) === Number(userId)
 })

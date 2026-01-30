@@ -4,7 +4,7 @@ import app from '@adonisjs/core/services/app'
 import { BookmarkMetadataService } from '#services/bookmark_metadata_service'
 import { SettingService } from '#services/setting_service'
 import { TransmitService } from '#services/transmit_service'
-import { METADATA_FETCH, BOOKMARK_EVENTS } from '#constants/index'
+import { METADATA_FETCH, BOOKMARK_EVENTS, TRANSMIT_CHANNEL_NAMES } from '#constants/index'
 import GenerateAiTags from './generate_ai_tags.js'
 
 export type FetchBookmarkMetadataPayload = {
@@ -84,7 +84,11 @@ export default class FetchBookmarkMetadata extends Job {
       const bookmark = await BookmarkModel.query().where('id', bookmarkId).preload('tags').first()
 
       if (bookmark) {
-        await transmitService.toUser(userId, BOOKMARK_EVENTS.BOOKMARK_UPDATED, bookmark.toJSON())
+        await transmitService.toUser(
+          `${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:${userId}`,
+          BOOKMARK_EVENTS.BOOKMARK_UPDATED,
+          bookmark.toJSON()
+        )
       }
     } catch (error) {
       logger.error(

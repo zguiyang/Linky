@@ -4,7 +4,7 @@ import { readFile, unlink } from 'node:fs/promises'
 import { BookmarkParserService, parseHtml } from '#services/bookmark_parser_service'
 import app from '@adonisjs/core/services/app'
 import { TransmitService } from '#services/transmit_service'
-import { BOOKMARK_EVENTS } from '#constants/index'
+import { BOOKMARK_EVENTS, TRANSMIT_CHANNEL_NAMES } from '#constants/index'
 
 export interface ImportBookmarkPayload {
   jobId: string
@@ -76,12 +76,16 @@ export default class ImportBookmark extends Job {
         onProgress: async (current, total, currentTitle) => {
           const progress = Math.round((current / total) * 100)
           await this.updateStatus(jobId, 'processing', progress)
-          await transmitService.toUser(userId, BOOKMARK_EVENTS.IMPORT_PROGRESS, {
-            jobId,
-            progress: current,
-            total,
-            currentTitle,
-          })
+          await transmitService.toUser(
+            `${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:${userId}`,
+            BOOKMARK_EVENTS.IMPORT_PROGRESS,
+            {
+              jobId,
+              progress: current,
+              total,
+              currentTitle,
+            }
+          )
         },
       })
       logger.info(`[ImportBookmark] Import result: ${JSON.stringify(result)}`)

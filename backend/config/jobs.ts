@@ -13,32 +13,8 @@ const jobsConfig = defineConfig({
   queues: [env.get('REDIS_QUEUE', 'linky_jobs')],
 
   options: {
-    /**
-     * The total number of attempts to try the job until it completes.
-     * Set to 1 for no automatic retries - user must manually refresh if fetch fails.
-     */
     attempts: 1,
-
-    /**
-     * Backoff setting removed - no automatic retries.
-     */
-
-    /**
-     * If true, removes the job when it successfully completes
-     * When given a number, it specifies the maximum amount of
-     * jobs to keep, or you can provide an object specifying max
-     * age and/or count to keep. It overrides whatever setting is used in the worker.
-     * Default behavior is to keep the job in the completed set.
-     */
     removeOnComplete: 1000,
-
-    /**
-     * If true, removes the job when it fails after all attempts.
-     * When given a number, it specifies the maximum amount of
-     * jobs to keep, or you can provide an object specifying max
-     * age and/or count to keep. It overrides whatever setting is used in the worker.
-     * Default behavior is to keep the job in the failed set.
-     */
     removeOnFail: 1000,
   },
 })

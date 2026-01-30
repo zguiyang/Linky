@@ -47,6 +47,10 @@ const BOOKMARK_EVENTS = {
   IMPORT_PROGRESS: 'bookmark.import.progress'
 } as const
 
+const TRANSMIT_CHANNEL_NAMES = {
+  BOOKMARKS: 'bookmarks'
+} as const
+
 export {
   ORDER_BY,
   VIEW_MODE,
@@ -55,7 +59,8 @@ export {
   SORT_BY_OPTIONS,
   SORT_ORDER_OPTIONS,
   BOOKMARK_STATUS,
-  BOOKMARK_EVENTS
+  BOOKMARK_EVENTS,
+  TRANSMIT_CHANNEL_NAMES
 }
 
 export type {

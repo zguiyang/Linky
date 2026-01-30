@@ -514,19 +514,23 @@ const handleRefresh = async (bookmark: Bookmark) => {
   await refreshBookmarks()
 }
 
+const handleUpdatedBookmark = (bookmark: Bookmark) => {
+  // const index = bookmarks.value.findIndex(b => b.id === bookmark.id)
+  console.log('Received updated bookmark via push:', bookmark)
+  console.log('Current bookmarks before update:', bookmarks.value)
+  // if (index !== -1) {
+  //   bookmarks.value[index] = bookmark
+  // }
+  refreshBookmarks()
+}
+
 onMounted(() => {
   window.addEventListener('add-bookmark', () => {
     openAddModal()
   })
 
   if (authStore.user?.id) {
-    onBookmarkUpdated(authStore.user.id, (bookmark) => {
-      const updatedBookmark = bookmark as unknown as Bookmark
-      const index = bookmarks.value.findIndex(b => b.id === updatedBookmark.id)
-      if (index !== -1) {
-        bookmarks.value[index] = updatedBookmark
-      }
-    })
+    onBookmarkUpdated(data => handleUpdatedBookmark(data as unknown as Bookmark))
   }
 })
 </script>

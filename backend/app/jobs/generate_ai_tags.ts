@@ -7,7 +7,7 @@ import { TransmitService } from '#services/transmit_service'
 import PromptService from '#services/prompt_service'
 import Bookmark from '#models/bookmark'
 import Tag from '#models/tag'
-import { AI_TAG, BOOKMARK_EVENTS } from '#constants/index'
+import { AI_TAG, BOOKMARK_EVENTS, TRANSMIT_CHANNEL_NAMES } from '#constants/index'
 import type { UserAiConfig } from '#types/ai'
 
 export interface GenerateAiTagsPayload {
@@ -167,7 +167,11 @@ export default class GenerateAiTags extends Job {
       const bookmark = await Bookmark.query().where('id', bookmarkId).preload('tags').first()
 
       if (bookmark) {
-        await transmitService.toUser(userId, BOOKMARK_EVENTS.BOOKMARK_UPDATED, bookmark.toJSON())
+        await transmitService.toUser(
+          `${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:${userId}`,
+          BOOKMARK_EVENTS.BOOKMARK_UPDATED,
+          bookmark.toJSON()
+        )
       }
     } catch (error) {
       logger.error(
