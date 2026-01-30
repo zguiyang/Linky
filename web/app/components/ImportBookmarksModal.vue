@@ -382,12 +382,10 @@ const startImport = async () => {
     step.value = 'result'
   } else if (data && 'jobId' in data) {
     isAsyncMode.value = true
-    if (authStore.user?.id) {
-      onImportProgress(authStore.user.id, (data: any) => {
-        progress.value = data.progress
-        currentTitle.value = data.currentTitle || ''
-      })
-    }
+    onImportProgress((data: any) => {
+      progress.value = data.progress
+      currentTitle.value = data.currentTitle || ''
+    })
     pollImportStatus(data.jobId)
   }
 
