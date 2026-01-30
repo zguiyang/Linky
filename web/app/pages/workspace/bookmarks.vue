@@ -346,6 +346,7 @@ const sortOrder = computed(() => selectedSortOrder.value?.value as 'desc' | 'asc
 const sortOrderIcon = computed(() => selectedSortOrder.value?.value === 'asc' ? 'i-heroicons-arrow-up' : 'i-heroicons-arrow-down')
 
 const searchQuery = ref('')
+const searchQueryParam = computed(() => searchQuery.value || undefined)
 
 const page = ref(1)
 const perPage = ref(20)
@@ -366,11 +367,11 @@ const { data: paginationData, pending, refresh } = await useApi<PaginationData>(
   '/bookmarks/paginate',
   {
     method: 'get',
-    params: {
+    query: {
       page: page,
       perPage: perPage,
-      search: () => searchQuery.value || undefined,
-      tagIds: () => tagsStore.selectedTags.length > 0 ? tagsStore.selectedTags : undefined,
+      search: searchQueryParam,
+      tagIds: computed(() => tagsStore.selectedTags.length > 0 ? tagsStore.selectedTags : undefined),
       sortBy: sortBy,
       sortOrder: sortOrder
     }

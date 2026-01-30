@@ -242,7 +242,7 @@ const { data: paginationData, pending, refresh } = await useApi<PaginationData>(
   '/memos/paginate',
   {
     method: 'get',
-    params: { page: page, perPage: perPage },
+    query: { page: page, perPage: perPage },
     watch: [page]
   }
 )
