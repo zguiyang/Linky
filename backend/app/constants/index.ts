@@ -83,6 +83,13 @@ const AI_TAG = {
 
 type AiTag = (typeof AI_TAG)[keyof typeof AI_TAG]
 
+const BOOKMARK_EVENTS = {
+  BOOKMARK_UPDATED: 'bookmark.updated',
+  IMPORT_PROGRESS: 'bookmark.import.progress',
+} as const
+
+type TransmitEvent = (typeof BOOKMARK_EVENTS)[keyof typeof BOOKMARK_EVENTS]
+
 export {
   ORDER_BY,
   PAGINATION,
@@ -93,6 +100,7 @@ export {
   IMPORT,
   AI,
   AI_TAG,
+  BOOKMARK_EVENTS,
 }
 export type {
   OrderBy,
@@ -104,4 +112,5 @@ export type {
   Import,
   Ai,
   AiTag,
+  TransmitEvent,
 }

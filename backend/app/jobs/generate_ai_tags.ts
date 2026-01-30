@@ -1,11 +1,13 @@
 import { Job } from 'adonisjs-jobs'
 import logger from '@adonisjs/core/services/logger'
+import app from '@adonisjs/core/services/app'
 import { AiService } from '#services/ai_service'
 import { SettingService } from '#services/setting_service'
+import { TransmitService } from '#services/transmit_service'
 import PromptService from '#services/prompt_service'
 import Bookmark from '#models/bookmark'
 import Tag from '#models/tag'
-import { AI_TAG } from '#constants/index'
+import { AI_TAG, BOOKMARK_EVENTS } from '#constants/index'
 import type { UserAiConfig } from '#types/ai'
 
 export interface GenerateAiTagsPayload {
@@ -26,17 +28,6 @@ interface AiTagSuggestion {
 }
 
 export default class GenerateAiTags extends Job {
-  /**
-   * Note: Services are manually instantiated because the adonisjs-jobs package
-   * does not support dependency injection.
-   *
-   * TODO: When jobs package supports DI, change to:
-   * @inject()
-   * constructor(
-   *   private settingService: SettingService,
-   *   private promptService: PromptService
-   * ) {}
-   */
   private settingService = new SettingService()
   private promptService = new PromptService()
 
@@ -160,10 +151,29 @@ export default class GenerateAiTags extends Job {
       logger.info(
         `[GenerateAiTags] Completed: ${bookmarkId}, created: ${tagsCreated}, reused: ${tagsReused}`
       )
+
+      await this.pushBookmarkUpdate(userId, bookmarkId)
+
       return { success: true, tagsCreated, tagsReused }
     } catch (error: any) {
       logger.error({ err: error }, `[GenerateAiTags] Error processing bookmark ${bookmarkId}`)
       return { success: false, tagsCreated: 0, tagsReused: 0, error: 'INTERNAL_ERROR' }
+    }
+  }
+
+  private async pushBookmarkUpdate(userId: number, bookmarkId: number): Promise<void> {
+    try {
+      const transmitService = await app.container.make(TransmitService)
+      const bookmark = await Bookmark.query().where('id', bookmarkId).preload('tags').first()
+
+      if (bookmark) {
+        await transmitService.toUser(userId, BOOKMARK_EVENTS.BOOKMARK_UPDATED, bookmark.toJSON())
+      }
+    } catch (error) {
+      logger.error(
+        { err: error },
+        `[GenerateAiTags] Failed to push update for bookmark ${bookmarkId}`
+      )
     }
   }
 

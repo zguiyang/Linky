@@ -1,8 +1,10 @@
 import { Job } from 'adonisjs-jobs'
 import logger from '@adonisjs/core/services/logger'
+import app from '@adonisjs/core/services/app'
 import { BookmarkMetadataService } from '#services/bookmark_metadata_service'
 import { SettingService } from '#services/setting_service'
-import { METADATA_FETCH } from '#constants/index'
+import { TransmitService } from '#services/transmit_service'
+import { METADATA_FETCH, BOOKMARK_EVENTS } from '#constants/index'
 import GenerateAiTags from './generate_ai_tags.js'
 
 export type FetchBookmarkMetadataPayload = {
@@ -18,17 +20,6 @@ export type FetchBookmarkMetadataResult = {
 }
 
 export default class FetchBookmarkMetadata extends Job {
-  /**
-   * Note: Services are manually instantiated because the adonisjs-jobs package
-   * does not support dependency injection.
-   *
-   * TODO: When jobs package supports DI, change to:
-   * @inject()
-   * constructor(
-   *   private metadataService: BookmarkMetadataService,
-   *   private settingService: SettingService
-   * ) {}
-   */
   private metadataService = new BookmarkMetadataService()
   private settingService = new SettingService()
 
@@ -38,6 +29,15 @@ export default class FetchBookmarkMetadata extends Job {
     logger.info(`[FetchBookmarkMetadata] Starting fetch for bookmark ${bookmarkId}: ${url}`)
     logger.info(`[FetchBookmarkMetadata] forceUpdate: ${forceUpdate}, autoAiTag: ${autoAiTag}`)
 
+    const { default: BookmarkModel } = await import('#models/bookmark')
+    const bookmark = await BookmarkModel.find(bookmarkId)
+    const userId = bookmark?.userId
+
+    if (!userId) {
+      logger.warn(`[FetchBookmarkMetadata] No userId for bookmark ${bookmarkId}`)
+      return { success: true, bookmarkId }
+    }
+
     const metadata = await this.metadataService.fetchAndUpdate(bookmarkId, url, forceUpdate)
 
     if (!metadata.success) {
@@ -45,23 +45,18 @@ export default class FetchBookmarkMetadata extends Job {
       throw new Error(metadata.error ?? 'Failed to fetch metadata')
     }
 
+    await this.pushBookmarkUpdate(userId, bookmarkId)
+
     if (autoAiTag) {
       logger.info(`[FetchBookmarkMetadata] Scheduling AI tag generation for bookmark ${bookmarkId}`)
-      const { default: BookmarkModel } = await import('#models/bookmark')
-      const bookmark = await BookmarkModel.find(bookmarkId)
-      const userId = bookmark?.userId
-
-      if (!userId) {
-        logger.warn(`[FetchBookmarkMetadata] No userId for bookmark ${bookmarkId}`)
-        return { success: true, bookmarkId }
-      }
 
       const aiConfig = await this.settingService.getAiConfig(userId)
 
       if (!aiConfig.aiEnabled) {
         logger.info(
-          `[FetchBookmarkMetadata] AI not enabled for user ${userId}, skip tag generation for bookmark ${bookmarkId}`
+          `[FetchBookmarkMetadata] AI not enabled for user ${userId}, skip tag generation`
         )
+        await this.pushBookmarkUpdate(userId, bookmarkId)
         return { success: true, bookmarkId }
       }
 
@@ -76,8 +71,27 @@ export default class FetchBookmarkMetadata extends Job {
       })
     }
 
+    await this.pushBookmarkUpdate(userId, bookmarkId)
+
     logger.info(`[FetchBookmarkMetadata] Completed for bookmark ${bookmarkId}`)
     return { success: true, bookmarkId }
+  }
+
+  private async pushBookmarkUpdate(userId: number, bookmarkId: number): Promise<void> {
+    try {
+      const transmitService = await app.container.make(TransmitService)
+      const { default: BookmarkModel } = await import('#models/bookmark')
+      const bookmark = await BookmarkModel.query().where('id', bookmarkId).preload('tags').first()
+
+      if (bookmark) {
+        await transmitService.toUser(userId, BOOKMARK_EVENTS.BOOKMARK_UPDATED, bookmark.toJSON())
+      }
+    } catch (error) {
+      logger.error(
+        { err: error },
+        `[FetchBookmarkMetadata] Failed to push update for bookmark ${bookmarkId}`
+      )
+    }
   }
 
   async retryDelay(_attemptsMade: number, _err: Error, _job: any): Promise<number> {

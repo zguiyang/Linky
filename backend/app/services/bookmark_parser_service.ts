@@ -194,11 +194,13 @@ export class BookmarkParserService {
       skipDuplicates = true,
       autoFetch = true,
       autoAiTag = true,
+      onProgress,
     }: {
       createTags?: boolean
       skipDuplicates?: boolean
       autoFetch?: boolean
       autoAiTag?: boolean
+      onProgress?: (current: number, total: number, currentTitle?: string) => void
     } = {}
   ): Promise<ImportResult> {
     const importResult: ImportResult = {
@@ -212,7 +214,7 @@ export class BookmarkParserService {
 
     const tagNameToId = new Map<string, number>()
 
-    for (const bookmark of parsedBookmarks) {
+    for (const [index, bookmark] of parsedBookmarks.entries()) {
       try {
         if (!bookmark.title || !bookmark.url) {
           importResult.errors++
@@ -221,6 +223,7 @@ export class BookmarkParserService {
             url: bookmark.url || '未知',
             reason: '缺少标题或URL',
           })
+          onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
           continue
         }
 
@@ -231,6 +234,7 @@ export class BookmarkParserService {
             url: bookmark.url,
             reason: '标题超过200字符限制',
           })
+          onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
           continue
         }
 
@@ -242,6 +246,7 @@ export class BookmarkParserService {
 
           if (existing) {
             importResult.skipped++
+            onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
             continue
           }
         }
@@ -301,6 +306,7 @@ export class BookmarkParserService {
         }
 
         importResult.imported++
+        onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
       } catch (error) {
         importResult.errors++
         importResult.errorsList.push({
@@ -308,6 +314,7 @@ export class BookmarkParserService {
           url: bookmark.url || '未知',
           reason: error instanceof Error ? error.message : '未知错误',
         })
+        onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
       }
     }
 

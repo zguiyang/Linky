@@ -2,6 +2,9 @@ import { Job } from 'adonisjs-jobs'
 import logger from '@adonisjs/core/services/logger'
 import { readFile, unlink } from 'node:fs/promises'
 import { BookmarkParserService, parseHtml } from '#services/bookmark_parser_service'
+import app from '@adonisjs/core/services/app'
+import { TransmitService } from '#services/transmit_service'
+import { BOOKMARK_EVENTS } from '#constants/index'
 
 export interface ImportBookmarkPayload {
   jobId: string
@@ -40,18 +43,6 @@ interface ImportJobStatus {
 }
 
 export default class ImportBookmark extends Job {
-  /**
-   * Note: Services are manually instantiated because the adonisjs-jobs package
-   * does not support dependency injection.
-   *
-   * TODO: When jobs package supports DI, change to:
-   * @inject()
-   * constructor(
-   *   private settingService: SettingService,
-   *   private promptService: PromptService
-   * ) {}
-   */
-
   private bookmarkParserService = new BookmarkParserService()
 
   async handle(payload: ImportBookmarkPayload) {
@@ -77,10 +68,21 @@ export default class ImportBookmark extends Job {
       await this.updateStatus(jobId, 'processing', 50)
       logger.info(`[ImportBookmark] Progress: 50%`)
 
+      const transmitService = await app.container.make(TransmitService)
       const result = await this.bookmarkParserService.processImport(userId, parseResult.bookmarks, {
         createTags,
         skipDuplicates,
         autoAiTag,
+        onProgress: async (current, total, currentTitle) => {
+          const progress = Math.round((current / total) * 100)
+          await this.updateStatus(jobId, 'processing', progress)
+          await transmitService.toUser(userId, BOOKMARK_EVENTS.IMPORT_PROGRESS, {
+            jobId,
+            progress: current,
+            total,
+            currentTitle,
+          })
+        },
       })
       logger.info(`[ImportBookmark] Import result: ${JSON.stringify(result)}`)
       await this.updateProgress(100)
