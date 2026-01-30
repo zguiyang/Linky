@@ -63,6 +63,7 @@
     "@adonisjs/lucid": "^21.8.2",
     "@adonisjs/mail": "^9.2.2",
     "@adonisjs/redis": "^9.2.0",
+    "@adonisjs/transmit": "^2.0.2",
     "@vinejs/vine": "^3.0.1",
     "adonisjs-jobs": "^0.1.5",
     "edge.js": "^6.4.0",

@@ -10,6 +10,7 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import env from '#start/env'
+import transmit from '@adonisjs/transmit/services/main'
 
 const AuthController = () => import('#controllers/auth_controller')
 const TagsController = () => import('#controllers/tags_controller')
@@ -98,3 +99,6 @@ router.jobs('/jobs').use(async (ctx, next) => {
 
   return next()
 })
+
+// Register Transmit routes
+transmit.registerRoutes()

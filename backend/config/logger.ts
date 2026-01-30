@@ -25,7 +25,7 @@ const loggerConfig = defineConfig({
               frequency: '7d',
               mkdir: true,
               limit: 1,
-            }
+            },
           })
           .toArray(),
       },

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@adonisjs/transmit-client':
+        specifier: ^1.1.0
+        version: 1.1.0
       '@iconify-json/lucide':
         specifier: ^1.2.82
         version: 1.2.82
@@ -59,6 +62,10 @@ importers:
         version: 3.2.1(typescript@5.9.3)
 
 packages:
+
+  '@adonisjs/transmit-client@1.1.0':
+    resolution: {integrity: sha512-4U3DJ4V2X7S0Js04aX7P3SJOq+3RWmCLZep5aRsB1Eo3S9xgRAlWu5gLFrIM/XVRG3DKjvOckeeGNwPPxXhGEQ==}
+    engines: {node: '>=18.16.0'}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -5079,6 +5086,8 @@ packages:
     engines: {node: '>= 14'}
 
 snapshots:
+
+  '@adonisjs/transmit-client@1.1.0': {}
 
   '@alloc/quick-lru@5.2.0': {}
 

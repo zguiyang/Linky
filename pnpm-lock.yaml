@@ -38,6 +38,9 @@ importers:
       '@adonisjs/redis':
         specifier: ^9.2.0
         version: 9.2.0(@adonisjs/core@6.19.3(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@vinejs/vine@3.0.1)(edge.js@6.4.0))
+      '@adonisjs/transmit':
+        specifier: ^2.0.2
+        version: 2.0.2(@adonisjs/core@6.19.3(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@vinejs/vine@3.0.1)(edge.js@6.4.0))(ioredis@5.9.2)
       '@vinejs/vine':
         specifier: ^3.0.1
         version: 3.0.1
@@ -399,6 +402,12 @@ packages:
       edge.js:
         optional: true
 
+  '@adonisjs/transmit@2.0.2':
+    resolution: {integrity: sha512-Oyh4S1773N1Ams9mmFM2pplLx8R0IdYwqSTBLRgeDWaR+cyWrL9ZQvF2q7GqIjNzZsXuDgMdPuLlNo+69zIZIg==}
+    engines: {node: '>=20.11.1'}
+    peerDependencies:
+      '@adonisjs/core': ^6.2.0
+
   '@adonisjs/tsconfig@1.4.1':
     resolution: {integrity: sha512-b7bHdnTaDRGfec4XVtpwsSEukZ549MgqOShScCd1b4xkMK8z1q/jb0Xs4iUL86oIDhty2y7k5vvA6aoQKPAvXQ==}
 
@@ -682,6 +691,19 @@ packages:
 
   '@borewit/text-codec@0.2.1':
     resolution: {integrity: sha512-k7vvKPbf7J2fZ5klGRD9AeKfUvojuZIQ3BT5u7Jfv+puwXkUBUT5PVyMDfJZpy30CBDXGMgw7fguK/lpOMBvgw==}
+
+  '@boringnode/bus@0.7.1':
+    resolution: {integrity: sha512-F74H1XxpX0MSP2xfDv5cTuP9OgC4HHG+K2w8kNRj/k104D/aBMC7mcEcntgIZMX8QgcRQsREToP5kPH5kZOO/Q==}
+    engines: {node: '>=20.6'}
+    peerDependencies:
+      ioredis: ^5.0.0
+    peerDependenciesMeta:
+      ioredis:
+        optional: true
+
+  '@boringnode/transmit@0.2.2':
+    resolution: {integrity: sha512-xIBg5PKqqgawNsXffq1P+BpRDjplfwOspwcFH5wfSN6uVcd5hYGC9lJpcXa1oL3wkQZimtiJhrTHhZZtgh2lqA==}
+    engines: {node: '>=20.11.1'}
 
   '@capsizecss/unpack@3.0.1':
     resolution: {integrity: sha512-8XqW8xGn++Eqqbz3e9wKuK7mxryeRjs4LOHLxbh2lwKeSbuNR4NFifDZT4KzvjU6HMOPbiNTsWpniK5EJfTWkg==}
@@ -5471,6 +5493,10 @@ packages:
     engines: {node: '>= 18'}
     hasBin: true
 
+  matchit@1.1.0:
+    resolution: {integrity: sha512-+nGYoOlfHmxe5BW5tE0EMJppXEwdSf8uBA1GTZC7Q77kbT35+VKLYJMzVNWCHSsga1ps1tPYFtFyvxvKzWVmMA==}
+    engines: {node: '>=6'}
+
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
@@ -5748,6 +5774,10 @@ packages:
 
   object-deep-merge@2.0.0:
     resolution: {integrity: sha512-3DC3UMpeffLTHiuXSy/UG4NOIYTLlY9u3V82+djSCLYClWobZiS4ivYzpIUWrRY/nfsJ8cWsKyG3QfyLePmhvg==}
+
+  object-hash@3.0.0:
+    resolution: {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
+    engines: {node: '>= 6'}
 
   object-inspect@1.13.4:
     resolution: {integrity: sha512-W67iLl4J2EXEGTbfeHCffrjDfitvLANg0UlX3wFUUSTx92KXRFegMHUVgSqE+wvhAbi4WqjGg9czysTV2Epbew==}
@@ -7945,6 +7975,13 @@ snapshots:
       edge.js: 6.4.0
     optional: true
 
+  '@adonisjs/transmit@2.0.2(@adonisjs/core@6.19.3(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@vinejs/vine@3.0.1)(edge.js@6.4.0))(ioredis@5.9.2)':
+    dependencies:
+      '@adonisjs/core': 6.19.3(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@vinejs/vine@3.0.1)(edge.js@6.4.0)
+      '@boringnode/transmit': 0.2.2(ioredis@5.9.2)
+    transitivePeerDependencies:
+      - ioredis
+
   '@adonisjs/tsconfig@1.4.1': {}
 
   '@alloc/quick-lru@5.2.0': {}
@@ -8525,6 +8562,23 @@ snapshots:
       citty: 0.1.6
 
   '@borewit/text-codec@0.2.1': {}
+
+  '@boringnode/bus@0.7.1(ioredis@5.9.2)':
+    dependencies:
+      '@paralleldrive/cuid2': 2.3.1
+      '@poppinss/utils': 6.10.1
+      object-hash: 3.0.0
+    optionalDependencies:
+      ioredis: 5.9.2
+
+  '@boringnode/transmit@0.2.2(ioredis@5.9.2)':
+    dependencies:
+      '@boringnode/bus': 0.7.1(ioredis@5.9.2)
+      '@poppinss/utils': 6.10.1
+      emittery: 1.2.0
+      matchit: 1.1.0
+    transitivePeerDependencies:
+      - ioredis
 
   '@capsizecss/unpack@3.0.1':
     dependencies:
@@ -13643,6 +13697,10 @@ snapshots:
 
   marked@15.0.12: {}
 
+  matchit@1.1.0:
+    dependencies:
+      '@arr/every': 1.0.1
+
   math-intrinsics@1.1.0: {}
 
   mdn-data@2.0.28: {}
@@ -14073,6 +14131,8 @@ snapshots:
       tinyexec: 1.0.2
 
   object-deep-merge@2.0.0: {}
+
+  object-hash@3.0.0: {}
 
   object-inspect@1.13.4: {}
 
