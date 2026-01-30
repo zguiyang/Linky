@@ -83,8 +83,12 @@ export function useTransmit() {
   }
 
   const cleanup = (): void => {
-    subscriptions.value.forEach((subscription) => {
-      subscription.delete()
+    subscriptions.value.forEach((subscription, channel) => {
+      try {
+        subscription.delete()
+      } catch (error) {
+        console.warn(`[Transmit] Failed to delete subscription for ${channel}:`, error)
+      }
     })
     subscriptions.value.clear()
     events.value = []
