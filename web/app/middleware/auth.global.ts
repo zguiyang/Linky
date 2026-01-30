@@ -1,4 +1,6 @@
-export default defineNuxtRouteMiddleware((to) => {
+import { useAuthStore } from '@/stores/auth'
+
+export default defineNuxtRouteMiddleware(async (to) => {
   if (import.meta.server) return
 
   const publicRoutes = ['/', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/auth/reset-password', '/auth/verify-email']
@@ -12,5 +14,10 @@ export default defineNuxtRouteMiddleware((to) => {
     const lastPath = useCookie('lastPath', { maxAge: 60 * 60 })
     lastPath.value = to.path
     return navigateTo('/auth/sign-in')
+  }
+  const authStore = useAuthStore()
+
+  if (!authStore.user) {
+    await authStore.fetchUser()
   }
 })

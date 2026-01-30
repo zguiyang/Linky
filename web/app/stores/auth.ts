@@ -9,9 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const tokenCookie = useCookie('auth_token', {
     httpOnly: false,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 30
+    secure: process.env.NODE_ENV === 'production'
   })
 
   const isAuthenticated = computed(() => !!tokenCookie.value)

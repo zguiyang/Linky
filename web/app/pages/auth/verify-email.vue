@@ -118,7 +118,6 @@ onMounted(async () => {
     return
   }
 
-  await authStore.fetchUser()
   success.value = true
   lastPath.value = null
   setTimeout(() => {

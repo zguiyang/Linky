@@ -519,7 +519,6 @@ onMounted(() => {
     openAddModal()
   })
 
-  console.log (authStore.user)
   if (authStore.user?.id) {
     subscribeBookmarks(authStore.user.id)
   }

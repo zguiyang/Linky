@@ -95,28 +95,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({ layout: 'marketing' })
 
 const authStore = useAuthStore()
-const user = ref<{ fullName: string | null, email: string } | null>(null)
-
-onMounted(async () => {
-  if (authStore.isAuthenticated) {
-    await authStore.fetchUser()
-    if (authStore.user) {
-      user.value = {
-        fullName: authStore.user.fullName,
-        email: authStore.user.email
-      }
-    }
-  }
-})
 
 const entryButton = computed(() => ({
-  label: user.value ? '进入工作区' : '开始使用',
-  to: user.value ? '/workspace/bookmarks' : '/auth/sign-in'
+  label: authStore.isAuthenticated ? '进入工作区' : '开始使用',
+  to: authStore.isAuthenticated ? '/workspace/bookmarks' : '/auth/sign-in'
 }))
 </script>
