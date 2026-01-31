@@ -188,8 +188,10 @@
     >
       <u-pagination
         v-model:page="page"
+        variant="soft"
         :total="total"
         :items-per-page="perPage"
+        @update:page="setPage"
       />
     </div>
 
@@ -358,7 +360,7 @@ const pagination = usePagination<Bookmark>(
   }
 )
 
-const { items: bookmarks, total, pending, page, perPage } = pagination
+const { items: bookmarks, total, pending, page, perPage, setPage } = pagination
 
 await pagination.execute()
 
@@ -491,8 +493,11 @@ const handleRefresh = async (bookmark: Bookmark) => {
 }
 
 const handleUpdatedBookmark = (bookmark: Bookmark) => {
-  console.log('Received updated bookmark via push:', bookmark)
-  pagination.execute()
+  console.log('Received updated bookmark:', bookmark)
+  const index = bookmarks.value.findIndex(b => b.id === bookmark.id)
+  if (index !== -1) {
+    bookmarks.value[index] = bookmark
+  }
 }
 
 onMounted(() => {
