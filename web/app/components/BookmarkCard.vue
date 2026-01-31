@@ -1,39 +1,37 @@
 <template>
   <div
-    class="group relative cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50"
+    class="group cursor-pointer transition-colors border rounded-xl overflow-hidden relative"
     :class="cardClasses"
     @click="$emit('click', bookmark)"
   >
-    <div class="absolute top-3 right-3 z-10">
+    <div
+      class="absolute top-3 right-3 z-20"
+    >
       <u-dropdown-menu
         :items="menuItems"
         :content="{ align: 'end' }"
-        :disabled="bookmark.status === 'fetching'"
       >
         <u-button
           icon="i-heroicons-ellipsis-horizontal"
           color="neutral"
           variant="ghost"
           size="sm"
-          :disabled="bookmark.status === 'fetching'"
+          class="opacity-0 group-hover:opacity-100 transition-opacity"
           @click.stop
         />
       </u-dropdown-menu>
     </div>
 
     <div
-      class="flex items-center justify-center flex-shrink-0 bg-muted dark:bg-muted rounded-xl overflow-hidden"
+      class="flex items-center justify-center flex-shrink-0"
       :class="iconContainerClasses"
     >
       <img
         :src="`https://www.google.com/s2/favicons?domain=${bookmark.url}&sz=64`"
         :alt="bookmark.title"
-        class="object-contain relative z-10"
+        class="object-contain"
         :class="iconClasses"
       >
-      <div
-        class="absolute inset-0 bg-[radial(circle,var(--color-primary-10),rgba(0,0,0,0.7))] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-      />
     </div>
 
     <div
@@ -41,7 +39,7 @@
       :class="contentClasses"
     >
       <h3
-        class="font-semibold text-default dark:text-default"
+        class="font-semibold"
         :class="titleClasses"
       >
         {{ bookmark.title }}
@@ -49,7 +47,7 @@
 
       <template v-if="viewMode === 'masonry'">
         <p
-          class="text-base text-muted dark:text-muted"
+          class="text-sm"
           :class="descriptionClasses"
         >
           {{ bookmark.description }}
@@ -59,7 +57,7 @@
       <template v-else-if="viewMode === 'grid'">
         <u-tooltip :text="bookmark.description ?? undefined">
           <p
-            class="text-base text-muted-foreground dark:text-muted-foreground truncate"
+            class="text-sm truncate"
             :class="descriptionClasses"
           >
             {{ bookmark.description }}
@@ -69,7 +67,7 @@
 
       <template v-else-if="viewMode === 'list'">
         <p
-          class="text-sm text-muted-foreground dark:text-muted-foreground"
+          class="text-sm"
           :class="descriptionClasses"
         >
           {{ bookmark.description }}
@@ -102,7 +100,7 @@
             </u-badge>
           </div>
           <div
-            class="flex items-center gap-1.5 text-sm text-muted-foreground dark:text-muted-foreground"
+            class="flex items-center gap-1.5 text-sm"
             :class="visitCountClasses"
           >
             <u-icon
@@ -116,7 +114,7 @@
 
       <template v-else>
         <div
-          class="flex items-center gap-1.5 text-sm text-muted-foreground dark:text-muted-foreground"
+          class="flex items-center gap-1.5 text-sm"
           :class="visitCountClasses"
         >
           <u-icon
@@ -151,7 +149,7 @@
       </template>
 
       <template v-if="bookmark.status === 'fetching'">
-        <div class="flex items-center gap-2 text-muted text-sm mt-2">
+        <div class="flex items-center gap-2 text-sm mt-2">
           <u-icon
             name="i-heroicons-arrow-path"
             class="animate-spin"
@@ -161,7 +159,7 @@
       </template>
 
       <template v-else-if="bookmark.metadata?.success === false">
-        <div class="flex items-center gap-2 text-error text-sm mt-2">
+        <div class="flex items-center gap-2 text-sm mt-2">
           <u-icon
             name="i-heroicons-exclamation-circle"
           />
@@ -182,7 +180,6 @@
 
 <script setup lang="ts">
 import type { Bookmark } from '~/api/types'
-import { BOOKMARK_STATUS } from '~/constants'
 
 const props = defineProps<{
   bookmark: Bookmark
@@ -196,34 +193,23 @@ const emit = defineEmits<{
   refresh: [bookmark: Bookmark]
 }>()
 
-const isFetching = computed(() => props.bookmark.status === BOOKMARK_STATUS.FETCHING)
-
 const menuItems = computed(() => [
   [
     {
       label: '刷新元数据',
       icon: 'i-heroicons-arrow-path',
-      disabled: isFetching.value,
-      onSelect: () => {
-        emit('refresh', props.bookmark)
-      }
+      onSelect: () => emit('refresh', props.bookmark)
     },
     {
       label: '编辑',
       icon: 'i-heroicons-pencil',
-      disabled: isFetching.value,
-      onSelect: () => {
-        emit('edit', props.bookmark)
-      }
+      onSelect: () => emit('edit', props.bookmark)
     },
     {
       label: '删除',
       icon: 'i-heroicons-trash',
       color: 'error',
-      disabled: isFetching.value,
-      onSelect: () => {
-        emit('delete', props.bookmark)
-      }
+      onSelect: () => emit('delete', props.bookmark)
     }
   ]
 ])
@@ -231,11 +217,11 @@ const menuItems = computed(() => [
 const cardClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'p-5 bg-muted dark:bg-muted border border-default rounded-2xl break-inside-avoid'
+      return 'bg-[var(--bg-surface)] border-[var(--border-subtle)] p-5 break-inside-avoid'
     case 'grid':
-      return 'flex gap-4 p-5 bg-muted dark:bg-muted border border-default rounded-2xl before:absolute before:inset-0 before:bg-gradient-to-br before:from-[var(--color-primary-10)] before:to-[var(--color-primary-10)] before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 hover:bg-muted/80 dark:hover:bg-muted/80 hover:border-default'
+      return 'flex gap-4 p-5 bg-[var(--bg-surface)] border-[var(--border-subtle)]'
     case 'list':
-      return 'flex items-center gap-3 p-4 bg-muted dark:bg-muted border border-default rounded-xl'
+      return 'flex items-center gap-3 p-4 bg-[var(--bg-surface)] border-[var(--border-subtle)]'
     default:
       return ''
   }
@@ -244,11 +230,11 @@ const cardClasses = computed(() => {
 const iconContainerClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'relative w-12 h-12 mb-3'
+      return 'w-12 h-12 mb-3 bg-[var(--bg-surface)] rounded-xl'
     case 'grid':
-      return 'relative w-12 h-12'
+      return 'w-12 h-12 bg-[var(--bg-surface)] rounded-xl'
     case 'list':
-      return 'w-10 h-10 rounded-lg'
+      return 'w-10 h-10 bg-[var(--bg-surface)] rounded-lg'
     default:
       return ''
   }
@@ -283,11 +269,11 @@ const contentClasses = computed(() => {
 const titleClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'text-base mb-2 line-clamp-2'
+      return 'text-[var(--text-primary)] text-base mb-2 line-clamp-2'
     case 'grid':
-      return 'text-base mb-1.5 line-clamp-1'
+      return 'text-[var(--text-primary)] text-base mb-1.5 line-clamp-1'
     case 'list':
-      return 'text-base mb-1 truncate'
+      return 'text-[var(--text-primary)] text-base mb-1 truncate'
     default:
       return ''
   }
@@ -296,11 +282,11 @@ const titleClasses = computed(() => {
 const descriptionClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'mb-3'
+      return 'text-[var(--text-secondary)] mb-3'
     case 'grid':
-      return 'mb-3'
+      return 'text-[var(--text-secondary)] mb-3'
     case 'list':
-      return 'mb-2'
+      return 'text-[var(--text-secondary)] mb-2'
     default:
       return ''
   }
@@ -309,11 +295,11 @@ const descriptionClasses = computed(() => {
 const visitCountClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'mb-3'
+      return 'text-[var(--text-secondary)] mb-3'
     case 'grid':
-      return 'mb-3'
+      return 'text-[var(--text-secondary)] mb-3'
     case 'list':
-      return ''
+      return 'text-[var(--text-secondary)]'
     default:
       return ''
   }

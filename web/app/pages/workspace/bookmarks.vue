@@ -2,22 +2,23 @@
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
       <div>
-        <h1 class="text-2xl font-bold text-default dark:text-default">
+        <h1 class="text-2xl font-bold text-[var(--text-primary)]">
           我的书签
         </h1>
-        <p class="text-sm text-muted dark:text-muted mt-1">
+        <p class="text-sm text-[var(--text-secondary)] mt-1">
           共 {{ total }} 个书签
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2 p-1.5 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-subtle)]">
         <u-input
           v-model="searchQuery"
           icon="i-heroicons-magnifying-glass"
           placeholder="搜索书签..."
           size="md"
-          class="w-full sm:w-auto flex-grow-0"
+          class="w-full sm:w-auto flex-grow-0 !bg-transparent"
         />
+        <div class="w-px h-6 bg-[var(--border-subtle)]" />
         <u-select-menu
           v-model="selectedSortBy"
           :items="sortByOptions"
@@ -37,7 +38,7 @@
             />
           </template>
         </u-select-menu>
-        <div class="inline-flex items-center p-1 bg-muted dark:bg-muted rounded-lg shrink-0">
+        <div class="inline-flex items-center p-0.5 bg-[var(--bg-canvas)] rounded-lg">
           <u-button
             :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
             :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
@@ -64,6 +65,8 @@
           />
         </div>
 
+        <div class="w-px h-6 bg-[var(--border-subtle)]" />
+
         <u-button
           icon="i-heroicons-plus"
           color="primary"
@@ -73,7 +76,7 @@
         />
         <u-button
           icon="i-heroicons-arrow-down-tray"
-          color="secondary"
+          color="neutral"
           variant="outline"
           size="md"
           title="导入书签"
@@ -84,10 +87,10 @@
 
     <div
       v-if="tagsStore.selectedTags.length > 0"
-      class="px-6 pb-6 border-b border-muted/12 dark:border-muted/12"
+      class="px-2 py-3 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-subtle)]"
     >
       <div class="flex items-center gap-3">
-        <span class="text-sm text-muted dark:text-muted">已选标签：</span>
+        <span class="text-sm text-[var(--text-secondary)]">已选标签：</span>
         <div class="flex items-center gap-2">
           <u-badge
             v-for="tagId in tagsStore.selectedTags"
@@ -120,7 +123,7 @@
     <u-scroll-area class="flex-1 min-h-0">
       <div
         v-if="viewMode === 'masonry'"
-        class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+        class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4"
       >
         <bookmark-card
           v-for="bookmark in bookmarks"
@@ -136,7 +139,7 @@
 
       <div
         v-else-if="viewMode === 'grid'"
-        class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
+        class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4"
       >
         <bookmark-card
           v-for="bookmark in bookmarks"
@@ -174,10 +177,10 @@
           />
         </template>
         <template #title>
-          <span class="text-lg font-semibold text-foreground dark:text-foreground">暂无书签</span>
+          <span class="text-lg font-semibold text-[var(--text-primary)]">暂无书签</span>
         </template>
         <template #description>
-          <span class="text-sm text-muted-foreground dark:text-muted-foreground">开始添加您的第一个书签吧</span>
+          <span class="text-sm text-[var(--text-secondary)]">开始添加您的第一个书签吧</span>
         </template>
       </u-empty>
     </u-scroll-area>
@@ -214,7 +217,7 @@
             <u-switch v-model="autoAiTag" />
           </u-form-field>
           <div>
-            <label class="block text-sm font-medium text-default dark:text-default mb-1.5">URL <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-[var(--text-primary)] mb-1.5">URL <span class="text-red-500">*</span></label>
             <u-input
               v-model="bookmarkForm.url"
               type="url"
@@ -224,14 +227,14 @@
           </div>
           <template v-if="!autoFetch">
             <div>
-              <label class="block text-sm font-medium text-default dark:text-default mb-1.5">标题</label>
+              <label class="block text-sm font-medium text-[var(--text-primary)] mb-1.5">标题</label>
               <u-input
                 v-model="bookmarkForm.title"
                 placeholder="留空将自动从网页获取"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-default dark:text-default mb-1.5">描述</label>
+              <label class="block text-sm font-medium text-[var(--text-primary)] mb-1.5">描述</label>
               <u-textarea
                 v-model="bookmarkForm.description"
                 placeholder="留空将自动从网页获取"
@@ -239,7 +242,7 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-default dark:text-default mb-1.5">标签</label>
+              <label class="block text-sm font-medium text-[var(--text-primary)] mb-1.5">标签</label>
               <u-select-menu
                 v-model="bookmarkForm.tagIds"
                 :items="tagSelectItems"
@@ -282,10 +285,10 @@
             </div>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-default dark:text-default">
+            <h3 class="text-lg font-semibold text-[var(--text-primary)]">
               确定要删除这个书签吗？
             </h3>
-            <p class="text-sm text-muted dark:text-muted mt-1">
+            <p class="text-sm text-[var(--text-secondary)] mt-1">
               书签名称: <strong>{{ contextBookmark?.title }}</strong>
             </p>
           </div>
@@ -493,7 +496,6 @@ const handleRefresh = async (bookmark: Bookmark) => {
 }
 
 const handleUpdatedBookmark = (bookmark: Bookmark) => {
-  console.log('Received updated bookmark:', bookmark)
   const index = bookmarks.value.findIndex(b => b.id === bookmark.id)
   if (index !== -1) {
     bookmarks.value[index] = bookmark
