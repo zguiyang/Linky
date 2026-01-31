@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-screen overflow-hidden bg-[var(--bg-canvas)]">
-    <aside class="flex-shrink-0 w-64 bg-[var(--bg-canvas)] border-r border-[var(--border-subtle)] overflow-y-auto">
+    <aside class="flex-shrink-0 w-64 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)] overflow-y-auto">
       <div class="flex items-center gap-2 px-4 py-4">
         <app-logo class="h-8 w-auto" />
         <span class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">
@@ -17,8 +17,8 @@
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
           :class="[
             $route.path === item.to
-              ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-medium shadow-sm'
-              : 'text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)]'
+              ? 'bg-[var(--bg-secondary)] text-[var(--text-primary)] font-medium shadow-sm'
+              : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
           ]"
         >
           <u-icon
@@ -42,7 +42,7 @@
       <div class="border-t border-[var(--border-subtle)] w-full mt-auto">
         <u-link
           to="/workspace/settings"
-          class="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+          class="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
         >
           <u-icon
             name="i-heroicons-cog-6-tooth"
@@ -54,7 +54,7 @@
     </aside>
 
     <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-      <header class="flex items-center justify-end px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-canvas)]">
+      <header class="flex items-center justify-end px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <div class="flex items-center gap-3">
           <u-dashboard-search-button />
           <workspace-user-dropdown />
@@ -63,7 +63,7 @@
 
       <u-dashboard-search
         size="xl"
-        class="bg-[var(--bg-canvas)]"
+        class="bg-[var(--bg-surface)]"
       />
 
       <div class="flex-1 overflow-y-auto">
