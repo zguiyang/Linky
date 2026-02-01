@@ -18,11 +18,15 @@ export default defineNuxtConfig({
     }
   },
 
-  compatibilityDate: '2025-01-15',
+  future: {
+    compatibilityVersion: 4
+  },
   vite: {
-    esbuild: {
-      drop: ['console', 'debugger']
-    }
+    esbuild: process.env.NODE_ENV === 'production'
+      ? {
+          drop: ['console', 'debugger']
+        }
+      : undefined
   },
 
   eslint: {
