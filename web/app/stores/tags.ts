@@ -30,9 +30,10 @@ export const useTagsStore = defineStore('tags', () => {
 
   const fetchTags = async (): Promise<Tag[]> => {
     if (tags.value.length > 0) return tags.value
-    const { data } = await useApi<Tag[]>('/tags')
-    if (data.value) {
-      tags.value = data.value
+    const { $api } = useNuxtApp()
+    const response = await $api<Tag[]>('/tags')
+    if (response) {
+      tags.value = response
     }
     return tags.value
   }
