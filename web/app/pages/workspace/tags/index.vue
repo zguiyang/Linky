@@ -410,7 +410,7 @@ const tagForm = ref<{ name: string, color: string }>({ name: '', color: '' })
 
 const navigateToTagDetail = (tagId: number) => {
   if (!batchMode.value) {
-    navigateTo(`/workspace/bookmarks?tag=${tagId}`)
+    navigateTo(`/workspace/tags/${tagId}`)
   }
 }
 
