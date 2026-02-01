@@ -1,16 +1,24 @@
 <template>
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
           标签管理
         </h1>
         <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-          管理您的所有标签
+          共 {{ tagsStore.tags.length }} 个标签
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2">
+      <div class="flex items-center gap-3">
+        <u-button
+          :color="batchMode ? 'primary' : 'neutral'"
+          variant="ghost"
+          icon="i-heroicons-check-circle"
+          @click="toggleBatchMode"
+        >
+          批量操作
+        </u-button>
         <u-button
           icon="i-heroicons-plus"
           color="primary"
@@ -21,95 +29,78 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-4">
-      <u-input
-        v-model="searchQuery"
-        icon="i-heroicons-magnifying-glass"
-        placeholder="搜索标签..."
-        class="flex-1"
-      />
-      <u-select
-        v-model="sortOption"
-        :items="sortOptions"
-        placeholder="排序方式"
-        class="w-48"
-      />
-      <u-button
-        :color="batchMode ? 'primary' : 'neutral'"
-        variant="outline"
-        icon="i-heroicons-check-circle"
-        @click="toggleBatchMode"
-      >
-        批量操作
-      </u-button>
-    </div>
-
     <div
       v-if="!tagsStore.tags || tagsStore.tags.length === 0"
-      class="flex flex-col items-center justify-center"
+      class="flex flex-col items-center justify-center py-20 bg-neutral-50 dark:bg-neutral-900/50 rounded-2xl border border-dashed border-neutral-200 dark:border-neutral-800"
     >
-      <div class="flex flex-col items-center justify-center py-16">
-        <u-icon
-          name="i-heroicons-tag"
-          class="w-20 h-20 text-gray-300 dark:text-gray-600"
-        />
-        <p class="text-lg font-semibold text-neutral-900 dark:text-neutral-50 mt-6">
-          {{ searchQuery ? '未找到匹配的标签' : '暂无标签' }}
-        </p>
-        <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-          {{ searchQuery ? '尝试其他搜索关键词' : '创建您的第一个标签吧' }}
-        </p>
-      </div>
+      <u-icon
+        name="i-heroicons-tag"
+        class="w-12 h-12 text-neutral-300 dark:text-neutral-600"
+      />
+      <p class="text-neutral-500 dark:text-neutral-400 mt-4">
+        暂无标签，创建您的第一个标签吧
+      </p>
     </div>
 
     <div
       v-else
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+      class="flex flex-col gap-8"
     >
-      <div
-        v-for="tag in tagsStore.tags"
-        :key="tag.id"
-      >
-        <u-card
-          class="hover:shadow-md transition-shadow duration-200"
-          :class="{
-            'cursor-pointer': !batchMode
-          }"
-          @click="navigateToTagDetail(tag.id)"
-        >
-          <div class="flex flex-col gap-3">
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-2">
-                  <span
-                    v-if="tag.color"
-                    class="w-3 h-3 rounded-full shrink-0"
-                    :style="{ backgroundColor: tag.color }"
-                  />
-                  <span class="font-medium text-neutral-900 dark:text-neutral-50 text-base">{{ tag.name }}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-sm text-neutral-500 dark:text-neutral-400">关联内容</span>
-                  <span class="px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs font-medium">
-                    {{ tag.bookmarksCount + tag.memosCount }}
-                  </span>
-                </div>
-              </div>
-              <u-checkbox
-                v-if="batchMode"
-                :model-value="selectedTagsForBatch.includes(tag.id)"
-                class="ml-2"
-                @change="toggleBatchSelection(tag.id)"
-                @click.stop
-              />
-            </div>
-            <div class="flex items-center justify-end gap-2 pt-3 border-t border-neutral-100 dark:border-neutral-700">
+      <!-- 用户标签 -->
+      <div v-if="userTags.length > 0">
+        <div class="flex items-center gap-2 mb-4">
+          <u-icon
+            name="i-heroicons-user"
+            class="w-5 h-5 text-neutral-500"
+          />
+          <h2 class="text-sm font-semibold text-neutral-900 dark:text-neutral-50 uppercase tracking-wider">
+            用户创建
+          </h2>
+          <span class="text-xs text-neutral-400 font-normal">({{ userTags.length }})</span>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <div
+            v-for="tag in userTags"
+            :key="tag.id"
+            class="group relative flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-primary-500 transition-colors duration-200"
+            :class="{
+              'cursor-pointer': !batchMode,
+              'border-primary-500 ring-1 ring-primary-500': batchMode && selectedTagsForBatch.includes(tag.id)
+            }"
+            @click="navigateToTagDetail(tag.id)"
+          >
+            <u-checkbox
+              v-if="batchMode"
+              :model-value="selectedTagsForBatch.includes(tag.id)"
+              size="sm"
+              @change="toggleBatchSelection(tag.id)"
+              @click.stop
+            />
+
+            <span
+              v-if="tag.color"
+              class="w-2 h-2 rounded-full"
+              :style="{ backgroundColor: tag.color }"
+            />
+
+            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              {{ tag.name }}
+            </span>
+
+            <span class="text-xs text-neutral-400 dark:text-neutral-500 ml-1">
+              {{ tag.bookmarksCount + tag.memosCount }}
+            </span>
+
+            <div
+              v-if="!batchMode"
+              class="flex items-center gap-0.5 ml-1 transition-opacity"
+            >
               <u-button
                 icon="i-heroicons-pencil"
                 size="xs"
                 variant="ghost"
                 color="neutral"
-                :disabled="batchMode"
+                class="!p-1 h-6 w-6"
                 @click.stop="openEditModal(tag)"
               />
               <u-button
@@ -117,12 +108,82 @@
                 size="xs"
                 variant="ghost"
                 color="error"
-                :disabled="batchMode"
+                class="!p-1 h-6 w-6"
                 @click.stop="openDeleteConfirm(tag)"
               />
             </div>
           </div>
-        </u-card>
+        </div>
+      </div>
+
+      <!-- AI 生成标签 -->
+      <div v-if="aiTags.length > 0">
+        <div class="flex items-center gap-2 mb-4">
+          <u-icon
+            name="i-heroicons-sparkles"
+            class="w-5 h-5 text-primary-500"
+          />
+          <h2 class="text-sm font-semibold text-neutral-900 dark:text-neutral-50 uppercase tracking-wider">
+            AI 自动生成
+          </h2>
+          <span class="text-xs text-neutral-400 font-normal">({{ aiTags.length }})</span>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <div
+            v-for="tag in aiTags"
+            :key="tag.id"
+            class="group relative flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-primary-500 transition-colors duration-200"
+            :class="{
+              'cursor-pointer': !batchMode,
+              'border-primary-500 ring-1 ring-primary-500': batchMode && selectedTagsForBatch.includes(tag.id)
+            }"
+            @click="navigateToTagDetail(tag.id)"
+          >
+            <u-checkbox
+              v-if="batchMode"
+              :model-value="selectedTagsForBatch.includes(tag.id)"
+              size="sm"
+              @change="toggleBatchSelection(tag.id)"
+              @click.stop
+            />
+
+            <span
+              v-if="tag.color"
+              class="w-2 h-2 rounded-full"
+              :style="{ backgroundColor: tag.color }"
+            />
+
+            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              {{ tag.name }}
+            </span>
+
+            <span class="text-xs text-neutral-400 dark:text-neutral-500 ml-1">
+              {{ tag.bookmarksCount + tag.memosCount }}
+            </span>
+
+            <div
+              v-if="!batchMode"
+              class="flex items-center gap-0.5 ml-1 transition-opacity"
+            >
+              <u-button
+                icon="i-heroicons-pencil"
+                size="xs"
+                variant="ghost"
+                color="neutral"
+                class="!p-1 h-6 w-6"
+                @click.stop="openEditModal(tag)"
+              />
+              <u-button
+                icon="i-heroicons-trash"
+                size="xs"
+                variant="ghost"
+                color="error"
+                class="!p-1 h-6 w-6"
+                @click.stop="openDeleteConfirm(tag)"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -297,19 +358,12 @@ definePageMeta({ layout: 'workspace' })
 
 const tagsStore = useTagsStore()
 
-onMounted(() => {
-  tagsStore.fetchTags()
+const userTags = computed(() => tagsStore.tags.filter(tag => !tag.isAiGenerated))
+const aiTags = computed(() => tagsStore.tags.filter(tag => tag.isAiGenerated))
+
+onMounted(async () => {
+  await tagsStore.fetchTags()
 })
-
-const searchQuery = ref('')
-const sortOption = ref('usage-desc')
-
-const sortOptions = [
-  { label: '使用频率（高到低）', value: 'usage-desc' },
-  { label: '使用频率（低到高）', value: 'usage-asc' },
-  { label: '名称（A-Z）', value: 'name-asc' },
-  { label: '名称（Z-A）', value: 'name-desc' }
-]
 
 const batchMode = ref(false)
 const selectedTagsForBatch = ref<number[]>([])
