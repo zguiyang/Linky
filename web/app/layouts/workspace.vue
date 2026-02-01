@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-screen overflow-hidden bg-[var(--bg-canvas)]">
-    <aside class="flex-shrink-0 w-64 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)] overflow-y-auto">
+    <aside class="flex flex-col flex-shrink-0 w-64 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)] overflow-y-auto">
       <div class="flex items-center gap-2 px-4 py-4">
         <app-logo class="h-8 w-auto" />
         <span class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">
@@ -40,16 +40,14 @@
       </div>
 
       <div class="border-t border-[var(--border-subtle)] w-full mt-auto">
-        <u-link
-          to="/workspace/settings"
-          class="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-        >
-          <u-icon
-            name="i-heroicons-cog-6-tooth"
-            class="size-5"
-          />
-          <span class="font-medium">设置</span>
-        </u-link>
+        <div class="flex flex-col items-center gap-1 px-4 py-4">
+          <span class="text-xs text-[var(--text-secondary)] font-medium">
+            版本号: {{ APP_INFO.VERSION }}
+          </span>
+          <span class="text-xs text-[var(--text-muted)]">
+            © {{ APP_INFO.COPYRIGHT_YEAR }} {{ APP_INFO.NAME }}
+          </span>
+        </div>
       </div>
     </aside>
 
@@ -57,6 +55,14 @@
       <header class="flex items-center justify-end px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <div class="flex items-center gap-3">
           <u-dashboard-search-button />
+          <u-button
+            icon="i-heroicons-cog-6-tooth"
+            color="neutral"
+            variant="ghost"
+            size="md"
+            to="/workspace/settings"
+            aria-label="设置"
+          />
           <workspace-user-dropdown />
         </div>
       </header>
@@ -77,6 +83,7 @@
 import WorkspaceUserDropdown from '~/components/workspace/UserDropdown.vue'
 import SidebarTags from '~/components/workspace/SidebarTags.vue'
 import { useTagsStore } from '~/stores/tags'
+import { APP_INFO } from '~/constants'
 
 const navItems = [
   { label: '书签', to: '/workspace/bookmarks', icon: 'i-heroicons-bookmark' },

@@ -53,6 +53,12 @@ const TRANSMIT_CHANNEL_NAMES = {
   BOOKMARKS: 'bookmarks'
 } as const
 
+const APP_INFO = {
+  NAME: 'Linky',
+  VERSION: '0.0.0',
+  COPYRIGHT_YEAR: '2024-2026'
+} as const
+
 export {
   ORDER_BY,
   VIEW_MODE,
@@ -62,7 +68,8 @@ export {
   SORT_ORDER_OPTIONS,
   BOOKMARK_STATUS,
   BOOKMARK_EVENTS,
-  TRANSMIT_CHANNEL_NAMES
+  TRANSMIT_CHANNEL_NAMES,
+  APP_INFO
 }
 
 export type {

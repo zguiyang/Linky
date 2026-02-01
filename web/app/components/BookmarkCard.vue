@@ -196,7 +196,7 @@ const emit = defineEmits<{
 const menuItems = computed(() => [
   [
     {
-      label: '刷新元数据',
+      label: '刷新',
       icon: 'i-heroicons-arrow-path',
       onSelect: () => emit('refresh', props.bookmark)
     },
