@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group relative border cursor-pointer transition-all duration-200"
+    class="group relative border rounded-xl overflow-hidden cursor-pointer transition-all duration-200"
     :class="cardClasses"
     @click="handleClick"
   >
@@ -10,7 +10,7 @@
     >
       <div class="flex items-center justify-between gap-4 mb-1.5">
         <h3
-          class="font-semibold text-default dark:text-default truncate"
+          class="font-semibold truncate"
           :class="titleClass"
         >
           {{ memo.title || '无标题备忘录' }}
@@ -18,14 +18,17 @@
       </div>
 
       <p
-        class="text-sm text-muted dark:text-muted leading-relaxed mb-3"
+        class="text-sm leading-relaxed mb-3"
         :class="contentClass"
       >
         {{ memo.content }}
       </p>
 
       <div class="flex flex-col gap-2">
-        <span class="text-xs text-muted dark:text-muted">
+        <span
+          class="text-xs"
+          :class="dateClass"
+        >
           {{ formatDate(memo.updatedAt) }}
         </span>
         <div class="flex flex-wrap gap-1.5">
@@ -33,20 +36,31 @@
             v-for="tag in displayTags"
             :key="tag"
             color="primary"
-            variant="outline"
+            :variant="memo.tags.find(t => t.name === tag)?.isAiGenerated ? 'soft' : 'outline'"
             size="md"
           >
+            <span
+              v-if="memo.tags.find(t => t.name === tag)?.isAiGenerated"
+              class="flex items-center gap-1"
+            >
+              <u-icon
+                name="i-heroicons-sparkles"
+                class="size-3"
+              />
+            </span>
             {{ tag }}
           </u-badge>
           <span
             v-if="displayTags.length === 0"
-            class="text-xs text-muted"
-          > 暂无标签 </span>
+            class="text-xs text-[var(--text-secondary)]"
+          >暂无标签</span>
         </div>
       </div>
     </div>
 
-    <div class="absolute top-3 right-3 z-10">
+    <div
+      class="absolute top-3 right-3 z-10"
+    >
       <u-dropdown-menu
         :items="getMemoMenuItems(memo)"
         :content="{ align: 'end' }"
@@ -81,58 +95,69 @@ const emit = defineEmits<{
 
 const cardClasses = computed(() => {
   const isPinned = props.memo.isPinned
-  const baseClasses = 'bg-default dark:bg-default border-default'
 
   if (isPinned) {
     switch (props.viewMode) {
       case 'masonry':
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-4 hover:-translate-y-1 hover:shadow-md hover:bg-warning-100 dark:hover:bg-warning-900/50 hover:border-warning-300 dark:hover:border-warning-700 break-inside-avoid'
+        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-5 break-inside-avoid'
       case 'grid':
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-4 hover:-translate-y-1 hover:shadow-md hover:bg-warning-100 dark:hover:bg-warning-900/50 hover:border-warning-300 dark:hover:border-warning-700'
+        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-5'
       case 'list':
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-lg hover:bg-warning-100 dark:hover:bg-warning-900/50 hover:border-warning-300 dark:hover:border-warning-700'
+        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-lg p-4'
       default:
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-4 hover:-translate-y-1 hover:shadow-md hover:bg-warning-100 dark:hover:bg-warning-900/50 hover:border-warning-300 dark:hover:border-warning-700'
+        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-5 break-inside-avoid'
     }
   }
 
   switch (props.viewMode) {
     case 'masonry':
-      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-muted/80 dark:hover:bg-muted/80 hover:border-default break-inside-avoid`
+      return 'bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-xl p-5 break-inside-avoid'
     case 'grid':
-      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-muted/80 dark:hover:bg-muted/80 hover:border-default`
+      return 'flex gap-4 p-5 bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-xl'
     case 'list':
-      return `${baseClasses} rounded-lg shadow-sm hover:bg-muted/80 dark:hover:bg-muted/80 hover:border-default p-4`
+      return 'flex items-center gap-3 p-4 bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-lg'
     default:
-      return `${baseClasses} rounded-xl p-4 shadow-sm hover:-translate-y-1 hover:shadow-md hover:bg-muted/80 dark:hover:bg-muted/80 hover:border-default`
+      return 'bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-xl p-5 break-inside-avoid'
   }
 })
 
 const contentPaddingClass = computed(() => {
   switch (props.viewMode) {
     case 'list':
-      return 'py-3 pr-6'
+      return 'flex-1 min-w-0 py-3 pr-6'
     default:
-      return 'pt-1 pr-6 pb-2'
+      return ''
   }
 })
 
 const titleClass = computed(() => {
   switch (props.viewMode) {
+    case 'masonry':
+      return 'text-[var(--text-primary)] text-base mb-2 line-clamp-2'
+    case 'grid':
+      return 'text-[var(--text-primary)] text-base mb-1.5 line-clamp-1'
     case 'list':
-      return 'text-base'
+      return 'text-[var(--text-primary)] text-base mb-1 truncate'
     default:
-      return 'text-[17px]'
+      return 'text-[var(--text-primary)] text-base mb-2 line-clamp-2'
   }
 })
 
 const contentClass = computed(() => {
   switch (props.viewMode) {
+    case 'masonry':
+      return 'text-[var(--text-secondary)] mb-3'
+    case 'grid':
+      return 'text-[var(--text-secondary)] mb-3 line-clamp-2'
     case 'list':
-      return 'line-clamp-1 mb-2'
+      return 'text-[var(--text-secondary)] mb-2 line-clamp-1'
     default:
-      return 'line-clamp-3'
+      return 'text-[var(--text-secondary)] mb-3'
   }
+})
+
+const dateClass = computed(() => {
+  return 'text-[var(--text-secondary)]'
 })
 
 const displayTags = computed(() => {

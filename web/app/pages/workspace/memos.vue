@@ -2,23 +2,24 @@
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
       <div>
-        <h1 class="text-2xl font-bold text-default dark:text-default">
+        <h1 class="text-2xl font-bold text-[var(--text-primary)]">
           我的备忘录
         </h1>
-        <p class="text-sm text-muted dark:text-muted mt-1">
+        <p class="text-sm text-[var(--text-secondary)] mt-1">
           共 {{ total }} 个备忘录
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2 p-1.5 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-subtle)]">
         <u-input
           v-model="searchQuery"
           icon="i-heroicons-magnifying-glass"
           placeholder="搜索备忘录..."
           size="md"
-          class="w-full sm:w-auto flex-grow-0"
+          class="w-full sm:w-auto flex-grow-0 !bg-transparent"
         />
-        <div class="inline-flex items-center p-1 bg-muted dark:bg-muted rounded-lg shrink-0">
+        <div class="w-px h-6 bg-[var(--border-subtle)]" />
+        <div class="inline-flex items-center p-0.5 bg-[var(--bg-canvas)] rounded-lg">
           <u-button
             :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
             :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
@@ -44,6 +45,9 @@
             @click="setViewMode('list')"
           />
         </div>
+
+        <div class="w-px h-6 bg-[var(--border-subtle)]" />
+
         <u-button
           icon="i-heroicons-plus"
           color="primary"
@@ -56,10 +60,10 @@
 
     <div
       v-if="tagsStore.selectedTags.length > 0"
-      class="px-6 pb-6 border-b border-muted/12 dark:border-muted/12"
+      class="px-2 py-3 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-subtle)]"
     >
       <div class="flex items-center gap-3">
-        <span class="text-sm text-muted dark:text-muted">已选标签：</span>
+        <span class="text-sm text-[var(--text-secondary)]">已选标签：</span>
         <div class="flex items-center gap-2">
           <u-badge
             v-for="tagId in tagsStore.selectedTags"
@@ -152,10 +156,10 @@
             />
           </template>
           <template #title>
-            <span class="text-lg font-semibold text-foreground dark:text-foreground">暂无备忘录</span>
+            <span class="text-lg font-semibold text-[var(--text-primary)]">暂无备忘录</span>
           </template>
           <template #description>
-            <span class="text-sm text-muted-foreground dark:text-muted-foreground">开始创建您的第一个备忘录吧</span>
+            <span class="text-sm text-[var(--text-secondary)]">开始创建您的第一个备忘录吧</span>
           </template>
         </u-empty>
       </div>
@@ -167,8 +171,10 @@
     >
       <u-pagination
         v-model:page="page"
+        variant="soft"
         :total="total"
         :items-per-page="perPage"
+        @update:page="setPage"
       />
     </div>
 
@@ -185,24 +191,38 @@
       title="确认删除"
     >
       <template #body>
-        <p class="text-default dark:text-default mb-6">
-          确定要删除这条备忘录吗？此操作无法撤销。
-        </p>
-        <div class="flex justify-end gap-3">
-          <u-button
-            color="neutral"
-            variant="ghost"
-            @click="closeDeleteModal"
-          >
-            取消
-          </u-button>
-          <u-button
-            color="error"
-            @click="confirmDelete"
-          >
-            删除
-          </u-button>
+        <div class="text-center space-y-4">
+          <div class="flex justify-center">
+            <div class="w-16 h-16 rounded-full bg-error-50 dark:bg-error-900/20 flex items-center justify-center">
+              <u-icon
+                name="i-heroicons-exclamation-triangle"
+                class="w-8 h-8 text-error"
+              />
+            </div>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-[var(--text-primary)]">
+              确定要删除这条备忘录吗？
+            </h3>
+            <p class="text-sm text-[var(--text-secondary)] mt-1">
+              此操作无法撤销
+            </p>
+          </div>
         </div>
+      </template>
+      <template #footer="{ close }">
+        <u-button
+          label="取消"
+          color="neutral"
+          variant="outline"
+          @click="closeDeleteModal"
+        />
+        <u-button
+          label="删除"
+          color="error"
+          :loading="isDeleting"
+          @click="confirmDelete(close)"
+        />
       </template>
     </u-modal>
   </div>
@@ -226,7 +246,7 @@ const pagination = usePagination<Memo>(
   '/memos/paginate'
 )
 
-const { items: memos, total, pending, page, perPage } = pagination
+const { items: memos, total, pending, page, perPage, setPage } = pagination
 
 await pagination.execute()
 
@@ -235,6 +255,7 @@ const modalMode = ref<'add' | 'edit'>('add')
 const currentMemo = ref<Memo | null>(null)
 const showDeleteModal = ref(false)
 const memoToDelete = ref<Memo | null>(null)
+const isDeleting = ref(false)
 
 const filteredMemos = computed(() => {
   let result = memos.value
@@ -301,14 +322,17 @@ const closeDeleteModal = () => {
   memoToDelete.value = null
 }
 
-const confirmDelete = async () => {
+const confirmDelete = async (close?: () => void) => {
   if (!memoToDelete.value) return
 
   const { $api } = useNuxtApp()
+  isDeleting.value = true
   await $api(`/memos/${memoToDelete.value.id}`, { method: 'delete' })
 
   await pagination.execute()
+  close?.()
   showDeleteModal.value = false
   memoToDelete.value = null
+  isDeleting.value = false
 }
 </script>
