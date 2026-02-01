@@ -23,12 +23,15 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
+const colorMode = useColorMode()
+
 const user = computed(() => authStore.user)
+const isDark = computed(() => colorMode.value === 'dark')
 
 const menuItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
-      type: 'label' as const,
+      type: 'label',
       label: user.value?.fullName || user.value?.email || '用户',
       avatar: {
         alt: user.value?.fullName || user.value?.email || 'User'
@@ -40,16 +43,23 @@ const menuItems = computed<DropdownMenuItem[][]>(() => [
       label: '个人信息',
       icon: 'i-heroicons-user',
       onSelect: () => navigateTo('/workspace/profile')
+    },
+    {
+      label: isDark.value ? 'Dark Mode' : 'Light Mode',
+      icon: isDark.value ? 'i-heroicons-moon' : 'i-heroicons-sun',
+      onSelect: () => {
+        colorMode.value = isDark.value ? 'light' : 'dark'
+      }
     }
   ],
   [
     {
-      type: 'separator' as const
+      type: 'separator'
     },
     {
       label: '退出登录',
       icon: 'i-heroicons-arrow-right-on-rectangle',
-      color: 'error' as const,
+      color: 'error',
       onSelect: handleLogout
     }
   ]
