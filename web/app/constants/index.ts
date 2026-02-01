@@ -59,6 +59,13 @@ const APP_INFO = {
   COPYRIGHT_YEAR: '2024-2026'
 } as const
 
+const TAG_ITEM_TYPE = {
+  BOOKMARK: 'bookmark',
+  MEMO: 'memo'
+} as const
+
+type _TagItemType = (typeof TAG_ITEM_TYPE)[keyof typeof TAG_ITEM_TYPE]
+
 export {
   ORDER_BY,
   VIEW_MODE,
@@ -69,12 +76,14 @@ export {
   BOOKMARK_STATUS,
   BOOKMARK_EVENTS,
   TRANSMIT_CHANNEL_NAMES,
-  APP_INFO
+  APP_INFO,
+  TAG_ITEM_TYPE
 }
 
 export type {
   _OrderBy as OrderBy,
   _ViewMode as ViewMode,
   _SortOrder as SortOrder,
-  _Pagination as Pagination
+  _Pagination as Pagination,
+  _TagItemType as TagItemType
 }

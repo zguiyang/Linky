@@ -119,7 +119,12 @@ export class TagService {
   async getItems(
     userId: number,
     tagId: number,
-    options: { page?: number; perPage?: number; sortOrder?: 'asc' | 'desc' } = {}
+    options: {
+      page?: number
+      perPage?: number
+      sortOrder?: 'asc' | 'desc'
+      type: 'bookmark' | 'memo'
+    }
   ): Promise<TagItemsResult> {
     await this.findById(userId, tagId)
 
@@ -129,88 +134,107 @@ export class TagService {
 
     const offset = (page - 1) * perPage
 
-    const bookmarksSubquery = Database.from('bookmark_tags')
-      .select('bookmark_id')
-      .where('tag_id', tagId)
+    if (options.type === 'bookmark') {
+      return await this.queryBookmarks(userId, tagId, { page, perPage, sortOrder, offset })
+    } else {
+      return await this.queryMemos(userId, tagId, { page, perPage, sortOrder, offset })
+    }
+  }
 
-    const memosSubquery = Database.from('memo_tags').select('memo_id').where('tag_id', tagId)
+  private async queryBookmarks(
+    userId: number,
+    tagId: number,
+    options: { page: number; perPage: number; sortOrder: 'asc' | 'desc'; offset: number }
+  ): Promise<TagItemsResult> {
+    const { page, perPage, sortOrder, offset } = options
 
-    const bookmarksQuery = Bookmark.query()
+    const subquery = Database.from('bookmark_tags').select('bookmark_id').where('tag_id', tagId)
+
+    const itemsResult = await Bookmark.query()
       .from('bookmarks')
-      .select(
-        Database.raw(`'bookmark' as type`),
-        'id',
-        'title',
-        'url',
-        Database.raw('NULL as content'),
-        'created_at'
-      )
+      .select('id', 'title', 'url', 'created_at')
       .where('user_id', userId)
-      .whereIn('id', bookmarksSubquery)
-
-    const memosQuery = Memo.query()
-      .from('memos')
-      .select(
-        Database.raw(`'memo' as type`),
-        'id',
-        'title',
-        Database.raw('NULL as url'),
-        'content',
-        'created_at'
-      )
-      .where('user_id', userId)
-      .whereIn('id', memosSubquery)
-
-    const unionQuery = Database.from(bookmarksQuery.unionAll(memosQuery, true).as('combined'))
-      .select('type', 'id', 'title', 'url', 'content', 'created_at')
+      .whereIn('id', subquery)
       .orderBy('created_at', sortOrder)
       .offset(offset)
       .limit(perPage)
 
-    const totalQuery = Database.from(
-      bookmarksQuery.unionAll(memosQuery, true).as('combined')
-    ).count('* as total')
-
-    const [itemsResult, totalResult] = await Promise.all([unionQuery, totalQuery])
-
+    const totalResult = await Database.from('bookmark_tags')
+      .count('* as total')
+      .where('tag_id', tagId)
     const total = Number(totalResult[0]?.total || 0)
     const lastPage = Math.ceil(total / perPage)
 
-    const items: TagItem[] = []
-
-    for (const item of itemsResult) {
-      let tags: Array<{ id: number; name: string; color: string | null }> = []
-
-      if (item.type === 'bookmark') {
-        const bookmark = await Bookmark.query().where('id', item.id).preload('tags').first()
-        if (bookmark) {
-          tags = bookmark.tags.map((t) => ({
+    const items: TagItem[] = await Promise.all(
+      itemsResult.map(async (bookmark) => {
+        await bookmark.load('tags')
+        return {
+          type: 'bookmark' as const,
+          id: bookmark.id,
+          title: bookmark.title,
+          url: bookmark.url,
+          content: null,
+          createdAt: bookmark.createdAt,
+          tags: bookmark.tags.map((t) => ({
             id: t.id,
             name: t.name,
             color: t.color,
-          }))
+          })),
         }
-      } else {
-        const memo = await Memo.query().where('id', item.id).preload('tags').first()
-        if (memo) {
-          tags = memo.tags.map((t) => ({
-            id: t.id,
-            name: t.name,
-            color: t.color,
-          }))
-        }
-      }
-
-      items.push({
-        type: item.type,
-        id: item.id,
-        title: item.title,
-        url: item.url,
-        content: item.content,
-        createdAt: item.created_at,
-        tags,
       })
+    )
+
+    return {
+      data: items,
+      meta: {
+        total,
+        page,
+        perPage,
+        lastPage,
+      },
     }
+  }
+
+  private async queryMemos(
+    userId: number,
+    tagId: number,
+    options: { page: number; perPage: number; sortOrder: 'asc' | 'desc'; offset: number }
+  ): Promise<TagItemsResult> {
+    const { page, perPage, sortOrder, offset } = options
+
+    const subquery = Database.from('memo_tags').select('memo_id').where('tag_id', tagId)
+
+    const itemsResult = await Memo.query()
+      .from('memos')
+      .select('id', 'title', 'content', 'created_at')
+      .where('user_id', userId)
+      .whereIn('id', subquery)
+      .orderBy('created_at', sortOrder)
+      .offset(offset)
+      .limit(perPage)
+
+    const totalResult = await Database.from('memo_tags').count('* as total').where('tag_id', tagId)
+    const total = Number(totalResult[0]?.total || 0)
+    const lastPage = Math.ceil(total / perPage)
+
+    const items: TagItem[] = await Promise.all(
+      itemsResult.map(async (memo) => {
+        await memo.load('tags')
+        return {
+          type: 'memo' as const,
+          id: memo.id,
+          title: memo.title,
+          url: null,
+          content: memo.content,
+          createdAt: memo.createdAt,
+          tags: memo.tags.map((t) => ({
+            id: t.id,
+            name: t.name,
+            color: t.color,
+          })),
+        }
+      })
+    )
 
     return {
       data: items,

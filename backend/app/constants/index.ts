@@ -96,6 +96,13 @@ const TRANSMIT_CHANNEL_NAMES = {
 
 type TransmitEvent = BookmarkEvent
 
+const TAG_ITEM_TYPE = {
+  BOOKMARK: 'bookmark',
+  MEMO: 'memo',
+} as const
+
+type TagItemType = (typeof TAG_ITEM_TYPE)[keyof typeof TAG_ITEM_TYPE]
+
 export {
   ORDER_BY,
   PAGINATION,
@@ -108,6 +115,7 @@ export {
   AI_TAG,
   BOOKMARK_EVENTS,
   TRANSMIT_CHANNEL_NAMES,
+  TAG_ITEM_TYPE,
 }
 export type {
   OrderBy,
@@ -121,4 +129,5 @@ export type {
   AiTag,
   BookmarkEvent,
   TransmitEvent,
+  TagItemType,
 }

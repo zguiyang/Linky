@@ -31,6 +31,31 @@
           <p class="text-sm text-[var(--text-secondary)]">
             {{ tag.bookmarksCount }} 个书签 · {{ tag.memosCount }} 个备忘录
           </p>
+          <div class="flex items-center gap-2 mt-2">
+            <button
+              :class="[
+                'text-sm px-3 py-1 rounded-full transition-colors',
+                currentType === 'bookmark'
+                  ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
+                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]'
+              ]"
+              @click="currentType = 'bookmark'"
+            >
+              {{ tag.bookmarksCount }} 个书签
+            </button>
+            <span class="text-[var(--text-muted)]">·</span>
+            <button
+              :class="[
+                'text-sm px-3 py-1 rounded-full transition-colors',
+                currentType === 'memo'
+                  ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
+                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]'
+              ]"
+              @click="currentType = 'memo'"
+            >
+              {{ tag.memosCount }} 个备忘录
+            </button>
+          </div>
         </div>
       </div>
       <div
@@ -81,23 +106,27 @@
         v-else
         class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4"
       >
-        <memo-card
-          v-for="item in memoItems"
-          :key="`memo-${item.id}`"
-          :memo="item"
-          view-mode="masonry"
-          @edit="handleEditMemo"
-          @delete="handleDeleteMemo"
-        />
-        <bookmark-card
-          v-for="item in bookmarkItems"
-          :key="`bookmark-${item.id}`"
-          :bookmark="item"
-          view-mode="masonry"
-          @click="handleClickBookmark"
-          @edit="handleEditBookmark"
-          @delete="handleDeleteBookmark"
-        />
+        <template v-if="currentType === 'bookmark'">
+          <bookmark-card
+            v-for="item in items"
+            :key="`bookmark-${item.id}`"
+            :bookmark="transformToBookmark(item)"
+            view-mode="masonry"
+            @click="handleClickBookmark"
+            @edit="handleEditBookmark"
+            @delete="handleDeleteBookmark"
+          />
+        </template>
+        <template v-else>
+          <memo-card
+            v-for="item in items"
+            :key="`memo-${item.id}`"
+            :memo="transformToMemo(item)"
+            view-mode="masonry"
+            @edit="handleEditMemo"
+            @delete="handleDeleteMemo"
+          />
+        </template>
       </div>
     </u-scroll-area>
 
@@ -209,10 +238,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, navigateTo } from '#app'
 import type { ContextMenuItem } from '@nuxt/ui'
 import type { Tag, TagItem, Bookmark, Memo } from '~/api/types'
+import { TAG_ITEM_TYPE } from '~/constants'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -227,44 +257,49 @@ const showDeleteConfirm = ref(false)
 const isSubmitting = ref(false)
 const isDeleting = ref(false)
 const tagForm = ref({ name: '', color: '' })
+const currentType = ref<'bookmark' | 'memo'>(TAG_ITEM_TYPE.BOOKMARK)
 
 const pagination = usePagination<TagItem>(
   () => `/tags/${tagId}/items`,
   {
     query: computed(() => ({
-      sortOrder: 'asc' as const
+      sortOrder: 'asc' as const,
+      type: currentType.value
     }))
   }
 )
 
+watch(currentType, () => {
+  pagination.reset()
+  pagination.execute()
+})
+
 const { items, pending, page, perPage, total, setPage } = pagination
 
-const bookmarkItems = computed(() =>
-  items.value.filter(item => item.type === 'bookmark').map(item => ({
-    ...item,
-    url: item.url || '',
-    description: item.content,
-    visit_count: 0,
-    user_id: 0,
-    status: 'active' as const,
-    metadata: undefined,
-    created_at: item.createdAt,
-    updated_at: null
-  })) as Bookmark[]
-)
+const transformToBookmark = (item: TagItem): Bookmark => ({
+  id: item.id,
+  title: item.title,
+  url: item.url || '',
+  description: item.content || '',
+  visit_count: 0,
+  user_id: 0,
+  status: 'active' as const,
+  metadata: undefined,
+  created_at: item.createdAt,
+  updated_at: null,
+  tags: item.tags
+})
 
-const memoItems = computed(() =>
-  items.value.filter(item => item.type === 'memo').map(item => ({
-    id: item.id,
-    title: item.title,
-    content: item.content || '',
-    isPinned: false,
-    userId: 0,
-    tags: item.tags,
-    createdAt: item.createdAt,
-    updatedAt: null
-  })) as Memo[]
-)
+const transformToMemo = (item: TagItem): Memo => ({
+  id: item.id,
+  title: item.title,
+  content: item.content || '',
+  isPinned: false,
+  userId: 0,
+  tags: item.tags,
+  createdAt: item.createdAt,
+  updatedAt: null
+})
 
 const menuItems: ContextMenuItem[][] = [
   [

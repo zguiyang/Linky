@@ -28,6 +28,7 @@ export default class TagsController {
       page: data.page,
       perPage: data.perPage,
       sortOrder: data.sortOrder,
+      type: data.type,
     })
   }
 

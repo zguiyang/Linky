@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import { VALIDATION, SORT_ORDER, PAGINATION } from '#constants/index'
+import { VALIDATION, SORT_ORDER, PAGINATION, TAG_ITEM_TYPE } from '#constants/index'
 
 export const createTagValidator = vine.compile(
   vine.object({
@@ -41,6 +41,7 @@ export const tagItemsValidator = vine.compile(
     page: vine.number().min(1).optional(),
     perPage: vine.number().min(1).max(PAGINATION.MAX_PER_PAGE).optional(),
     sortOrder: vine.enum([SORT_ORDER.ASC, SORT_ORDER.DESC]).optional(),
+    type: vine.enum([TAG_ITEM_TYPE.BOOKMARK, TAG_ITEM_TYPE.MEMO]),
   })
 )
 
