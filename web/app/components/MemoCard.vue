@@ -39,7 +39,7 @@
             :variant="tag.isAiGenerated ? 'soft' : 'outline'"
             size="md"
             class="cursor-pointer hover:opacity-80 transition-opacity"
-            @click="navigateToTag(tag.id)"
+            @click.stop="navigateToTag(tag.id)"
           >
             <span
               v-if="tag.isAiGenerated"

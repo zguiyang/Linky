@@ -55,7 +55,7 @@
       </u-dropdown-menu>
     </div>
 
-    <div class="flex-1 min-h-0 overflow-y-auto">
+    <u-scroll-area class="flex-1 min-h-0">
       <div
         v-if="pending"
         class="flex justify-center py-16"
@@ -79,13 +79,13 @@
       </div>
       <div
         v-else
-        class="flex flex-col gap-3"
+        class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4"
       >
         <memo-card
           v-for="item in memoItems"
           :key="`memo-${item.id}`"
           :memo="item"
-          view-mode="list"
+          view-mode="masonry"
           @edit="handleEditMemo"
           @delete="handleDeleteMemo"
         />
@@ -93,16 +93,16 @@
           v-for="item in bookmarkItems"
           :key="`bookmark-${item.id}`"
           :bookmark="item"
-          view-mode="list"
+          view-mode="masonry"
           @click="handleClickBookmark"
           @edit="handleEditBookmark"
           @delete="handleDeleteBookmark"
         />
       </div>
-    </div>
+    </u-scroll-area>
 
     <div
-      v-if="lastPage > 1"
+      v-if="!pending && total > 0"
       class="flex justify-center py-4 flex-shrink-0"
     >
       <u-pagination
@@ -110,7 +110,7 @@
         variant="soft"
         :total="total"
         :items-per-page="perPage"
-        @update:page="handlePageChange"
+        @update:page="setPage"
       />
     </div>
 
@@ -222,18 +222,22 @@ const tagId = Number(route.params.id)
 const { $api } = useNuxtApp()
 
 const tag = ref<Tag | null>(null)
-const items = ref<TagItem[]>([])
-const pending = ref(true)
-const page = ref(1)
-const perPage = ref(20)
-const total = ref(0)
-const lastPage = ref(1)
-
 const showEditModal = ref(false)
 const showDeleteConfirm = ref(false)
 const isSubmitting = ref(false)
 const isDeleting = ref(false)
 const tagForm = ref({ name: '', color: '' })
+
+const pagination = usePagination<TagItem>(
+  () => `/tags/${tagId}/items`,
+  {
+    query: computed(() => ({
+      sortOrder: 'asc' as const
+    }))
+  }
+)
+
+const { items, pending, page, perPage, total, setPage } = pagination
 
 const bookmarkItems = computed(() =>
   items.value.filter(item => item.type === 'bookmark').map(item => ({
@@ -284,35 +288,6 @@ const fetchTag = async () => {
   } catch (error) {
     console.error('Failed to fetch tag:', error)
   }
-}
-
-const fetchItems = async () => {
-  pending.value = true
-  try {
-    const response = await $api<{ data: TagItem[], meta: { total: number, page: number, perPage: number, lastPage: number } }>(
-      `/tags/${tagId}/items`,
-      {
-        method: 'get',
-        query: {
-          page: page.value,
-          perPage: perPage.value,
-          sortOrder: 'asc'
-        }
-      }
-    )
-    items.value = response.data
-    total.value = response.meta.total
-    lastPage.value = response.meta.lastPage
-  } catch (error) {
-    console.error('Failed to fetch items:', error)
-  } finally {
-    pending.value = false
-  }
-}
-
-const handlePageChange = (newPage: number) => {
-  page.value = newPage
-  fetchItems()
 }
 
 const openEditModal = () => {
@@ -368,23 +343,23 @@ const handleClickBookmark = (bookmark: Bookmark) => {
   window.open(bookmark.url, '_blank')
 }
 
-const handleEditBookmark = (bookmark: Bookmark) => {
-  console.log('Edit bookmark:', bookmark.id)
+const handleEditBookmark = (_bookmark: Bookmark) => {
+  console.log('Edit bookmark')
 }
 
-const handleDeleteBookmark = (bookmark: Bookmark) => {
-  console.log('Delete bookmark:', bookmark.id)
+const handleDeleteBookmark = (_bookmark: Bookmark) => {
+  console.log('Delete bookmark')
 }
 
-const handleEditMemo = (memo: Memo) => {
-  console.log('Edit memo:', memo.id)
+const handleEditMemo = (_memo: Memo) => {
+  console.log('Edit memo')
 }
 
-const handleDeleteMemo = (memo: Memo) => {
-  console.log('Delete memo:', memo.id)
+const handleDeleteMemo = (_memo: Memo) => {
+  console.log('Delete memo')
 }
 
 onMounted(async () => {
-  await Promise.all([fetchTag(), fetchItems()])
+  await Promise.all([fetchTag(), pagination.execute()])
 })
 </script>
