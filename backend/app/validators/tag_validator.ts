@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import { VALIDATION } from '#constants/index'
+import { VALIDATION, SORT_ORDER, PAGINATION } from '#constants/index'
 
 export const createTagValidator = vine.compile(
   vine.object({
@@ -36,5 +36,14 @@ export const updateTagValidator = vine.compile(
   })
 )
 
+export const tagItemsValidator = vine.compile(
+  vine.object({
+    page: vine.number().min(1).optional(),
+    perPage: vine.number().min(1).max(PAGINATION.MAX_PER_PAGE).optional(),
+    sortOrder: vine.enum([SORT_ORDER.ASC, SORT_ORDER.DESC]).optional(),
+  })
+)
+
 export type CreateTagValidator = typeof createTagValidator
 export type UpdateTagValidator = typeof updateTagValidator
+export type TagItemsValidator = typeof tagItemsValidator

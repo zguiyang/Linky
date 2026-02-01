@@ -35,10 +35,6 @@
 
       <div class="mx-3 my-2 border-t border-[var(--border-subtle)]" />
 
-      <div class="p-2">
-        <sidebar-tags />
-      </div>
-
       <div class="border-t border-[var(--border-subtle)] w-full mt-auto">
         <div class="flex flex-col items-center gap-1 px-4 py-4">
           <span class="text-xs text-[var(--text-secondary)] font-medium">
@@ -78,8 +74,6 @@
 
 <script setup lang="ts">
 import WorkspaceUserDropdown from '~/components/workspace/UserDropdown.vue'
-import SidebarTags from '~/components/workspace/SidebarTags.vue'
-import { useTagsStore } from '~/stores/tags'
 import { APP_INFO } from '~/constants'
 
 const navItems = [
@@ -87,9 +81,4 @@ const navItems = [
   { label: '备忘录', to: '/workspace/memos', icon: 'i-heroicons-document-text' },
   { label: '标签管理', to: '/workspace/tags', icon: 'i-heroicons-tag' }
 ]
-
-await useAsyncData('sidebar-tags', async () => {
-  const tagsStore = useTagsStore()
-  return await tagsStore.fetchTags()
-})
 </script>

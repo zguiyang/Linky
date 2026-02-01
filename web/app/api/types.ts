@@ -190,3 +190,29 @@ export interface UpdateSettingsRequest {
 }
 
 export type PaginationData<T> = PaginatedResponse<T>
+
+export interface TagItem {
+  type: 'bookmark' | 'memo'
+  id: number
+  title: string
+  url?: string | null
+  content?: string | null
+  createdAt: string
+  tags: Tag[]
+}
+
+export interface TagItemsResponse {
+  data: TagItem[]
+  meta: {
+    total: number
+    page: number
+    perPage: number
+    lastPage: number
+  }
+}
+
+export interface TagItemsParams {
+  page?: number
+  perPage?: number
+  sortOrder?: 'asc' | 'desc'
+}

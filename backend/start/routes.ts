@@ -44,6 +44,7 @@ router
     // 标签 API
     router.get('/tags', [TagsController, 'index'])
     router.get('/tags/:id', [TagsController, 'show'])
+    router.get('/tags/:id/items', [TagsController, 'items'])
     router.post('/tags', [TagsController, 'store'])
     router.put('/tags/:id', [TagsController, 'update'])
     router.delete('/tags/:id', [TagsController, 'destroy'])

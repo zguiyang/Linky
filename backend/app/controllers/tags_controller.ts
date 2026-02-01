@@ -1,6 +1,10 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { createTagValidator, updateTagValidator } from '#validators/tag_validator'
+import {
+  createTagValidator,
+  updateTagValidator,
+  tagItemsValidator,
+} from '#validators/tag_validator'
 import { TagService } from '#services/tag_service'
 
 @inject()
@@ -15,6 +19,16 @@ export default class TagsController {
   async show({ auth, params }: HttpContext) {
     const user = auth.getUserOrFail()
     return await this.tagService.findById(user.id, params.id)
+  }
+
+  async items({ auth, params, request }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const data = await request.validateUsing(tagItemsValidator)
+    return await this.tagService.getItems(user.id, params.id, {
+      page: data.page,
+      perPage: data.perPage,
+      sortOrder: data.sortOrder,
+    })
   }
 
   async store({ auth, request }: HttpContext) {

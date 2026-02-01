@@ -1,6 +1,30 @@
+import { DateTime } from 'luxon'
 import Tag from '#models/tag'
+import Bookmark from '#models/bookmark'
+import Memo from '#models/memo'
 import { Exception } from '@adonisjs/core/exceptions'
 import Database from '@adonisjs/lucid/services/db'
+import { PAGINATION, SORT_ORDER } from '#constants/index'
+
+interface TagItem {
+  type: 'bookmark' | 'memo'
+  id: number
+  title: string
+  url?: string | null
+  content?: string | null
+  createdAt: DateTime
+  tags: Array<{ id: number; name: string; color: string | null }>
+}
+
+interface TagItemsResult {
+  data: TagItem[]
+  meta: {
+    total: number
+    page: number
+    perPage: number
+    lastPage: number
+  }
+}
 
 export class TagService {
   async create(userId: number, data: { name: string; color?: string }) {
@@ -90,5 +114,112 @@ export class TagService {
     }
 
     await tag.delete()
+  }
+
+  async getItems(
+    userId: number,
+    tagId: number,
+    options: { page?: number; perPage?: number; sortOrder?: 'asc' | 'desc' } = {}
+  ): Promise<TagItemsResult> {
+    await this.findById(userId, tagId)
+
+    const page = options.page || PAGINATION.DEFAULT_PAGE
+    const perPage = options.perPage || PAGINATION.DEFAULT_PER_PAGE
+    const sortOrder = options.sortOrder || SORT_ORDER.ASC
+
+    const offset = (page - 1) * perPage
+
+    const bookmarksSubquery = Database.from('bookmark_tags')
+      .select('bookmark_id')
+      .where('tag_id', tagId)
+
+    const memosSubquery = Database.from('memo_tags').select('memo_id').where('tag_id', tagId)
+
+    const bookmarksQuery = Bookmark.query()
+      .from('bookmarks')
+      .select(
+        Database.raw(`'bookmark' as type`),
+        'id',
+        'title',
+        'url',
+        Database.raw('NULL as content'),
+        'created_at'
+      )
+      .where('user_id', userId)
+      .whereIn('id', bookmarksSubquery)
+
+    const memosQuery = Memo.query()
+      .from('memos')
+      .select(
+        Database.raw(`'memo' as type`),
+        'id',
+        'title',
+        Database.raw('NULL as url'),
+        'content',
+        'created_at'
+      )
+      .where('user_id', userId)
+      .whereIn('id', memosSubquery)
+
+    const unionQuery = Database.from(bookmarksQuery.unionAll(memosQuery, true).as('combined'))
+      .select('type', 'id', 'title', 'url', 'content', 'created_at')
+      .orderBy('created_at', sortOrder)
+      .offset(offset)
+      .limit(perPage)
+
+    const totalQuery = Database.from(
+      bookmarksQuery.unionAll(memosQuery, true).as('combined')
+    ).count('* as total')
+
+    const [itemsResult, totalResult] = await Promise.all([unionQuery, totalQuery])
+
+    const total = Number(totalResult[0]?.total || 0)
+    const lastPage = Math.ceil(total / perPage)
+
+    const items: TagItem[] = []
+
+    for (const item of itemsResult) {
+      let tags: Array<{ id: number; name: string; color: string | null }> = []
+
+      if (item.type === 'bookmark') {
+        const bookmark = await Bookmark.query().where('id', item.id).preload('tags').first()
+        if (bookmark) {
+          tags = bookmark.tags.map((t) => ({
+            id: t.id,
+            name: t.name,
+            color: t.color,
+          }))
+        }
+      } else {
+        const memo = await Memo.query().where('id', item.id).preload('tags').first()
+        if (memo) {
+          tags = memo.tags.map((t) => ({
+            id: t.id,
+            name: t.name,
+            color: t.color,
+          }))
+        }
+      }
+
+      items.push({
+        type: item.type,
+        id: item.id,
+        title: item.title,
+        url: item.url,
+        content: item.content,
+        createdAt: item.created_at,
+        tags,
+      })
+    }
+
+    return {
+      data: items,
+      meta: {
+        total,
+        page,
+        perPage,
+        lastPage,
+      },
+    }
   }
 }

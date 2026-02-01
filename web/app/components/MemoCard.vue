@@ -33,14 +33,16 @@
         </span>
         <div class="flex flex-wrap gap-1.5">
           <u-badge
-            v-for="tag in displayTags"
-            :key="tag"
+            v-for="tag in memo.tags"
+            :key="tag.id"
             color="primary"
-            :variant="memo.tags.find(t => t.name === tag)?.isAiGenerated ? 'soft' : 'outline'"
+            :variant="tag.isAiGenerated ? 'soft' : 'outline'"
             size="md"
+            class="cursor-pointer hover:opacity-80 transition-opacity"
+            @click="navigateToTag(tag.id)"
           >
             <span
-              v-if="memo.tags.find(t => t.name === tag)?.isAiGenerated"
+              v-if="tag.isAiGenerated"
               class="flex items-center gap-1"
             >
               <u-icon
@@ -48,10 +50,10 @@
                 class="size-3"
               />
             </span>
-            {{ tag }}
+            {{ tag.name }}
           </u-badge>
           <span
-            v-if="displayTags.length === 0"
+            v-if="memo.tags.length === 0"
             class="text-xs text-[var(--text-secondary)]"
           >暂无标签</span>
         </div>
@@ -160,15 +162,6 @@ const dateClass = computed(() => {
   return 'text-[var(--text-secondary)]'
 })
 
-const displayTags = computed(() => {
-  switch (props.viewMode) {
-    case 'list':
-      return props.memo.tags.slice(0, 2).map(tag => tag.name)
-    default:
-      return props.memo.tags.slice(0, 3).map(tag => tag.name)
-  }
-})
-
 const formatDate = (date: string | null) => {
   if (!date) return ''
   const d = new Date(date)
@@ -214,5 +207,9 @@ const getMemoMenuItems = (memo: Memo): DropdownMenuItem[][] => {
 
 const handleClick = () => {
   emit('edit', props.memo)
+}
+
+const navigateToTag = (tagId: number) => {
+  navigateTo(`/workspace/tags/${tagId}`)
 }
 </script>
