@@ -48,7 +48,7 @@ const menuItems = computed<DropdownMenuItem[][]>(() => [
       label: isDark.value ? 'Dark Mode' : 'Light Mode',
       icon: isDark.value ? 'i-heroicons-moon' : 'i-heroicons-sun',
       onSelect: () => {
-        colorMode.value = isDark.value ? 'light' : 'dark'
+        colorMode.preference = isDark.value ? 'light' : 'dark'
       }
     }
   ],
