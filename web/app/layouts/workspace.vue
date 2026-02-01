@@ -54,7 +54,7 @@
     <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
       <header class="flex items-center justify-end px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <div class="flex items-center gap-3">
-          <u-dashboard-search-button />
+          <u-dashboard-search-button variant="subtle" />
           <u-button
             icon="i-heroicons-cog-6-tooth"
             color="neutral"
@@ -67,10 +67,7 @@
         </div>
       </header>
 
-      <u-dashboard-search
-        size="xl"
-        class="bg-[var(--bg-surface)]"
-      />
+      <u-dashboard-search />
 
       <div class="flex-1 overflow-y-auto">
         <nuxt-page />

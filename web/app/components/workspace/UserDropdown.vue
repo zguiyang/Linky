@@ -32,9 +32,9 @@ const menuItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
       type: 'label',
-      label: user.value?.fullName || user.value?.email || '用户',
+      label: user.value?.email || user.value?.fullName || '用户',
       avatar: {
-        alt: user.value?.fullName || user.value?.email || 'User'
+        alt: user.value?.email || user.value?.fullName || 'User'
       }
     }
   ],
