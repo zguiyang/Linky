@@ -228,8 +228,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { usePush } from '~/composables/usePush'
 import type { ImportResultData, AsyncImportResponseData } from '~/api/types'
+
+const { onImportProgress } = usePush()
 
 const props = defineProps<{
   modelValue: boolean
@@ -254,8 +255,6 @@ const importResult = ref<ImportResultData | null>(null)
 const progress = ref(0)
 const isAsyncMode = ref(false)
 const currentTitle = ref('')
-
-const { onImportProgress } = usePush()
 
 const createTags = ref(true)
 const skipDuplicates = ref(true)
