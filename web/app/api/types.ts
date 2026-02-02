@@ -84,13 +84,13 @@ export interface Bookmark {
   title: string
   url: string
   description: string | null
-  visit_count: number
-  user_id: number
+  visitCount: number
+  userId: number
   tags: Tag[]
   status: BookmarkStatus
   metadata?: BookmarkMetadata
-  created_at: string
-  updated_at: string | null
+  createdAt: string
+  updatedAt: string | null
 }
 
 export interface BookmarkPaginationParams {
@@ -176,6 +176,25 @@ export interface ImportStatusResponse {
   error?: string
 }
 
+export interface ImportResultData {
+  total: number
+  imported: number
+  skipped: number
+  errors: number
+  tagsCreated: number
+  errorsList: Array<{
+    title: string
+    url: string
+    reason: string
+  }>
+}
+
+export interface AsyncImportResponseData {
+  jobId: string
+  status: 'waiting' | 'active' | 'completed'
+  progress: number
+}
+
 export interface UserSettings {
   aiBaseUrl: string | null
   aiModelName: string | null
@@ -212,6 +231,7 @@ export interface TagItemsResponse {
 }
 
 export interface TagItemsParams {
+  type: 'bookmark' | 'memo'
   page?: number
   perPage?: number
   sortOrder?: 'asc' | 'desc'

@@ -229,25 +229,7 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
 import { usePush } from '~/composables/usePush'
-
-type ImportResultData = {
-  total: number
-  imported: number
-  skipped: number
-  errors: number
-  tagsCreated: number
-  errorsList: Array<{
-    title: string
-    url: string
-    reason: string
-  }>
-}
-
-type AsyncImportResponseData = {
-  jobId: string
-  status: 'waiting' | 'active' | 'completed'
-  progress: number
-}
+import type { ImportResultData, AsyncImportResponseData } from '~/api/types'
 
 const props = defineProps<{
   modelValue: boolean

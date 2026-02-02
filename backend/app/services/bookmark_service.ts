@@ -153,7 +153,14 @@ export class BookmarkService {
       })
     }
 
-    return await query.preload('tags').orderBy(sortBy, sortOrder).paginate(page, perPage)
+    const fieldMap: Record<string, string> = {
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    }
+
+    const dbSortBy = fieldMap[sortBy] || sortBy
+
+    return await query.preload('tags').orderBy(dbSortBy, sortOrder).paginate(page, perPage)
   }
 
   async findById(userId: number, bookmarkId: number) {

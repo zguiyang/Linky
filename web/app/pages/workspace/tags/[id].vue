@@ -291,12 +291,12 @@ const transformToBookmark = (item: TagItem): Bookmark => ({
   title: item.title,
   url: item.url || '',
   description: item.content || '',
-  visit_count: 0,
-  user_id: 0,
+  visitCount: 0,
+  userId: 0,
   status: 'active' as const,
   metadata: undefined,
-  created_at: item.createdAt,
-  updated_at: null,
+  createdAt: item.createdAt,
+  updatedAt: null,
   tags: item.tags
 })
 

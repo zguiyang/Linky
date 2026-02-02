@@ -266,13 +266,14 @@ const getTagMenuItems = (tag: Tag): ContextMenuItem[][] => {
 }
 
 const toggleTag = (tagId: number) => {
-  const index = selectedTagsList.value.indexOf(tagId)
+  const newTags = [...selectedTagsList.value]
+  const index = newTags.indexOf(tagId)
   if (index > -1) {
-    selectedTagsList.value.splice(index, 1)
+    newTags.splice(index, 1)
   } else {
-    selectedTagsList.value.push(tagId)
+    newTags.push(tagId)
   }
-  emit('update:selectedTags', selectedTagsList.value)
+  emit('update:selectedTags', newTags)
 }
 
 const openEditModal = (tag: Tag) => {

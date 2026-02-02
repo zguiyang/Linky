@@ -41,6 +41,7 @@ const SORT_ORDER_OPTIONS = [
 const BOOKMARK_STATUS = {
   FETCHING: 'fetching',
   ACTIVE: 'active',
+  ERROR: 'error',
   ARCHIVED: 'archived'
 } as const
 

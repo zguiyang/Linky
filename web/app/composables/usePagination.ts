@@ -74,7 +74,6 @@ export function usePagination<T>(
   }
 
   const setPage = (newPage: number) => {
-    console.log('setPage called with:', newPage)
     page.value = newPage
     execute()
   }
