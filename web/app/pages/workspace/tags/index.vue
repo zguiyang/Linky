@@ -2,10 +2,10 @@
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
+        <h1 class="text-2xl font-bold text-[var(--text-primary)]">
           标签管理
         </h1>
-        <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+        <p class="text-sm text-[var(--text-secondary)] mt-1">
           共 {{ tagsStore.tags.length }} 个标签
         </p>
       </div>
@@ -31,13 +31,13 @@
 
     <div
       v-if="!tagsStore.tags || tagsStore.tags.length === 0"
-      class="flex flex-col items-center justify-center py-20 bg-neutral-50 dark:bg-neutral-900/50 rounded-2xl border border-dashed border-neutral-200 dark:border-neutral-800"
+      class="flex flex-col items-center justify-center py-20 bg-[var(--bg-surface)] rounded-2xl border border-dashed border-[var(--border-subtle)]"
     >
       <u-icon
         name="i-heroicons-tag"
-        class="w-12 h-12 text-neutral-300 dark:text-neutral-600"
+        class="w-12 h-12 text-[var(--text-secondary)]"
       />
-      <p class="text-neutral-500 dark:text-neutral-400 mt-4">
+      <p class="text-[var(--text-secondary)] mt-4">
         暂无标签，创建您的第一个标签吧
       </p>
     </div>

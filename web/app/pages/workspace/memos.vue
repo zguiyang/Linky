@@ -10,16 +10,16 @@
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2 p-1.5 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-subtle)]">
+      <div class="flex flex-wrap items-center gap-2">
         <u-input
           v-model="searchQuery"
           icon="i-heroicons-magnifying-glass"
           placeholder="搜索备忘录..."
           size="md"
-          class="w-full sm:w-auto flex-grow-0 !bg-transparent"
+          class="w-full sm:w-64"
         />
-        <div class="w-px h-6 bg-[var(--border-subtle)]" />
-        <div class="inline-flex items-center p-0.5 bg-[var(--bg-canvas)] rounded-lg">
+        <div class="hidden sm:block w-px h-6 bg-[var(--border-subtle)]" />
+        <div class="inline-flex items-center p-0.5 rounded-lg border border-[var(--border-subtle)]">
           <u-button
             :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
             :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
