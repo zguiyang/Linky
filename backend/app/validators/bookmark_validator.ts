@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import { VALIDATION, ORDER_BY, SORT_ORDER, IMPORT } from '#constants/index'
+import { VALIDATION, ORDER_BY, SORT_ORDER, IMPORT } from '#constants'
 
 export const createBookmarkValidator = vine.compile(
   vine.object({
