@@ -32,6 +32,7 @@ components.d.ts
 .opencode/
 openspec/
 .roo/
+.junie/
 AGENTS.md
 
 # docker files

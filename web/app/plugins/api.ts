@@ -28,6 +28,7 @@ export default defineNuxtPlugin((_nuxtApp) => {
     },
 
     onResponseError({ response }) {
+      console.log('API response error:', response)
       const { handle401, handleError } = useHttpError()
 
       if (response.status === 401) {
