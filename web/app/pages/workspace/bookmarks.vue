@@ -203,7 +203,11 @@
       :title="isEditing ? '编辑书签' : '添加新书签'"
     >
       <template #body>
-        <div class="space-y-4">
+        <u-form
+          :state="bookmarkForm"
+          class="space-y-4"
+          @submit="handleSaveBookmark(() => showBookmarkModal = false)"
+        >
           <u-form-field
             label="自动获取元数据"
             direction="row"
@@ -216,33 +220,49 @@
           >
             <u-switch v-model="autoAiTag" />
           </u-form-field>
-          <div>
-            <label class="block text-sm font-medium text-[var(--text-primary)] mb-1.5">URL <span class="text-red-500">*</span></label>
+
+          <u-form-field
+            label="URL"
+            name="url"
+            required
+          >
             <u-input
               v-model="bookmarkForm.url"
               type="url"
               placeholder="https://example.com"
               icon="i-heroicons-globe-alt"
+              class="w-full"
             />
-          </div>
+          </u-form-field>
+
           <template v-if="!autoFetch">
-            <div>
-              <label class="block text-sm font-medium text-[var(--text-primary)] mb-1.5">标题</label>
+            <u-form-field
+              label="标题"
+              name="title"
+            >
               <u-input
                 v-model="bookmarkForm.title"
                 placeholder="留空将自动从网页获取"
+                class="w-full"
               />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-[var(--text-primary)] mb-1.5">描述</label>
+            </u-form-field>
+
+            <u-form-field
+              label="描述"
+              name="description"
+            >
               <u-textarea
                 v-model="bookmarkForm.description"
                 placeholder="留空将自动从网页获取"
                 :rows="3"
+                class="w-full"
               />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-[var(--text-primary)] mb-1.5">标签</label>
+            </u-form-field>
+
+            <u-form-field
+              label="标签"
+              name="tagIds"
+            >
               <u-select-menu
                 v-model="bookmarkForm.tagIds"
                 :items="tagSelectItems"
@@ -250,23 +270,26 @@
                 value-key="value"
                 label-key="label"
                 placeholder="选择标签"
+                class="w-full"
               />
-            </div>
+            </u-form-field>
           </template>
-        </div>
+        </u-form>
       </template>
       <template #footer="{ close }">
-        <u-button
-          label="取消"
-          color="neutral"
-          variant="outline"
-          @click="close"
-        />
-        <u-button
-          :label="isEditing ? '保存' : '添加'"
-          color="primary"
-          @click="handleSaveBookmark(close)"
-        />
+        <div class="flex justify-end gap-2 w-full">
+          <u-button
+            label="取消"
+            color="neutral"
+            variant="outline"
+            @click="close"
+          />
+          <u-button
+            :label="isEditing ? '保存' : '添加'"
+            color="primary"
+            @click="handleSaveBookmark(close)"
+          />
+        </div>
       </template>
     </u-modal>
 
@@ -295,18 +318,20 @@
         </div>
       </template>
       <template #footer="{ close }">
-        <u-button
-          label="取消"
-          color="neutral"
-          variant="outline"
-          @click="close"
-        />
-        <u-button
-          label="删除"
-          color="error"
-          :loading="isDeleting"
-          @click="handleDeleteBookmark(close)"
-        />
+        <div class="flex justify-end gap-2 w-full">
+          <u-button
+            label="取消"
+            color="neutral"
+            variant="outline"
+            @click="close"
+          />
+          <u-button
+            label="删除"
+            color="error"
+            :loading="isDeleting"
+            @click="handleDeleteBookmark(close)"
+          />
+        </div>
       </template>
     </u-modal>
 

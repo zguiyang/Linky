@@ -4,73 +4,76 @@
     :title="props.mode === 'add' ? '新建备忘录' : '编辑备忘录'"
   >
     <template #body>
-      <div class="flex flex-col gap-4">
-        <div>
+      <u-form
+        :state="formData"
+        class="flex flex-col gap-4"
+        @submit="handleSubmit"
+      >
+        <u-form-field
+          label="标题"
+          name="title"
+          required
+        >
           <u-input
             v-model="formData.title"
-            placeholder="输入标题（必填）"
+            placeholder="输入标题"
             size="lg"
-            :class="{ 'border-red-500': errors.title }"
+            class="w-full"
           />
-          <p
-            v-if="errors.title"
-            class="text-sm text-red-500 mt-1"
-          >
-            {{ errors.title }}
-          </p>
-        </div>
+        </u-form-field>
 
-        <div>
+        <u-form-field
+          label="内容"
+          name="content"
+          required
+        >
           <u-textarea
             v-model="formData.content"
-            placeholder="输入内容（必填）"
+            placeholder="输入内容"
             size="lg"
             :rows="6"
-            :class="{ 'border-red-500': errors.content }"
+            class="w-full"
           />
-          <p
-            v-if="errors.content"
-            class="text-sm text-red-500 mt-1"
-          >
-            {{ errors.content }}
-          </p>
-        </div>
+        </u-form-field>
 
-        <div>
+        <u-form-field>
           <u-checkbox
             v-model="formData.isPinned"
             label="置顶备忘录"
             color="primary"
           />
-        </div>
+        </u-form-field>
 
-        <div>
+        <u-form-field label="标签">
           <u-select
             v-model="formData.tagIds"
             :items="tagSelectItems"
             placeholder="选择标签"
             multiple
             size="lg"
+            class="w-full"
             :ui="{ placeholder: 'text-gray-400' }"
           />
-        </div>
+        </u-form-field>
+      </u-form>
+    </template>
 
-        <div class="flex justify-end gap-2 pt-4 border-t border-neutral-200 dark:border-neutral-700">
-          <u-button
-            color="neutral"
-            variant="ghost"
-            @click="handleCancel"
-          >
-            取消
-          </u-button>
-          <u-button
-            color="primary"
-            :loading="isSubmitting"
-            @click="handleSubmit"
-          >
-            {{ props.mode === 'add' ? '创建' : '保存' }}
-          </u-button>
-        </div>
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <u-button
+          color="neutral"
+          variant="ghost"
+          @click="handleCancel"
+        >
+          取消
+        </u-button>
+        <u-button
+          color="primary"
+          :loading="isSubmitting"
+          @click="handleSubmit"
+        >
+          {{ props.mode === 'add' ? '创建' : '保存' }}
+        </u-button>
       </div>
     </template>
   </u-modal>

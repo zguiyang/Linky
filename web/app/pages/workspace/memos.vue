@@ -211,18 +211,20 @@
         </div>
       </template>
       <template #footer="{ close }">
-        <u-button
-          label="取消"
-          color="neutral"
-          variant="outline"
-          @click="closeDeleteModal"
-        />
-        <u-button
-          label="删除"
-          color="error"
-          :loading="isDeleting"
-          @click="confirmDelete(close)"
-        />
+        <div class="flex justify-end gap-2 w-full">
+          <u-button
+            label="取消"
+            color="neutral"
+            variant="outline"
+            @click="closeDeleteModal"
+          />
+          <u-button
+            label="删除"
+            color="error"
+            :loading="isDeleting"
+            @click="confirmDelete(close)"
+          />
+        </div>
       </template>
     </u-modal>
   </div>

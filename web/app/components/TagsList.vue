@@ -103,25 +103,29 @@
     :title="isEditMode ? '编辑标签' : '新增标签'"
   >
     <template #body>
-      <div class="space-y-4">
-        <div>
-          <label
-            for="tagName"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
-          >
-            标签名称 <span class="text-red-500">*</span>
-          </label>
+      <u-form
+        :state="tagForm"
+        class="space-y-4"
+        @submit="isEditMode ? handleUpdateTag(() => showTagModal = false) : handleCreateTag(() => showTagModal = false)"
+      >
+        <u-form-field
+          label="标签名称"
+          name="name"
+          required
+        >
           <u-input
             id="tagName"
             v-model="tagForm.name"
             placeholder="输入标签名称"
             autofocus
+            class="w-full"
           />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            标签颜色
-          </label>
+        </u-form-field>
+
+        <u-form-field
+          label="标签颜色"
+          name="color"
+        >
           <div class="flex items-center gap-2">
             <input
               v-model="tagForm.color"
@@ -134,23 +138,25 @@
               class="flex-1"
             />
           </div>
-        </div>
-      </div>
+        </u-form-field>
+      </u-form>
     </template>
     <template #footer="{ close }">
-      <u-button
-        label="取消"
-        color="neutral"
-        variant="outline"
-        @click="close"
-      />
-      <u-button
-        :label="isEditMode ? '保存' : '创建'"
-        :loading="isSubmitting"
-        :disabled="!tagForm.name.trim()"
-        color="primary"
-        @click="isEditMode ? handleUpdateTag(close) : handleCreateTag(close)"
-      />
+      <div class="flex justify-end gap-2 w-full">
+        <u-button
+          label="取消"
+          color="neutral"
+          variant="outline"
+          @click="close"
+        />
+        <u-button
+          :label="isEditMode ? '保存' : '创建'"
+          :loading="isSubmitting"
+          :disabled="!tagForm.name.trim()"
+          color="primary"
+          @click="isEditMode ? handleUpdateTag(close) : handleCreateTag(close)"
+        />
+      </div>
     </template>
   </u-modal>
 
@@ -179,18 +185,20 @@
       </div>
     </template>
     <template #footer="{ close }">
-      <u-button
-        label="取消"
-        color="neutral"
-        variant="outline"
-        @click="close"
-      />
-      <u-button
-        label="删除"
-        color="error"
-        :loading="isDeleting"
-        @click="handleDeleteTag(close)"
-      />
+      <div class="flex justify-end gap-2 w-full">
+        <u-button
+          label="取消"
+          color="neutral"
+          variant="outline"
+          @click="close"
+        />
+        <u-button
+          label="删除"
+          color="error"
+          :loading="isDeleting"
+          @click="handleDeleteTag(close)"
+        />
+      </div>
     </template>
   </u-modal>
 </template>
