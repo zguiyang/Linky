@@ -92,7 +92,7 @@ export default class GenerateAiTags extends Job {
       })
 
       if (!response.success) {
-        logger.error(
+        logger.warn(
           { err: response.error },
           `[GenerateAiTags] AI request failed for bookmark ${bookmarkId}`
         )
@@ -156,7 +156,7 @@ export default class GenerateAiTags extends Job {
 
       return { success: true, tagsCreated, tagsReused }
     } catch (error: any) {
-      logger.error({ err: error }, `[GenerateAiTags] Error processing bookmark ${bookmarkId}`)
+      logger.warn({ err: error }, `[GenerateAiTags] Error processing bookmark ${bookmarkId}`)
       return { success: false, tagsCreated: 0, tagsReused: 0, error: 'INTERNAL_ERROR' }
     }
   }

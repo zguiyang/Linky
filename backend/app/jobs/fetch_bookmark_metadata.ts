@@ -41,8 +41,8 @@ export default class FetchBookmarkMetadata extends Job {
     const metadata = await this.metadataService.fetchAndUpdate(bookmarkId, url, forceUpdate)
 
     if (!metadata.success) {
-      logger.error(`[FetchBookmarkMetadata] Failed for bookmark ${bookmarkId}: ${metadata.error}`)
-      throw new Error(metadata.error ?? 'Failed to fetch metadata')
+      logger.warn(`[FetchBookmarkMetadata] Failed for bookmark ${bookmarkId}: ${metadata.error}`)
+      return { success: false, bookmarkId }
     }
 
     await this.pushBookmarkUpdate(userId, bookmarkId)

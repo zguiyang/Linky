@@ -161,23 +161,6 @@
           <span>元数据获取中...</span>
         </div>
       </template>
-
-      <template v-else-if="bookmark.status === 'error'">
-        <div class="flex items-center gap-2 text-sm mt-2">
-          <u-icon
-            name="i-heroicons-exclamation-circle"
-          />
-          <span>获取失败</span>
-          <u-button
-            size="xs"
-            variant="link"
-            color="error"
-            @click.stop="emit('refresh', bookmark)"
-          >
-            重试
-          </u-button>
-        </div>
-      </template>
     </div>
   </div>
 </template>

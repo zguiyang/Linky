@@ -17,7 +17,6 @@ type Pagination = (typeof PAGINATION)[keyof typeof PAGINATION]
 const BOOKMARK_STATUS = {
   FETCHING: 'fetching',
   ACTIVE: 'active',
-  ERROR: 'error',
   ARCHIVED: 'archived',
 } as const
 
