@@ -250,4 +250,36 @@ export class BookmarkService {
 
     await bookmark.delete()
   }
+
+  async getImportStatus(jobId: string) {
+    const { default: redis } = await import('@adonisjs/redis/services/main')
+
+    const resultKey = `import:result:${jobId}`
+    const resultJson = await redis.get(resultKey)
+
+    if (resultJson) {
+      const result = JSON.parse(resultJson)
+      return {
+        total: result.total,
+        imported: result.imported,
+        skipped: result.skipped,
+        errors: result.errors,
+        tagsCreated: result.tagsCreated,
+        errorsList: result.errorsList || [],
+      }
+    }
+
+    const statusKey = `import:status:${jobId}`
+    const statusJson = await redis.get(statusKey)
+
+    if (statusJson) {
+      const status = JSON.parse(statusJson)
+      return {
+        status: status.status,
+        current: status.current,
+      }
+    }
+
+    return null
+  }
 }

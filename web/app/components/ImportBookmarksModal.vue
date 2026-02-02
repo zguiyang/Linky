@@ -134,7 +134,7 @@
                 正在导入书签...
               </p>
               <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                进度: {{ progress }}%{{ currentTitle ? ` - ${currentTitle}` : '' }}
+                {{ current }}/{{ total }} {{ currentTitle ? `- ${currentTitle}` : '' }}
               </p>
             </div>
           </div>
@@ -227,8 +227,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import type { ImportResultData, AsyncImportResponseData, ImportProgressData } from '~/api/types'
+import { computed, onMounted, ref } from 'vue'
+import type { AsyncImportResponseData, ImportProgressData, ImportResultData } from '~/api/types'
 import { useAuthStore } from '~/stores/auth'
 
 const { $api } = useNuxtApp()
@@ -255,8 +255,15 @@ const isDragging = ref(false)
 const selectedFile = ref<File | null>(null)
 const isImporting = ref(false)
 const importResult = ref<ImportResultData | null>(null)
-const progress = ref(0)
+const current = ref(0)
+const total = ref(0)
 const currentTitle = ref('')
+
+const progress = computed(() => {
+  console.log('progress', current.value, total.value)
+  if (total.value === 0) return 0
+  return Math.round((current.value / total.value) * 100)
+})
 
 const createTags = ref(true)
 const skipDuplicates = ref(true)
@@ -298,31 +305,31 @@ const formatFileSize = (bytes: number): string => {
 }
 
 const handleImportProgress = (data: ImportProgressData) => {
+  console.log('handle import progress', data)
   if (step.value !== 'importing') {
     step.value = 'importing'
   }
 
-  progress.value = data.progress
+  current.value = data.current
+  total.value = data.total
   currentTitle.value = data.currentTitle || ''
 
-  if (data.progress === data.total && data.total > 0) {
+  if (data.current === data.total && data.total > 0) {
     setTimeout(async () => {
-      const statusResponse = await $api<ImportResultData>('/bookmarks/import/' + data.jobId + '/status', { method: 'get' })
-      importResult.value = statusResponse
+      importResult.value = await $api<ImportResultData>('/bookmarks/import/' + data.jobId + '/status', { method: 'get' })
       step.value = 'result'
       isImporting.value = false
-    }, 300)
+    }, 0)
   }
 }
 
 const startImport = async () => {
   if (!selectedFile.value) return
 
-  const { $api } = useNuxtApp()
-
   isImporting.value = true
   step.value = 'importing'
-  progress.value = 0
+  current.value = 0
+  total.value = 0
 
   const formData = new FormData()
   formData.append('file', selectedFile.value)
@@ -356,7 +363,8 @@ const handleClose = () => {
   step.value = 'upload'
   selectedFile.value = null
   importResult.value = null
-  progress.value = 0
+  current.value = 0
+  total.value = 0
   createTags.value = true
   skipDuplicates.value = true
   autoAiTag.value = true

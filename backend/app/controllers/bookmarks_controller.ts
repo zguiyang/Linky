@@ -120,7 +120,7 @@ export default class BookmarksController {
     return {
       jobId,
       status: 'waiting',
-      progress: 0,
+      current: 0,
     }
   }
 
@@ -128,34 +128,12 @@ export default class BookmarksController {
     await auth.getUserOrFail()
     const { jobId } = params
 
-    const { default: redis } = await import('@adonisjs/redis/services/main')
+    const result = await this.bookmarkService.getImportStatus(jobId)
 
-    const resultKey = `import:result:${jobId}`
-    const resultJson = await redis.get(resultKey)
-
-    if (resultJson) {
-      const result = JSON.parse(resultJson)
-      return {
-        total: result.total,
-        imported: result.imported,
-        skipped: result.skipped,
-        errors: result.errors,
-        tagsCreated: result.tagsCreated,
-        errorsList: result.errorsList || [],
-      }
+    if (!result) {
+      throw new Exception('导入任务不存在', { status: 404 })
     }
 
-    const statusKey = `import:status:${jobId}`
-    const statusJson = await redis.get(statusKey)
-
-    if (statusJson) {
-      const status = JSON.parse(statusJson)
-      return {
-        status: status.status,
-        progress: status.progress,
-      }
-    }
-
-    throw new Exception('导入任务不存在', { status: 404 })
+    return result
   }
 }

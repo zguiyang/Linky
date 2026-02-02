@@ -38,7 +38,7 @@ export interface ImportJobResult {
 
 interface ImportJobStatus {
   status: 'waiting' | 'processing' | 'completed' | 'failed'
-  progress: number
+  current: number
   error?: string
 }
 
@@ -74,14 +74,13 @@ export default class ImportBookmark extends Job {
         skipDuplicates,
         autoAiTag,
         onProgress: async (current, total, currentTitle) => {
-          const progressPercent = Math.round((current / total) * 100)
-          await this.updateStatus(jobId, 'processing', progressPercent)
+          await this.updateStatus(jobId, 'processing', current)
           await transmitService.toUser(
             `${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:${userId}`,
             BOOKMARK_EVENTS.IMPORT_PROGRESS,
             {
               jobId,
-              progress: progressPercent,
+              current,
               total,
               currentTitle,
             }
@@ -120,14 +119,14 @@ export default class ImportBookmark extends Job {
   private async updateStatus(
     jobId: string,
     status: ImportJobStatus['status'],
-    progress: number,
+    current: number,
     error?: string
   ) {
     const { default: redis } = await import('@adonisjs/redis/services/main')
 
     const jobStatus: ImportJobStatus = {
       status,
-      progress,
+      current,
       error,
     }
 

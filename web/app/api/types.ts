@@ -185,7 +185,7 @@ export interface ImportResultData {
 export interface AsyncImportResponseData {
   jobId: string
   status: 'waiting'
-  progress: number
+  current: number
 }
 
 export interface UserSettings {
@@ -232,7 +232,7 @@ export interface TagItemsParams {
 
 export interface ImportProgressData {
   jobId: string
-  progress: number
+  current: number
   total: number
   currentTitle: string
 }
