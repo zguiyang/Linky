@@ -1,82 +1,129 @@
 <template>
   <div
-    class="group relative border rounded-xl overflow-hidden cursor-pointer transition-all duration-200"
+    class="group relative border rounded-xl overflow-hidden transition-all duration-200"
     :class="cardClasses"
-    @click="handleClick"
   >
-    <div
-      class="flex flex-col"
-      :class="contentPaddingClass"
-    >
-      <div class="flex items-center justify-between gap-4 mb-1.5">
-        <h3
-          class="font-semibold truncate"
-          :class="titleClass"
-        >
-          {{ memo.title || '无标题备忘录' }}
-        </h3>
-      </div>
+    <template v-if="isEditing">
+      <div class="p-4">
+        <div class="memo-editor">
+          <u-editor
+            ref="editorRef"
+            v-model="localContent"
+            :content-type="'html'"
+            :placeholder="{ placeholder: '在这里输入你的灵感...' }"
+            class="min-h-[150px] max-h-[400px]"
+          />
+        </div>
 
-      <p
-        class="text-sm leading-relaxed mb-3"
-        :class="contentClass"
-      >
-        {{ memo.content }}
-      </p>
-
-      <div class="flex flex-col gap-2">
-        <span
-          class="text-xs"
-          :class="dateClass"
-        >
-          {{ formatDate(memo.updatedAt) }}
-        </span>
-        <div class="flex flex-wrap gap-1.5">
-          <u-badge
-            v-for="tag in memo.tags"
-            :key="tag.id"
+        <div class="flex justify-center gap-2 mt-4 pt-3 border-t border-[var(--border-subtle)]">
+          <u-button
+            color="neutral"
+            variant="ghost"
+            label="取消"
+            @click="handleCancel"
+          />
+          <u-button
             color="primary"
-            :variant="tag.isAiGenerated ? 'soft' : 'outline'"
-            size="md"
-            class="cursor-pointer hover:opacity-80 transition-opacity"
-            @click.stop="navigateToTag(tag.id)"
-          >
-            <span
-              v-if="tag.isAiGenerated"
-              class="flex items-center gap-1"
-            >
-              <u-icon
-                name="i-heroicons-sparkles"
-                class="size-3"
-              />
-            </span>
-            {{ tag.name }}
-          </u-badge>
-          <span
-            v-if="memo.tags.length === 0"
-            class="text-xs text-[var(--text-secondary)]"
-          >暂无标签</span>
+            label="保存"
+            :loading="isSaving"
+            @click="handleSave"
+          />
         </div>
       </div>
-    </div>
+    </template>
 
-    <div
-      class="absolute top-3 right-3 z-10"
-    >
-      <u-dropdown-menu
-        :items="getMemoMenuItems(memo)"
-        :content="{ align: 'end' }"
+    <template v-else>
+      <div
+        class="flex flex-col"
+        :class="contentPaddingClass"
       >
-        <u-button
-          icon="i-heroicons-ellipsis-horizontal"
-          color="neutral"
-          variant="ghost"
-          size="sm"
-          class="opacity-0 group-hover:opacity-100 transition-opacity"
-          @click.stop
-        />
-      </u-dropdown-menu>
-    </div>
+        <div class="flex items-center justify-between gap-4 mb-1.5">
+          <div class="flex items-center gap-2 min-w-0">
+            <u-icon
+              v-if="memo.isPinned"
+              name="i-heroicons-bookmark"
+              class="text-warning shrink-0"
+            />
+            <h3
+              class="font-semibold truncate"
+              :class="titleClass"
+            >
+              {{ memo.title || '无标题备忘录' }}
+            </h3>
+          </div>
+        </div>
+
+        <div
+          class="text-sm leading-relaxed mb-3 cursor-text"
+          :class="contentClass"
+          @click.stop="emit('startContentEdit', memo)"
+        >
+          <div
+            v-if="memo.content"
+            class="prose prose-sm max-w-none"
+            v-html="renderedContent"
+          />
+          <div
+            v-else
+            class="text-[var(--text-tertiary)]"
+          >
+            ✏️ 点击编辑内容...
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <span
+            class="text-xs"
+            :class="dateClass"
+          >
+            {{ formatDate(memo.updatedAt || memo.createdAt) }}
+          </span>
+          <div
+            v-if="memo.tags.length > 0"
+            class="flex flex-wrap gap-1.5"
+          >
+            <u-badge
+              v-for="tag in memo.tags"
+              :key="tag.id"
+              color="primary"
+              :variant="tag.isAiGenerated ? 'soft' : 'outline'"
+              size="md"
+              class="cursor-pointer hover:opacity-80 transition-opacity"
+              @click.stop="navigateToTag(tag.id)"
+            >
+              <span
+                v-if="tag.isAiGenerated"
+                class="flex items-center gap-1"
+              >
+                <u-icon
+                  name="i-heroicons-sparkles"
+                  class="size-3"
+                />
+              </span>
+              {{ tag.name }}
+            </u-badge>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="absolute top-3 right-3 z-10"
+      >
+        <u-dropdown-menu
+          :items="getMemoMenuItems(memo)"
+          :content="{ align: 'end' }"
+        >
+          <u-button
+            icon="i-heroicons-ellipsis-horizontal"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            class="opacity-0 group-hover:opacity-100 transition-opacity"
+            @click.stop
+          />
+        </u-dropdown-menu>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -85,15 +132,46 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 import type { Memo } from '~/api/types'
 import type { ViewMode } from '~/constants'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   memo: Memo
   viewMode?: ViewMode
-}>()
+  isEditing?: boolean
+}>(), {
+  viewMode: 'masonry',
+  isEditing: false
+})
 
 const emit = defineEmits<{
   edit: [memo: Memo]
   delete: [memo: Memo]
+  saveContent: [id: number, content: string]
+  saveNewContent: [content: string]
+  startContentEdit: [memo: Memo]
+  cancelContentEdit: []
 }>()
+
+const editorRef = ref()
+const localContent = ref('')
+const isSaving = ref(false)
+
+watch(() => props.memo.content, (newContent) => {
+  if (props.isEditing && newContent !== localContent.value) {
+    localContent.value = newContent || ''
+  }
+}, { immediate: true })
+
+watch(() => props.isEditing, (editing) => {
+  if (editing) {
+    localContent.value = props.memo.content || ''
+    nextTick(() => {
+      editorRef.value?.element?.focus()
+    })
+  }
+})
+
+const renderedContent = computed(() => {
+  return props.memo.content
+})
 
 const cardClasses = computed(() => {
   const isPinned = props.memo.isPinned
@@ -183,14 +261,14 @@ const formatDate = (date: string | null) => {
   return `${year}年${month}月${day}日`
 }
 
-const getMemoMenuItems = (memo: Memo): DropdownMenuItem[][] => {
+const getMemoMenuItems = (_memo: Memo): DropdownMenuItem[][] => {
   return [
     [
       {
-        label: '编辑',
+        label: '编辑信息',
         icon: 'i-heroicons-pencil',
         onSelect: () => {
-          emit('edit', memo)
+          emit('edit', props.memo)
         }
       },
       {
@@ -198,15 +276,31 @@ const getMemoMenuItems = (memo: Memo): DropdownMenuItem[][] => {
         icon: 'i-heroicons-trash',
         color: 'error',
         onSelect: () => {
-          emit('delete', memo)
+          emit('delete', props.memo)
         }
       }
     ]
   ]
 }
 
-const handleClick = () => {
-  emit('edit', props.memo)
+const handleCancel = () => {
+  localContent.value = props.memo.content || ''
+  emit('cancelContentEdit')
+}
+
+const handleSave = async () => {
+  if (isSaving.value) return
+
+  isSaving.value = true
+  try {
+    if (props.memo.id === 0 || props.memo.id === null) {
+      emit('saveNewContent', localContent.value)
+    } else {
+      emit('saveContent', props.memo.id, localContent.value)
+    }
+  } finally {
+    isSaving.value = false
+  }
 }
 
 const navigateToTag = (tagId: number) => {

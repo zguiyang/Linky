@@ -5,10 +5,10 @@ import Database from '@adonisjs/lucid/services/db'
 export class MemoService {
   async create(
     userId: number,
-    data: { title: string; content: string; isPinned?: boolean; tagIds?: number[] }
+    data: { title?: string; content: string; isPinned?: boolean; tagIds?: number[] }
   ) {
     const memo = await Memo.create({
-      title: data.title,
+      title: data.title || '',
       content: data.content,
       isPinned: data.isPinned || false,
       userId,

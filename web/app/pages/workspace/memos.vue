@@ -53,7 +53,7 @@
           color="primary"
           size="md"
           title="新建备忘录"
-          @click="openAddModal"
+          @click="handleCreate"
         />
       </div>
     </div>
@@ -106,49 +106,101 @@
 
       <div v-else>
         <div
+          v-if="pendingMemo"
+          class="mb-6"
+        >
+          <memo-card
+            :memo="pendingMemo"
+            :is-editing="true"
+            @save-new-content="handleSaveNew"
+            @cancel-content-edit="handleCancelNew"
+          />
+        </div>
+
+        <div
           v-if="viewMode === 'masonry'"
           class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
         >
-          <memo-card
+          <template
             v-for="memo in memos"
             :key="memo.id"
-            :memo="memo"
-            view-mode="masonry"
-            @edit="openEditor"
-            @delete="openDeleteConfirm"
-          />
+          >
+            <memo-card
+              v-if="editingMemoId !== memo.id"
+              :memo="memo"
+              view-mode="masonry"
+              @edit="openMetaModal"
+              @delete="openDeleteConfirm"
+              @start-content-edit="handleStartEditContent"
+            />
+            <memo-card
+              v-else
+              :memo="memo"
+              :is-editing="true"
+              view-mode="masonry"
+              @save-content="handleSaveContent"
+              @cancel-content-edit="handleCancelEdit"
+            />
+          </template>
         </div>
 
         <div
           v-else-if="viewMode === 'grid'"
           class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
         >
-          <memo-card
+          <template
             v-for="memo in memos"
             :key="memo.id"
-            :memo="memo"
-            view-mode="grid"
-            @edit="openEditor"
-            @delete="openDeleteConfirm"
-          />
+          >
+            <memo-card
+              v-if="editingMemoId !== memo.id"
+              :memo="memo"
+              view-mode="grid"
+              @edit="openMetaModal"
+              @delete="openDeleteConfirm"
+              @start-content-edit="handleStartEditContent"
+            />
+            <memo-card
+              v-else
+              :memo="memo"
+              :is-editing="true"
+              view-mode="grid"
+              @save-content="handleSaveContent"
+              @cancel-content-edit="handleCancelEdit"
+            />
+          </template>
         </div>
 
         <div
           v-else
           class="flex flex-col gap-2"
         >
-          <memo-card
+          <template
             v-for="memo in memos"
             :key="memo.id"
-            :memo="memo"
-            view-mode="list"
-            class="w-full"
-            @edit="openEditor"
-            @delete="openDeleteConfirm"
-          />
+          >
+            <memo-card
+              v-if="editingMemoId !== memo.id"
+              :memo="memo"
+              view-mode="list"
+              class="w-full"
+              @edit="openMetaModal"
+              @delete="openDeleteConfirm"
+              @start-content-edit="handleStartEditContent"
+            />
+            <memo-card
+              v-else
+              :memo="memo"
+              :is-editing="true"
+              view-mode="list"
+              class="w-full"
+              @save-content="handleSaveContent"
+              @cancel-content-edit="handleCancelEdit"
+            />
+          </template>
         </div>
 
-        <u-empty v-if="memos.length === 0">
+        <u-empty v-if="memos.length === 0 && !pendingMemo">
           <template #icon>
             <u-icon
               name="i-heroicons-document-text"
@@ -179,11 +231,10 @@
     </div>
 
     <memo-modal
-      v-model="showMemoModal"
+      v-model="showMetaModal"
       :memo="currentMemo"
-      :mode="modalMode"
-      @save="handleSave"
-      @close="closeModal"
+      @save="handleSaveMeta"
+      @close="closeMetaModal"
     />
 
     <u-modal
@@ -234,10 +285,29 @@
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
 import type { Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
-import MemoModal from '~/components/MemoModal.vue'
 import { VIEW_MODE, type ViewMode } from '~/constants'
 
 definePageMeta({ layout: 'workspace' })
+
+function extractTitle(content: string, maxLength: number = 100): string {
+  const plainText = content
+    .replace(/#{1,6}\s+/g, '')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/>\s+/g, '')
+    .replace(/[-*+]\s+/g, '')
+    .replace(/\n+/g, ' ')
+    .trim()
+
+  if (!plainText) return '无标题备忘录'
+
+  return plainText.length > maxLength
+    ? plainText.substring(0, maxLength) + '...'
+    : plainText
+}
 
 const { $api } = useNuxtApp()
 
@@ -262,43 +332,91 @@ const { items: memos, total, pending, page, perPage, setPage } = pagination
 
 await pagination.execute()
 
-const showMemoModal = ref(false)
-const modalMode = ref<'add' | 'edit'>('add')
+const showMetaModal = ref(false)
 const currentMemo = ref<Memo | null>(null)
 const showDeleteModal = ref(false)
 const memoToDelete = ref<Memo | null>(null)
 const isDeleting = ref(false)
 
+const pendingMemo = ref<Memo | null>(null)
+const editingMemoId = ref<number | null>(null)
+
 const setViewMode = (mode: ViewMode) => {
   viewMode.value = mode
 }
 
-const openAddModal = () => {
-  modalMode.value = 'add'
-  currentMemo.value = null
-  showMemoModal.value = true
-}
-
-const openEditor = (memo: Memo) => {
-  modalMode.value = 'edit'
-  currentMemo.value = memo
-  showMemoModal.value = true
-}
-
-const closeModal = () => {
-  showMemoModal.value = false
-  currentMemo.value = null
-}
-
-const handleSave = async (data: CreateMemoRequest | UpdateMemoRequest) => {
-  if (modalMode.value === 'add') {
-    await $api('/memos', { method: 'post', body: data })
-  } else if (currentMemo.value) {
-    await $api(`/memos/${currentMemo.value.id}`, { method: 'put', body: data })
+const handleCreate = () => {
+  pendingMemo.value = {
+    id: 0,
+    content: '',
+    title: '',
+    isPinned: false,
+    userId: 0,
+    tags: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: null
   }
+  editingMemoId.value = null
+}
+
+const handleStartEditContent = (memo: Memo) => {
+  editingMemoId.value = memo.id
+  pendingMemo.value = null
+}
+
+const handleSaveNew = (_content: string) => {
+  if (!pendingMemo.value) return
+
+  const content = _content
+  const title = extractTitle(content, 100)
+
+  $api('/memos', {
+    method: 'post',
+    body: { title, content } as CreateMemoRequest
+  }).then(() => {
+    pendingMemo.value = null
+    return pagination.execute()
+  })
+}
+
+const handleCancelNew = () => {
+  pendingMemo.value = null
+}
+
+const handleSaveContent = (id: number, content: string) => {
+  $api(`/memos/${id}`, {
+    method: 'put',
+    body: { content } as UpdateMemoRequest
+  }).then(() => {
+    editingMemoId.value = null
+    return pagination.execute()
+  })
+}
+
+const handleCancelEdit = () => {
+  editingMemoId.value = null
+}
+
+const openMetaModal = (memo: Memo) => {
+  currentMemo.value = memo
+  showMetaModal.value = true
+}
+
+const closeMetaModal = () => {
+  showMetaModal.value = false
+  currentMemo.value = null
+}
+
+const handleSaveMeta = async (data: UpdateMemoRequest) => {
+  if (!currentMemo.value) return
+
+  await $api(`/memos/${currentMemo.value.id}`, {
+    method: 'put',
+    body: data
+  })
 
   await pagination.execute()
-  showMemoModal.value = false
+  showMetaModal.value = false
   currentMemo.value = null
 }
 
