@@ -1,6 +1,10 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { createMemoValidator, updateMemoValidator } from '#validators/memo_validator'
+import {
+  createMemoValidator,
+  updateMemoValidator,
+  memoPaginationValidator,
+} from '#validators/memo_validator'
 import { MemoService } from '#services/memo_service'
 
 @inject()
@@ -14,9 +18,11 @@ export default class MemosController {
 
   async paginate({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
-    const page = request.input('page', 1)
-    const perPage = request.input('perPage', 20)
-    return await this.memoService.paginate(user.id, page, perPage)
+    const data = await request.validateUsing(memoPaginationValidator)
+    return await this.memoService.paginate(user.id, data.page, data.perPage, {
+      search: data.search,
+      tagIds: data.tagIds,
+    })
   }
 
   async show({ auth, params }: HttpContext) {

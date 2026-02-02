@@ -110,7 +110,7 @@
           class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
         >
           <memo-card
-            v-for="memo in filteredMemos"
+            v-for="memo in memos"
             :key="memo.id"
             :memo="memo"
             view-mode="masonry"
@@ -124,7 +124,7 @@
           class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
         >
           <memo-card
-            v-for="memo in filteredMemos"
+            v-for="memo in memos"
             :key="memo.id"
             :memo="memo"
             view-mode="grid"
@@ -138,7 +138,7 @@
           class="flex flex-col gap-2"
         >
           <memo-card
-            v-for="memo in filteredMemos"
+            v-for="memo in memos"
             :key="memo.id"
             :memo="memo"
             view-mode="list"
@@ -148,7 +148,7 @@
           />
         </div>
 
-        <u-empty v-if="filteredMemos.length === 0">
+        <u-empty v-if="memos.length === 0">
           <template #icon>
             <u-icon
               name="i-heroicons-document-text"
@@ -233,19 +233,29 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
-import type { Memo, CreateMemoRequest, UpdateMemoRequest, Tag } from '~/api/types'
+import type { Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
 import MemoModal from '~/components/MemoModal.vue'
 import { VIEW_MODE, type ViewMode } from '~/constants'
 
 definePageMeta({ layout: 'workspace' })
 
+const { $api } = useNuxtApp()
+
 const tagsStore = useTagsStore()
 
 const searchQuery = ref('')
+const searchQueryParam = computed(() => searchQuery.value || undefined)
+
 const viewMode = ref<ViewMode>(VIEW_MODE.MASONRY)
 
 const pagination = usePagination<Memo>(
-  '/memos/paginate'
+  '/memos/paginate',
+  {
+    query: computed(() => ({
+      search: searchQueryParam.value,
+      tagIds: tagsStore.selectedTags.length > 0 ? tagsStore.selectedTags : undefined
+    }))
+  }
 )
 
 const { items: memos, total, pending, page, perPage, setPage } = pagination
@@ -258,26 +268,6 @@ const currentMemo = ref<Memo | null>(null)
 const showDeleteModal = ref(false)
 const memoToDelete = ref<Memo | null>(null)
 const isDeleting = ref(false)
-
-const filteredMemos = computed(() => {
-  let result = memos.value
-
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter(
-      (m: Memo) =>
-        m.title.toLowerCase().includes(query)
-        || m.content.toLowerCase().includes(query)
-        || m.tags.some((tag: Tag) => tag.name.toLowerCase().includes(query))
-    )
-  }
-
-  if (tagsStore.selectedTags.length > 0) {
-    result = result.filter((m: Memo) => m.tags.some((t: Tag) => tagsStore.selectedTags.includes(t.id)))
-  }
-
-  return result
-})
 
 const setViewMode = (mode: ViewMode) => {
   viewMode.value = mode
@@ -301,8 +291,6 @@ const closeModal = () => {
 }
 
 const handleSave = async (data: CreateMemoRequest | UpdateMemoRequest) => {
-  const { $api } = useNuxtApp()
-
   if (modalMode.value === 'add') {
     await $api('/memos', { method: 'post', body: data })
   } else if (currentMemo.value) {
@@ -327,7 +315,6 @@ const closeDeleteModal = () => {
 const confirmDelete = async (close?: () => void) => {
   if (!memoToDelete.value) return
 
-  const { $api } = useNuxtApp()
   isDeleting.value = true
   await $api(`/memos/${memoToDelete.value.id}`, { method: 'delete' })
 

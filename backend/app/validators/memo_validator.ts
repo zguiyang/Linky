@@ -19,5 +19,15 @@ const updateMemoSchema = vine.object({
 
 export const updateMemoValidator = vine.compile(updateMemoSchema)
 
+export const memoPaginationValidator = vine.compile(
+  vine.object({
+    page: vine.number().optional(),
+    perPage: vine.number().optional(),
+    search: vine.string().optional(),
+    tagIds: vine.array(vine.number()).optional(),
+  })
+)
+
 export type CreateMemoValidator = typeof createMemoValidator
 export type UpdateMemoValidator = typeof updateMemoValidator
+export type MemoPaginationValidator = typeof memoPaginationValidator

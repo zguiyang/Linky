@@ -1,4 +1,5 @@
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
+import { watchDebounced } from '@vueuse/core'
 import { PAGINATION } from '~/constants'
 import type { PaginatedResponse } from '~/api/types'
 
@@ -13,14 +14,15 @@ interface UsePaginationReturn<T> {
   error: Ref<Error | null>
   errorMessage: ComputedRef<string>
   execute: () => Promise<void>
-  setPage: (page: number) => void
-  setPerPage: (perPage: number) => void
+  setPage: (page: number) => Promise<void>
+  setPerPage: (perPage: number) => Promise<void>
   reset: () => void
 }
 
 interface UsePaginationOptions {
   perPage?: number
   query?: ComputedRef<Record<string, unknown>>
+  debounce?: number
 }
 
 export function usePagination<T>(
@@ -73,20 +75,30 @@ export function usePagination<T>(
     }
   }
 
-  const setPage = (newPage: number) => {
+  const setPage = async (newPage: number) => {
     page.value = newPage
-    execute()
+    await execute()
   }
 
-  const setPerPage = (newPerPage: number) => {
+  const setPerPage = async (newPerPage: number) => {
     perPage.value = newPerPage
     page.value = PAGINATION.DEFAULT_PAGE
+    await execute()
   }
 
   const reset = () => {
     page.value = PAGINATION.DEFAULT_PAGE
     error.value = null
   }
+
+  watchDebounced(
+    () => options?.query?.value,
+    () => {
+      page.value = PAGINATION.DEFAULT_PAGE
+      execute()
+    },
+    { debounce: options?.debounce ?? 300, deep: true }
+  )
 
   return {
     page,

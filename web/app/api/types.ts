@@ -102,6 +102,13 @@ export interface BookmarkPaginationParams {
   sortOrder?: 'asc' | 'desc'
 }
 
+export interface MemoPaginationParams {
+  page?: number
+  perPage?: number
+  search?: string
+  tagIds?: number[]
+}
+
 export interface CreateBookmarkRequest {
   url: string
   title?: string | null

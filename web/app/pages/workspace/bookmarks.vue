@@ -346,6 +346,8 @@ import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({ layout: 'workspace' })
 
+const { $api } = useNuxtApp()
+
 const tagsStore = useTagsStore()
 const authStore = useAuthStore()
 const { onBookmarkUpdated } = usePush()
@@ -447,8 +449,6 @@ const handleSaveBookmark = async (close?: () => void) => {
   if (!bookmarkForm.value.url) {
     return
   }
-
-  const { $api } = useNuxtApp()
 
   if (isEditing.value && editingBookmarkId.value) {
     await $api(`/bookmarks/${editingBookmarkId.value}`, {
