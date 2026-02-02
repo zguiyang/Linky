@@ -5,7 +5,7 @@
   >
     <template #body>
       <u-form
-        :state="{ autoFetch, createTags, skipDuplicates, autoAiTag }"
+        :state="{ createTags, skipDuplicates, autoAiTag }"
         @submit="startImport"
       >
         <div
@@ -88,29 +88,33 @@
             </p>
             <u-form-field>
               <u-checkbox
-                v-model="autoFetch"
-                label="自动获取元数据（标题、描述、图片）"
-              />
-            </u-form-field>
-            <u-form-field>
-              <u-checkbox
-                v-model="createTags"
-                label="将文件夹名称转换为标签"
-              />
-            </u-form-field>
-            <u-form-field>
-              <u-checkbox
                 v-model="skipDuplicates"
                 label="跳过已存在的书签"
               />
             </u-form-field>
-            <u-form-field>
-              <u-checkbox
-                v-model="autoAiTag"
-                label="✨ 自动使用 AI 生成标签"
-              />
-            </u-form-field>
           </div>
+
+          <u-accordion
+            :items="[{ label: '高级选项', icon: 'i-heroicons-cog-6-tooth', value: 'advanced' }]"
+            type="single"
+          >
+            <template #body>
+              <div class="space-y-3 pt-2">
+                <u-form-field>
+                  <u-checkbox
+                    v-model="createTags"
+                    label="将文件夹名称转换为标签"
+                  />
+                </u-form-field>
+                <u-form-field>
+                  <u-checkbox
+                    v-model="autoAiTag"
+                    label="自动使用 AI 生成标签"
+                  />
+                </u-form-field>
+              </div>
+            </template>
+          </u-accordion>
         </div>
 
         <div
@@ -275,7 +279,6 @@ const { onImportProgress } = usePush()
 
 const createTags = ref(true)
 const skipDuplicates = ref(true)
-const autoFetch = ref(true)
 const autoAiTag = ref(true)
 
 const handleDrop = (event: DragEvent) => {
@@ -358,9 +361,6 @@ const startImport = async () => {
   if (skipDuplicates.value !== undefined) {
     formData.append('skipDuplicates', String(skipDuplicates.value))
   }
-  if (autoFetch.value !== undefined) {
-    formData.append('autoFetch', String(autoFetch.value))
-  }
   if (autoAiTag.value !== undefined) {
     formData.append('autoAiTag', String(autoAiTag.value))
   }
@@ -391,14 +391,9 @@ const startImport = async () => {
   isImporting.value = false
 }
 
-const handleComplete = () => {
+const handleClose = () => {
   emit('imported')
   open.value = false
-  resetState()
-}
-
-const resetState = () => {
-  stopPolling()
   step.value = 'upload'
   selectedFile.value = null
   importResult.value = null
@@ -406,7 +401,6 @@ const resetState = () => {
   isAsyncMode.value = false
   createTags.value = true
   skipDuplicates.value = true
-  autoFetch.value = true
   autoAiTag.value = true
 }
 

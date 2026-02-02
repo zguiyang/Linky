@@ -208,18 +208,14 @@
           class="space-y-4"
           @submit="handleSaveBookmark(() => showBookmarkModal = false)"
         >
-          <u-form-field
-            label="自动获取元数据"
-            direction="row"
-          >
-            <u-switch v-model="autoFetch" />
-          </u-form-field>
-          <u-form-field
-            label="✨ 自动使用 AI 生成标签"
-            direction="row"
-          >
-            <u-switch v-model="autoAiTag" />
-          </u-form-field>
+          <template v-if="!isEditing">
+            <u-form-field
+              label="自动使用 AI 生成标签"
+              direction="row"
+            >
+              <u-switch v-model="autoAiTag" />
+            </u-form-field>
+          </template>
 
           <u-form-field
             label="URL"
@@ -235,45 +231,43 @@
             />
           </u-form-field>
 
-          <template v-if="!autoFetch">
-            <u-form-field
-              label="标题"
-              name="title"
-            >
-              <u-input
-                v-model="bookmarkForm.title"
-                placeholder="留空将自动从网页获取"
-                class="w-full"
-              />
-            </u-form-field>
+          <u-form-field
+            label="标题"
+            name="title"
+          >
+            <u-input
+              v-model="bookmarkForm.title"
+              placeholder="留空将自动从网页获取"
+              class="w-full"
+            />
+          </u-form-field>
 
-            <u-form-field
-              label="描述"
-              name="description"
-            >
-              <u-textarea
-                v-model="bookmarkForm.description"
-                placeholder="留空将自动从网页获取"
-                :rows="3"
-                class="w-full"
-              />
-            </u-form-field>
+          <u-form-field
+            label="描述"
+            name="description"
+          >
+            <u-textarea
+              v-model="bookmarkForm.description"
+              placeholder="留空将自动从网页获取"
+              :rows="3"
+              class="w-full"
+            />
+          </u-form-field>
 
-            <u-form-field
-              label="标签"
-              name="tagIds"
-            >
-              <u-select-menu
-                v-model="bookmarkForm.tagIds"
-                :items="tagSelectItems"
-                multiple
-                value-key="value"
-                label-key="label"
-                placeholder="选择标签"
-                class="w-full"
-              />
-            </u-form-field>
-          </template>
+          <u-form-field
+            label="标签"
+            name="tagIds"
+          >
+            <u-select-menu
+              v-model="bookmarkForm.tagIds"
+              :items="tagSelectItems"
+              multiple
+              value-key="value"
+              label-key="label"
+              placeholder="选择标签"
+              class="w-full"
+            />
+          </u-form-field>
         </u-form>
       </template>
       <template #footer="{ close }">
@@ -406,7 +400,6 @@ const bookmarkForm = ref({
   tagIds: [] as number[]
 })
 
-const autoFetch = ref(true)
 const autoAiTag = ref(true)
 
 const tagSelectItems = computed(() => tagsStore.tagSelectItems)
@@ -422,7 +415,6 @@ const openBookmark = (bookmark: Bookmark) => {
 const openAddModal = () => {
   isEditing.value = false
   editingBookmarkId.value = null
-  autoFetch.value = true
   autoAiTag.value = true
   bookmarkForm.value = {
     title: '',
@@ -436,7 +428,6 @@ const openAddModal = () => {
 const openEditModal = (bookmark: Bookmark) => {
   isEditing.value = true
   editingBookmarkId.value = bookmark.id
-  autoFetch.value = false
   autoAiTag.value = false
   bookmarkForm.value = {
     title: bookmark.title,
@@ -464,22 +455,16 @@ const handleSaveBookmark = async (close?: () => void) => {
       method: 'put',
       body: bookmarkForm.value
     })
-  } else if (autoFetch.value) {
-    await $api('/bookmarks', {
-      method: 'post',
-      body: { url: bookmarkForm.value.url, autoFetch: true, autoAiTag: autoAiTag.value }
-    })
   } else {
     await $api('/bookmarks', {
       method: 'post',
-      body: { ...bookmarkForm.value, autoAiTag: autoAiTag.value }
+      body: { url: bookmarkForm.value.url, autoAiTag: autoAiTag.value }
     })
   }
 
   await pagination.execute()
   close?.()
   showBookmarkModal.value = false
-  autoFetch.value = true
   autoAiTag.value = true
   bookmarkForm.value = {
     title: '',

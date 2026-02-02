@@ -192,13 +192,11 @@ export class BookmarkParserService {
     {
       createTags = true,
       skipDuplicates = true,
-      autoFetch = true,
       autoAiTag = true,
       onProgress,
     }: {
       createTags?: boolean
       skipDuplicates?: boolean
-      autoFetch?: boolean
       autoAiTag?: boolean
       onProgress?: (current: number, total: number, currentTitle?: string) => void
     } = {}
@@ -290,9 +288,7 @@ export class BookmarkParserService {
           visitCount: 0,
         })
 
-        if (autoFetch) {
-          await this.scheduleMetadataFetch(newBookmark.id, bookmark.url, true, autoAiTag)
-        }
+        await this.scheduleMetadataFetch(newBookmark.id, bookmark.url, true, autoAiTag)
 
         if (tagIds.length > 0) {
           const bookmarkWithTags = await Bookmark.query()

@@ -54,7 +54,6 @@ export default class BookmarksController {
       title: data.title ?? null,
       description: data.description ?? null,
       tagIds: data.tagIds ?? undefined,
-      autoFetch: data.autoFetch,
       autoAiTag: data.autoAiTag,
     })
   }
@@ -65,7 +64,6 @@ export default class BookmarksController {
     return await this.bookmarkService.createByUrl(user.id, {
       url: data.url,
       tagIds: data.tagIds ?? undefined,
-      autoFetch: data.autoFetch,
       autoAiTag: data.autoAiTag,
     })
   }

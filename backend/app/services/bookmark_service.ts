@@ -13,7 +13,6 @@ export class BookmarkService {
       title?: string | null
       description?: string | null
       tagIds?: number[]
-      autoFetch?: boolean
       autoAiTag?: boolean
     }
   ) {
@@ -31,16 +30,14 @@ export class BookmarkService {
       url: data.url,
       description: data.description ?? null,
       userId,
-      status: data.autoFetch !== false ? BOOKMARK_STATUS.FETCHING : BOOKMARK_STATUS.ACTIVE,
+      status: BOOKMARK_STATUS.FETCHING,
     })
 
     if (data.tagIds && data.tagIds.length > 0) {
       await bookmark.related('tags').sync(data.tagIds)
     }
 
-    if (data.autoFetch !== false) {
-      await this.scheduleMetadataFetch(bookmark.id, data.url, data.autoAiTag)
-    }
+    await this.scheduleMetadataFetch(bookmark.id, data.url, data.autoAiTag)
 
     return bookmark
   }
@@ -50,7 +47,6 @@ export class BookmarkService {
     data: {
       url: string
       tagIds?: number[]
-      autoFetch?: boolean
       autoAiTag?: boolean
     }
   ) {
@@ -59,7 +55,6 @@ export class BookmarkService {
       title: null,
       description: null,
       tagIds: data.tagIds,
-      autoFetch: data.autoFetch,
       autoAiTag: data.autoAiTag,
     })
   }

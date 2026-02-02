@@ -12,7 +12,6 @@ export const createBookmarkValidator = vine.compile(
       .optional(),
     description: vine.string().trim().maxLength(VALIDATION.DESCRIPTION_MAX).optional(),
     tagIds: vine.array(vine.number()).nullable().optional(),
-    autoFetch: vine.boolean().optional(),
     autoAiTag: vine.boolean().optional(),
   })
 )
@@ -21,7 +20,6 @@ export const createBookmarkByUrlValidator = vine.compile(
   vine.object({
     url: vine.string().trim().url(),
     tagIds: vine.array(vine.number()).nullable().optional(),
-    autoFetch: vine.boolean().optional(),
     autoAiTag: vine.boolean().optional(),
   })
 )
@@ -59,7 +57,6 @@ export const importBookmarkValidator = vine.compile(
     }),
     createTags: vine.boolean().optional(),
     skipDuplicates: vine.boolean().optional(),
-    autoFetch: vine.boolean().optional(),
     autoAiTag: vine.boolean().optional(),
   })
 )
