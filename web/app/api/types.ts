@@ -169,20 +169,6 @@ export interface PaginatedResponse<T> {
   data: T[]
 }
 
-export interface ImportStatusResponse {
-  jobId: string
-  status: 'waiting' | 'active' | 'completed' | 'failed'
-  progress: number
-  total?: number
-  imported?: number
-  skipped?: number
-  errors?: number
-  tagsCreated?: number
-  errorsList?: string[]
-  completedAt?: string
-  error?: string
-}
-
 export interface ImportResultData {
   total: number
   imported: number

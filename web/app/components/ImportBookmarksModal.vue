@@ -255,8 +255,6 @@ const progress = ref(0)
 const isAsyncMode = ref(false)
 const currentTitle = ref('')
 
-let pollInterval: ReturnType<typeof setInterval> | null = null
-
 const { onImportProgress } = usePush()
 
 const createTags = ref(true)
@@ -298,34 +296,6 @@ const formatFileSize = (bytes: number): string => {
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
-const stopPolling = () => {
-  if (pollInterval) {
-    clearInterval(pollInterval)
-    pollInterval = null
-  }
-}
-
-const pollImportStatus = async (jobId: string) => {
-  const { $api } = useNuxtApp()
-
-  pollInterval = setInterval(async () => {
-    const response = await $api<AsyncImportResponseData>(`/bookmarks/import/${jobId}/status`, { method: 'get' })
-
-    if (response) {
-      progress.value = response.progress
-
-      if (response.status === 'completed' && (response as any).data) {
-        stopPolling()
-        importResult.value = (response as any).data
-        step.value = 'result'
-        isImporting.value = false
-      } else if (response.status === 'waiting') {
-        progress.value = 0
-      }
-    }
-  }, 1000)
-}
-
 const startImport = async () => {
   if (!selectedFile.value) return
 
@@ -363,8 +333,25 @@ const startImport = async () => {
       onImportProgress((data: any) => {
         progress.value = data.progress
         currentTitle.value = data.currentTitle || ''
+
+        if (data.progress === data.total) {
+          setTimeout(async () => {
+            const { $api } = useNuxtApp()
+            const statusResponse = await $api<any>('/bookmarks/import/' + resultData.jobId + '/status', { method: 'get' })
+            importResult.value = {
+              total: statusResponse.total || 0,
+              imported: statusResponse.imported || 0,
+              skipped: statusResponse.skipped || 0,
+              errors: statusResponse.errors || 0,
+              tagsCreated: statusResponse.tagsCreated || 0,
+              errorsList: statusResponse.errorsList || []
+            }
+            step.value = 'result'
+            isImporting.value = false
+            isAsyncMode.value = false
+          }, 300)
+        }
       })
-      pollImportStatus(resultData.jobId)
     }
   } else {
     step.value = 'upload'
@@ -387,6 +374,5 @@ const handleClose = () => {
 }
 
 onUnmounted(() => {
-  stopPolling()
 })
 </script>
