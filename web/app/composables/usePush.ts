@@ -2,6 +2,7 @@ import { watch } from 'vue'
 import { BOOKMARK_EVENTS, TRANSMIT_CHANNEL_NAMES } from '~/constants'
 import { useAuthStore } from '~/stores/auth'
 import { useTransmit, type TransmitEvent } from './useTransmit'
+import type { ImportProgressData } from '~/api/types'
 
 export function usePush() {
   const { events, subscribe } = useTransmit()
@@ -26,7 +27,7 @@ export function usePush() {
     )
   }
 
-  const onImportProgress = (callback: (data: TransmitEvent['data']) => void) => {
+  const onImportProgress = (callback: (data: ImportProgressData) => void) => {
     subscribe(`${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:${authStore.user?.id}`)
 
     watch(
@@ -34,7 +35,7 @@ export function usePush() {
       (newEvents) => {
         const latest = newEvents[newEvents.length - 1]
         if (latest?.event === BOOKMARK_EVENTS.IMPORT_PROGRESS) {
-          callback(latest.data)
+          callback(latest.data as unknown as ImportProgressData)
         }
       },
       { deep: true }

@@ -12,16 +12,12 @@ import {
   importBookmarkValidator,
 } from '#validators/bookmark_validator'
 import { BookmarkService } from '#services/bookmark_service'
-import { BookmarkParserService } from '#services/bookmark_parser_service'
 import ImportBookmark from '#jobs/import_bookmark'
 import { IMPORT } from '#constants/index'
 
 @inject()
 export default class BookmarksController {
-  constructor(
-    private bookmarkService: BookmarkService,
-    private bookmarkParserService: BookmarkParserService
-  ) {}
+  constructor(private bookmarkService: BookmarkService) {}
 
   async index({ auth }: HttpContext) {
     const user = auth.getUserOrFail()
@@ -105,35 +101,6 @@ export default class BookmarksController {
       throw new Exception('文件上传失败', { status: 400 })
     }
 
-    const fileSize = file.size || 0
-
-    if (fileSize <= IMPORT.ASYNC_SIZE_THRESHOLD) {
-      const htmlContent = await readFile(file.tmpPath, { encoding: 'utf-8' })
-      const parseResult = await this.bookmarkParserService.parseHtml(htmlContent)
-
-      const importResult = await this.bookmarkParserService.processImport(
-        user.id,
-        parseResult.bookmarks,
-        {
-          createTags: createTags ?? true,
-          skipDuplicates: skipDuplicates ?? true,
-          autoAiTag: autoAiTag ?? true,
-        }
-      )
-
-      return {
-        mode: 'sync',
-        data: {
-          total: importResult.total,
-          imported: importResult.imported,
-          skipped: importResult.skipped,
-          errors: importResult.errors,
-          tagsCreated: importResult.tagsCreated,
-          errorsList: importResult.errorsList.slice(0, 50),
-        },
-      }
-    }
-
     const jobId = randomUUID()
     const tempPath = `${IMPORT.TEMP_DIR}/${jobId}.html`
 
@@ -151,12 +118,44 @@ export default class BookmarksController {
     })
 
     return {
-      mode: 'async',
-      data: {
-        jobId,
-        status: 'waiting',
-        progress: 0,
-      },
+      jobId,
+      status: 'waiting',
+      progress: 0,
     }
+  }
+
+  async importStatus({ auth, params }: HttpContext) {
+    await auth.getUserOrFail()
+    const { jobId } = params
+
+    const { default: redis } = await import('@adonisjs/redis/services/main')
+
+    const resultKey = `import:result:${jobId}`
+    const resultJson = await redis.get(resultKey)
+
+    if (resultJson) {
+      const result = JSON.parse(resultJson)
+      return {
+        total: result.total,
+        imported: result.imported,
+        skipped: result.skipped,
+        errors: result.errors,
+        tagsCreated: result.tagsCreated,
+        errorsList: result.errorsList || [],
+      }
+    }
+
+    const statusKey = `import:status:${jobId}`
+    const statusJson = await redis.get(statusKey)
+
+    if (statusJson) {
+      const status = JSON.parse(statusJson)
+      return {
+        status: status.status,
+        progress: status.progress,
+      }
+    }
+
+    throw new Exception('导入任务不存在', { status: 404 })
   }
 }

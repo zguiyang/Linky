@@ -74,14 +74,14 @@ export default class ImportBookmark extends Job {
         skipDuplicates,
         autoAiTag,
         onProgress: async (current, total, currentTitle) => {
-          const progress = Math.round((current / total) * 100)
-          await this.updateStatus(jobId, 'processing', progress)
+          const progressPercent = Math.round((current / total) * 100)
+          await this.updateStatus(jobId, 'processing', progressPercent)
           await transmitService.toUser(
             `${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:${userId}`,
             BOOKMARK_EVENTS.IMPORT_PROGRESS,
             {
               jobId,
-              progress: current,
+              progress: progressPercent,
               total,
               currentTitle,
             }

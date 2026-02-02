@@ -184,7 +184,7 @@ export interface ImportResultData {
 
 export interface AsyncImportResponseData {
   jobId: string
-  status: 'waiting' | 'active' | 'completed'
+  status: 'waiting'
   progress: number
 }
 
@@ -228,4 +228,11 @@ export interface TagItemsParams {
   page?: number
   perPage?: number
   sortOrder?: 'asc' | 'desc'
+}
+
+export interface ImportProgressData {
+  jobId: string
+  progress: number
+  total: number
+  currentTitle: string
 }

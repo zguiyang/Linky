@@ -131,10 +131,10 @@
             </div>
             <div>
               <p class="text-lg font-medium text-neutral-900 dark:text-neutral-50">
-                {{ isAsyncMode ? '正在后台导入书签...' : '正在导入书签...' }}
+                正在导入书签...
               </p>
               <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                {{ isAsyncMode ? `进度: ${progress}%` + (currentTitle ? ` - ${currentTitle}` : '') : '解析文件并创建书签，请稍候' }}
+                进度: {{ progress }}%{{ currentTitle ? ` - ${currentTitle}` : '' }}
               </p>
             </div>
           </div>
@@ -227,10 +227,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue'
-import type { ImportResultData, AsyncImportResponseData } from '~/api/types'
+import { ref, computed, onMounted } from 'vue'
+import type { ImportResultData, AsyncImportResponseData, ImportProgressData } from '~/api/types'
+import { useAuthStore } from '~/stores/auth'
 
+const { $api } = useNuxtApp()
 const { onImportProgress } = usePush()
+const authStore = useAuthStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -253,7 +256,6 @@ const selectedFile = ref<File | null>(null)
 const isImporting = ref(false)
 const importResult = ref<ImportResultData | null>(null)
 const progress = ref(0)
-const isAsyncMode = ref(false)
 const currentTitle = ref('')
 
 const createTags = ref(true)
@@ -295,6 +297,24 @@ const formatFileSize = (bytes: number): string => {
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
+const handleImportProgress = (data: ImportProgressData) => {
+  if (step.value !== 'importing') {
+    step.value = 'importing'
+  }
+
+  progress.value = data.progress
+  currentTitle.value = data.currentTitle || ''
+
+  if (data.progress === data.total && data.total > 0) {
+    setTimeout(async () => {
+      const statusResponse = await $api<ImportResultData>('/bookmarks/import/' + data.jobId + '/status', { method: 'get' })
+      importResult.value = statusResponse
+      step.value = 'result'
+      isImporting.value = false
+    }, 300)
+  }
+}
+
 const startImport = async () => {
   if (!selectedFile.value) return
 
@@ -316,42 +336,13 @@ const startImport = async () => {
     formData.append('autoAiTag', String(autoAiTag.value))
   }
 
-  const data = await $api<ImportResultData | AsyncImportResponseData>('/bookmarks/import', {
+  const data = await $api<AsyncImportResponseData>('/bookmarks/import', {
     method: 'post',
     body: formData
   })
 
-  if (data) {
-    const resultData = data as any
-
-    if (resultData && 'total' in resultData) {
-      importResult.value = resultData
-      step.value = 'result'
-    } else if (resultData && 'jobId' in resultData) {
-      isAsyncMode.value = true
-      onImportProgress((data: any) => {
-        progress.value = data.progress
-        currentTitle.value = data.currentTitle || ''
-
-        if (data.progress === data.total) {
-          setTimeout(async () => {
-            const { $api } = useNuxtApp()
-            const statusResponse = await $api<any>('/bookmarks/import/' + resultData.jobId + '/status', { method: 'get' })
-            importResult.value = {
-              total: statusResponse.total || 0,
-              imported: statusResponse.imported || 0,
-              skipped: statusResponse.skipped || 0,
-              errors: statusResponse.errors || 0,
-              tagsCreated: statusResponse.tagsCreated || 0,
-              errorsList: statusResponse.errorsList || []
-            }
-            step.value = 'result'
-            isImporting.value = false
-            isAsyncMode.value = false
-          }, 300)
-        }
-      })
-    }
+  if (data && 'jobId' in data) {
+    // Job 已创建，等待 SSE 进度更新
   } else {
     step.value = 'upload'
   }
@@ -366,11 +357,20 @@ const handleClose = () => {
   selectedFile.value = null
   importResult.value = null
   progress.value = 0
-  isAsyncMode.value = false
   createTags.value = true
   skipDuplicates.value = true
   autoAiTag.value = true
 }
+
+onMounted(() => {
+  if (authStore.user?.id) {
+    console.log('subscribe import progress')
+    onImportProgress((data: ImportProgressData) => {
+      console.log('handle import progress', data)
+      handleImportProgress(data)
+    })
+  }
+})
 
 onUnmounted(() => {
 })
