@@ -162,7 +162,7 @@
         </div>
       </template>
 
-      <template v-else-if="bookmark.metadata?.success === false">
+      <template v-else-if="bookmark.status === 'error'">
         <div class="flex items-center gap-2 text-sm mt-2">
           <u-icon
             name="i-heroicons-exclamation-circle"

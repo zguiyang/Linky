@@ -89,7 +89,7 @@ export class BookmarkMetadataService {
     } = {
       metadata,
       description: bookmark.description,
-      status: BOOKMARK_STATUS.ACTIVE,
+      status: metadata.success ? BOOKMARK_STATUS.ACTIVE : BOOKMARK_STATUS.ERROR,
     }
 
     if (forceUpdate) {

@@ -60,7 +60,7 @@ export interface UpdateTagRequest {
   color?: string
 }
 
-export type BookmarkStatus = 'fetching' | 'active' | 'archived'
+export type BookmarkStatus = 'fetching' | 'active' | 'error' | 'archived'
 
 export interface BookmarkMetadata {
   ogTitle?: string | null

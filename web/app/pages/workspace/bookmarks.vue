@@ -500,9 +500,13 @@ const handleImportComplete = async () => {
 }
 
 const handleRefresh = async (bookmark: Bookmark) => {
+  const index = bookmarks.value.findIndex(b => b.id === bookmark.id)
+  if (index !== -1 && bookmarks.value[index]) {
+    bookmarks.value[index].status = 'fetching'
+  }
+
   const { $api } = useNuxtApp()
   await $api(`/bookmarks/${bookmark.id}/refresh-metadata`, { method: 'post' })
-  await pagination.execute()
 }
 
 const handleUpdatedBookmark = (bookmark: Bookmark) => {

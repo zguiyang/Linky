@@ -201,8 +201,13 @@ export class BookmarkService {
       title?: string
       url?: string
       description: string | null
+      status?: string
     } = {
       description: bookmark.description,
+    }
+
+    if (data.title !== undefined || data.description !== undefined) {
+      updateData.status = BOOKMARK_STATUS.ACTIVE
     }
 
     if (data.title !== undefined) {
