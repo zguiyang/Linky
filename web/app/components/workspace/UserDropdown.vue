@@ -42,7 +42,7 @@ const menuItems = computed<DropdownMenuItem[][]>(() => [
     {
       label: '个人信息',
       icon: 'i-heroicons-user',
-      onSelect: () => navigateTo('/workspace/profile')
+      onSelect: () => navigateTo('/workspace/settings?tab=profile')
     },
     {
       label: isDark.value ? 'Dark Mode' : 'Light Mode',
