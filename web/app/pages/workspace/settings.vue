@@ -107,10 +107,11 @@
                 <u-form-field
                   label="API Key"
                   description="您的 AI 服务授权密钥"
-                  class="max-w-2xl"
+                  class="max-w-full"
                 >
                   <u-input
                     v-model="form.aiApiKey"
+                    class="w-full"
                     type="password"
                     placeholder="sk-..."
                     size="lg"
