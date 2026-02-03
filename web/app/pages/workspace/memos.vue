@@ -205,14 +205,14 @@
       />
     </div>
 
-    <memo-modal
+    <memo-meta-modal
       v-model="showMetaModal"
       :memo="currentMemo"
       @save="handleSaveMeta"
       @close="closeMetaModal"
     />
 
-    <memo-modal
+    <memo-editor-modal
       v-model="showEditorModal"
       :memo="editorMemo"
       @save="handleSaveEditor"
