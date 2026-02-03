@@ -144,8 +144,9 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   edit: [memo: Memo]
   delete: [memo: Memo]
-  saveContent: [id: number, content: string]
+  openEditor: [memo: Memo]
   saveNewContent: [content: string]
+  saveContent: [id: number, content: string]
   startContentEdit: [memo: Memo]
   cancelContentEdit: []
 }>()
@@ -272,6 +273,13 @@ const getMemoMenuItems = (_memo: Memo): DropdownMenuItem[][] => {
         }
       },
       {
+        label: '打开编辑器',
+        icon: 'i-heroicons-document-text',
+        onSelect: () => {
+          emit('openEditor', props.memo)
+        }
+      },
+      {
         label: '删除',
         icon: 'i-heroicons-trash',
         color: 'error',
@@ -288,19 +296,19 @@ const handleCancel = () => {
   emit('cancelContentEdit')
 }
 
-const handleSave = async () => {
+const handleSave = () => {
   if (isSaving.value) return
 
   isSaving.value = true
-  try {
-    if (props.memo.id === 0 || props.memo.id === null) {
-      emit('saveNewContent', localContent.value)
-    } else {
-      emit('saveContent', props.memo.id, localContent.value)
-    }
-  } finally {
-    isSaving.value = false
+  if (props.memo.id === 0 || props.memo.id === null) {
+    emit('saveNewContent', localContent.value)
+  } else {
+    emit('saveContent', props.memo.id, localContent.value)
   }
+
+  nextTick(() => {
+    isSaving.value = false
+  })
 }
 
 const navigateToTag = (tagId: number) => {
