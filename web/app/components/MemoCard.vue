@@ -54,14 +54,15 @@
         </div>
 
         <div
-          class="text-sm leading-relaxed mb-3 cursor-text"
+          class="text-sm leading-relaxed mb-3"
           :class="contentClass"
-          @click.stop="emit('startContentEdit', memo)"
         >
-          <div
+          <u-editor
             v-if="memo.content"
+            :model-value="memo.content"
+            :content-type="'html'"
+            :editable="false"
             class="prose prose-sm max-w-none"
-            v-html="renderedContent"
           />
           <div
             v-else
@@ -71,57 +72,54 @@
           </div>
         </div>
 
-        <div class="flex flex-col gap-2">
-          <span
-            class="text-xs"
-            :class="dateClass"
-          >
-            {{ formatDate(memo.updatedAt || memo.createdAt) }}
-          </span>
-          <div
-            v-if="memo.tags.length > 0"
-            class="flex flex-wrap gap-1.5"
-          >
-            <u-badge
-              v-for="tag in memo.tags"
-              :key="tag.id"
-              color="primary"
-              :variant="tag.isAiGenerated ? 'soft' : 'outline'"
-              size="md"
-              class="cursor-pointer hover:opacity-80 transition-opacity"
-              @click.stop="navigateToTag(tag.id)"
+        <div class="flex items-end justify-between gap-4 mt-auto pt-2">
+          <div class="flex flex-col gap-2">
+            <span
+              class="text-xs"
+              :class="dateClass"
             >
-              <span
-                v-if="tag.isAiGenerated"
-                class="flex items-center gap-1"
+              {{ formatDate(memo.updatedAt || memo.createdAt) }}
+            </span>
+            <div
+              v-if="memo.tags.length > 0"
+              class="flex flex-wrap gap-1.5"
+            >
+              <u-badge
+                v-for="tag in memo.tags"
+                :key="tag.id"
+                color="primary"
+                :variant="tag.isAiGenerated ? 'soft' : 'outline'"
+                size="md"
+                class="cursor-pointer hover:opacity-80 transition-opacity"
+                @click.stop="navigateToTag(tag.id)"
               >
-                <u-icon
-                  name="i-heroicons-sparkles"
-                  class="size-3"
-                />
-              </span>
-              {{ tag.name }}
-            </u-badge>
+                <span
+                  v-if="tag.isAiGenerated"
+                  class="flex items-center gap-1"
+                >
+                  <u-icon
+                    name="i-heroicons-sparkles"
+                    class="size-3"
+                  />
+                </span>
+                {{ tag.name }}
+              </u-badge>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div
-        class="absolute top-3 right-3 z-10"
-      >
-        <u-dropdown-menu
-          :items="getMemoMenuItems(memo)"
-          :content="{ align: 'end' }"
-        >
-          <u-button
-            icon="i-heroicons-ellipsis-horizontal"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            class="opacity-0 group-hover:opacity-100 transition-opacity"
-            @click.stop
-          />
-        </u-dropdown-menu>
+          <u-dropdown-menu
+            :items="getMemoMenuItems(memo)"
+            :content="{ align: 'end' }"
+          >
+            <u-button
+              icon="i-heroicons-ellipsis-horizontal"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              @click.stop
+            />
+          </u-dropdown-menu>
+        </div>
       </div>
     </template>
   </div>
@@ -168,10 +166,6 @@ watch(() => props.isEditing, (editing) => {
       editorRef.value?.element?.focus()
     })
   }
-})
-
-const renderedContent = computed(() => {
-  return props.memo.content
 })
 
 const cardClasses = computed(() => {
