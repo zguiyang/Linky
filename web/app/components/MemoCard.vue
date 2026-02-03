@@ -72,40 +72,39 @@
           </div>
         </div>
 
-        <div class="flex items-end justify-between gap-4 mt-auto pt-2">
-          <div class="flex flex-col gap-2">
+        <div
+          v-if="memo.tags.length > 0"
+          class="flex flex-wrap gap-1.5 mb-3"
+        >
+          <u-badge
+            v-for="tag in memo.tags"
+            :key="tag.id"
+            color="primary"
+            :variant="tag.isAiGenerated ? 'soft' : 'outline'"
+            size="md"
+            class="cursor-pointer hover:opacity-80 transition-opacity"
+            @click.stop="navigateToTag(tag.id)"
+          >
             <span
-              class="text-xs"
-              :class="dateClass"
+              v-if="tag.isAiGenerated"
+              class="flex items-center gap-1"
             >
-              {{ formatDate(memo.updatedAt || memo.createdAt) }}
+              <u-icon
+                name="i-heroicons-sparkles"
+                class="size-3"
+              />
             </span>
-            <div
-              v-if="memo.tags.length > 0"
-              class="flex flex-wrap gap-1.5"
-            >
-              <u-badge
-                v-for="tag in memo.tags"
-                :key="tag.id"
-                color="primary"
-                :variant="tag.isAiGenerated ? 'soft' : 'outline'"
-                size="md"
-                class="cursor-pointer hover:opacity-80 transition-opacity"
-                @click.stop="navigateToTag(tag.id)"
-              >
-                <span
-                  v-if="tag.isAiGenerated"
-                  class="flex items-center gap-1"
-                >
-                  <u-icon
-                    name="i-heroicons-sparkles"
-                    class="size-3"
-                  />
-                </span>
-                {{ tag.name }}
-              </u-badge>
-            </div>
-          </div>
+            {{ tag.name }}
+          </u-badge>
+        </div>
+
+        <div class="flex items-center justify-between gap-4 mt-auto pt-2">
+          <span
+            class="text-xs"
+            :class="dateClass"
+          >
+            {{ formatDate(memo.updatedAt || memo.createdAt) }}
+          </span>
 
           <u-dropdown-menu
             :items="getMemoMenuItems(memo)"
