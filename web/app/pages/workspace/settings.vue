@@ -142,10 +142,10 @@
           <!-- Profile Settings Section -->
           <div
             v-if="activeTab === 'profile'"
-            class="space-y-8"
+            class="space-y-10"
           >
             <section>
-              <div class="mb-6">
+              <div class="mb-8">
                 <h2 class="text-xl font-semibold text-[var(--text-primary)] flex items-center gap-2">
                   <u-icon
                     name="i-heroicons-user-circle"
@@ -158,14 +158,105 @@
                 </p>
               </div>
 
-              <div class="py-12 flex flex-col items-center justify-center border-2 border-dashed border-[var(--border-subtle)] rounded-2xl text-[var(--text-secondary)]">
-                <u-icon
-                  name="i-heroicons-user"
-                  class="size-16 opacity-20 mb-4"
-                />
-                <p class="text-lg">
-                  个人资料设置正在开发中...
-                </p>
+              <div class="space-y-10">
+                <!-- Avatar Section -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-8 p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
+                  <u-avatar
+                    :alt="authStore.user?.fullName || authStore.user?.email || 'User'"
+                    size="xl"
+                    class="ring-4 ring-primary-500/10"
+                  >
+                    <template #fallback>
+                      {{ (authStore.user?.fullName || authStore.user?.email || 'U').charAt(0).toUpperCase() }}
+                    </template>
+                  </u-avatar>
+
+                  <div class="space-y-3">
+                    <div class="flex flex-wrap gap-3">
+                      <u-button
+                        color="primary"
+                        variant="soft"
+                        icon="i-heroicons-cloud-arrow-up"
+                        size="sm"
+                        disabled
+                      >
+                        更换头像
+                      </u-button>
+                      <u-button
+                        color="neutral"
+                        variant="ghost"
+                        icon="i-heroicons-trash"
+                        size="sm"
+                        disabled
+                      >
+                        移除
+                      </u-button>
+                    </div>
+                    <p class="text-xs text-[var(--text-muted)]">
+                      支持 JPG、PNG 或 GIF。最大文件大小 2MB。
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Basic Info Form -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <u-form-field
+                    label="用户名 / 昵称"
+                    description="这将作为您的公开显示名称"
+                    required
+                  >
+                    <u-input
+                      v-model="profileForm.fullName"
+                      placeholder="您的姓名"
+                      size="lg"
+                      class="w-full"
+                      icon="i-heroicons-user"
+                    />
+                  </u-form-field>
+
+                  <u-form-field
+                    label="邮箱地址"
+                    description="用于登录及接收系统通知"
+                  >
+                    <u-input
+                      v-model="profileForm.email"
+                      type="email"
+                      placeholder="example@linky.com"
+                      size="lg"
+                      class="w-full"
+                      icon="i-heroicons-envelope"
+                      disabled
+                    />
+                  </u-form-field>
+                </div>
+
+                <!-- Account Status -->
+                <div class="p-4 rounded-xl bg-primary-50/50 dark:bg-primary-900/10 border border-primary-200/50 dark:border-primary-800/50 flex items-start gap-3">
+                  <u-icon
+                    name="i-heroicons-information-circle"
+                    class="size-5 text-primary-600 mt-0.5"
+                  />
+                  <div class="text-sm">
+                    <p class="font-medium text-primary-900 dark:text-primary-100">
+                      账号验证状态
+                    </p>
+                    <p class="text-primary-700 dark:text-primary-300 mt-0.5">
+                      您的账号已通过邮箱验证，可以正常使用所有 AI 功能。
+                    </p>
+                  </div>
+                </div>
+
+                <div class="pt-4 border-t border-[var(--border-subtle)] flex justify-end items-center gap-4">
+                  <u-button
+                    color="primary"
+                    size="lg"
+                    class="px-8"
+                    :loading="saving"
+                    @click="saveProfile"
+                  >
+                    保存个人资料
+                  </u-button>
+                </div>
               </div>
             </section>
           </div>
@@ -176,10 +267,13 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth'
+
 definePageMeta({ layout: 'workspace' })
 
 const route = useRoute()
 const toast = useToast()
+const authStore = useAuthStore()
 const saving = ref(false)
 const lastSaved = ref('')
 const activeTab = ref(route.query.tab as string || 'ai')
@@ -200,6 +294,11 @@ const form = reactive({
   aiBaseUrl: '',
   aiModelName: '',
   aiApiKey: ''
+})
+
+const profileForm = reactive({
+  fullName: authStore.user?.fullName || '',
+  email: authStore.user?.email || ''
 })
 
 onMounted(async () => {
@@ -250,5 +349,15 @@ const saveSettings = async () => {
   } finally {
     saving.value = false
   }
+}
+
+const saveProfile = async () => {
+  // TODO: Implement profile update API in backend
+  toast.add({
+    title: '功能开发中',
+    description: '个人资料更新功能正在接入中，敬请期待',
+    color: 'warning',
+    icon: 'i-heroicons-clock'
+  })
 }
 </script>
