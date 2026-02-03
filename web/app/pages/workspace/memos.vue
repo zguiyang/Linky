@@ -18,35 +18,6 @@
           size="md"
           class="w-full sm:w-64"
         />
-        <div class="hidden sm:block w-px h-6 bg-[var(--border-subtle)]" />
-        <div class="inline-flex items-center p-0.5 rounded-lg border border-[var(--border-subtle)]">
-          <u-button
-            :color="viewMode === 'masonry' ? 'primary' : 'neutral'"
-            :variant="viewMode === 'masonry' ? 'solid' : 'ghost'"
-            size="sm"
-            icon="i-heroicons-view-columns"
-            title="瀑布流"
-            @click="setViewMode('masonry')"
-          />
-          <u-button
-            :color="viewMode === 'grid' ? 'primary' : 'neutral'"
-            :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
-            size="sm"
-            icon="i-heroicons-squares-2x2"
-            title="网格"
-            @click="setViewMode('grid')"
-          />
-          <u-button
-            :color="viewMode === 'list' ? 'primary' : 'neutral'"
-            :variant="viewMode === 'list' ? 'solid' : 'ghost'"
-            size="sm"
-            icon="i-heroicons-list-bullet"
-            title="列表"
-            @click="setViewMode('list')"
-          />
-        </div>
-
-        <div class="w-px h-6 bg-[var(--border-subtle)]" />
 
         <u-button
           icon="i-heroicons-plus"
@@ -104,92 +75,42 @@
         />
       </div>
 
-      <div v-else>
-        <div
-          v-if="viewMode === 'masonry'"
-          class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+      <div
+        v-else
+        class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+      >
+        <template
+          v-for="memo in allMemos"
+          :key="memo.id"
         >
-          <template
-            v-for="memo in allMemos"
-            :key="memo.id"
-          >
-            <memo-card
-              :memo="memo"
-              :is-editing="isNewCard(memo) || editingMemoId === memo.id"
-              view-mode="masonry"
-              @save-new-content="handleSaveNew"
-              @cancel-content-edit="handleCancelNew"
-              @save-content="handleSaveContent"
-              @open-editor="openEditor"
-              @edit="openMetaModal"
-              @delete="openDeleteConfirm"
-              @start-content-edit="handleStartEditContent"
-            />
-          </template>
-        </div>
-
-        <div
-          v-else-if="viewMode === 'grid'"
-          class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6"
-        >
-          <template
-            v-for="memo in allMemos"
-            :key="memo.id"
-          >
-            <memo-card
-              :memo="memo"
-              :is-editing="isNewCard(memo) || editingMemoId === memo.id"
-              view-mode="grid"
-              @save-new-content="handleSaveNew"
-              @cancel-content-edit="handleCancelNew"
-              @save-content="handleSaveContent"
-              @open-editor="openEditor"
-              @edit="openMetaModal"
-              @delete="openDeleteConfirm"
-              @start-content-edit="handleStartEditContent"
-            />
-          </template>
-        </div>
-
-        <div
-          v-else
-          class="flex flex-col gap-2"
-        >
-          <template
-            v-for="memo in allMemos"
-            :key="memo.id"
-          >
-            <memo-card
-              :memo="memo"
-              :is-editing="isNewCard(memo) || editingMemoId === memo.id"
-              view-mode="list"
-              class="w-full"
-              @save-new-content="handleSaveNew"
-              @cancel-content-edit="handleCancelNew"
-              @save-content="handleSaveContent"
-              @open-editor="openEditor"
-              @edit="openMetaModal"
-              @delete="openDeleteConfirm"
-              @start-content-edit="handleStartEditContent"
-            />
-          </template>
-        </div>
-
-        <u-empty v-if="memos.length === 0 && !pendingMemo">
-          <template #icon>
-            <u-icon
-              name="i-heroicons-document-text"
-              class="size-16"
-            />
-          </template>
-          <template #title>
-            <span class="text-lg font-semibold text-[var(--text-primary)]">暂无备忘录</span>
-          </template>
-          <template #description>
-            <span class="text-sm text-[var(--text-secondary)]">开始创建您的第一个备忘录吧</span>
-          </template>
-        </u-empty>
+          <memo-card
+            :memo="memo"
+            :is-editing="isNewCard(memo) || editingMemoId === memo.id"
+            @save-new-content="handleSaveNew"
+            @cancel-content-edit="handleCancelNew"
+            @save-content="handleSaveContent"
+            @open-editor="openEditor"
+            @edit="openMetaModal"
+            @delete="openDeleteConfirm"
+            @start-content-edit="handleStartEditContent"
+          />
+        </template>
       </div>
+
+      <u-empty v-if="memos.length === 0 && !pendingMemo">
+        <template #icon>
+          <u-icon
+            name="i-heroicons-document-text"
+            class="size-16"
+          />
+        </template>
+        <template #title>
+          <span class="text-lg font-semibold text-[var(--text-primary)]">暂无备忘录</span>
+        </template>
+        <template #description>
+          <span class="text-sm text-[var(--text-secondary)]">开始创建您的第一个备忘录吧</span>
+        </template>
+      </u-empty>
     </u-scroll-area>
 
     <div
@@ -267,7 +188,6 @@
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
 import type { Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
-import { VIEW_MODE, type ViewMode } from '~/constants'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -299,8 +219,6 @@ const tagsStore = useTagsStore()
 
 const searchQuery = ref('')
 const searchQueryParam = computed(() => searchQuery.value || undefined)
-
-const viewMode = ref<ViewMode>(VIEW_MODE.MASONRY)
 
 const pagination = usePagination<Memo>(
   '/memos/paginate',
@@ -334,10 +252,6 @@ const editorMemo = ref<Memo | null>(null)
 
 const pendingMemo = ref<Memo | null>(null)
 const editingMemoId = ref<number | null>(null)
-
-const setViewMode = (mode: ViewMode) => {
-  viewMode.value = mode
-}
 
 const handleCreate = () => {
   pendingMemo.value = {
