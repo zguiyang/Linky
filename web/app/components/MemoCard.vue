@@ -174,13 +174,13 @@ const cardClasses = computed(() => {
   if (isPinned) {
     switch (props.viewMode) {
       case 'masonry':
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-5 break-inside-avoid'
+        return 'bg-[var(--bg-surface)] border border-warning-300 dark:border-warning-700 rounded-xl p-5 break-inside-avoid border-l-4 border-l-warning-500'
       case 'grid':
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-5'
+        return 'bg-[var(--bg-surface)] border border-warning-300 dark:border-warning-700 rounded-xl p-5 border-l-4 border-l-warning-500'
       case 'list':
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-lg p-4'
+        return 'bg-[var(--bg-surface)] border border-warning-300 dark:border-warning-700 rounded-lg p-4 border-l-4 border-l-warning-500'
       default:
-        return 'bg-warning-50 dark:bg-warning-900/30 border-warning-200 dark:border-warning-800 rounded-xl p-5 break-inside-avoid'
+        return 'bg-[var(--bg-surface)] border border-warning-300 dark:border-warning-700 rounded-xl p-5 break-inside-avoid border-l-4 border-l-warning-500'
     }
   }
 
