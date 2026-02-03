@@ -1,27 +1,10 @@
 <template>
   <div
-    class="group cursor-pointer transition-colors border rounded-xl overflow-hidden relative"
+    class="group cursor-pointer transition-colors border rounded-xl overflow-hidden"
     :class="cardClasses"
     @click="$emit('click', bookmark)"
   >
-    <div
-      class="absolute top-3 right-3 z-20"
-    >
-      <u-dropdown-menu
-        :items="menuItems"
-        :content="{ align: 'end' }"
-      >
-        <u-button
-          icon="i-heroicons-ellipsis-horizontal"
-          color="neutral"
-          variant="ghost"
-          size="sm"
-          class="opacity-0 group-hover:opacity-100 transition-opacity"
-          @click.stop
-        />
-      </u-dropdown-menu>
-    </div>
-
+    <!-- 图标区域 -->
     <div
       class="flex items-center justify-center flex-shrink-0"
       :class="iconContainerClasses"
@@ -34,41 +17,51 @@
       >
     </div>
 
+    <!-- 内容区域 -->
     <div
-      class="relative z-10"
+      class="relative z-10 flex flex-col flex-1"
       :class="contentClasses"
     >
-      <h3
-        class="font-semibold"
-        :class="titleClasses"
-      >
-        {{ bookmark.title }}
-      </h3>
-
-      <template v-if="viewMode === 'masonry'">
-        <p
-          class="text-sm"
-          :class="descriptionClasses"
+      <div class="flex-1">
+        <h3
+          class="font-semibold"
+          :class="titleClasses"
         >
-          {{ bookmark.description }}
-        </p>
-      </template>
+          {{ bookmark.title }}
+        </h3>
 
-      <template v-else-if="viewMode === 'list'">
-        <p
-          class="text-sm"
-          :class="descriptionClasses"
-        >
-          {{ bookmark.description }}
-        </p>
-      </template>
-
-      <template v-if="viewMode === 'list'">
-        <div class="flex items-center justify-between">
-          <div
-            class="flex flex-wrap gap-2"
-            :class="tagsClasses"
+        <template v-if="viewMode === 'masonry'">
+          <p
+            class="text-sm"
+            :class="descriptionClasses"
           >
+            {{ bookmark.description }}
+          </p>
+        </template>
+
+        <template v-else-if="viewMode === 'list'">
+          <p
+            class="text-sm"
+            :class="descriptionClasses"
+          >
+            {{ bookmark.description }}
+          </p>
+        </template>
+
+        <!-- 访问次数 -->
+        <div
+          class="flex items-center gap-1.5 text-sm"
+          :class="visitCountClasses"
+        >
+          <u-icon
+            name="i-heroicons-eye"
+            class="size-4"
+          />
+          <span>{{ bookmark.visitCount }}次访问</span>
+        </div>
+
+        <template v-if="viewMode === 'list'">
+          <div class="flex flex-wrap gap-2 mt-2">
             <u-badge
               v-for="tag in bookmark.tags"
               :key="tag.id"
@@ -90,66 +83,59 @@
               {{ tag.name }}
             </u-badge>
           </div>
-          <div
-            class="flex items-center gap-1.5 text-sm"
-            :class="visitCountClasses"
-          >
-            <u-icon
-              name="i-heroicons-eye"
-              class="size-4"
-            />
-            <span>{{ bookmark.visitCount }}次访问</span>
-          </div>
-        </div>
-      </template>
+        </template>
 
-      <template v-else>
-        <div
-          class="flex items-center gap-1.5 text-sm"
-          :class="visitCountClasses"
-        >
-          <u-icon
-            name="i-heroicons-eye"
-            class="size-4"
-          />
-          <span>{{ bookmark.visitCount }}次访问</span>
-        </div>
-        <div
-          class="flex flex-wrap gap-2"
-          :class="tagsClasses"
-        >
-          <u-badge
-            v-for="tag in bookmark.tags"
-            :key="tag.id"
-            color="primary"
-            :variant="tag.isAiGenerated ? 'soft' : 'outline'"
-            size="md"
-            class="cursor-pointer hover:opacity-80 transition-opacity"
-            @click.stop="navigateToTag(tag.id)"
-          >
-            <span
-              v-if="tag.isAiGenerated"
-              class="flex items-center gap-1"
+        <template v-else>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <u-badge
+              v-for="tag in bookmark.tags"
+              :key="tag.id"
+              color="primary"
+              :variant="tag.isAiGenerated ? 'soft' : 'outline'"
+              size="md"
+              class="cursor-pointer hover:opacity-80 transition-opacity"
+              @click.stop="navigateToTag(tag.id)"
             >
-              <u-icon
-                name="i-heroicons-sparkles"
-                class="size-3"
-              />
-            </span>
-            {{ tag.name }}
-          </u-badge>
-        </div>
-      </template>
+              <span
+                v-if="tag.isAiGenerated"
+                class="flex items-center gap-1"
+              >
+                <u-icon
+                  name="i-heroicons-sparkles"
+                  class="size-3"
+                />
+              </span>
+              {{ tag.name }}
+            </u-badge>
+          </div>
+        </template>
 
-      <template v-if="bookmark.status === 'fetching'">
-        <div class="flex items-center gap-2 text-sm mt-2">
-          <u-icon
-            name="i-heroicons-arrow-path"
-            class="animate-spin"
+        <template v-if="bookmark.status === 'fetching'">
+          <div class="flex items-center gap-2 text-sm mt-2">
+            <u-icon
+              name="i-heroicons-arrow-path"
+              class="animate-spin"
+            />
+            <span>元数据获取中...</span>
+          </div>
+        </template>
+      </div>
+
+      <!-- Footer 区域 - 只放操作按钮 -->
+      <div class="flex justify-end mt-3">
+        <u-dropdown-menu
+          :items="menuItems"
+          :content="{ align: 'end' }"
+        >
+          <u-button
+            icon="i-heroicons-ellipsis-horizontal"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            @click.stop
           />
-          <span>元数据获取中...</span>
-        </div>
-      </template>
+        </u-dropdown-menu>
+      </div>
     </div>
   </div>
 </template>
@@ -193,7 +179,7 @@ const menuItems = computed(() => [
 const cardClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'bg-[var(--bg-surface)] border-[var(--border-subtle)] p-5 break-inside-avoid'
+      return 'bg-[var(--bg-surface)] border-[var(--border-subtle)] p-5 break-inside-avoid h-full'
     case 'list':
       return 'flex items-center gap-3 p-4 bg-[var(--bg-surface)] border-[var(--border-subtle)]'
     default:
@@ -204,7 +190,7 @@ const cardClasses = computed(() => {
 const iconContainerClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'w-12 h-12 mb-3 bg-[var(--bg-surface)] rounded-xl'
+      return 'w-12 h-12 bg-[var(--bg-surface)] rounded-xl'
     case 'list':
       return 'w-10 h-10 bg-[var(--bg-surface)] rounded-lg'
     default:
@@ -228,7 +214,7 @@ const contentClasses = computed(() => {
     case 'masonry':
       return ''
     case 'list':
-      return 'flex-1 min-w-0'
+      return 'min-w-0'
     default:
       return ''
   }
@@ -237,9 +223,9 @@ const contentClasses = computed(() => {
 const titleClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'text-[var(--text-primary)] text-base mb-2 line-clamp-2'
+      return 'text-[var(--text-primary)] text-base line-clamp-2'
     case 'list':
-      return 'text-[var(--text-primary)] text-base mb-1 truncate'
+      return 'text-[var(--text-primary)] text-base truncate'
     default:
       return ''
   }
@@ -248,9 +234,9 @@ const titleClasses = computed(() => {
 const descriptionClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'text-[var(--text-secondary)] mb-3'
+      return 'text-[var(--text-secondary)] mt-2'
     case 'list':
-      return 'text-[var(--text-secondary)] mb-2'
+      return 'text-[var(--text-secondary)] mt-1'
     default:
       return ''
   }
@@ -259,20 +245,9 @@ const descriptionClasses = computed(() => {
 const visitCountClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'text-[var(--text-secondary)] mb-3'
+      return 'text-[var(--text-secondary)] mt-2'
     case 'list':
-      return 'text-[var(--text-secondary)]'
-    default:
-      return ''
-  }
-})
-
-const tagsClasses = computed(() => {
-  switch (props.viewMode) {
-    case 'masonry':
-      return ''
-    case 'list':
-      return ''
+      return 'text-[var(--text-secondary)] mt-2'
     default:
       return ''
   }
