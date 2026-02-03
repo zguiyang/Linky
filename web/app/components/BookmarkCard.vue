@@ -54,17 +54,6 @@
         </p>
       </template>
 
-      <template v-else-if="viewMode === 'grid'">
-        <u-tooltip :text="bookmark.description ?? undefined">
-          <p
-            class="text-sm truncate"
-            :class="descriptionClasses"
-          >
-            {{ bookmark.description }}
-          </p>
-        </u-tooltip>
-      </template>
-
       <template v-else-if="viewMode === 'list'">
         <p
           class="text-sm"
@@ -170,7 +159,7 @@ import type { Bookmark } from '~/api/types'
 
 const props = defineProps<{
   bookmark: Bookmark
-  viewMode: 'masonry' | 'grid' | 'list'
+  viewMode: 'masonry' | 'list'
 }>()
 
 const emit = defineEmits<{
@@ -205,8 +194,6 @@ const cardClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
       return 'bg-[var(--bg-surface)] border-[var(--border-subtle)] p-5 break-inside-avoid'
-    case 'grid':
-      return 'flex gap-4 p-5 bg-[var(--bg-surface)] border-[var(--border-subtle)]'
     case 'list':
       return 'flex items-center gap-3 p-4 bg-[var(--bg-surface)] border-[var(--border-subtle)]'
     default:
@@ -218,8 +205,6 @@ const iconContainerClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
       return 'w-12 h-12 mb-3 bg-[var(--bg-surface)] rounded-xl'
-    case 'grid':
-      return 'w-12 h-12 bg-[var(--bg-surface)] rounded-xl'
     case 'list':
       return 'w-10 h-10 bg-[var(--bg-surface)] rounded-lg'
     default:
@@ -230,8 +215,6 @@ const iconContainerClasses = computed(() => {
 const iconClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'w-6 h-6'
-    case 'grid':
       return 'w-6 h-6'
     case 'list':
       return 'w-5 h-5'
@@ -244,8 +227,6 @@ const contentClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
       return ''
-    case 'grid':
-      return 'flex-1 min-w-0'
     case 'list':
       return 'flex-1 min-w-0'
     default:
@@ -257,8 +238,6 @@ const titleClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
       return 'text-[var(--text-primary)] text-base mb-2 line-clamp-2'
-    case 'grid':
-      return 'text-[var(--text-primary)] text-base mb-1.5 line-clamp-1'
     case 'list':
       return 'text-[var(--text-primary)] text-base mb-1 truncate'
     default:
@@ -269,8 +248,6 @@ const titleClasses = computed(() => {
 const descriptionClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'text-[var(--text-secondary)] mb-3'
-    case 'grid':
       return 'text-[var(--text-secondary)] mb-3'
     case 'list':
       return 'text-[var(--text-secondary)] mb-2'
@@ -283,8 +260,6 @@ const visitCountClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
       return 'text-[var(--text-secondary)] mb-3'
-    case 'grid':
-      return 'text-[var(--text-secondary)] mb-3'
     case 'list':
       return 'text-[var(--text-secondary)]'
     default:
@@ -295,8 +270,6 @@ const visitCountClasses = computed(() => {
 const tagsClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return ''
-    case 'grid':
       return ''
     case 'list':
       return ''

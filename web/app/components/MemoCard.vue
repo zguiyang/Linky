@@ -174,8 +174,6 @@ const cardClasses = computed(() => {
     switch (props.viewMode) {
       case 'masonry':
         return 'bg-[var(--bg-surface)] border border-warning-300 dark:border-warning-700 rounded-xl p-5 break-inside-avoid border-l-4 border-l-warning-500'
-      case 'grid':
-        return 'bg-[var(--bg-surface)] border border-warning-300 dark:border-warning-700 rounded-xl p-5 border-l-4 border-l-warning-500'
       case 'list':
         return 'bg-[var(--bg-surface)] border border-warning-300 dark:border-warning-700 rounded-lg p-4 border-l-4 border-l-warning-500'
       default:
@@ -186,8 +184,6 @@ const cardClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
       return 'bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-xl p-5 break-inside-avoid'
-    case 'grid':
-      return 'flex gap-4 p-5 bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-xl'
     case 'list':
       return 'flex items-center gap-3 p-4 bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-lg'
     default:
@@ -208,8 +204,6 @@ const titleClass = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
       return 'text-[var(--text-primary)] text-base mb-2 line-clamp-2'
-    case 'grid':
-      return 'text-[var(--text-primary)] text-base mb-1.5 line-clamp-1'
     case 'list':
       return 'text-[var(--text-primary)] text-base mb-1 truncate'
     default:
@@ -221,8 +215,6 @@ const contentClass = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
       return 'text-[var(--text-secondary)] mb-3'
-    case 'grid':
-      return 'text-[var(--text-secondary)] mb-3 line-clamp-2'
     case 'list':
       return 'text-[var(--text-secondary)] mb-2 line-clamp-1'
     default:

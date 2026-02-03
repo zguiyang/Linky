@@ -48,14 +48,6 @@
             @click="setViewMode('masonry')"
           />
           <u-button
-            :color="viewMode === 'grid' ? 'primary' : 'neutral'"
-            :variant="viewMode === 'grid' ? 'solid' : 'ghost'"
-            size="sm"
-            icon="i-heroicons-squares-2x2"
-            title="网格"
-            @click="setViewMode('grid')"
-          />
-          <u-button
             :color="viewMode === 'list' ? 'primary' : 'neutral'"
             :variant="viewMode === 'list' ? 'solid' : 'ghost'"
             size="sm"
@@ -138,23 +130,7 @@
       </div>
 
       <div
-        v-else-if="viewMode === 'grid'"
-        class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4"
-      >
-        <bookmark-card
-          v-for="bookmark in bookmarks"
-          :key="bookmark.id"
-          :bookmark="bookmark"
-          view-mode="grid"
-          @click="openBookmark"
-          @edit="openEditModal"
-          @delete="openDeleteConfirm"
-          @refresh="handleRefresh"
-        />
-      </div>
-
-      <div
-        v-else
+        v-else-if="viewMode === 'list'"
         class="flex flex-col gap-3"
       >
         <bookmark-card

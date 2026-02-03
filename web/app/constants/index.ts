@@ -7,7 +7,6 @@ type _OrderBy = (typeof ORDER_BY)[keyof typeof ORDER_BY]
 
 const VIEW_MODE = {
   MASONRY: 'masonry',
-  GRID: 'grid',
   LIST: 'list'
 } as const
 
