@@ -2,7 +2,6 @@
   <div class="flex h-screen overflow-hidden bg-[var(--bg-canvas)]">
     <aside class="flex flex-col flex-shrink-0 w-64 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)] overflow-y-auto">
       <div class="flex items-center gap-2 px-4 py-4">
-        <app-logo class="h-8 w-auto" />
         <span class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">
           Linky
         </span>
