@@ -19,9 +19,13 @@ export default class MemosController {
   async paginate({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
     const data = await request.validateUsing(memoPaginationValidator)
-    return await this.memoService.paginate(user.id, data.page, data.perPage, {
+    return await this.memoService.paginate(user.id, {
+      page: data.page,
+      perPage: data.perPage,
       search: data.search,
       tagIds: data.tagIds,
+      sortBy: data.sortBy,
+      sortOrder: data.sortOrder,
     })
   }
 

@@ -107,6 +107,8 @@ export interface MemoPaginationParams {
   perPage?: number
   search?: string
   tagIds?: number[]
+  sortBy?: 'createdAt' | 'updatedAt'
+  sortOrder?: 'asc' | 'desc'
 }
 
 export interface CreateBookmarkRequest {

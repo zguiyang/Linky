@@ -31,14 +31,28 @@ export class MemoService {
 
   async paginate(
     userId: number,
-    page: number = 1,
-    perPage: number = 20,
-    options?: { search?: string; tagIds?: number[] }
+    options: {
+      page?: number
+      perPage?: number
+      search?: string
+      tagIds?: number[]
+      sortBy?: 'createdAt' | 'updatedAt'
+      sortOrder?: 'asc' | 'desc'
+    } = {}
   ) {
+    const {
+      page = 1,
+      perPage = 20,
+      search,
+      tagIds,
+      sortBy = 'updatedAt',
+      sortOrder = 'desc',
+    } = options
+
     let query = Memo.query().where('user_id', userId).preload('tags')
 
-    if (options?.search && options.search.trim()) {
-      const searchTerm = `%${options.search.trim()}%`
+    if (search && search.trim()) {
+      const searchTerm = `%${search.trim()}%`
       query = query.where((qb) => {
         qb.where('title', 'like', searchTerm)
           .orWhere('content', 'like', searchTerm)
@@ -52,18 +66,25 @@ export class MemoService {
       })
     }
 
-    if (options?.tagIds && options.tagIds.length > 0) {
+    if (tagIds && tagIds.length > 0) {
       query = query.whereExists((qb) => {
         qb.from('tags')
           .join('memo_tag', 'tags.id', '=', 'memo_tag.tag_id')
           .where('memo_tag.memo_id', '=', Database.ref('memos.id'))
-          .whereIn('tags.id', options.tagIds!)
+          .whereIn('tags.id', tagIds)
       })
     }
 
+    const fieldMap: Record<string, string> = {
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    }
+
+    const dbSortBy = fieldMap[sortBy] || sortBy
+
     return await query
       .orderBy('is_pinned', 'desc')
-      .orderBy('created_at', 'desc')
+      .orderBy(dbSortBy, sortOrder)
       .paginate(page, perPage)
   }
 

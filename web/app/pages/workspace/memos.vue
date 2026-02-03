@@ -18,6 +18,26 @@
           size="md"
           class="w-full sm:w-64"
         />
+        <div class="hidden sm:block w-px h-6 bg-[var(--border-subtle)]" />
+        <u-select-menu
+          v-model="selectedSortBy"
+          :items="sortByOptions"
+          size="md"
+          class="w-40"
+        />
+        <u-select-menu
+          v-model="selectedSortOrder"
+          :items="sortOrderOptions"
+          size="md"
+          class="w-32"
+        >
+          <template #leading>
+            <u-icon
+              :name="sortOrderIcon"
+              class="w-4 h-4"
+            />
+          </template>
+        </u-select-menu>
 
         <u-button
           icon="i-heroicons-plus"
@@ -187,6 +207,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
+import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS } from '~/constants'
 import type { Memo, CreateMemoRequest, UpdateMemoRequest } from '~/api/types'
 
 definePageMeta({ layout: 'workspace' })
@@ -217,6 +238,21 @@ const { $api } = useNuxtApp()
 
 const tagsStore = useTagsStore()
 
+const sortByOptions = SORT_BY_OPTIONS
+const sortOrderOptions = SORT_ORDER_OPTIONS
+
+interface SortOption {
+  label: string
+  value: string
+}
+
+const selectedSortBy = ref(sortByOptions[0] as SortOption)
+const selectedSortOrder = ref(sortOrderOptions[0] as SortOption)
+
+const sortBy = computed(() => selectedSortBy.value?.value as 'createdAt' | 'updatedAt' | undefined)
+const sortOrder = computed(() => selectedSortOrder.value?.value as 'desc' | 'asc' | undefined)
+const sortOrderIcon = computed(() => selectedSortOrder.value?.value === 'asc' ? 'i-heroicons-arrow-up' : 'i-heroicons-arrow-down')
+
 const searchQuery = ref('')
 const searchQueryParam = computed(() => searchQuery.value || undefined)
 
@@ -225,7 +261,9 @@ const pagination = usePagination<Memo>(
   {
     query: computed(() => ({
       search: searchQueryParam.value,
-      tagIds: tagsStore.selectedTags.length > 0 ? tagsStore.selectedTags : undefined
+      tagIds: tagsStore.selectedTags.length > 0 ? tagsStore.selectedTags : undefined,
+      sortBy: sortBy.value,
+      sortOrder: sortOrder.value
     }))
   }
 )
