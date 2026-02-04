@@ -1,7 +1,7 @@
 <template>
   <u-modal
     v-model:open="isOpen"
-    title="备忘录详情"
+    :title="memo?.title || '无标题备忘录'"
     :ui="{ content: 'max-w-2xl' }"
   >
     <template #body>
@@ -21,9 +21,6 @@
       >
         <div class="flex items-start justify-between gap-4">
           <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold truncate">
-              {{ memo.title || '无标题备忘录' }}
-            </h3>
             <div class="flex items-center gap-2 mt-2">
               <u-badge
                 v-for="tag in memo.tags"
@@ -47,22 +44,9 @@
           class="prose prose-sm max-w-none dark:prose-invert"
         >
           <u-editor
-            :model-value="memo.content"
+            v-model="editedContent"
             content-type="html"
-            :editable="false"
           />
-        </div>
-
-        <div class="flex items-center gap-4 pt-2 border-t border-[var(--border-subtle)]">
-          <span class="text-xs text-[var(--text-muted)]">
-            创建于 {{ formatDate(memo.createdAt) }}
-          </span>
-          <span
-            v-if="memo.updatedAt"
-            class="text-xs text-[var(--text-muted)]"
-          >
-            更新于 {{ formatDate(memo.updatedAt) }}
-          </span>
         </div>
       </div>
 
@@ -75,16 +59,18 @@
     </template>
 
     <template #footer>
-      <div class="flex justify-end gap-2">
-        <u-button
-          variant="ghost"
-          label="关闭"
-          @click="isOpen = false"
-        />
+      <div class="flex justify-between items-center w-full">
+        <span class="text-xs text-muted">
+          创建于 {{ formatDate(memo?.createdAt || null) }}
+          <span v-if="memo?.updatedAt">
+            · 更新于 {{ formatDate(memo.updatedAt || null) }}
+          </span>
+        </span>
         <u-button
           color="primary"
-          label="打开详情页"
-          @click="openDetail"
+          label="保存"
+          :loading="isSaving"
+          @click="handleSave"
         />
       </div>
     </template>
@@ -109,8 +95,12 @@ const isOpen = computed({
 })
 
 const { $api } = useNuxtApp()
+const toast = useToast()
 const memo = ref<Memo | null>(null)
 const isLoading = ref(false)
+const isSaving = ref(false)
+const originalContent = ref('')
+const editedContent = ref('')
 
 const fetchMemo = async () => {
   if (!props.memoId) {
@@ -121,11 +111,36 @@ const fetchMemo = async () => {
   isLoading.value = true
   try {
     memo.value = await $api<Memo>(`/memos/${props.memoId}`, { method: 'get' })
+    if (memo.value) {
+      originalContent.value = memo.value.content
+      editedContent.value = originalContent.value
+    }
   } catch {
     memo.value = null
   } finally {
     isLoading.value = false
   }
+}
+
+const handleSave = async () => {
+  if (originalContent.value === editedContent.value) {
+    toast.add({ title: '内容未更改，无需保存', color: 'warning' })
+    isOpen.value = false
+    return
+  }
+
+  if (!memo.value) return
+
+  isSaving.value = true
+  await $api(`/memos/${memo.value.id}`, {
+    method: 'put',
+    body: { content: editedContent.value }
+  })
+  originalContent.value = editedContent.value
+  memo.value.content = editedContent.value
+  toast.add({ title: '保存成功', color: 'success' })
+  isOpen.value = false
+  isSaving.value = false
 }
 
 watch(() => props.memoId, fetchMemo, { immediate: true })
@@ -145,12 +160,5 @@ const formatDate = (date: string | null) => {
     hour: '2-digit',
     minute: '2-digit'
   })
-}
-
-const openDetail = () => {
-  if (memo.value) {
-    navigateTo(`/workspace/memos?id=${memo.value.id}`)
-    isOpen.value = false
-  }
 }
 </script>
