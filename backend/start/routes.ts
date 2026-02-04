@@ -20,6 +20,7 @@ const BookmarksController = () => import('#controllers/bookmarks_controller')
 const MemosController = () => import('#controllers/memos_controller')
 const SettingsController = () => import('#controllers/settings_controller')
 const AiController = () => import('#controllers/ai_controller')
+const SearchController = () => import('#controllers/search_controller')
 
 // 公开认证路由组（不需要认证）
 router
@@ -78,6 +79,9 @@ router
     router.get('/ai/config', [AiController, 'getConfig'])
     router.post('/ai/chat', [AiController, 'chat'])
     router.post('/ai/chat/stream', [AiController, 'stream'])
+
+    // 全局搜索
+    router.get('/search', [SearchController, 'search'])
   })
   .prefix('api')
   .middleware(middleware.auth())

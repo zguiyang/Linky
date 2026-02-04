@@ -49,7 +49,10 @@
     <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
       <header class="flex items-center justify-end px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <div class="flex items-center gap-3">
-          <u-dashboard-search-button variant="subtle" />
+          <u-dashboard-search-button
+            variant="subtle"
+            @click="openSearch"
+          />
           <u-button
             icon="i-heroicons-cog-6-tooth"
             color="neutral"
@@ -62,7 +65,15 @@
         </div>
       </header>
 
-      <u-dashboard-search />
+      <u-dashboard-search
+        v-model:open="isOpen"
+        v-model:search-term="searchQuery"
+        v-model:groups="groups"
+        :loading="isLoading"
+        placeholder="搜索书签、备忘录、标签..."
+        :autofocus="true"
+        shortcut="meta_k"
+      />
 
       <div class="flex-1 overflow-y-auto">
         <nuxt-page />
@@ -72,12 +83,45 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted } from 'vue'
 import WorkspaceUserDropdown from '~/components/workspace/UserDropdown.vue'
+import { useGlobalSearch } from '~/composables/useGlobalSearch'
 import { APP_INFO } from '~/constants'
+
+const {
+  isOpen,
+  searchQuery,
+  groups,
+  isLoading,
+  open,
+  close
+} = useGlobalSearch()
 
 const navItems = [
   { label: '书签', to: '/workspace/bookmarks', icon: 'i-heroicons-bookmark' },
   { label: '备忘录', to: '/workspace/memos', icon: 'i-heroicons-document-text' },
   { label: '标签管理', to: '/workspace/tags', icon: 'i-heroicons-tag' }
 ]
+
+const openSearch = () => {
+  open()
+}
+
+const handleKeydown = (event: KeyboardEvent) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+    event.preventDefault()
+    open()
+  }
+  if (event.key === 'Escape') {
+    close()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>

@@ -1,10 +1,10 @@
 <template>
-  <UPopover
+  <u-popover
     :close-delay="closeDelay"
     :content="{ align, sideOffset: 8 }"
   >
     <slot>
-      <UButton
+      <u-button
         :icon="triggerIcon"
         :label="triggerLabel"
         :color="triggerColor"
@@ -19,7 +19,7 @@
           class="icon-container"
           :class="iconContainerClass"
         >
-          <UIcon
+          <u-icon
             :name="currentIcon"
             class="icon"
             :class="iconClass"
@@ -38,13 +38,13 @@
         </p>
 
         <div class="button-group">
-          <UButton
+          <u-button
             :label="cancelText"
             variant="ghost"
             class="cancel-btn"
             @click="handleCancel(close)"
           />
-          <UButton
+          <u-button
             :label="confirmText"
             :color="confirmColor"
             :loading="confirmLoading"
@@ -54,7 +54,7 @@
         </div>
       </div>
     </template>
-  </UPopover>
+  </u-popover>
 </template>
 
 <script setup lang="ts">
@@ -95,7 +95,7 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
-const iconConfig: Record<string, { icon: string; iconClass: string; containerClass: string }> = {
+const iconConfig: Record<string, { icon: string, iconClass: string, containerClass: string }> = {
   info: {
     icon: 'i-heroicons-information-circle',
     iconClass: 'text-info',

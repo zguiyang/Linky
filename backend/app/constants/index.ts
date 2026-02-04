@@ -102,6 +102,14 @@ const TAG_ITEM_TYPE = {
 
 type TagItemType = (typeof TAG_ITEM_TYPE)[keyof typeof TAG_ITEM_TYPE]
 
+const SEARCH = {
+  RESULT_LIMIT: 10,
+  MIN_QUERY_LENGTH: 1,
+  MAX_QUERY_LENGTH: 100,
+} as const
+
+type Search = (typeof SEARCH)[keyof typeof SEARCH]
+
 export {
   ORDER_BY,
   PAGINATION,
@@ -115,6 +123,7 @@ export {
   BOOKMARK_EVENTS,
   TRANSMIT_CHANNEL_NAMES,
   TAG_ITEM_TYPE,
+  SEARCH,
 }
 export type {
   OrderBy,
@@ -129,4 +138,5 @@ export type {
   BookmarkEvent,
   TransmitEvent,
   TagItemType,
+  Search,
 }
