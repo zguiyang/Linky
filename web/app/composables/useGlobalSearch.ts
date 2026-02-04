@@ -128,14 +128,6 @@ export function useGlobalSearch() {
       })
     }
 
-    if (groups.length === 0) {
-      groups.push({
-        id: 'empty',
-        label: '无结果',
-        items: []
-      })
-    }
-
     return groups
   })
 

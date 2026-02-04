@@ -73,7 +73,17 @@
         placeholder="搜索书签、备忘录、标签..."
         :autofocus="true"
         shortcut="meta_k"
-      />
+      >
+        <template #empty>
+          <u-empty
+            v-if="searchQuery.trim() && !isLoading"
+            icon="i-lucide-search"
+            title="未找到结果"
+            description="尝试使用其他关键词搜索"
+            size="sm"
+          />
+        </template>
+      </u-dashboard-search>
 
       <div class="flex-1 overflow-y-auto">
         <nuxt-page />
