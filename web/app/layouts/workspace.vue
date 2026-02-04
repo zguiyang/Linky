@@ -74,6 +74,7 @@
         placeholder="搜索书签、备忘录、标签..."
         :autofocus="true"
         shortcut="meta_k"
+        :fuse="{ fuseOptions: { includeMatches: true } }"
       >
         <template #empty>
           <div
