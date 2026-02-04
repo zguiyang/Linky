@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { watchDebounced } from '@vueuse/core'
+import { highlightText, stripHtml } from '~/utils/highlight'
 
 const MIN_LOADING_DELAY = 300
 
@@ -37,6 +38,9 @@ export function useGlobalSearch() {
   const results = ref<SearchResults | null>(null)
   const isLoading = ref(false)
   let abortController: AbortController | null = null
+
+  const memoModalOpen = ref(false)
+  const selectedMemoId = ref<number | null>(null)
 
   const open = () => {
     isOpen.value = true
@@ -122,17 +126,29 @@ export function useGlobalSearch() {
     }
 
     if (results.value.memos.length > 0) {
+      const query = searchQuery.value.trim()
       groups.push({
         id: 'memos',
         label: '备忘录',
-        items: results.value.memos.map(item => ({
-          id: `memo-${item.id}`,
-          type: 'memo' as const,
-          label: item.title || '无标题备忘录',
-          suffix: item.description || '点击查看详情',
-          icon: 'i-heroicons-document-text',
-          to: `/workspace/memos?id=${item.id}`
-        }))
+        items: results.value.memos.map((item) => {
+          const rawDescription = item.description || ''
+          const highlightedDescription = query
+            ? highlightText(rawDescription, query)
+            : stripHtml(rawDescription)
+
+          return {
+            id: `memo-${item.id}`,
+            type: 'memo' as const,
+            label: item.title || '无标题备忘录',
+            suffix: stripHtml(rawDescription),
+            highlightedDescription,
+            icon: 'i-heroicons-document-text',
+            onSelect: () => {
+              selectedMemoId.value = item.id
+              memoModalOpen.value = true
+            }
+          }
+        })
       })
     }
 
@@ -164,6 +180,8 @@ export function useGlobalSearch() {
     results,
     isLoading,
     groups,
+    memoModalOpen,
+    selectedMemoId,
     open,
     close,
     clearSearch,

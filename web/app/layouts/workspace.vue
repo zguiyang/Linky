@@ -75,6 +75,22 @@
         :autofocus="true"
         shortcut="meta_k"
       >
+        <template #item="{ item }">
+          <template v-if="item.type === 'memo'">
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <span
+              class="flex-1 truncate"
+              :class="item.highlightedDescription ? '' : 'text-muted'"
+              v-html="item.highlightedDescription || item.suffix"
+            />
+          </template>
+          <template v-else-if="item.suffix">
+            <span class="flex-1 truncate text-muted text-xs">
+              {{ item.suffix }}
+            </span>
+          </template>
+        </template>
+
         <template #empty>
           <div
             v-if="searchQuery.trim()"
@@ -112,6 +128,11 @@
       <div class="flex-1 overflow-y-auto">
         <nuxt-page />
       </div>
+
+      <memo-detail-modal
+        v-model:open="memoModalOpen"
+        :memo-id="selectedMemoId"
+      />
     </main>
   </div>
 </template>
@@ -119,6 +140,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
 import WorkspaceUserDropdown from '~/components/workspace/UserDropdown.vue'
+import MemoDetailModal from '~/components/workspace/MemoDetailModal.vue'
 import { useGlobalSearch } from '~/composables/useGlobalSearch'
 import { APP_INFO } from '~/constants'
 
@@ -127,6 +149,8 @@ const {
   searchQuery,
   groups,
   isLoading,
+  memoModalOpen,
+  selectedMemoId,
   open,
   close
 } = useGlobalSearch()
