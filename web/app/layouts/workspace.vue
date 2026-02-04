@@ -70,18 +70,42 @@
         v-model:search-term="searchQuery"
         v-model:groups="groups"
         :loading="isLoading"
+        :color-mode="false"
         placeholder="搜索书签、备忘录、标签..."
         :autofocus="true"
         shortcut="meta_k"
       >
         <template #empty>
-          <u-empty
-            v-if="searchQuery.trim() && !isLoading"
-            icon="i-lucide-search"
-            title="未找到结果"
-            description="尝试使用其他关键词搜索"
-            size="sm"
-          />
+          <div
+            v-if="searchQuery.trim()"
+            class="flex flex-col items-center gap-2 py-6 text-center"
+          >
+            <u-icon
+              name="i-lucide-search"
+              class="size-8 text-muted"
+            />
+            <p class="text-sm text-muted">
+              未找到相关结果
+            </p>
+            <p class="text-xs text-muted">
+              尝试使用其他关键词
+            </p>
+          </div>
+          <div
+            v-else
+            class="flex flex-col items-center gap-2 py-8 text-center"
+          >
+            <div class="flex gap-2 items-center justify-center">
+              <u-icon
+                name="i-lucide-sparkles"
+                class="size-5 text-primary"
+              />
+              <span class="text-sm font-medium">全局搜索</span>
+            </div>
+            <p class="text-xs text-muted">
+              输入关键词搜索书签、备忘录、标签
+            </p>
+          </div>
         </template>
       </u-dashboard-search>
 
