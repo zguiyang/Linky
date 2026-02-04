@@ -1,6 +1,8 @@
 import { ref, computed } from 'vue'
 import { watchDebounced } from '@vueuse/core'
 
+const MIN_LOADING_DELAY = 300
+
 interface SearchResultItem {
   id: number
   title: string
@@ -34,12 +36,17 @@ export function useGlobalSearch() {
   const searchQuery = ref('')
   const results = ref<SearchResults | null>(null)
   const isLoading = ref(false)
+  let abortController: AbortController | null = null
 
   const open = () => {
     isOpen.value = true
   }
 
   const close = () => {
+    if (abortController) {
+      abortController.abort()
+      abortController = null
+    }
     isOpen.value = false
     clearSearch()
   }
@@ -50,15 +57,30 @@ export function useGlobalSearch() {
       return
     }
 
+    if (abortController) {
+      abortController.abort()
+    }
+    abortController = new AbortController()
+
+    const loadingStartTime = Date.now()
     const { $api } = useNuxtApp()
     isLoading.value = true
 
     try {
       results.value = await $api<SearchResults>('/search', {
-        query: { q: searchQuery.value.trim() }
+        query: { q: searchQuery.value.trim() },
+        signal: abortController.signal
       })
     } finally {
+      const elapsed = Date.now() - loadingStartTime
+      const remaining = MIN_LOADING_DELAY - elapsed
+
+      if (remaining > 0) {
+        await new Promise(resolve => setTimeout(resolve, remaining))
+      }
+
       isLoading.value = false
+      abortController = null
     }
   }
 
