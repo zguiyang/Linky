@@ -124,7 +124,7 @@ const fetchMemo = async () => {
 
 const handleSave = async () => {
   if (originalContent.value === editedContent.value) {
-    toast.add({ title: '内容未更改，无需保存', color: 'warning' })
+    toast.add({ title: '内容未更改，无需保存', color: 'info' })
     isOpen.value = false
     return
   }
