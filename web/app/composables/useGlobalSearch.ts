@@ -1,6 +1,5 @@
 import { ref, computed } from 'vue'
 import { watchDebounced } from '@vueuse/core'
-import { highlightText, stripHtml } from '~/utils/highlight'
 
 const MIN_LOADING_DELAY = 300
 
@@ -126,22 +125,18 @@ export function useGlobalSearch() {
     }
 
     if (results.value.memos.length > 0) {
-      const query = searchQuery.value.trim()
       groups.push({
         id: 'memos',
         label: '备忘录',
         items: results.value.memos.map((item) => {
-          const rawDescription = item.description || ''
-          const highlightedDescription = query
-            ? highlightText(rawDescription, query)
-            : stripHtml(rawDescription)
+          const description = item.description || ''
+          const plainText = description.replace(/<[^>]*>/g, '')
 
           return {
             id: `memo-${item.id}`,
             type: 'memo' as const,
             label: item.title || '无标题备忘录',
-            suffix: stripHtml(rawDescription),
-            highlightedDescription,
+            suffix: plainText,
             icon: 'i-heroicons-document-text',
             onSelect: () => {
               selectedMemoId.value = item.id

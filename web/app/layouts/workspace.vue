@@ -75,22 +75,6 @@
         :autofocus="true"
         shortcut="meta_k"
       >
-        <template #item="{ item }">
-          <template v-if="item.type === 'memo'">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <span
-              class="flex-1 truncate"
-              :class="item.highlightedDescription ? '' : 'text-muted'"
-              v-html="item.highlightedDescription || item.suffix"
-            />
-          </template>
-          <template v-else-if="item.suffix">
-            <span class="flex-1 truncate text-muted text-xs">
-              {{ item.suffix }}
-            </span>
-          </template>
-        </template>
-
         <template #empty>
           <div
             v-if="searchQuery.trim()"
