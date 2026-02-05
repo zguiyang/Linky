@@ -1,7 +1,7 @@
 import logger from '@adonisjs/core/services/logger'
 import ogs from 'open-graph-scraper'
 import Bookmark from '#models/bookmark'
-import { METADATA_FETCH, BOOKMARK_STATUS } from '#constants/index'
+import { METADATA_FETCH, BOOKMARK_STATUS } from '#constants'
 import type { BookmarkMetadata } from '#types/bookmark'
 
 export interface FetchMetadataOptions {
