@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import type { Authenticators } from '@adonisjs/auth/types'
+import { Exception } from '@adonisjs/core/exceptions'
 
 /**
  * Auth middleware is used authenticate HTTP requests and deny
@@ -18,9 +19,7 @@ export default class AuthMiddleware {
       await ctx.auth.authenticateUsing(options.guards)
       return next()
     } catch (error) {
-      return ctx.response.status(401).json({
-        errors: [{ message: 'Unauthenticated' }],
-      })
+      throw new Exception('Unauthenticated', { status: 401 })
     }
   }
 }

@@ -15,6 +15,7 @@ import type {
   AiChatSuccessResponse,
 } from '#types/ai'
 import { AI } from '#constants'
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
 @inject()
 export class AiService {
@@ -39,9 +40,9 @@ export class AiService {
     })
 
     try {
-      const response = await client.chat.completions.create({
+      const response = (await client.chat.completions.create({
         model: params.model,
-        messages: params.messages as any,
+        messages: params.messages as ChatCompletionMessageParam[],
         tools: params.tools as any,
         stream: params.stream ?? false,
         temperature: params.temperature,
@@ -51,16 +52,16 @@ export class AiService {
         presence_penalty: params.presence_penalty,
         response_format: params.response_format as any,
         user: params.user,
-      })
+      })) as any
 
       if (params.stream) {
         return {
           success: true,
-          data: response as any,
+          data: response,
         }
       }
 
-      const data = response as any
+      const data = response
 
       logger.info(
         'AI chat request completed: model=%s, tokens=%d',
@@ -129,15 +130,15 @@ export class AiService {
     })
 
     try {
-      const stream = await client.chat.completions.create({
+      const stream = (await client.chat.completions.create({
         model: params.model,
-        messages: params.messages as any,
+        messages: params.messages as ChatCompletionMessageParam[],
         tools: params.tools as any,
         stream: true,
         temperature: params.temperature,
         max_tokens: params.max_tokens,
         user: params.user,
-      })
+      })) as any
 
       for await (const chunk of stream) {
         const formattedChunk: AiStreamChunk = {

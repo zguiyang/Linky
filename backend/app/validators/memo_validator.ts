@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { Infer } from '@vinejs/vine/types'
 import { VALIDATION, ORDER_BY, SORT_ORDER } from '#constants'
 
 const createMemoSchema = vine.object({
@@ -30,6 +31,6 @@ export const memoPaginationValidator = vine.compile(
   })
 )
 
-export type CreateMemoValidator = typeof createMemoValidator
-export type UpdateMemoValidator = typeof updateMemoValidator
-export type MemoPaginationValidator = typeof memoPaginationValidator
+export type CreateMemoValidator = Infer<typeof createMemoValidator>
+export type UpdateMemoValidator = Infer<typeof updateMemoValidator>
+export type MemoPaginationValidator = Infer<typeof memoPaginationValidator>

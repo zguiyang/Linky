@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { Infer } from '@vinejs/vine/types'
 import { SEARCH } from '#constants'
 
 export const searchValidator = vine.compile(
@@ -7,4 +8,4 @@ export const searchValidator = vine.compile(
   })
 )
 
-export type SearchValidator = typeof searchValidator
+export type SearchValidator = Infer<typeof searchValidator>

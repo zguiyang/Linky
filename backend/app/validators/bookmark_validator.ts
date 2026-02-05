@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { Infer } from '@vinejs/vine/types'
 import { VALIDATION, ORDER_BY, SORT_ORDER, IMPORT } from '#constants'
 
 export const createBookmarkValidator = vine.compile(
@@ -61,8 +62,8 @@ export const importBookmarkValidator = vine.compile(
   })
 )
 
-export type CreateBookmarkValidator = typeof createBookmarkValidator
-export type CreateBookmarkByUrlValidator = typeof createBookmarkByUrlValidator
-export type UpdateBookmarkValidator = typeof updateBookmarkValidator
-export type BookmarkPaginationValidator = typeof bookmarkPaginationValidator
-export type ImportBookmarkValidator = typeof importBookmarkValidator
+export type CreateBookmarkValidator = Infer<typeof createBookmarkValidator>
+export type CreateBookmarkByUrlValidator = Infer<typeof createBookmarkByUrlValidator>
+export type UpdateBookmarkValidator = Infer<typeof updateBookmarkValidator>
+export type BookmarkPaginationValidator = Infer<typeof bookmarkPaginationValidator>
+export type ImportBookmarkValidator = Infer<typeof importBookmarkValidator>
