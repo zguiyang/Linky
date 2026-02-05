@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import { VALIDATION, ORDER_BY, SORT_ORDER } from '#constants/index'
+import { VALIDATION, ORDER_BY, SORT_ORDER } from '#constants'
 
 const createMemoSchema = vine.object({
   title: vine.string().minLength(VALIDATION.TITLE_MIN).maxLength(VALIDATION.TITLE_MAX).optional(),

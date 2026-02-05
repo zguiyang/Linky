@@ -6,3 +6,5 @@ export const searchValidator = vine.compile(
     q: vine.string().trim().minLength(SEARCH.MIN_QUERY_LENGTH).maxLength(SEARCH.MAX_QUERY_LENGTH),
   })
 )
+
+export type SearchValidator = typeof searchValidator

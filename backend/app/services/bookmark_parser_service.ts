@@ -1,4 +1,5 @@
 import { Exception } from '@adonisjs/core/exceptions'
+import logger from '@adonisjs/core/services/logger'
 import { JSDOM } from 'jsdom'
 import Bookmark from '#models/bookmark'
 import Tag from '#models/tag'
@@ -118,7 +119,7 @@ function findNextDlSibling(h3Element: Element): Element | null {
   }
 
   if (iterations >= maxIterations) {
-    console.warn('findNextDlSibling: 达到最大迭代次数限制')
+    logger.warn({ iterations, maxIterations }, 'findNextDlSibling: reached max iteration limit')
   }
 
   return null

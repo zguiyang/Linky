@@ -1,8 +1,22 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { Exception } from '@adonisjs/core/exceptions'
 import { AiService } from '#services/ai_service'
 import { SettingService } from '#services/setting_service'
 import { chatValidator } from '#validators/ai'
+
+interface AiChatMessage {
+  role: 'user' | 'assistant' | 'system'
+  content: string
+}
+
+interface AiChatTools {
+  type: 'function'
+  function: {
+    name: string
+    arguments: string
+  }
+}
 
 @inject()
 export default class AiController {
@@ -21,7 +35,7 @@ export default class AiController {
     const { aiConfig, apiKey } = await this.getAiConfigAndKey(user.id)
 
     if (!apiKey) {
-      return AiService.formatError('MISSING_API_KEY', 'AI API key is not configured')
+      throw new Exception('AI API key is not configured', { status: 400 })
     }
 
     const response = await AiService.chat(
@@ -33,8 +47,8 @@ export default class AiController {
       },
       {
         model: data.model,
-        messages: data.messages as any,
-        tools: data.tools as any,
+        messages: data.messages as AiChatMessage[],
+        tools: data.tools as AiChatTools[],
         stream: data.stream,
         temperature: data.temperature,
         max_tokens: data.max_tokens,
@@ -55,9 +69,7 @@ export default class AiController {
     const { aiConfig, apiKey } = await this.getAiConfigAndKey(user.id)
 
     if (!apiKey) {
-      return response
-        .status(400)
-        .json(AiService.formatError('MISSING_API_KEY', 'AI API key is not configured'))
+      throw new Exception('AI API key is not configured', { status: 400 })
     }
 
     return AiService.streamToSse(
@@ -69,8 +81,8 @@ export default class AiController {
       },
       {
         model: chatData.model,
-        messages: chatData.messages as any,
-        tools: chatData.tools as any,
+        messages: chatData.messages as AiChatMessage[],
+        tools: chatData.tools as AiChatTools[],
         temperature: chatData.temperature,
         max_tokens: chatData.max_tokens,
       },

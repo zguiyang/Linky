@@ -48,7 +48,7 @@ export default class AuthController {
     const user = await this.authService.resetPassword(data.token, data.password)
 
     if (!user) {
-      throw new Exception('重置令牌无效或已过期', { status: 422 })
+      throw new Exception('Reset token is invalid or expired', { status: 422 })
     }
   }
 
@@ -57,7 +57,7 @@ export default class AuthController {
     const user = await this.authService.verifyEmail(token)
 
     if (!user) {
-      throw new Exception('验证令牌无效或已过期', { status: 422 })
+      throw new Exception('Verification token is invalid or expired', { status: 422 })
     }
   }
 
