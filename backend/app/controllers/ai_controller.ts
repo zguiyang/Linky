@@ -8,7 +8,10 @@ import type { MessageContent, ToolDefinition } from '#types/ai'
 
 @inject()
 export default class AiController {
-  constructor(protected settingService: SettingService) {}
+  constructor(
+    protected settingService: SettingService,
+    private aiService: AiService
+  ) {}
 
   private async getAiConfigAndKey(userId: number) {
     const aiConfig = await this.settingService.getAiConfig(userId)
@@ -26,7 +29,7 @@ export default class AiController {
       throw new Exception('AI API key is not configured', { status: 400 })
     }
 
-    const response = await AiService.chat(
+    const response = await this.aiService.chat(
       {
         baseUrl: aiConfig.aiBaseUrl,
         apiKey,
@@ -60,7 +63,7 @@ export default class AiController {
       throw new Exception('AI API key is not configured', { status: 400 })
     }
 
-    return AiService.streamToSse(
+    return this.aiService.streamToSse(
       {
         baseUrl: aiConfig.aiBaseUrl,
         apiKey,

@@ -4,7 +4,7 @@ import app from '@adonisjs/core/services/app'
 import { BookmarkMetadataService } from '#services/bookmark_metadata_service'
 import { SettingService } from '#services/setting_service'
 import { TransmitService } from '#services/transmit_service'
-import { METADATA_FETCH, BOOKMARK_EVENTS, TRANSMIT_CHANNEL_NAMES } from '#constants/index'
+import { METADATA_FETCH, BOOKMARK_EVENTS, TRANSMIT_CHANNEL_NAMES } from '#constants'
 import GenerateAiTags from './generate_ai_tags.js'
 
 export type FetchBookmarkMetadataPayload = {
@@ -63,7 +63,7 @@ export default class FetchBookmarkMetadata extends Job {
       GenerateAiTags.dispatch({
         bookmarkId,
         userId,
-      }).catch((err) => {
+      }).catch((err: any) => {
         logger.error(
           { err },
           `[FetchBookmarkMetadata] Failed to schedule AI tags for bookmark ${bookmarkId}`

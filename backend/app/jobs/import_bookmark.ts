@@ -1,10 +1,10 @@
 import { Job } from 'adonisjs-jobs'
 import logger from '@adonisjs/core/services/logger'
 import { readFile, unlink } from 'node:fs/promises'
-import { BookmarkParserService, parseHtml } from '#services/bookmark_parser_service'
+import { BookmarkParserService } from '#services/bookmark_parser_service'
 import app from '@adonisjs/core/services/app'
 import { TransmitService } from '#services/transmit_service'
-import { BOOKMARK_EVENTS, TRANSMIT_CHANNEL_NAMES } from '#constants/index'
+import { BOOKMARK_EVENTS, TRANSMIT_CHANNEL_NAMES } from '#constants'
 
 export interface ImportBookmarkPayload {
   jobId: string
@@ -62,7 +62,7 @@ export default class ImportBookmark extends Job {
       await this.updateStatus(jobId, 'processing', 30)
       logger.info(`[ImportBookmark] Progress: 30%`)
 
-      const parseResult = await parseHtml(htmlContent)
+      const parseResult = await this.bookmarkParserService.parseHtml(htmlContent)
       logger.info(`[ImportBookmark] Parsed bookmarks: ${parseResult.bookmarks.length}`)
       await this.updateProgress(50)
       await this.updateStatus(jobId, 'processing', 50)

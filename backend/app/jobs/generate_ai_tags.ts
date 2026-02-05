@@ -7,7 +7,7 @@ import { TransmitService } from '#services/transmit_service'
 import PromptService from '#services/prompt_service'
 import Bookmark from '#models/bookmark'
 import Tag from '#models/tag'
-import { AI_TAG, BOOKMARK_EVENTS, TRANSMIT_CHANNEL_NAMES } from '#constants/index'
+import { AI_TAG, BOOKMARK_EVENTS, TRANSMIT_CHANNEL_NAMES } from '#constants'
 import type { UserAiConfig } from '#types/ai'
 
 export interface GenerateAiTagsPayload {
@@ -29,6 +29,7 @@ interface AiTagSuggestion {
 
 export default class GenerateAiTags extends Job {
   private settingService = new SettingService()
+  private aiService = new AiService()
   private promptService = new PromptService()
 
   async handle(payload: GenerateAiTagsPayload): Promise<GenerateAiTagsResult> {
@@ -80,7 +81,7 @@ export default class GenerateAiTags extends Job {
         existingTags: Array.from(existingTagNames).join(', '),
       })
 
-      const response = await AiService.chat(aiServiceConfig, {
+      const response = await this.aiService.chat(aiServiceConfig, {
         messages: [
           { role: 'system', content: this.promptService.render('system') },
           { role: 'user', content: prompt },

@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import app from '@adonisjs/core/services/app'
 import { AiService } from '#services/ai_service'
 import type { UserAiConfig, AiChatParams, AiChatResponseError } from '#types/ai'
 import encryption from '@adonisjs/core/services/encryption'
@@ -10,6 +11,7 @@ const mockChatParams: AiChatParams = {
 }
 
 test('should return error when AI is disabled', async ({ assert }) => {
+  const aiService = await app.container.make(AiService)
   const disabledConfig: UserAiConfig = {
     baseUrl: 'https://api.openai.com/v1',
     apiKey: 'sk-test-key',
@@ -17,13 +19,14 @@ test('should return error when AI is disabled', async ({ assert }) => {
     enabled: false,
   }
 
-  const response = await AiService.chat(disabledConfig, mockChatParams)
+  const response = await aiService.chat(disabledConfig, mockChatParams)
 
   assert.isFalse(response.success)
   assert.equal((response as AiChatResponseError).error.code, 'AI_DISABLED')
 })
 
 test('should return error when API key is missing', async ({ assert }) => {
+  const aiService = await app.container.make(AiService)
   const noKeyConfig: UserAiConfig = {
     baseUrl: 'https://api.openai.com/v1',
     apiKey: null,
@@ -31,13 +34,14 @@ test('should return error when API key is missing', async ({ assert }) => {
     enabled: true,
   }
 
-  const response = await AiService.chat(noKeyConfig, mockChatParams)
+  const response = await aiService.chat(noKeyConfig, mockChatParams)
 
   assert.isFalse(response.success)
   assert.equal((response as AiChatResponseError).error.code, 'MISSING_API_KEY')
 })
 
 test('should return error when base URL is missing', async ({ assert }) => {
+  const aiService = await app.container.make(AiService)
   const noUrlConfig: UserAiConfig = {
     baseUrl: null,
     apiKey: 'sk-test-key',
@@ -45,14 +49,15 @@ test('should return error when base URL is missing', async ({ assert }) => {
     enabled: true,
   }
 
-  const response = await AiService.chat(noUrlConfig, mockChatParams)
+  const response = await aiService.chat(noUrlConfig, mockChatParams)
 
   assert.isFalse(response.success)
   assert.equal((response as AiChatResponseError).error.code, 'MISSING_BASE_URL')
 })
 
 test('should format OpenAI API error correctly', async ({ assert }) => {
-  const response = AiService.formatError(
+  const aiService = await app.container.make(AiService)
+  const response = (aiService as any).formatError(
     'INVALID_API_KEY',
     'Incorrect API key provided',
     'authentication_error'
@@ -65,7 +70,8 @@ test('should format OpenAI API error correctly', async ({ assert }) => {
 })
 
 test('should format network error correctly', async ({ assert }) => {
-  const response = AiService.formatError(
+  const aiService = await app.container.make(AiService)
+  const response = (aiService as any).formatError(
     'NETWORK_ERROR',
     'Unable to connect to AI service: Connection refused'
   )
@@ -107,6 +113,7 @@ test('should handle JSON response format', async ({ assert }) => {
 })
 
 test('should work with real OpenAI API', async ({ assert }) => {
+  const aiService = await app.container.make(AiService)
   const config = await db.query().from('user_configs').first()
 
   if (!config) {
@@ -144,7 +151,7 @@ test('should work with real OpenAI API', async ({ assert }) => {
     enabled: true,
   }
 
-  const response = await AiService.chat(userConfig, {
+  const response = await aiService.chat(userConfig, {
     model: userConfig.modelName!,
     messages: [{ role: 'user', content: 'Say hello in exactly one word' }],
   })

@@ -18,7 +18,7 @@ import { AI } from '#constants'
 
 @inject()
 export class AiService {
-  static async chat(userConfig: UserAiConfig, params: AiChatParams): Promise<AiChatResponse> {
+  async chat(userConfig: UserAiConfig, params: AiChatParams): Promise<AiChatResponse> {
     if (!userConfig.enabled) {
       return this.formatError('AI_DISABLED', 'AI feature is not enabled for this user')
     }
@@ -106,7 +106,7 @@ export class AiService {
     }
   }
 
-  static async streamChat(
+  async streamChat(
     userConfig: UserAiConfig,
     params: AiChatParams,
     handler: AiStreamHandler
@@ -174,7 +174,7 @@ export class AiService {
     }
   }
 
-  static async streamToSse(
+  async streamToSse(
     userConfig: UserAiConfig,
     params: AiChatParams,
     response: HttpContext['response']
@@ -197,8 +197,8 @@ export class AiService {
     }
 
     const webStream = new ReadableStream<Uint8Array>({
-      async start(controller) {
-        await AiService.streamChat(userConfig, params, {
+      start: async (controller) => {
+        await this.streamChat(userConfig, params, {
           onChunk: (chunk: AiStreamChunk) => {
             sendEvent(controller, 'chunk', chunk)
           },
@@ -224,7 +224,7 @@ export class AiService {
     return response.stream(nodeReadable)
   }
 
-  private static formatOpenAiError(error: any): AiChatResponseError {
+  private formatOpenAiError(error: any): AiChatResponseError {
     if (error.status) {
       return this.formatError(
         `HTTP_${error.status}`,
@@ -249,7 +249,7 @@ export class AiService {
     return this.formatError('UNKNOWN_ERROR', error.message || 'An unexpected error occurred')
   }
 
-  static formatError(
+  private formatError(
     code: string,
     message: string,
     type?: string,
