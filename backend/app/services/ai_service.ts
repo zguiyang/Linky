@@ -1,6 +1,10 @@
 import { OpenAI } from 'openai'
 import { Readable } from 'node:stream'
 import type { ReadableStream as NodeReadableStream } from 'node:stream/web'
+import logger from '@adonisjs/core/services/logger'
+import type { HttpContext } from '@adonisjs/core/http'
+import { inject } from '@adonisjs/core'
+
 import type {
   UserAiConfig,
   AiChatParams,
@@ -11,9 +15,8 @@ import type {
   AiChatSuccessResponse,
 } from '#types/ai'
 import { AI } from '#constants'
-import logger from '@adonisjs/core/services/logger'
-import type { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export class AiService {
   static async chat(userConfig: UserAiConfig, params: AiChatParams): Promise<AiChatResponse> {
     if (!userConfig.enabled) {
