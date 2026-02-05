@@ -1,5 +1,6 @@
 import vine from '@vinejs/vine'
-import { VALIDATION, SORT_ORDER, PAGINATION, TAG_ITEM_TYPE } from '#constants/index'
+import { VALIDATION, SORT_ORDER, PAGINATION, TAG_ITEM_TYPE } from '#constants'
+import { Infer } from '@vinejs/vine/types'
 
 export const createTagValidator = vine.compile(
   vine.object({
@@ -45,6 +46,6 @@ export const tagItemsValidator = vine.compile(
   })
 )
 
-export type CreateTagValidator = typeof createTagValidator
-export type UpdateTagValidator = typeof updateTagValidator
-export type TagItemsValidator = typeof tagItemsValidator
+export type CreateTagValidator = Infer<typeof createTagValidator>
+export type UpdateTagValidator = Infer<typeof updateTagValidator>
+export type TagItemsValidator = Infer<typeof tagItemsValidator>
