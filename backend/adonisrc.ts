@@ -57,7 +57,6 @@ export default defineConfig({
     () => import('@adonisjs/redis/redis_provider'),
     () => import('adonisjs-jobs/jobs_provider'),
     () => import('@adonisjs/transmit/transmit_provider'),
-    () => import('#providers/services_provider'),
   ],
 
   /*
