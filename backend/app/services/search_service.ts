@@ -24,6 +24,16 @@ interface SearchResults {
 
 @inject()
 export class SearchService {
+  /**
+   * SearchService is a global search aggregator that queries multiple models.
+   *
+   * Direct model access is acceptable here because:
+   * 1. This is a read-only operation (no business logic)
+   * 2. Aggregating data from multiple sources is its core responsibility
+   * 3. Going through individual services would add unnecessary complexity
+   *
+   * This follows CQRS principles where read operations can be handled differently from write operations.
+   */
   async search(userId: number, query: string): Promise<SearchResults> {
     logger.info({ userId, query }, 'Executing global search')
 

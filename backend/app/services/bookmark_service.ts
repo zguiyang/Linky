@@ -1,8 +1,15 @@
 import { inject } from '@adonisjs/core'
+import Database from '@adonisjs/lucid/services/db'
 import Bookmark from '#models/bookmark'
 import { Exception } from '@adonisjs/core/exceptions'
 import type { BookmarkMetadata } from '#types/bookmark'
 import { BOOKMARK_STATUS } from '#constants/index'
+
+interface FindByTagIdResult {
+  data: Bookmark[]
+  total: number
+  lastPage: number
+}
 
 @inject()
 export class BookmarkService {
@@ -281,5 +288,62 @@ export class BookmarkService {
     }
 
     return null
+  }
+
+  async findByTagId(
+    userId: number,
+    tagId: number,
+    options: { page?: number; perPage?: number; sortOrder?: 'asc' | 'desc' } = {}
+  ): Promise<FindByTagIdResult> {
+    const { page = 1, perPage = 20, sortOrder = 'desc' } = options
+
+    const subquery = Database.from('bookmark_tags').select('bookmark_id').where('tag_id', tagId)
+
+    const paginatedResult = await Bookmark.query()
+      .from('bookmarks')
+      .select(
+        'id',
+        'title',
+        'url',
+        'description',
+        'user_id',
+        'status',
+        'metadata',
+        'created_at',
+        'updated_at'
+      )
+      .where('user_id', userId)
+      .whereIn('id', subquery)
+      .orderBy('created_at', sortOrder)
+      .paginate(page, perPage)
+
+    const data: Bookmark[] = await Promise.all(
+      paginatedResult.map(async (bookmark) => {
+        await bookmark.load('tags')
+        return bookmark
+      })
+    )
+
+    return {
+      data,
+      total: paginatedResult.total,
+      lastPage: paginatedResult.lastPage,
+    }
+  }
+
+  async findManyByTagIds(userId: number, tagIds: number[], limit: number): Promise<Bookmark[]> {
+    const subquery = Database.from('bookmark_tags')
+      .select('bookmark_id')
+      .whereIn('tag_id', tagIds)
+      .distinct()
+
+    const bookmarks = await Bookmark.query()
+      .where('user_id', userId)
+      .whereIn('id', subquery)
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .preload('tags')
+
+    return bookmarks
   }
 }

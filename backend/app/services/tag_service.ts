@@ -1,10 +1,11 @@
 import { DateTime } from 'luxon'
+import { inject } from '@adonisjs/core'
 import Tag from '#models/tag'
-import Bookmark from '#models/bookmark'
-import Memo from '#models/memo'
 import { Exception } from '@adonisjs/core/exceptions'
 import Database from '@adonisjs/lucid/services/db'
-import { PAGINATION, SORT_ORDER } from '#constants/index'
+import { PAGINATION, SORT_ORDER } from '#constants'
+import { BookmarkService } from './bookmark_service.js'
+import { MemoService } from './memo_service.js'
 
 interface TagItem {
   type: 'bookmark' | 'memo'
@@ -26,7 +27,13 @@ interface TagItemsResult {
   }
 }
 
+@inject()
 export class TagService {
+  constructor(
+    private bookmarkService: BookmarkService,
+    private memoService: MemoService
+  ) {}
+
   async create(userId: number, data: { name: string; color?: string }) {
     const existingTag = await Tag.query().where('user_id', userId).where('name', data.name).first()
 
@@ -132,65 +139,47 @@ export class TagService {
     const perPage = options.perPage || PAGINATION.DEFAULT_PER_PAGE
     const sortOrder = options.sortOrder || SORT_ORDER.ASC
 
-    const offset = (page - 1) * perPage
-
     if (options.type === 'bookmark') {
-      return await this.queryBookmarks(userId, tagId, { page, perPage, sortOrder, offset })
+      return await this.queryBookmarks(userId, tagId, { page, perPage, sortOrder })
     } else {
-      return await this.queryMemos(userId, tagId, { page, perPage, sortOrder, offset })
+      return await this.queryMemos(userId, tagId, { page, perPage, sortOrder })
     }
   }
 
   private async queryBookmarks(
     userId: number,
     tagId: number,
-    options: { page: number; perPage: number; sortOrder: 'asc' | 'desc'; offset: number }
+    options: { page: number; perPage: number; sortOrder: 'asc' | 'desc' }
   ): Promise<TagItemsResult> {
-    const { page, perPage, sortOrder, offset } = options
+    const { page, perPage, sortOrder } = options
 
-    const subquery = Database.from('bookmark_tags').select('bookmark_id').where('tag_id', tagId)
+    const result = await this.bookmarkService.findByTagId(userId, tagId, {
+      page,
+      perPage,
+      sortOrder,
+    })
 
-    const itemsResult = await Bookmark.query()
-      .from('bookmarks')
-      .select('id', 'title', 'url', 'created_at')
-      .where('user_id', userId)
-      .whereIn('id', subquery)
-      .orderBy('created_at', sortOrder)
-      .offset(offset)
-      .limit(perPage)
-
-    const totalResult = await Database.from('bookmark_tags')
-      .count('* as total')
-      .where('tag_id', tagId)
-    const total = Number(totalResult[0]?.total || 0)
-    const lastPage = Math.ceil(total / perPage)
-
-    const items: TagItem[] = await Promise.all(
-      itemsResult.map(async (bookmark) => {
-        await bookmark.load('tags')
-        return {
-          type: 'bookmark' as const,
-          id: bookmark.id,
-          title: bookmark.title,
-          url: bookmark.url,
-          content: null,
-          createdAt: bookmark.createdAt,
-          tags: bookmark.tags.map((t) => ({
-            id: t.id,
-            name: t.name,
-            color: t.color,
-          })),
-        }
-      })
-    )
+    const items: TagItem[] = result.data.map((bookmark) => ({
+      type: 'bookmark' as const,
+      id: bookmark.id,
+      title: bookmark.title,
+      url: bookmark.url,
+      content: null,
+      createdAt: bookmark.createdAt,
+      tags: bookmark.tags.map((t) => ({
+        id: t.id,
+        name: t.name,
+        color: t.color,
+      })),
+    }))
 
     return {
       data: items,
       meta: {
-        total,
+        total: result.total,
         page,
         perPage,
-        lastPage,
+        lastPage: result.lastPage,
       },
     }
   }
@@ -198,51 +187,37 @@ export class TagService {
   private async queryMemos(
     userId: number,
     tagId: number,
-    options: { page: number; perPage: number; sortOrder: 'asc' | 'desc'; offset: number }
+    options: { page: number; perPage: number; sortOrder: 'asc' | 'desc' }
   ): Promise<TagItemsResult> {
-    const { page, perPage, sortOrder, offset } = options
+    const { page, perPage, sortOrder } = options
 
-    const subquery = Database.from('memo_tags').select('memo_id').where('tag_id', tagId)
+    const result = await this.memoService.findByTagId(userId, tagId, {
+      page,
+      perPage,
+      sortOrder,
+    })
 
-    const itemsResult = await Memo.query()
-      .from('memos')
-      .select('id', 'title', 'content', 'created_at')
-      .where('user_id', userId)
-      .whereIn('id', subquery)
-      .orderBy('created_at', sortOrder)
-      .offset(offset)
-      .limit(perPage)
-
-    const totalResult = await Database.from('memo_tags').count('* as total').where('tag_id', tagId)
-    const total = Number(totalResult[0]?.total || 0)
-    const lastPage = Math.ceil(total / perPage)
-
-    const items: TagItem[] = await Promise.all(
-      itemsResult.map(async (memo) => {
-        await memo.load('tags')
-        return {
-          type: 'memo' as const,
-          id: memo.id,
-          title: memo.title,
-          url: null,
-          content: memo.content,
-          createdAt: memo.createdAt,
-          tags: memo.tags.map((t) => ({
-            id: t.id,
-            name: t.name,
-            color: t.color,
-          })),
-        }
-      })
-    )
+    const items: TagItem[] = result.data.map((memo) => ({
+      type: 'memo' as const,
+      id: memo.id,
+      title: memo.title,
+      url: null,
+      content: memo.content,
+      createdAt: memo.createdAt,
+      tags: memo.tags.map((t) => ({
+        id: t.id,
+        name: t.name,
+        color: t.color,
+      })),
+    }))
 
     return {
       data: items,
       meta: {
-        total,
+        total: result.total,
         page,
         perPage,
-        lastPage,
+        lastPage: result.lastPage,
       },
     }
   }

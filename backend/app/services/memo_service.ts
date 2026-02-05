@@ -1,7 +1,15 @@
+import { inject } from '@adonisjs/core'
 import Memo from '#models/memo'
 import { Exception } from '@adonisjs/core/exceptions'
 import Database from '@adonisjs/lucid/services/db'
 
+interface FindByTagIdResult {
+  data: Memo[]
+  total: number
+  lastPage: number
+}
+
+@inject()
 export class MemoService {
   async create(
     userId: number,
@@ -149,5 +157,52 @@ export class MemoService {
     }
 
     await memo.delete()
+  }
+
+  async findByTagId(
+    userId: number,
+    tagId: number,
+    options: { page?: number; perPage?: number; sortOrder?: 'asc' | 'desc' } = {}
+  ): Promise<FindByTagIdResult> {
+    const { page = 1, perPage = 20, sortOrder = 'desc' } = options
+
+    const subquery = Database.from('memo_tags').select('memo_id').where('tag_id', tagId)
+
+    const paginatedResult = await Memo.query()
+      .from('memos')
+      .select('id', 'title', 'content', 'user_id', 'is_pinned', 'created_at', 'updated_at')
+      .where('user_id', userId)
+      .whereIn('id', subquery)
+      .orderBy('created_at', sortOrder)
+      .paginate(page, perPage)
+
+    const data: Memo[] = await Promise.all(
+      paginatedResult.map(async (memo) => {
+        await memo.load('tags')
+        return memo
+      })
+    )
+
+    return {
+      data,
+      total: paginatedResult.total,
+      lastPage: paginatedResult.lastPage,
+    }
+  }
+
+  async findManyByTagIds(userId: number, tagIds: number[], limit: number): Promise<Memo[]> {
+    const subquery = Database.from('memo_tags')
+      .select('memo_id')
+      .whereIn('tag_id', tagIds)
+      .distinct()
+
+    const memos = await Memo.query()
+      .where('user_id', userId)
+      .whereIn('id', subquery)
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .preload('tags')
+
+    return memos
   }
 }
