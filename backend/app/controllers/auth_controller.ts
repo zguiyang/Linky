@@ -2,8 +2,8 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { Exception } from '@adonisjs/core/exceptions'
 import {
-  registerValidator,
   loginValidator,
+  registerValidator,
   resetPasswordValidator,
 } from '#validators/auth_validator'
 import { AuthService } from '#services/auth_service'
@@ -38,8 +38,8 @@ export default class AuthController {
 
   async forgotPassword({ request }: HttpContext) {
     const data = request.only(['email'])
-    const result = await this.authService.requestPasswordReset(data.email)
-    return result
+
+    return await this.authService.requestPasswordReset(data.email)
   }
 
   async resetPassword({ request }: HttpContext) {

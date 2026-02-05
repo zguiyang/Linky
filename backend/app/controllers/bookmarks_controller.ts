@@ -13,7 +13,7 @@ import {
 } from '#validators/bookmark_validator'
 import { BookmarkService } from '#services/bookmark_service'
 import ImportBookmark from '#jobs/import_bookmark'
-import { IMPORT } from '#constants/index'
+import { IMPORT } from '#constants'
 
 @inject()
 export default class BookmarksController {
