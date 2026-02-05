@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { Infer } from '@vinejs/vine/types'
 
 export const chatValidator = vine.compile(
   vine.object({
@@ -44,4 +45,4 @@ export const chatValidator = vine.compile(
   })
 )
 
-export type ChatValidator = typeof chatValidator
+export type ChatValidator = Infer<typeof chatValidator>

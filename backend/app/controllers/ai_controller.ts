@@ -4,23 +4,11 @@ import { Exception } from '@adonisjs/core/exceptions'
 import { AiService } from '#services/ai_service'
 import { SettingService } from '#services/setting_service'
 import { chatValidator } from '#validators/ai'
-
-interface AiChatMessage {
-  role: 'user' | 'assistant' | 'system'
-  content: string
-}
-
-interface AiChatTools {
-  type: 'function'
-  function: {
-    name: string
-    arguments: string
-  }
-}
+import type { MessageContent, ToolDefinition } from '#types/ai'
 
 @inject()
 export default class AiController {
-  constructor(private settingService: SettingService) {}
+  constructor(protected settingService: SettingService) {}
 
   private async getAiConfigAndKey(userId: number) {
     const aiConfig = await this.settingService.getAiConfig(userId)
@@ -47,15 +35,15 @@ export default class AiController {
       },
       {
         model: data.model,
-        messages: data.messages as AiChatMessage[],
-        tools: data.tools as AiChatTools[],
+        messages: data.messages as MessageContent[],
+        tools: data.tools as unknown as ToolDefinition[],
         stream: data.stream,
         temperature: data.temperature,
         max_tokens: data.max_tokens,
         top_p: data.top_p,
         frequency_penalty: data.frequency_penalty,
         presence_penalty: data.presence_penalty,
-        response_format: data.response_format,
+        response_format: data.response_format as any,
       }
     )
 
@@ -81,10 +69,13 @@ export default class AiController {
       },
       {
         model: chatData.model,
-        messages: chatData.messages as AiChatMessage[],
-        tools: chatData.tools as AiChatTools[],
+        messages: chatData.messages as MessageContent[],
+        tools: chatData.tools as unknown as ToolDefinition[],
         temperature: chatData.temperature,
         max_tokens: chatData.max_tokens,
+        top_p: chatData.top_p,
+        frequency_penalty: chatData.frequency_penalty,
+        presence_penalty: chatData.presence_penalty,
       },
       response
     )
