@@ -12,10 +12,9 @@ import { AuthService } from '#services/auth_service'
 export default class AuthController {
   constructor(private authService: AuthService) {}
 
-  async register({ request, auth }: HttpContext) {
+  async register({ request }: HttpContext) {
     const data = await request.validateUsing(registerValidator)
-    const user = await this.authService.register(data)
-    const token = await auth.use('api').createToken(user)
+    const { user, token } = await this.authService.register(data)
 
     return {
       user: user.serialize(),

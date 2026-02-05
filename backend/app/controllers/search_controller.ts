@@ -8,13 +8,9 @@ export default class SearchController {
   constructor(private searchService: SearchService) {}
 
   async search({ request, auth }: HttpContext) {
-    const userId = auth.user?.id
-    if (!userId) {
-      return { query: '', bookmarks: [], memos: [], tags: [] }
-    }
-
+    const user = auth.getUserOrFail()
     const { q: query } = await request.validateUsing(searchValidator)
 
-    return await this.searchService.search(userId, query)
+    return await this.searchService.search(user.id, query)
   }
 }

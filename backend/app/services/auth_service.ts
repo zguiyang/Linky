@@ -23,11 +23,13 @@ export class AuthService {
       password: data.password,
     })
 
+    const token = await User.accessTokens.create(user)
+
     await this.sendVerificationEmail(user)
 
     logger.info({ userId: user.id }, 'Registration successful')
 
-    return user
+    return { user, token }
   }
 
   async login(email: string, password: string) {
