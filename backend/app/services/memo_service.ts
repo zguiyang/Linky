@@ -168,23 +168,18 @@ export class MemoService {
 
     const subquery = Database.from('memo_tags').select('memo_id').where('tag_id', tagId)
 
-    const paginatedResult = await Memo.query()
+    const query = Memo.query()
       .from('memos')
       .select('id', 'title', 'content', 'user_id', 'is_pinned', 'created_at', 'updated_at')
       .where('user_id', userId)
       .whereIn('id', subquery)
+      .preload('tags')
       .orderBy('created_at', sortOrder)
-      .paginate(page, perPage)
 
-    const data: Memo[] = await Promise.all(
-      paginatedResult.map(async (memo) => {
-        await memo.load('tags')
-        return memo
-      })
-    )
+    const paginatedResult = await query.paginate(page, perPage)
 
     return {
-      data,
+      data: paginatedResult.all(),
       total: paginatedResult.total,
       lastPage: paginatedResult.lastPage,
     }

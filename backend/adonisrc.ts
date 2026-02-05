@@ -56,6 +56,7 @@ export default defineConfig({
     () => import('@adonisjs/core/providers/edge_provider'),
     () => import('@adonisjs/redis/redis_provider'),
     () => import('adonisjs-jobs/jobs_provider'),
+    () => import('@adonisjs/limiter/limiter_provider'),
     () => import('@adonisjs/transmit/transmit_provider'),
   ],
 

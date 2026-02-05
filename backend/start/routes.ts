@@ -11,6 +11,7 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import env from '#start/env'
 import transmit from '@adonisjs/transmit/services/main'
+import { apiLimiter, authLimiter, searchLimiter, aiChatLimiter } from '#start/limiter'
 
 import { TRANSMIT_CHANNEL_NAMES } from '#constants/index'
 
@@ -22,7 +23,7 @@ const SettingsController = () => import('#controllers/settings_controller')
 const AiController = () => import('#controllers/ai_controller')
 const SearchController = () => import('#controllers/search_controller')
 
-// 公开认证路由组（不需要认证）
+// 公开认证路由组（不需要认证）- 更严格的限流
 router
   .group(() => {
     router.post('/auth/register', [AuthController, 'register'])
@@ -32,6 +33,7 @@ router
     router.get('/auth/verify-email', [AuthController, 'verifyEmail'])
   })
   .prefix('api')
+  .use(authLimiter)
 
 // 受保护 API 路由组（需要认证）
 router
@@ -75,16 +77,17 @@ router
     router.get('/settings/ai', [SettingsController, 'getAiConfig'])
     router.put('/settings/ai', [SettingsController, 'updateAiConfig'])
 
-    // AI API
+    // AI API - 独立限流
     router.get('/ai/config', [AiController, 'getConfig'])
-    router.post('/ai/chat', [AiController, 'chat'])
-    router.post('/ai/chat/stream', [AiController, 'stream'])
+    router.post('/ai/chat', [AiController, 'chat']).use(aiChatLimiter)
+    router.post('/ai/chat/stream', [AiController, 'stream']).use(aiChatLimiter)
 
-    // 全局搜索
-    router.get('/search', [SearchController, 'search'])
+    // 全局搜索 - 独立限流
+    router.get('/search', [SearchController, 'search']).use(searchLimiter)
   })
   .prefix('api')
   .middleware(middleware.auth())
+  .use(apiLimiter)
 
 // Jobs Dashboard（GUI 界面）- 仅管理员可访问
 router.jobs('/jobs').use(async (ctx, next) => {

@@ -299,7 +299,7 @@ export class BookmarkService {
 
     const subquery = Database.from('bookmark_tags').select('bookmark_id').where('tag_id', tagId)
 
-    const paginatedResult = await Bookmark.query()
+    const query = Bookmark.query()
       .from('bookmarks')
       .select(
         'id',
@@ -314,18 +314,13 @@ export class BookmarkService {
       )
       .where('user_id', userId)
       .whereIn('id', subquery)
+      .preload('tags')
       .orderBy('created_at', sortOrder)
-      .paginate(page, perPage)
 
-    const data: Bookmark[] = await Promise.all(
-      paginatedResult.map(async (bookmark) => {
-        await bookmark.load('tags')
-        return bookmark
-      })
-    )
+    const paginatedResult = await query.paginate(page, perPage)
 
     return {
-      data,
+      data: paginatedResult.all(),
       total: paginatedResult.total,
       lastPage: paginatedResult.lastPage,
     }
