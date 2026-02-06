@@ -1,7 +1,7 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { UserService } from '#services/user_service'
-import { updateProfileValidator } from '#validators/user_validator'
+import { updateProfileValidator, changeEmailValidator } from '#validators/user_validator'
 
 @inject()
 export default class UsersController {
@@ -22,5 +22,14 @@ export default class UsersController {
     })
 
     return updatedUser.serialize()
+  }
+
+  async changeEmail({ auth, request }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const data = await request.validateUsing(changeEmailValidator)
+
+    await this.userService.changeEmail(user.id, data.newEmail, data.password)
+
+    return { message: 'Verification email sent' }
   }
 }

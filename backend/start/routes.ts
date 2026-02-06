@@ -39,13 +39,13 @@ router
 // 受保护 API 路由组（需要认证）
 router
   .group(() => {
-    router.post('/auth/logout', [AuthController, 'logout']).middleware(middleware.auth())
-    router
-      .post('/auth/resend-verification', [AuthController, 'resendVerification'])
-      .middleware(middleware.auth())
+    router.post('/auth/logout', [AuthController, 'logout'])
+    router.post('/auth/resend-verification', [AuthController, 'resendVerification'])
+
     // 用户 API
-    router.get('/user/me', [UsersController, 'me']).middleware(middleware.auth())
-    router.put('/user', [UsersController, 'update']).middleware(middleware.auth())
+    router.get('/user/me', [UsersController, 'me'])
+    router.put('/user', [UsersController, 'update'])
+    router.post('/user/change-email', [UsersController, 'changeEmail'])
 
     // 标签 API
     router.get('/tags', [TagsController, 'index'])

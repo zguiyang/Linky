@@ -1,6 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/icon', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vueuse/nuxt'],
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false
+    }
+  ],
 
   devtools: {
     enabled: true
@@ -21,12 +27,6 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4
   },
-  components: [
-    {
-      path: '~/components',
-      pathPrefix: false,
-    },
-  ],
   vite: {
     esbuild: process.env.NODE_ENV === 'production'
       ? {

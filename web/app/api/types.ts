@@ -38,6 +38,16 @@ export interface ResetPasswordRequest {
   passwordConfirmation: string
 }
 
+export interface ChangeEmailRequest {
+  newEmail: string
+  password: string
+}
+
+export interface ChangeEmailResponse {
+  message: string
+  user: User
+}
+
 export interface Tag {
   id: number
   name: string

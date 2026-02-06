@@ -219,15 +219,24 @@
                     label="邮箱地址"
                     description="用于登录及接收系统通知"
                   >
-                    <u-input
-                      v-model="profileForm.email"
-                      type="email"
-                      placeholder="example@linky.com"
-                      size="lg"
-                      class="w-full"
-                      icon="i-heroicons-envelope"
-                      disabled
-                    />
+                    <div class="flex items-center gap-3">
+                      <u-input
+                        v-model="profileForm.email"
+                        type="email"
+                        placeholder="example@linky.com"
+                        size="lg"
+                        class="flex-1"
+                        icon="i-heroicons-envelope"
+                        disabled
+                      />
+                      <u-button
+                        color="primary"
+                        variant="soft"
+                        @click="showEmailModal = true"
+                      >
+                        修改邮箱
+                      </u-button>
+                    </div>
                   </u-form-field>
                 </div>
 
@@ -242,7 +251,7 @@
                       账号验证状态
                     </p>
                     <p class="text-primary-700 dark:text-primary-300 mt-0.5">
-                      您的账号已通过邮箱验证，可以正常使用所有 AI 功能。
+                      您的账号已通过邮箱验证，可以正常接收邮件通知了
                     </p>
                   </div>
                 </div>
@@ -261,6 +270,61 @@
               </div>
             </section>
           </div>
+
+          <!-- Email Change Modal -->
+          <u-modal
+            v-model:open="showEmailModal"
+            title="修改邮箱"
+            description="修改邮箱后，需要验证新邮箱才能继续接收邮件通知"
+          >
+            <template #body>
+              <div class="space-y-4 py-4">
+                <u-form-field
+                  label="新邮箱地址"
+                  required
+                >
+                  <u-input
+                    v-model="emailForm.newEmail"
+                    type="email"
+                    placeholder="newemail@example.com"
+                    class="w-full"
+                  />
+                </u-form-field>
+
+                <u-form-field
+                  label="当前密码"
+                  required
+                >
+                  <u-input
+                    v-model="emailForm.password"
+                    type="password"
+                    placeholder="请输入当前密码以确认身份"
+                    class="w-full"
+                  />
+                </u-form-field>
+              </div>
+            </template>
+
+            <template #footer="{ close }">
+              <div class="flex justify-end gap-3 w-full">
+                <u-button
+                  variant="ghost"
+                  color="neutral"
+                  @click="close"
+                >
+                  取消
+                </u-button>
+                <u-button
+                  color="primary"
+                  :loading="changingEmail"
+                  :disabled="!isEmailFormValid"
+                  @click="changeEmail"
+                >
+                  确认修改
+                </u-button>
+              </div>
+            </template>
+          </u-modal>
         </div>
       </main>
     </div>
@@ -300,6 +364,19 @@ const form = reactive({
 const profileForm = reactive({
   fullName: '',
   email: ''
+})
+
+const showEmailModal = ref(false)
+const changingEmail = ref(false)
+
+const emailForm = reactive({
+  newEmail: '',
+  password: ''
+})
+
+const isEmailFormValid = computed(() => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(emailForm.newEmail) && emailForm.password.length >= 8
 })
 
 const loadProfile = async () => {
@@ -394,6 +471,42 @@ const saveProfile = async () => {
     })
   } finally {
     saving.value = false
+  }
+}
+
+const changeEmail = async () => {
+  const { $api } = useNuxtApp()
+  changingEmail.value = true
+
+  try {
+    await $api('/user/change-email', {
+      method: 'post',
+      body: {
+        newEmail: emailForm.newEmail,
+        password: emailForm.password
+      }
+    })
+
+    toast.add({
+      title: '验证邮件已发送',
+      description: `请前往 ${emailForm.newEmail} 查收验证邮件`,
+      color: 'success',
+      icon: 'i-heroicons-envelope'
+    })
+
+    showEmailModal.value = false
+    emailForm.newEmail = ''
+    emailForm.password = ''
+    await authStore.fetchUser()
+  } catch (err: any) {
+    toast.add({
+      title: '修改失败',
+      description: err.message || '请检查输入后重试',
+      color: 'error',
+      icon: 'i-heroicons-x-circle'
+    })
+  } finally {
+    changingEmail.value = false
   }
 }
 </script>

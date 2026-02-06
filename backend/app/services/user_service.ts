@@ -1,7 +1,13 @@
 import { inject } from '@adonisjs/core'
+import { Exception } from '@adonisjs/core/exceptions'
+import hash from '@adonisjs/core/services/hash'
 import logger from '@adonisjs/core/services/logger'
+import Mail from '@adonisjs/mail/services/main'
+import { randomUUID } from 'node:crypto'
 import User from '#models/user'
 import { DateTime } from 'luxon'
+import { VALIDATION } from '#constants'
+import VerifyEmailNotification from '#mails/verify_email_notification'
 
 @inject()
 export class UserService {
@@ -22,7 +28,7 @@ export class UserService {
   async verifyEmail(token: string) {
     logger.info({ token }, 'Verifying email')
 
-    const user = await User.findBy('verificationToken', token)
+    const user = await this.isVerificationTokenValid(token)
     if (!user) {
       return null
     }
@@ -94,5 +100,90 @@ export class UserService {
     user.resetPasswordExpiresAt = expiresAt
     await user.save()
     return user
+  }
+
+  async changeEmail(userId: number, newEmail: string, password: string): Promise<User> {
+    const user = await User.findOrFail(userId)
+
+    const isValidPassword = await hash.verify(user.password, password)
+    if (!isValidPassword) {
+      throw new Exception('Invalid password', { status: 401 })
+    }
+
+    if (user.email === newEmail) {
+      throw new Exception('New email must be different from current email', { status: 400 })
+    }
+
+    const newToken = randomUUID()
+    logger.info({ userId, newEmail, oldToken: user.verificationToken, newToken }, 'Changing email')
+
+    user.email = newEmail
+    user.emailVerifiedAt = null
+    user.verificationToken = newToken
+    user.verificationEmailSentAt = DateTime.now()
+
+    await user.save()
+
+    logger.info({ userId, savedToken: user.verificationToken }, 'Email changed, token saved')
+
+    await Mail.send(new VerifyEmailNotification(user, user.verificationToken!))
+
+    logger.info({ userId, sentToken: user.verificationToken }, 'Verification email sent')
+
+    return user
+  }
+
+  async isVerificationTokenValid(token: string): Promise<User | null> {
+    logger.info({ token }, 'Validating verification token')
+
+    const user = await User.findBy('verificationToken', token)
+
+    logger.info(
+      { token, found: !!user, hasSentAt: !!user?.verificationEmailSentAt },
+      'Token lookup result'
+    )
+
+    if (!user || !user.verificationEmailSentAt) {
+      return null
+    }
+
+    const sentAt = user.verificationEmailSentAt.toMillis()
+    const now = DateTime.now().toMillis()
+    const expiryMs = VALIDATION.EMAIL_VERIFICATION_EXPIRY_MINUTES * 60 * 1000
+
+    logger.info({ token, sentAt, now, expiryMs, ageMs: now - sentAt }, 'Token expiry check')
+
+    if (now - sentAt > expiryMs) {
+      logger.warn({ token }, 'Token expired')
+      return null
+    }
+
+    logger.info({ token, userId: user.id }, 'Token valid')
+    return user
+  }
+
+  async resendVerificationEmail(userId: number): Promise<void> {
+    const user = await User.findOrFail(userId)
+    const cooldownMs = VALIDATION.VERIFICATION_RESEND_COOLDOWN_MINUTES * 60 * 1000
+
+    if (user.verificationEmailSentAt) {
+      const lastSent = user.verificationEmailSentAt.toMillis()
+      const now = DateTime.now().toMillis()
+
+      if (now - lastSent < cooldownMs) {
+        throw new Exception(
+          `Please wait ${VALIDATION.VERIFICATION_RESEND_COOLDOWN_MINUTES} minutes before resending`,
+          { status: 429 }
+        )
+      }
+    }
+
+    user.verificationToken = randomUUID()
+    user.verificationEmailSentAt = DateTime.now()
+    await user.save()
+
+    await Mail.send(new VerifyEmailNotification(user, user.verificationToken!))
+
+    logger.info({ userId }, 'Verification email resent')
   }
 }

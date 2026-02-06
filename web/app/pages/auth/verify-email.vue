@@ -112,7 +112,7 @@ onMounted(async () => {
   }
 
   const { $api } = useNuxtApp()
-  const result = await $api(token, { method: 'get' })
+  const result = await $api(`/auth/verify-email?token=${token}`, { method: 'get' })
 
   if (result) {
     success.value = true
