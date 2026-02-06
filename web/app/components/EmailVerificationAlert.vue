@@ -40,6 +40,7 @@ const emit = defineEmits<{
 }>()
 
 const showAlert = computed(() => props.user && !props.user.isEmailVerified)
+console.log(showAlert.value, 'showAlert.value')
 const userClosed = ref(false)
 
 const sending = ref(false)

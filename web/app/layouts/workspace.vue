@@ -47,8 +47,13 @@
     </aside>
 
     <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-      <header class="flex items-center justify-end px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-        <div class="flex items-center gap-3">
+      <header class="flex flex-col gap-2 px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+        <email-verification-alert
+          v-if="authStore.isAuthenticated && !authStore.isEmailVerified"
+          :user="authStore.user"
+          @refresh="authStore.fetchUser()"
+        />
+        <div class="flex items-center justify-end">
           <u-dashboard-search-button
             variant="subtle"
             @click="openSearch"
@@ -126,7 +131,10 @@
 import { onMounted, onUnmounted } from 'vue'
 import { useGlobalSearch } from '~/composables/useGlobalSearch'
 import { APP_INFO } from '~/constants'
+import EmailVerificationAlert from '~/components/EmailVerificationAlert.vue'
+import { useAuthStore } from '~/stores/auth'
 
+const authStore = useAuthStore()
 const {
   isOpen,
   searchQuery,
