@@ -305,7 +305,7 @@
       </template>
     </u-modal>
 
-    <import-bookmarks-modal
+    <bookmark-import-modal
       v-model="showImportModal"
       @imported="handleImportComplete"
     />
@@ -316,7 +316,6 @@
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
 import type { Bookmark, Tag } from '~/api/types'
-import ImportBookmarksModal from '~/components/ImportBookmarksModal.vue'
 import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS, VIEW_MODE, type ViewMode } from '~/constants'
 import { useAuthStore } from '~/stores/auth'
 

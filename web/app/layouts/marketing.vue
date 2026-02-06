@@ -7,7 +7,6 @@
 </template>
 
 <script setup lang="ts">
-import AmbientBackground from '~/components/shared/AmbientBackground.vue'
 </script>
 
 <style scoped>

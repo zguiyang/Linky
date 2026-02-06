@@ -61,7 +61,7 @@
             to="/workspace/settings"
             aria-label="设置"
           />
-          <workspace-user-dropdown />
+          <user-dropdown />
         </div>
       </header>
 
@@ -124,8 +124,6 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
-import WorkspaceUserDropdown from '~/components/workspace/UserDropdown.vue'
-import MemoDetailModal from '~/components/workspace/MemoDetailModal.vue'
 import { useGlobalSearch } from '~/composables/useGlobalSearch'
 import { APP_INFO } from '~/constants'
 
