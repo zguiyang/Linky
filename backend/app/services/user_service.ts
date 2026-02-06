@@ -4,9 +4,10 @@ import hash from '@adonisjs/core/services/hash'
 import logger from '@adonisjs/core/services/logger'
 import Mail from '@adonisjs/mail/services/main'
 import { randomUUID } from 'node:crypto'
+import redis from '@adonisjs/redis/services/main'
 import User from '#models/user'
 import { DateTime } from 'luxon'
-import { VALIDATION } from '#constants'
+import { EMAIL_VERIFICATION } from '#constants'
 import VerifyEmailNotification from '#mails/verify_email_notification'
 
 @inject()
@@ -26,20 +27,14 @@ export class UserService {
   }
 
   async verifyEmail(token: string) {
-    logger.info({ token }, 'Verifying email')
+    logger.info({ token }, 'Verifying email via Redis')
 
-    const user = await this.isVerificationTokenValid(token)
+    const user = await this.verifyEmailFromRedis(token)
     if (!user) {
       return null
     }
 
-    user.emailVerifiedAt = DateTime.now()
-    user.verificationToken = null
-    user.verificationEmailSentAt = null
-    await user.save()
-
     logger.info({ userId: user.id }, 'Email verified')
-
     return user
   }
 
@@ -86,14 +81,6 @@ export class UserService {
     return user
   }
 
-  async updateVerificationToken(userId: number, token: string) {
-    const user = await User.findOrFail(userId)
-    user.verificationToken = token
-    user.verificationEmailSentAt = DateTime.now()
-    await user.save()
-    return user
-  }
-
   async updateResetPasswordToken(userId: number, token: string, expiresAt: DateTime) {
     const user = await User.findOrFail(userId)
     user.resetPasswordToken = token
@@ -114,76 +101,116 @@ export class UserService {
       throw new Exception('New email must be different from current email', { status: 400 })
     }
 
-    const newToken = randomUUID()
-    logger.info({ userId, newEmail, oldToken: user.verificationToken, newToken }, 'Changing email')
+    logger.info({ userId, newEmail }, 'Changing email')
+
+    const token = await this.storeEmailVerificationToken(userId, newEmail, 'change')
 
     user.email = newEmail
     user.emailVerifiedAt = null
-    user.verificationToken = newToken
-    user.verificationEmailSentAt = DateTime.now()
-
     await user.save()
 
-    logger.info({ userId, savedToken: user.verificationToken }, 'Email changed, token saved')
+    await Mail.send(new VerifyEmailNotification(user, token))
 
-    await Mail.send(new VerifyEmailNotification(user, user.verificationToken!))
+    logger.info({ userId, newEmail }, 'Email changed, verification email sent')
 
-    logger.info({ userId, sentToken: user.verificationToken }, 'Verification email sent')
-
-    return user
-  }
-
-  async isVerificationTokenValid(token: string): Promise<User | null> {
-    logger.info({ token }, 'Validating verification token')
-
-    const user = await User.findBy('verificationToken', token)
-
-    logger.info(
-      { token, found: !!user, hasSentAt: !!user?.verificationEmailSentAt },
-      'Token lookup result'
-    )
-
-    if (!user || !user.verificationEmailSentAt) {
-      return null
-    }
-
-    const sentAt = user.verificationEmailSentAt.toMillis()
-    const now = DateTime.now().toMillis()
-    const expiryMs = VALIDATION.EMAIL_VERIFICATION_EXPIRY_MINUTES * 60 * 1000
-
-    logger.info({ token, sentAt, now, expiryMs, ageMs: now - sentAt }, 'Token expiry check')
-
-    if (now - sentAt > expiryMs) {
-      logger.warn({ token }, 'Token expired')
-      return null
-    }
-
-    logger.info({ token, userId: user.id }, 'Token valid')
     return user
   }
 
   async resendVerificationEmail(userId: number): Promise<void> {
     const user = await User.findOrFail(userId)
-    const cooldownMs = VALIDATION.VERIFICATION_RESEND_COOLDOWN_MINUTES * 60 * 1000
 
-    if (user.verificationEmailSentAt) {
-      const lastSent = user.verificationEmailSentAt.toMillis()
-      const now = DateTime.now().toMillis()
-
-      if (now - lastSent < cooldownMs) {
-        throw new Exception(
-          `Please wait ${VALIDATION.VERIFICATION_RESEND_COOLDOWN_MINUTES} minutes before resending`,
-          { status: 429 }
-        )
-      }
+    if (user.emailVerifiedAt) {
+      throw new Exception('Email already verified', { status: 400 })
     }
 
-    user.verificationToken = randomUUID()
-    user.verificationEmailSentAt = DateTime.now()
-    await user.save()
+    const inCooldown = await this.checkVerificationCooldown(userId)
+    if (inCooldown) {
+      throw new Exception(
+        `Please wait ${EMAIL_VERIFICATION.COOLDOWN_MINUTES} minute(s) before resending`,
+        { status: 429 }
+      )
+    }
 
-    await Mail.send(new VerifyEmailNotification(user, user.verificationToken!))
+    const token = await this.storeEmailVerificationToken(userId, user.email, 'register')
+
+    await Mail.send(new VerifyEmailNotification(user, token))
+
+    await this.setVerificationCooldown(userId)
 
     logger.info({ userId }, 'Verification email resent')
+  }
+
+  private async storeEmailVerificationToken(
+    userId: number,
+    email: string,
+    type: 'register' | 'change'
+  ): Promise<string> {
+    const token = randomUUID()
+    const key = `${EMAIL_VERIFICATION.KEY_PREFIX}${token}`
+    const now = DateTime.now().toISO()
+
+    await redis.hset(key, {
+      userId: userId.toString(),
+      email,
+      type,
+      createdAt: now,
+    })
+
+    await redis.expire(key, EMAIL_VERIFICATION.EXPIRY_MINUTES * 60)
+
+    logger.info({ userId, email, type, token }, 'Email verification token stored in Redis')
+
+    return token
+  }
+
+  private async verifyEmailFromRedis(token: string): Promise<User | null> {
+    const key = `${EMAIL_VERIFICATION.KEY_PREFIX}${token}`
+    const data = await redis.hgetall(key)
+
+    if (!data || Object.keys(data).length === 0) {
+      logger.warn({ token }, 'Token not found or expired in Redis')
+      return null
+    }
+
+    const createdAt = DateTime.fromISO(data.createdAt)
+    const elapsed = DateTime.now().diff(createdAt, 'minutes').minutes
+    if (elapsed > EMAIL_VERIFICATION.EXPIRY_MINUTES) {
+      await redis.del(key)
+      logger.warn({ token }, 'Token expired, deleted from Redis')
+      return null
+    }
+
+    const user = await User.find(Number(data.userId))
+    if (!user) {
+      await redis.del(key)
+      logger.warn({ token, userId: data.userId }, 'User not found')
+      return null
+    }
+
+    if (data.type === 'register') {
+      user.emailVerifiedAt = DateTime.now()
+    } else if (data.type === 'change') {
+      user.email = data.email
+      user.emailVerifiedAt = DateTime.now()
+    }
+
+    await user.save()
+
+    await redis.del(key)
+
+    logger.info({ userId: user.id, type: data.type }, 'Email verified via Redis')
+
+    return user
+  }
+
+  private async checkVerificationCooldown(userId: number): Promise<boolean> {
+    const cooldownKey = `${EMAIL_VERIFICATION.KEY_PREFIX}cooldown:${userId}`
+    const inCooldown = await redis.get(cooldownKey)
+    return !!inCooldown
+  }
+
+  private async setVerificationCooldown(userId: number): Promise<void> {
+    const cooldownKey = `${EMAIL_VERIFICATION.KEY_PREFIX}cooldown:${userId}`
+    await redis.setex(cooldownKey, EMAIL_VERIFICATION.COOLDOWN_MINUTES * 60, '1')
   }
 }

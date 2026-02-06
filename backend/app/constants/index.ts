@@ -39,10 +39,18 @@ const VALIDATION = {
   METADATA_MAX_SIZE: 65535,
   PASSWORD_MIN: 8,
   EMAIL_VERIFICATION_EXPIRY_MINUTES: 30,
-  VERIFICATION_RESEND_COOLDOWN_MINUTES: 5,
+  VERIFICATION_RESEND_COOLDOWN_MINUTES: 1,
 } as const
 
 type Validation = (typeof VALIDATION)[keyof typeof VALIDATION]
+
+const EMAIL_VERIFICATION = {
+  KEY_PREFIX: 'email_verify:',
+  EXPIRY_MINUTES: 30,
+  COOLDOWN_MINUTES: 1,
+} as const
+
+type EmailVerification = (typeof EMAIL_VERIFICATION)[keyof typeof EMAIL_VERIFICATION]
 
 const METADATA_FETCH = {
   ATTEMPTS: 1,
@@ -127,6 +135,7 @@ export {
   TRANSMIT_CHANNEL_NAMES,
   TAG_ITEM_TYPE,
   SEARCH,
+  EMAIL_VERIFICATION,
 }
 export type {
   OrderBy,
@@ -142,4 +151,5 @@ export type {
   TransmitEvent,
   TagItemType,
   Search,
+  EmailVerification,
 }

@@ -1,23 +1,18 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { Exception } from '@adonisjs/core/exceptions'
-import { DateTime } from 'luxon'
 import User from '#models/user'
 import { UserService } from '#services/user_service'
-import { NotificationService } from '#services/notification_service'
 
 @inject()
 export class AuthService {
-  constructor(
-    private userService: UserService,
-    private notificationService: NotificationService
-  ) {}
+  constructor(private userService: UserService) {}
 
   async register(data: { email: string; name: string; password: string }) {
     logger.info({ email: data.email }, 'Registration attempt')
 
     const user = await this.userService.create(data)
-    await this.notificationService.sendVerificationEmail(user)
+    await this.userService.resendVerificationEmail(user.id)
 
     const token = await User.accessTokens.create(user)
 
@@ -49,8 +44,6 @@ export class AuthService {
     if (!user.emailVerifiedAt) {
       throw new Exception('Please verify your email address first', { status: 422 })
     }
-
-    await this.notificationService.sendPasswordResetEmail(user)
   }
 
   async resetPassword(token: string, newPassword: string) {
@@ -86,21 +79,7 @@ export class AuthService {
   async resendVerificationEmail(user: User): Promise<void> {
     logger.info({ userId: user.id }, 'Resend verification email attempt')
 
-    if (user.emailVerifiedAt) {
-      throw new Exception('Email has already been verified', { status: 422 })
-    }
-
-    if (user.verificationEmailSentAt) {
-      const timeSinceLastSent = DateTime.now().diff(user.verificationEmailSentAt, 'minutes').minutes
-      if (timeSinceLastSent < 1) {
-        const remainingSeconds = Math.ceil(60 - timeSinceLastSent * 60)
-        throw new Exception(`Please wait ${remainingSeconds} seconds before resending`, {
-          status: 422,
-        })
-      }
-    }
-
-    await this.notificationService.sendVerificationEmail(user)
+    await this.userService.resendVerificationEmail(user.id)
 
     logger.info({ userId: user.id }, 'Verification email resent')
   }
