@@ -11,7 +11,6 @@ export interface ImportBookmarkPayload {
   userId: number
   filePath: string
   createTags: boolean
-  skipDuplicates: boolean
   autoAiTag: boolean
 }
 
@@ -43,10 +42,11 @@ interface ImportJobStatus {
 }
 
 export default class ImportBookmark extends Job {
-  private bookmarkParserService = new BookmarkParserService()
-
   async handle(payload: ImportBookmarkPayload) {
-    const { jobId, userId, filePath, createTags, skipDuplicates, autoAiTag } = payload
+    const { jobId, userId, filePath, createTags, autoAiTag } = payload
+
+    const bookmarkParserService = await app.container.make(BookmarkParserService)
+    const transmitService = await app.container.make(TransmitService)
 
     logger.info(`[ImportBookmark] Job started: ${jobId}`)
     await this.updateStatus(jobId, 'processing', 0)
@@ -62,16 +62,14 @@ export default class ImportBookmark extends Job {
       await this.updateStatus(jobId, 'processing', 30)
       logger.info(`[ImportBookmark] Progress: 30%`)
 
-      const parseResult = await this.bookmarkParserService.parseHtml(htmlContent)
+      const parseResult = await bookmarkParserService.parseHtml(htmlContent)
       logger.info(`[ImportBookmark] Parsed bookmarks: ${parseResult.bookmarks.length}`)
       await this.updateProgress(50)
       await this.updateStatus(jobId, 'processing', 50)
       logger.info(`[ImportBookmark] Progress: 50%`)
 
-      const transmitService = await app.container.make(TransmitService)
-      const result = await this.bookmarkParserService.processImport(userId, parseResult.bookmarks, {
+      const result = await bookmarkParserService.processImport(userId, parseResult.bookmarks, {
         createTags,
-        skipDuplicates,
         autoAiTag,
         onProgress: async (current, total, currentTitle) => {
           await this.updateStatus(jobId, 'processing', current)
@@ -103,7 +101,7 @@ export default class ImportBookmark extends Job {
         jobId,
         'failed',
         0,
-        error instanceof Error ? error.message : '未知错误'
+        error instanceof Error ? error.message : 'Unknown error'
       )
       await this.cleanupFile(filePath)
       throw error

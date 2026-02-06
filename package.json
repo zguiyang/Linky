@@ -8,6 +8,7 @@
   "scripts": {
     "dev:backend": "pnpm --filter backend dev",
     "dev:web": "pnpm --filter web dev",
+    "backend:jobs": "pnpm --filter backend run:jobs",
     "build": "pnpm --filter backend build & pnpm --filter web build",
     "start": "pnpm --filter backend start",
     "preview": "pnpm --filter web preview",

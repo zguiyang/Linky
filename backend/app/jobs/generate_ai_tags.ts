@@ -28,12 +28,12 @@ interface AiTagSuggestion {
 }
 
 export default class GenerateAiTags extends Job {
-  private settingService = new SettingService()
-  private aiService = new AiService()
-  private promptService = new PromptService()
-
   async handle(payload: GenerateAiTagsPayload): Promise<GenerateAiTagsResult> {
     const { bookmarkId, userId } = payload
+
+    const settingService = await app.container.make(SettingService)
+    const aiService = await app.container.make(AiService)
+    const promptService = await app.container.make(PromptService)
 
     try {
       const bookmark = await Bookmark.find(bookmarkId)
@@ -47,11 +47,11 @@ export default class GenerateAiTags extends Job {
         return { success: false, tagsCreated: 0, tagsReused: 0, error: 'METADATA_NOT_FETCHED' }
       }
 
-      const aiConfig = await this.settingService.getAiConfig(userId)
-      const apiKey = await this.settingService.decryptAiApiKey(userId)
+      const aiConfig = await settingService.getAiConfig(userId)
+      const apiKey = await settingService.decryptAiApiKey(userId)
 
       logger.info(
-        `[GenerateAiTags] AI config: enabled=${aiConfig?.aiEnabled}, baseUrl=${aiConfig?.aiBaseUrl}, modelName=${aiConfig?.aiModelName}, apiKey=${apiKey ? `****${apiKey.slice(-4)}` : 'null'}`
+        `[GenerateAiTags] AI config: enabled=${aiConfig?.aiEnabled}, baseUrl=${aiConfig?.aiBaseUrl}, modelName=${aiConfig?.aiModelName}`
       )
 
       if (!aiConfig?.aiEnabled) {
@@ -74,16 +74,16 @@ export default class GenerateAiTags extends Job {
       const userTags = await Tag.query().where('userId', userId).exec()
       const existingTagNames = new Set(userTags.map((t) => t.name.toLowerCase().trim()))
 
-      const prompt = this.promptService.render('tag_generation', {
-        title: bookmark.title || '无',
-        description: bookmark.description || '无',
+      const prompt = promptService.render('tag_generation', {
+        title: bookmark.title || 'N/A',
+        description: bookmark.description || 'N/A',
         maxTags: AI_TAG.MAX_TAGS,
         existingTags: Array.from(existingTagNames).join(', '),
       })
 
-      const response = await this.aiService.chat(aiServiceConfig, {
+      const response = await aiService.chat(aiServiceConfig, {
         messages: [
-          { role: 'system', content: this.promptService.render('system') },
+          { role: 'system', content: promptService.render('system') },
           { role: 'user', content: prompt },
         ],
         model: aiConfig.aiModelName,
@@ -153,7 +153,8 @@ export default class GenerateAiTags extends Job {
         `[GenerateAiTags] Completed: ${bookmarkId}, created: ${tagsCreated}, reused: ${tagsReused}`
       )
 
-      await this.pushBookmarkUpdate(userId, bookmarkId)
+      const transmitService = await app.container.make(TransmitService)
+      await this.pushBookmarkUpdate(transmitService, userId, bookmarkId)
 
       return { success: true, tagsCreated, tagsReused }
     } catch (error: any) {
@@ -162,9 +163,12 @@ export default class GenerateAiTags extends Job {
     }
   }
 
-  private async pushBookmarkUpdate(userId: number, bookmarkId: number): Promise<void> {
+  private async pushBookmarkUpdate(
+    transmitService: TransmitService,
+    userId: number,
+    bookmarkId: number
+  ): Promise<void> {
     try {
-      const transmitService = await app.container.make(TransmitService)
       const bookmark = await Bookmark.query().where('id', bookmarkId).preload('tags').first()
 
       if (bookmark) {

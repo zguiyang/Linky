@@ -20,11 +20,12 @@ export type FetchBookmarkMetadataResult = {
 }
 
 export default class FetchBookmarkMetadata extends Job {
-  private metadataService = new BookmarkMetadataService()
-  private settingService = new SettingService()
-
   async handle(payload: FetchBookmarkMetadataPayload): Promise<FetchBookmarkMetadataResult> {
     const { bookmarkId, url, forceUpdate = false, autoAiTag = true } = payload
+
+    const metadataService = await app.container.make(BookmarkMetadataService)
+    const settingService = await app.container.make(SettingService)
+    const transmitService = await app.container.make(TransmitService)
 
     logger.info(`[FetchBookmarkMetadata] Starting fetch for bookmark ${bookmarkId}: ${url}`)
     logger.info(`[FetchBookmarkMetadata] forceUpdate: ${forceUpdate}, autoAiTag: ${autoAiTag}`)
@@ -38,25 +39,25 @@ export default class FetchBookmarkMetadata extends Job {
       return { success: true, bookmarkId }
     }
 
-    const metadata = await this.metadataService.fetchAndUpdate(bookmarkId, url, forceUpdate)
+    const metadata = await metadataService.fetchAndUpdate(bookmarkId, url, forceUpdate)
 
     if (!metadata.success) {
       logger.warn(`[FetchBookmarkMetadata] Failed for bookmark ${bookmarkId}: ${metadata.error}`)
       return { success: false, bookmarkId }
     }
 
-    await this.pushBookmarkUpdate(userId, bookmarkId)
+    await this.pushBookmarkUpdate(transmitService, userId, bookmarkId)
 
     if (autoAiTag) {
       logger.info(`[FetchBookmarkMetadata] Scheduling AI tag generation for bookmark ${bookmarkId}`)
 
-      const aiConfig = await this.settingService.getAiConfig(userId)
+      const aiConfig = await settingService.getAiConfig(userId)
 
       if (!aiConfig.aiEnabled) {
         logger.info(
           `[FetchBookmarkMetadata] AI not enabled for user ${userId}, skip tag generation`
         )
-        await this.pushBookmarkUpdate(userId, bookmarkId)
+        await this.pushBookmarkUpdate(transmitService, userId, bookmarkId)
         return { success: true, bookmarkId }
       }
 
@@ -71,15 +72,18 @@ export default class FetchBookmarkMetadata extends Job {
       })
     }
 
-    await this.pushBookmarkUpdate(userId, bookmarkId)
+    await this.pushBookmarkUpdate(transmitService, userId, bookmarkId)
 
     logger.info(`[FetchBookmarkMetadata] Completed for bookmark ${bookmarkId}`)
     return { success: true, bookmarkId }
   }
 
-  private async pushBookmarkUpdate(userId: number, bookmarkId: number): Promise<void> {
+  private async pushBookmarkUpdate(
+    transmitService: TransmitService,
+    userId: number,
+    bookmarkId: number
+  ): Promise<void> {
     try {
-      const transmitService = await app.container.make(TransmitService)
       const { default: BookmarkModel } = await import('#models/bookmark')
       const bookmark = await BookmarkModel.query().where('id', bookmarkId).preload('tags').first()
 

@@ -1,9 +1,12 @@
+import { inject } from '@adonisjs/core'
 import { Exception } from '@adonisjs/core/exceptions'
 import logger from '@adonisjs/core/services/logger'
 import { JSDOM } from 'jsdom'
-import Bookmark from '#models/bookmark'
-import Tag from '#models/tag'
 import type { ParsedBookmark, ParsedFolder, ParseResult } from '#types/bookmark'
+import { VALIDATION } from '#constants'
+import Tag from '#models/tag'
+import { TagService } from './tag_service.js'
+import { BookmarkService } from './bookmark_service.js'
 
 export interface ImportResult {
   total: number
@@ -12,6 +15,185 @@ export interface ImportResult {
   errors: number
   tagsCreated: number
   errorsList: Array<{ title: string; url: string; reason: string }>
+}
+
+@inject()
+export class BookmarkParserService {
+  constructor(
+    private tagService: TagService,
+    private bookmarkService: BookmarkService
+  ) {}
+
+  private async scheduleMetadataFetch(
+    bookmarkId: number,
+    url: string,
+    forceUpdate: boolean = false,
+    autoAiTag?: boolean
+  ): Promise<void> {
+    const { default: FetchBookmarkMetadata } = await import('#jobs/fetch_bookmark_metadata')
+    await FetchBookmarkMetadata.dispatch({
+      bookmarkId,
+      url,
+      forceUpdate,
+      autoAiTag: autoAiTag !== false,
+    })
+  }
+
+  private async parseHtmlInternal(htmlContent: string): Promise<ParseResult> {
+    const result: ParseResult = {
+      bookmarks: [],
+      totalCount: 0,
+      errors: [],
+    }
+
+    if (!htmlContent.includes(NETSCAPE_BOOKMARK_HEADER)) {
+      throw new Exception('Invalid bookmark file format: missing NETSCAPE header', { status: 400 })
+    }
+
+    try {
+      const dom = new JSDOM(htmlContent)
+      const document = dom.window.document
+
+      const dlElement = document.querySelector('dl')
+      if (!dlElement) {
+        throw new Exception('Cannot find bookmark root element', { status: 400 })
+      }
+
+      const folder = parseDlElement(dlElement, '')
+      result.bookmarks = folder.bookmarks
+      result.totalCount = result.bookmarks.length
+    } catch (error) {
+      throw new Exception(
+        `Failed to parse bookmark file: ${error instanceof Error ? error.message : 'unknown error'}`,
+        { status: 400 }
+      )
+    }
+
+    return result
+  }
+
+  async parseHtml(htmlContent: string): Promise<ParseResult> {
+    if (!htmlContent.includes(NETSCAPE_BOOKMARK_HEADER)) {
+      throw new Exception('Invalid bookmark file format: missing NETSCAPE header', { status: 400 })
+    }
+
+    try {
+      const result = await this.parseHtmlInternal(htmlContent)
+      return result
+    } catch (error) {
+      if (error instanceof Exception) {
+        throw error
+      }
+      throw new Exception(
+        `Failed to parse bookmark file: ${error instanceof Error ? error.message : 'unknown error'}`,
+        { status: 400 }
+      )
+    }
+  }
+
+  async processImport(
+    userId: number,
+    parsedBookmarks: ParsedBookmark[],
+    {
+      createTags = true,
+      autoAiTag = true,
+      onProgress,
+    }: {
+      createTags?: boolean
+      autoAiTag?: boolean
+      onProgress?: (current: number, total: number, currentTitle?: string) => void
+    } = {}
+  ): Promise<ImportResult> {
+    const importResult: ImportResult = {
+      total: parsedBookmarks.length,
+      imported: 0,
+      skipped: 0,
+      errors: 0,
+      tagsCreated: 0,
+      errorsList: [],
+    }
+
+    const tagNameToId = new Map<string, number>()
+
+    for (const [index, bookmark] of parsedBookmarks.entries()) {
+      try {
+        if (!bookmark.title || !bookmark.url) {
+          importResult.errors++
+          importResult.errorsList.push({
+            title: bookmark.title || 'Unknown',
+            url: bookmark.url || 'Unknown',
+            reason: 'Missing title or URL',
+          })
+          onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
+          continue
+        }
+
+        if (bookmark.title.length > VALIDATION.TITLE_MAX) {
+          importResult.errors++
+          importResult.errorsList.push({
+            title: bookmark.title.substring(0, 50) + '...',
+            url: bookmark.url,
+            reason: `Title exceeds ${VALIDATION.TITLE_MAX} character limit`,
+          })
+          onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
+          continue
+        }
+
+        let tagIds: number[] = []
+
+        if (createTags && bookmark.tags.length > 0) {
+          for (const tagName of bookmark.tags) {
+            const normalizedName = tagName.trim()
+            if (!normalizedName) continue
+
+            let tagId = tagNameToId.get(normalizedName)
+            if (!tagId) {
+              let tag = await Tag.query()
+                .where('user_id', userId)
+                .where('name', normalizedName)
+                .first()
+
+              if (!tag) {
+                tag = await this.tagService.create(userId, { name: normalizedName })
+                importResult.tagsCreated++
+              }
+
+              tagId = tag.id
+              tagNameToId.set(normalizedName, tagId)
+            }
+
+            tagIds.push(tagId)
+          }
+        }
+
+        const newBookmark = await this.bookmarkService.createForImport(userId, {
+          url: bookmark.url,
+          title: bookmark.title,
+          description: null,
+          visitCount: 0,
+        })
+
+        if (tagIds.length > 0) {
+          await newBookmark.related('tags').sync(tagIds)
+        }
+
+        await this.scheduleMetadataFetch(newBookmark.id, bookmark.url, true, autoAiTag)
+
+        importResult.imported++
+        onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
+      } catch (error) {
+        importResult.errors++
+        importResult.errorsList.push({
+          title: bookmark.title || 'Unknown',
+          url: bookmark.url || 'Unknown',
+          reason: error instanceof Error ? error.message : 'Unknown error',
+        })
+        onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
+      }
+    }
+
+    return importResult
+  }
 }
 
 const NETSCAPE_BOOKMARK_HEADER = 'NETSCAPE-Bookmark-file-1'
@@ -124,199 +306,3 @@ function findNextDlSibling(h3Element: Element): Element | null {
 
   return null
 }
-
-async function parseHtml(htmlContent: string): Promise<ParseResult> {
-  const result: ParseResult = {
-    bookmarks: [],
-    totalCount: 0,
-    errors: [],
-  }
-
-  if (!htmlContent.includes(NETSCAPE_BOOKMARK_HEADER)) {
-    throw new Error('无效的书签文件格式')
-  }
-
-  try {
-    const dom = new JSDOM(htmlContent)
-    const document = dom.window.document
-
-    const dlElement = document.querySelector('dl')
-    if (!dlElement) {
-      throw new Error('无法找到书签根元素')
-    }
-
-    const folder = parseDlElement(dlElement, '')
-    result.bookmarks = folder.bookmarks
-    result.totalCount = result.bookmarks.length
-  } catch (error) {
-    throw new Error(`解析书签文件失败: ${error instanceof Error ? error.message : '未知错误'}`)
-  }
-
-  return result
-}
-
-export class BookmarkParserService {
-  async parseHtml(htmlContent: string): Promise<ParseResult> {
-    if (!htmlContent.includes(NETSCAPE_BOOKMARK_HEADER)) {
-      throw new Exception('无效的书签文件格式', { status: 400 })
-    }
-
-    try {
-      const result = await parseHtml(htmlContent)
-      return result
-    } catch (error) {
-      throw new Exception(
-        `解析书签文件失败: ${error instanceof Error ? error.message : '未知错误'}`,
-        { status: 400 }
-      )
-    }
-  }
-
-  private async scheduleMetadataFetch(
-    bookmarkId: number,
-    url: string,
-    forceUpdate: boolean = false,
-    autoAiTag?: boolean
-  ): Promise<void> {
-    const { default: FetchBookmarkMetadata } = await import('#jobs/fetch_bookmark_metadata')
-    await FetchBookmarkMetadata.dispatch({
-      bookmarkId,
-      url,
-      forceUpdate,
-      autoAiTag: autoAiTag !== false,
-    })
-  }
-
-  async processImport(
-    userId: number,
-    parsedBookmarks: ParsedBookmark[],
-    {
-      createTags = true,
-      skipDuplicates = true,
-      autoAiTag = true,
-      onProgress,
-    }: {
-      createTags?: boolean
-      skipDuplicates?: boolean
-      autoAiTag?: boolean
-      onProgress?: (current: number, total: number, currentTitle?: string) => void
-    } = {}
-  ): Promise<ImportResult> {
-    const importResult: ImportResult = {
-      total: parsedBookmarks.length,
-      imported: 0,
-      skipped: 0,
-      errors: 0,
-      tagsCreated: 0,
-      errorsList: [],
-    }
-
-    const tagNameToId = new Map<string, number>()
-
-    for (const [index, bookmark] of parsedBookmarks.entries()) {
-      try {
-        if (!bookmark.title || !bookmark.url) {
-          importResult.errors++
-          importResult.errorsList.push({
-            title: bookmark.title || '未知',
-            url: bookmark.url || '未知',
-            reason: '缺少标题或URL',
-          })
-          onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
-          continue
-        }
-
-        if (bookmark.title.length > 200) {
-          importResult.errors++
-          importResult.errorsList.push({
-            title: bookmark.title.substring(0, 50) + '...',
-            url: bookmark.url,
-            reason: '标题超过200字符限制',
-          })
-          onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
-          continue
-        }
-
-        if (skipDuplicates) {
-          const existing = await Bookmark.query()
-            .where('user_id', userId)
-            .where('url', bookmark.url)
-            .first()
-
-          if (existing) {
-            importResult.skipped++
-            onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
-            continue
-          }
-        }
-
-        let tagIds: number[] = []
-
-        if (createTags && bookmark.tags.length > 0) {
-          for (const tagName of bookmark.tags) {
-            const normalizedName = tagName.trim()
-            if (!normalizedName) continue
-
-            let tagId = tagNameToId.get(normalizedName)
-            if (!tagId) {
-              let tag = await Tag.query()
-                .where('user_id', userId)
-                .where('name', normalizedName)
-                .first()
-
-              if (!tag) {
-                tag = await Tag.create({
-                  name: normalizedName,
-                  userId,
-                  color: null,
-                })
-                importResult.tagsCreated++
-              }
-
-              tagId = tag.id
-              tagNameToId.set(normalizedName, tagId)
-            }
-
-            tagIds.push(tagId)
-          }
-        }
-
-        const newBookmark = await Bookmark.create({
-          title: bookmark.title,
-          url: bookmark.url,
-          description: null,
-          userId,
-          visitCount: 0,
-        })
-
-        await this.scheduleMetadataFetch(newBookmark.id, bookmark.url, true, autoAiTag)
-
-        if (tagIds.length > 0) {
-          const bookmarkWithTags = await Bookmark.query()
-            .where('user_id', userId)
-            .where('url', bookmark.url)
-            .first()
-
-          if (bookmarkWithTags) {
-            await bookmarkWithTags.related('tags').sync(tagIds)
-          }
-        }
-
-        importResult.imported++
-        onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
-      } catch (error) {
-        importResult.errors++
-        importResult.errorsList.push({
-          title: bookmark.title || '未知',
-          url: bookmark.url || '未知',
-          reason: error instanceof Error ? error.message : '未知错误',
-        })
-        onProgress?.(index + 1, parsedBookmarks.length, bookmark.title)
-      }
-    }
-
-    return importResult
-  }
-}
-
-export { parseHtml }

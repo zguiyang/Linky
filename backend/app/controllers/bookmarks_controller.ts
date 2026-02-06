@@ -83,19 +83,16 @@ export default class BookmarksController {
   async refreshMetadata({ auth, params }: HttpContext) {
     const user = auth.getUserOrFail()
     await this.bookmarkService.refreshMetadata(user.id, params.id)
-    return { message: 'Metadata refresh queued' }
   }
 
   async fetchingCount({ auth }: HttpContext) {
     const user = auth.getUserOrFail()
-    const count = await this.bookmarkService.getFetchingCount(user.id)
-    return { count }
+    return await this.bookmarkService.getFetchingCount(user.id)
   }
 
   async import({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
-    const { file, createTags, skipDuplicates, autoAiTag } =
-      await request.validateUsing(importBookmarkValidator)
+    const { file, createTags, autoAiTag } = await request.validateUsing(importBookmarkValidator)
 
     if (!file.tmpPath) {
       throw new Exception('文件上传失败', { status: 400 })
@@ -113,7 +110,6 @@ export default class BookmarksController {
       userId: user.id,
       filePath: tempPath,
       createTags: createTags ?? true,
-      skipDuplicates: skipDuplicates ?? true,
       autoAiTag: autoAiTag ?? true,
     })
 

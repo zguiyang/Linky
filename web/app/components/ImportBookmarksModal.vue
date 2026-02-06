@@ -5,7 +5,7 @@
   >
     <template #body>
       <u-form
-        :state="{ createTags, skipDuplicates, autoAiTag }"
+        :state="{ createTags, autoAiTag }"
         @submit="startImport"
       >
         <div
@@ -80,18 +80,6 @@
                 @click="clearFile"
               />
             </div>
-          </div>
-
-          <div class="space-y-3">
-            <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              导入选项
-            </p>
-            <u-form-field>
-              <u-checkbox
-                v-model="skipDuplicates"
-                label="跳过已存在的书签"
-              />
-            </u-form-field>
           </div>
 
           <u-accordion
@@ -266,7 +254,6 @@ const progress = computed(() => {
 })
 
 const createTags = ref(true)
-const skipDuplicates = ref(true)
 const autoAiTag = ref(true)
 
 const handleDrop = (event: DragEvent) => {
@@ -336,9 +323,6 @@ const startImport = async () => {
   if (createTags.value !== undefined) {
     formData.append('createTags', String(createTags.value))
   }
-  if (skipDuplicates.value !== undefined) {
-    formData.append('skipDuplicates', String(skipDuplicates.value))
-  }
   if (autoAiTag.value !== undefined) {
     formData.append('autoAiTag', String(autoAiTag.value))
   }
@@ -366,7 +350,6 @@ const handleClose = () => {
   current.value = 0
   total.value = 0
   createTags.value = true
-  skipDuplicates.value = true
   autoAiTag.value = true
 }
 

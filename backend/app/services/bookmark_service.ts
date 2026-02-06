@@ -341,4 +341,23 @@ export class BookmarkService {
 
     return bookmarks
   }
+
+  async createForImport(
+    userId: number,
+    data: {
+      url: string
+      title?: string | null
+      description?: string | null
+      visitCount?: number
+    }
+  ): Promise<Bookmark> {
+    return await Bookmark.create({
+      title: data.title || '',
+      url: data.url,
+      description: data.description ?? null,
+      userId,
+      status: BOOKMARK_STATUS.ACTIVE,
+      visitCount: data.visitCount ?? 0,
+    })
+  }
 }
