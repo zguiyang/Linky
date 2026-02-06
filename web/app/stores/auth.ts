@@ -12,7 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   const isAuthenticated = computed(() => !!tokenCookie.value)
-  const isEmailVerified = computed(() => user.value?.emailVerifiedAt !== null)
+  const isEmailVerified = computed(() => user.value?.isEmailVerified === true)
 
   const fetchUser = async () => {
     const { $api } = useNuxtApp()

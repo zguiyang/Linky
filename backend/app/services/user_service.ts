@@ -117,7 +117,7 @@ export class UserService {
     const token = await this.storeEmailVerificationToken(userId, newEmail, 'change')
 
     user.email = newEmail
-    user.emailVerifiedAt = null
+    user.isEmailVerified = false
     await user.save()
 
     await this.notificationService.sendVerificationEmail(user, token)
@@ -130,7 +130,7 @@ export class UserService {
   async resendVerificationEmail(userId: number): Promise<void> {
     const user = await User.findOrFail(userId)
 
-    if (user.emailVerifiedAt) {
+    if (user.isEmailVerified) {
       throw new Exception('Email already verified', { status: 400 })
     }
 
@@ -199,10 +199,10 @@ export class UserService {
     }
 
     if (data.type === 'register') {
-      user.emailVerifiedAt = DateTime.now()
+      user.isEmailVerified = true
     } else if (data.type === 'change') {
       user.email = data.email
-      user.emailVerifiedAt = DateTime.now()
+      user.isEmailVerified = true
     }
 
     await user.save()

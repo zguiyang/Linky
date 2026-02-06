@@ -27,7 +27,7 @@
 import { ref, computed, onUnmounted } from 'vue'
 
 interface User {
-  emailVerifiedAt: string | null
+  isEmailVerified: boolean
   email: string
 }
 
@@ -39,7 +39,7 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
-const showAlert = computed(() => props.user && !props.user.emailVerifiedAt)
+const showAlert = computed(() => props.user && !props.user.isEmailVerified)
 const userClosed = ref(false)
 
 const sending = ref(false)

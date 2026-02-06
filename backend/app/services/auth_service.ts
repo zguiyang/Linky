@@ -41,7 +41,7 @@ export class AuthService {
       throw new Exception('User not found with this email', { status: 422 })
     }
 
-    if (!user.emailVerifiedAt) {
+    if (!user.isEmailVerified) {
       throw new Exception('Please verify your email address first', { status: 422 })
     }
   }

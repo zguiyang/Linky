@@ -2,9 +2,7 @@ export interface User {
   id: number
   fullName: string | null
   email: string
-  emailVerifiedAt: string | null
-  verificationEmailSentAt: string | null
-  verificationToken: string | null
+  isEmailVerified: boolean
   resetPasswordToken: string | null
   resetPasswordExpiresAt: string | null
   createdAt: string
