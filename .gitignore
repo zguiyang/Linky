@@ -33,6 +33,7 @@ components.d.ts
 openspec/
 .roo/
 .junie/
+.ai/
 AGENTS.md
 
 # docker files
