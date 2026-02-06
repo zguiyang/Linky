@@ -64,6 +64,22 @@ export class UserService {
     return User.findOrFail(userId)
   }
 
+  async update(userId: number, data: { fullName?: string | null }) {
+    logger.info({ userId }, 'Updating user')
+
+    const user = await User.findOrFail(userId)
+
+    if (data.fullName !== undefined) {
+      user.fullName = data.fullName
+    }
+
+    await user.save()
+
+    logger.info({ userId }, 'User updated')
+
+    return user
+  }
+
   async updateVerificationToken(userId: number, token: string) {
     const user = await User.findOrFail(userId)
     user.verificationToken = token

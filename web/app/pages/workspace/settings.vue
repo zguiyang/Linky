@@ -298,11 +298,24 @@ const form = reactive({
 })
 
 const profileForm = reactive({
-  fullName: authStore.user?.fullName || '',
-  email: authStore.user?.email || ''
+  fullName: '',
+  email: ''
 })
 
-onMounted(async () => {
+const loadProfile = async () => {
+  const { $api } = useNuxtApp()
+  try {
+    const user = await $api<{ fullName: string | null, email: string }>('/user')
+    if (user) {
+      profileForm.fullName = user.fullName || ''
+      profileForm.email = user.email || ''
+    }
+  } catch (err) {
+    console.error('Failed to load profile:', err)
+  }
+}
+
+const loadSettings = async () => {
   const { $api } = useNuxtApp()
   try {
     const data = await $api<{ aiEnabled: boolean, aiBaseUrl: string | null, aiModelName: string | null }>('/settings/ai', { method: 'get' })
@@ -314,6 +327,13 @@ onMounted(async () => {
   } catch (err) {
     console.error('Failed to load settings:', err)
   }
+}
+
+onMounted(async () => {
+  await Promise.all([
+    loadProfile(),
+    loadSettings()
+  ])
 })
 
 const saveSettings = async () => {
@@ -353,12 +373,33 @@ const saveSettings = async () => {
 }
 
 const saveProfile = async () => {
-  // TODO: Implement profile update API in backend
-  toast.add({
-    title: '功能开发中',
-    description: '个人资料更新功能正在接入中，敬请期待',
-    color: 'warning',
-    icon: 'i-heroicons-clock'
-  })
+  const { $api } = useNuxtApp()
+  saving.value = true
+
+  try {
+    await $api('/user', {
+      method: 'put',
+      body: {
+        fullName: profileForm.fullName || null
+      }
+    })
+
+    toast.add({
+      title: '保存成功',
+      description: '个人资料已成功更新',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
+  } catch (err) {
+    console.error('Failed to save profile:', err)
+    toast.add({
+      title: '保存失败',
+      description: '更新个人资料时出错，请重试',
+      color: 'error',
+      icon: 'i-heroicons-x-circle'
+    })
+  } finally {
+    saving.value = false
+  }
 }
 </script>

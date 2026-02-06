@@ -16,6 +16,7 @@ import { apiLimiter, authLimiter, searchLimiter, aiChatLimiter } from '#start/li
 import { TRANSMIT_CHANNEL_NAMES } from '#constants/index'
 
 const AuthController = () => import('#controllers/auth_controller')
+const UsersController = () => import('#controllers/users_controller')
 const TagsController = () => import('#controllers/tags_controller')
 const BookmarksController = () => import('#controllers/bookmarks_controller')
 const MemosController = () => import('#controllers/memos_controller')
@@ -43,6 +44,10 @@ router
       .post('/auth/resend-verification', [AuthController, 'resendVerification'])
       .middleware(middleware.auth())
     router.get('/auth/me', [AuthController, 'me']).middleware(middleware.auth())
+
+    // 用户 API
+    router.get('/user', [UsersController, 'show']).middleware(middleware.auth())
+    router.put('/user', [UsersController, 'update']).middleware(middleware.auth())
 
     // 标签 API
     router.get('/tags', [TagsController, 'index'])
