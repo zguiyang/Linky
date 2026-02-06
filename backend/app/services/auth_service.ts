@@ -1,31 +1,25 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
-import User from '#models/user'
-import VerifyEmailNotification from '#mails/verify_email_notification'
-import ResetPasswordNotification from '#mails/reset_password_notification'
-import mail from '@adonisjs/mail/services/main'
-import { DateTime } from 'luxon'
-import { randomBytes } from 'node:crypto'
 import { Exception } from '@adonisjs/core/exceptions'
-
-function generateToken(): string {
-  return randomBytes(32).toString('hex')
-}
+import { DateTime } from 'luxon'
+import User from '#models/user'
+import { UserService } from '#services/user_service'
+import { NotificationService } from '#services/notification_service'
 
 @inject()
 export class AuthService {
+  constructor(
+    private userService: UserService,
+    private notificationService: NotificationService
+  ) {}
+
   async register(data: { email: string; name: string; password: string }) {
     logger.info({ email: data.email }, 'Registration attempt')
 
-    const user = await User.create({
-      email: data.email,
-      fullName: data.name,
-      password: data.password,
-    })
+    const user = await this.userService.create(data)
+    await this.notificationService.sendVerificationEmail(user)
 
     const token = await User.accessTokens.create(user)
-
-    await this.sendVerificationEmail(user)
 
     logger.info({ userId: user.id }, 'Registration successful')
 
@@ -46,7 +40,7 @@ export class AuthService {
   async requestPasswordReset(email: string): Promise<void> {
     logger.info({ email }, 'Password reset request')
 
-    const user = await User.findBy('email', email)
+    const user = await this.userService.findByEmail(email)
 
     if (!user) {
       throw new Exception('User not found with this email', { status: 422 })
@@ -56,23 +50,18 @@ export class AuthService {
       throw new Exception('Please verify your email address first', { status: 422 })
     }
 
-    await this.sendResetPasswordEmail(user)
+    await this.notificationService.sendPasswordResetEmail(user)
   }
 
   async resetPassword(token: string, newPassword: string) {
     logger.info({ token }, 'Password reset attempt')
 
-    const user = await User.findBy('resetPasswordToken', token)
+    const user = await this.userService.resetPassword(token, newPassword)
 
-    if (!user || !user.resetPasswordExpiresAt || user.resetPasswordExpiresAt < DateTime.now()) {
+    if (!user) {
       logger.warn({ token }, 'Invalid or expired reset token')
       return null
     }
-
-    user.password = newPassword
-    user.resetPasswordToken = null
-    user.resetPasswordExpiresAt = null
-    await user.save()
 
     logger.info({ userId: user.id }, 'Password reset successful')
 
@@ -82,42 +71,16 @@ export class AuthService {
   async verifyEmail(token: string) {
     logger.info({ token }, 'Email verification attempt')
 
-    const user = await User.findBy('verificationToken', token)
+    const user = await this.userService.verifyEmail(token)
 
     if (!user) {
       logger.warn({ token }, 'Invalid verification token')
       return null
     }
 
-    user.emailVerifiedAt = DateTime.now()
-    user.verificationToken = null
-    user.verificationEmailSentAt = null
-    await user.save()
-
     logger.info({ userId: user.id }, 'Email verification successful')
 
     return user
-  }
-
-  private async sendVerificationEmail(user: User): Promise<void> {
-    const verificationToken = generateToken()
-
-    user.verificationToken = verificationToken
-    user.verificationEmailSentAt = DateTime.now()
-    await user.save()
-
-    await mail.send(new VerifyEmailNotification(user, verificationToken))
-  }
-
-  private async sendResetPasswordEmail(user: User): Promise<void> {
-    const resetToken = generateToken()
-    const expiresAt = DateTime.now().plus({ hours: 1 })
-
-    user.resetPasswordToken = resetToken
-    user.resetPasswordExpiresAt = expiresAt
-    await user.save()
-
-    await mail.send(new ResetPasswordNotification(user, resetToken))
   }
 
   async resendVerificationEmail(user: User): Promise<void> {
@@ -137,7 +100,7 @@ export class AuthService {
       }
     }
 
-    await this.sendVerificationEmail(user)
+    await this.notificationService.sendVerificationEmail(user)
 
     logger.info({ userId: user.id }, 'Verification email resent')
   }
