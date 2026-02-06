@@ -31,7 +31,6 @@ router
     router.post('/auth/login', [AuthController, 'login'])
     router.post('/auth/forgot-password', [AuthController, 'forgotPassword'])
     router.post('/auth/reset-password', [AuthController, 'resetPassword'])
-    router.get('/auth/verify-email', [AuthController, 'verifyEmail'])
   })
   .prefix('api')
   .use(authLimiter)
@@ -40,12 +39,13 @@ router
 router
   .group(() => {
     router.post('/auth/logout', [AuthController, 'logout'])
-    router.post('/auth/resend-verification', [AuthController, 'resendVerification'])
 
     // 用户 API
     router.get('/user/me', [UsersController, 'me'])
     router.put('/user', [UsersController, 'update'])
     router.post('/user/change-email', [UsersController, 'changeEmail'])
+    router.get('/user/verify-email', [UsersController, 'verifyEmail'])
+    router.post('/user/resend-verification', [UsersController, 'resendVerification'])
 
     // 标签 API
     router.get('/tags', [TagsController, 'index'])

@@ -1,7 +1,7 @@
 <template>
-  <div class="w-full max-w-[400px] p-4">
+  <div class="w-full p-4 h-screen flex items-center justify-center">
     <u-card
-      class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-[40px] border border-gray-200 dark:border-gray-700"
+      class=" min-w-3/12 bg-white/95 dark:bg-gray-900/95 backdrop-blur-[40px] border border-gray-200 dark:border-gray-700"
       variant="outline"
     >
       <template #header>
@@ -67,17 +67,19 @@
           {{ error }}
         </u-alert>
         <div class="flex flex-col gap-2 w-full mt-4">
-          <nuxt-link
-            to="/auth/forgot-password"
-            class="text-center w-full px-4 py-2 bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-white rounded-lg transition-colors"
+          <u-button
+            color="primary"
+            block
+            :loading="resending"
+            @click="resendVerification"
           >
             重新发送验证邮件
-          </nuxt-link>
+          </u-button>
           <nuxt-link
-            to="/auth/sign-in"
+            to="/workspace/bookmarks"
             class="text-center text-[var(--color-primary-500)] dark:text-[var(--color-primary-300)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-primary-200)] hover:underline"
           >
-            返回登录
+            返回工作台
           </nuxt-link>
         </div>
       </div>
@@ -90,16 +92,42 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from '#app'
 import { useAuthStore } from '~/stores/auth'
 
-definePageMeta({ layout: 'auth' })
+definePageMeta({ layout: 'default' })
 
 const route = useRoute()
 const authStore = useAuthStore()
-const loading = ref(true)
+const toast = useToast()
 
+const loading = ref(true)
 const success = ref(false)
 const error = ref('')
+const resending = ref(false)
 
 const token = (route.query.token as string) || ''
+
+const resendVerification = async () => {
+  const { $api } = useNuxtApp()
+  resending.value = true
+
+  try {
+    await $api('/user/resend-verification', { method: 'post' })
+    toast.add({
+      title: '发送成功',
+      description: '验证邮件已重新发送，请检查您的邮箱',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
+  } catch (err: any) {
+    toast.add({
+      title: '发送失败',
+      description: err.message || '请稍后重试',
+      color: 'error',
+      icon: 'i-heroicons-x-circle'
+    })
+  } finally {
+    resending.value = false
+  }
+}
 
 onMounted(async () => {
   const lastPath = useCookie('lastPath')
@@ -112,7 +140,7 @@ onMounted(async () => {
   }
 
   const { $api } = useNuxtApp()
-  const result = await $api(`/auth/verify-email?token=${token}`, { method: 'get' })
+  const result = await $api(`/user/verify-email?token=${token}`, { method: 'get' })
 
   if (result) {
     success.value = true

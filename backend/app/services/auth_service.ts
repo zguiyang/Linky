@@ -60,27 +60,4 @@ export class AuthService {
 
     return user
   }
-
-  async verifyEmail(token: string) {
-    logger.info({ token }, 'Email verification attempt')
-
-    const user = await this.userService.verifyEmail(token)
-
-    if (!user) {
-      logger.warn({ token }, 'Invalid verification token')
-      return null
-    }
-
-    logger.info({ userId: user.id }, 'Email verification successful')
-
-    return user
-  }
-
-  async resendVerificationEmail(user: User): Promise<void> {
-    logger.info({ userId: user.id }, 'Resend verification email attempt')
-
-    await this.userService.resendVerificationEmail(user.id)
-
-    logger.info({ userId: user.id }, 'Verification email resent')
-  }
 }

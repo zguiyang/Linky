@@ -4,7 +4,7 @@ import { useTagsStore } from '@/stores/tags'
 export default defineNuxtRouteMiddleware(async (to) => {
   if (import.meta.server) return
 
-  const publicRoutes = ['/', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/auth/reset-password', '/auth/verify-email']
+  const publicRoutes = ['/', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/auth/reset-password']
 
   if (publicRoutes.includes(to.path)) {
     return

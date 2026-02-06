@@ -50,18 +50,4 @@ export default class AuthController {
       throw new Exception('Reset token is invalid or expired', { status: 422 })
     }
   }
-
-  async verifyEmail({ request }: HttpContext) {
-    const token = request.input('token')
-    const user = await this.authService.verifyEmail(token)
-
-    if (!user) {
-      throw new Exception('Verification token is invalid or expired', { status: 422 })
-    }
-  }
-
-  async resendVerification({ auth }: HttpContext) {
-    const user = auth.getUserOrFail()
-    return await this.authService.resendVerificationEmail(user)
-  }
 }

@@ -13,14 +13,8 @@ function generateToken(): string {
 
 @inject()
 export class NotificationService {
-  async sendVerificationEmail(user: User): Promise<void> {
+  async sendVerificationEmail(user: User, token: string): Promise<void> {
     logger.info({ userId: user.id }, 'Sending verification email')
-
-    const token = generateToken()
-
-    user.verificationToken = token
-    user.verificationEmailSentAt = DateTime.now()
-    await user.save()
 
     await mail.send(new VerifyEmailNotification(user, token))
 

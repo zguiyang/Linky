@@ -2,16 +2,16 @@ import { inject } from '@adonisjs/core'
 import { Exception } from '@adonisjs/core/exceptions'
 import hash from '@adonisjs/core/services/hash'
 import logger from '@adonisjs/core/services/logger'
-import Mail from '@adonisjs/mail/services/main'
 import { randomUUID } from 'node:crypto'
 import redis from '@adonisjs/redis/services/main'
 import User from '#models/user'
 import { DateTime } from 'luxon'
 import { EMAIL_VERIFICATION } from '#constants'
-import VerifyEmailNotification from '#mails/verify_email_notification'
+import { NotificationService } from '#services/notification_service'
 
 @inject()
 export class UserService {
+  constructor(private notificationService: NotificationService) {}
   async create(data: { email: string; name: string; password: string }) {
     logger.info({ email: data.email }, 'Creating user')
 
@@ -36,6 +36,17 @@ export class UserService {
 
     logger.info({ userId: user.id }, 'Email verified')
     return user
+  }
+
+  async verifyEmailByUser(userId: number, token: string) {
+    const key = `${EMAIL_VERIFICATION.KEY_PREFIX}${token}`
+    const data = await redis.hgetall(key)
+
+    if (!data || Number(data.userId) !== userId) {
+      return null
+    }
+
+    return await this.verifyEmail(token)
   }
 
   async resetPassword(token: string, newPassword: string) {
@@ -109,7 +120,7 @@ export class UserService {
     user.emailVerifiedAt = null
     await user.save()
 
-    await Mail.send(new VerifyEmailNotification(user, token))
+    await this.notificationService.sendVerificationEmail(user, token)
 
     logger.info({ userId, newEmail }, 'Email changed, verification email sent')
 
@@ -133,7 +144,7 @@ export class UserService {
 
     const token = await this.storeEmailVerificationToken(userId, user.email, 'register')
 
-    await Mail.send(new VerifyEmailNotification(user, token))
+    await this.notificationService.sendVerificationEmail(user, token)
 
     await this.setVerificationCooldown(userId)
 
