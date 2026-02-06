@@ -47,13 +47,9 @@
     </aside>
 
     <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-      <header class="flex flex-col gap-2 px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-        <email-verification-alert
-          v-if="authStore.isAuthenticated && !authStore.isEmailVerified"
-          :user="authStore.user"
-          @refresh="authStore.fetchUser()"
-        />
-        <div class="flex items-center justify-end">
+      <header class="flex items-center gap-3 px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+        <email-verification-alert v-if="authStore.isAuthenticated && !authStore.isEmailVerified" />
+        <div class="flex items-center gap-2 ml-auto">
           <u-dashboard-search-button
             variant="subtle"
             @click="openSearch"
