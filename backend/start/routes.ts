@@ -13,7 +13,7 @@ import env from '#start/env'
 import transmit from '@adonisjs/transmit/services/main'
 import { apiLimiter, authLimiter, searchLimiter, aiChatLimiter } from '#start/limiter'
 
-import { TRANSMIT_CHANNEL_NAMES } from '#constants/index'
+import { TRANSMIT_CHANNEL_NAMES } from '#constants'
 
 const AuthController = () => import('#controllers/auth_controller')
 const UsersController = () => import('#controllers/users_controller')
@@ -43,10 +43,8 @@ router
     router
       .post('/auth/resend-verification', [AuthController, 'resendVerification'])
       .middleware(middleware.auth())
-    router.get('/auth/me', [AuthController, 'me']).middleware(middleware.auth())
-
     // 用户 API
-    router.get('/user', [UsersController, 'show']).middleware(middleware.auth())
+    router.get('/user/me', [UsersController, 'me']).middleware(middleware.auth())
     router.put('/user', [UsersController, 'update']).middleware(middleware.auth())
 
     // 标签 API

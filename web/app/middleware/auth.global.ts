@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/auth'
+import { useTagsStore } from '@/stores/tags'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   if (import.meta.server) return
@@ -16,8 +17,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo('/auth/sign-in')
   }
   const authStore = useAuthStore()
+  const tagsStore = useTagsStore()
 
   if (!authStore.user) {
     await authStore.fetchUser()
   }
+  await tagsStore.fetchTags()
 })

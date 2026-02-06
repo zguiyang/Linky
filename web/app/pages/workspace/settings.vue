@@ -303,16 +303,10 @@ const profileForm = reactive({
 })
 
 const loadProfile = async () => {
-  const { $api } = useNuxtApp()
-  try {
-    const user = await $api<{ fullName: string | null, email: string }>('/user')
-    if (user) {
-      profileForm.fullName = user.fullName || ''
-      profileForm.email = user.email || ''
-    }
-  } catch (err) {
-    console.error('Failed to load profile:', err)
-  }
+  const user = await authStore.fetchUser()
+  if (!user) return
+  profileForm.email = user.email || ''
+  profileForm.fullName = user.fullName || ''
 }
 
 const loadSettings = async () => {

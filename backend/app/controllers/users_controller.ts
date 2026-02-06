@@ -7,8 +7,9 @@ import { updateProfileValidator } from '#validators/user_validator'
 export default class UsersController {
   constructor(private userService: UserService) {}
 
-  async show({ auth }: HttpContext) {
+  async me({ auth }: HttpContext) {
     const user = auth.getUserOrFail()
+    console.log(user)
     return user.serialize()
   }
 

@@ -27,6 +27,9 @@ export default defineNuxtPlugin((_nuxtApp) => {
       }
     },
 
+    onResponse() {
+      // do something with response
+    },
     onResponseError({ response }) {
       const { handle401, handleError } = useHttpError()
 

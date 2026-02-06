@@ -15,39 +15,42 @@ export const useAuthStore = defineStore('auth', () => {
   const isEmailVerified = computed(() => user.value?.emailVerifiedAt !== null)
 
   const fetchUser = async () => {
-    const { data } = await useApi<User>('/auth/me')
-    if (data.value) {
-      user.value = data.value
+    const { $api } = useNuxtApp()
+    const data = await $api<User>('/user/me')
+    if (data) {
+      user.value = data
     }
     return user.value
   }
 
   const login = async (email: string, password: string, rememberMe?: boolean) => {
+    const { $api } = useNuxtApp()
     loading.value = true
-    const { data } = await useApi<AuthResponse>('/auth/login', {
+    const data = await $api<AuthResponse>('/auth/login', {
       method: 'post',
       body: { email, password, rememberMe }
     })
-    if (data.value) {
-      user.value = data.value.user
-      tokenCookie.value = data.value.token
+    if (data) {
+      user.value = data.user
+      tokenCookie.value = data.token
     }
     loading.value = false
-    return data.value
+    return data
   }
 
   const register = async (email: string, password: string, fullName: string) => {
+    const { $api } = useNuxtApp()
     loading.value = true
-    const { data } = await useApi<AuthResponse>('/auth/register', {
+    const data = await $api<AuthResponse>('/auth/register', {
       method: 'post',
       body: { email, password, name: fullName }
     })
-    if (data.value) {
-      user.value = data.value.user
-      tokenCookie.value = data.value.token
+    if (data) {
+      user.value = data.user
+      tokenCookie.value = data.token
     }
     loading.value = false
-    return data.value
+    return data
   }
 
   const logout = async () => {

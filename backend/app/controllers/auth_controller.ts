@@ -64,9 +64,4 @@ export default class AuthController {
     const user = auth.getUserOrFail()
     return await this.authService.resendVerificationEmail(user)
   }
-
-  async me({ auth }: HttpContext) {
-    const user = auth.getUserOrFail()
-    return user.serialize()
-  }
 }
