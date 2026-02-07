@@ -119,7 +119,7 @@ export class UserService {
 
     logger.info({ userId, newEmail }, 'Changing email')
 
-    const token = await this.storeEmailVerificationToken(userId, newEmail)
+    const token = await this.storeEmailVerificationToken(userId, user.email, newEmail)
 
     await this.notificationService.sendVerificationEmail(newEmail, user.fullName, token)
 
@@ -143,7 +143,7 @@ export class UserService {
       )
     }
 
-    const token = await this.storeEmailVerificationToken(userId, user.email)
+    const token = await this.storeEmailVerificationToken(userId, user.email, user.email)
 
     await this.notificationService.sendVerificationEmail(user.email, user.fullName, token)
 
@@ -152,20 +152,25 @@ export class UserService {
     logger.info({ userId }, 'Verification email resent')
   }
 
-  private async storeEmailVerificationToken(userId: number, email: string): Promise<string> {
+  private async storeEmailVerificationToken(
+    userId: number,
+    oldEmail: string,
+    newEmail: string
+  ): Promise<string> {
     const token = randomUUID()
     const key = `${EMAIL_VERIFICATION.KEY_PREFIX}${token}`
     const now = DateTime.now().toISO()
 
     await redis.hset(key, {
       userId: userId.toString(),
-      email,
+      oldEmail,
+      newEmail,
       createdAt: now,
     })
 
     await redis.expire(key, EMAIL_VERIFICATION.EXPIRY_MINUTES * 60)
 
-    logger.info({ userId, email, token }, 'Email verification token stored in Redis')
+    logger.info({ userId, oldEmail, newEmail, token }, 'Email verification token stored in Redis')
 
     return token
   }
@@ -194,12 +199,13 @@ export class UserService {
       return null
     }
 
-    if (user.email !== data.email) {
+    if (user.email !== data.oldEmail) {
       await redis.del(key)
       logger.warn({ token }, 'Email mismatch during verification, token deleted')
       return null
     }
 
+    user.email = data.newEmail
     user.isEmailVerified = true
     await user.save()
 
