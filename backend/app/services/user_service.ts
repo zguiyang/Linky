@@ -112,17 +112,18 @@ export class UserService {
       throw new Exception('New email must be different from current email', { status: 400 })
     }
 
+    const existingUser = await User.findBy('email', newEmail)
+    if (existingUser) {
+      throw new Exception('Email is already in use', { status: 400 })
+    }
+
     logger.info({ userId, newEmail }, 'Changing email')
 
-    const token = await this.storeEmailVerificationToken(userId, newEmail, 'change')
+    const token = await this.storeEmailVerificationToken(userId, newEmail)
 
-    user.email = newEmail
-    user.isEmailVerified = false
-    await user.save()
+    await this.notificationService.sendVerificationEmail(newEmail, user.fullName, token)
 
-    await this.notificationService.sendVerificationEmail(user, token)
-
-    logger.info({ userId, newEmail }, 'Email changed, verification email sent')
+    logger.info({ userId, newEmail }, 'Email change initiated, verification email sent')
 
     return user
   }
@@ -142,20 +143,16 @@ export class UserService {
       )
     }
 
-    const token = await this.storeEmailVerificationToken(userId, user.email, 'register')
+    const token = await this.storeEmailVerificationToken(userId, user.email)
 
-    await this.notificationService.sendVerificationEmail(user, token)
+    await this.notificationService.sendVerificationEmail(user.email, user.fullName, token)
 
     await this.setVerificationCooldown(userId)
 
     logger.info({ userId }, 'Verification email resent')
   }
 
-  private async storeEmailVerificationToken(
-    userId: number,
-    email: string,
-    type: 'register' | 'change'
-  ): Promise<string> {
+  private async storeEmailVerificationToken(userId: number, email: string): Promise<string> {
     const token = randomUUID()
     const key = `${EMAIL_VERIFICATION.KEY_PREFIX}${token}`
     const now = DateTime.now().toISO()
@@ -163,18 +160,17 @@ export class UserService {
     await redis.hset(key, {
       userId: userId.toString(),
       email,
-      type,
       createdAt: now,
     })
 
     await redis.expire(key, EMAIL_VERIFICATION.EXPIRY_MINUTES * 60)
 
-    logger.info({ userId, email, type, token }, 'Email verification token stored in Redis')
+    logger.info({ userId, email, token }, 'Email verification token stored in Redis')
 
     return token
   }
 
-  private async verifyEmailFromRedis(token: string): Promise<User | null> {
+  async verifyEmailFromRedis(token: string): Promise<User | null> {
     const key = `${EMAIL_VERIFICATION.KEY_PREFIX}${token}`
     const data = await redis.hgetall(key)
 
@@ -198,18 +194,18 @@ export class UserService {
       return null
     }
 
-    if (data.type === 'register') {
-      user.isEmailVerified = true
-    } else if (data.type === 'change') {
-      user.email = data.email
-      user.isEmailVerified = true
+    if (user.email !== data.email) {
+      await redis.del(key)
+      logger.warn({ token }, 'Email mismatch during verification, token deleted')
+      return null
     }
 
+    user.isEmailVerified = true
     await user.save()
 
     await redis.del(key)
 
-    logger.info({ userId: user.id, type: data.type }, 'Email verified via Redis')
+    logger.info({ userId: user.id }, 'Email verified via Redis')
 
     return user
   }

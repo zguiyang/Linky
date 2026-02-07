@@ -96,10 +96,10 @@
       <div class="content">
         <p class="greeting">
           Hi
-          @if(user.fullName)
-            {{ user.fullName }}
+          @if(name)
+            {{ name }}
           @else
-            {{ user.email }}
+            {{ email }}
           @end
           ,
         </p>

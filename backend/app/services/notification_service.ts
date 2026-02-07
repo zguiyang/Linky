@@ -13,12 +13,12 @@ function generateToken(): string {
 
 @inject()
 export class NotificationService {
-  async sendVerificationEmail(user: User, token: string): Promise<void> {
-    logger.info({ userId: user.id }, 'Sending verification email')
+  async sendVerificationEmail(email: string, name: string | null, token: string): Promise<void> {
+    logger.info({ email }, 'Sending verification email')
 
-    await mail.send(new VerifyEmailNotification(user, token))
+    await mail.send(new VerifyEmailNotification(email, name, token))
 
-    logger.info({ userId: user.id }, 'Verification email sent')
+    logger.info({ email }, 'Verification email sent')
   }
 
   async sendPasswordResetEmail(user: User): Promise<void> {

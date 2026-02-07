@@ -10,7 +10,6 @@ export default class UsersController {
 
   async me({ auth }: HttpContext) {
     const user = auth.getUserOrFail()
-    console.log(user)
     return user.serialize()
   }
 
@@ -42,6 +41,8 @@ export default class UsersController {
     if (!verifiedUser) {
       throw new Exception('Verification token is invalid or expired', { status: 422 })
     }
+
+    return { message: 'Email verified successfully' }
   }
 
   async resendVerification({ auth }: HttpContext) {

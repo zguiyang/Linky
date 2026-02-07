@@ -1,10 +1,10 @@
 import { BaseMail } from '@adonisjs/mail'
-import User from '#models/user'
 import env from '#start/env'
 
 export default class VerifyEmailNotification extends BaseMail {
   constructor(
-    private user: User,
+    private email: string,
+    private name: string | null,
     private token: string
   ) {
     super()
@@ -16,8 +16,9 @@ export default class VerifyEmailNotification extends BaseMail {
   prepare() {
     const verifyUrl = `${env.get('CLIENT_URL', env.get('APP_URL'))}/verify-email?token=${this.token}`
 
-    this.message.to(this.user.email).htmlView('emails/verify_email', {
-      user: this.user,
+    this.message.to(this.email).htmlView('emails/verify_email', {
+      email: this.email,
+      name: this.name,
       verifyUrl,
     })
   }
