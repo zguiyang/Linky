@@ -1,8 +1,7 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { Exception } from '@adonisjs/core/exceptions'
 import { UserService } from '#services/user_service'
-import { updateProfileValidator, changeEmailValidator } from '#validators/user_validator'
+import { changeEmailValidator, updateProfileValidator } from '#validators/user_validator'
 
 @inject()
 export default class UsersController {
@@ -36,13 +35,8 @@ export default class UsersController {
   async verifyEmail({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
     const token = request.input('token')
-    const verifiedUser = await this.userService.verifyEmailByUser(user.id, token)
 
-    if (!verifiedUser) {
-      throw new Exception('Verification token is invalid or expired', { status: 422 })
-    }
-
-    return { message: 'Email verified successfully' }
+    return await this.userService.verifyEmailByUser(user.id, token)
   }
 
   async resendVerification({ auth }: HttpContext) {

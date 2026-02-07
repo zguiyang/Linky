@@ -43,7 +43,7 @@ export class UserService {
     const data = await redis.hgetall(key)
 
     if (!data || Number(data.userId) !== userId) {
-      return null
+      throw new Exception('Invalid verification token', { status: 403 })
     }
 
     return await this.verifyEmail(token)
@@ -54,8 +54,7 @@ export class UserService {
 
     const user = await User.findBy('resetPasswordToken', token)
     if (!user || !user.resetPasswordExpiresAt || user.resetPasswordExpiresAt < DateTime.now()) {
-      logger.warn({ token }, 'Invalid or expired reset token')
-      return null
+      throw new Exception('Invalid or expired reset token', { status: 403 })
     }
 
     user.password = newPassword
@@ -180,8 +179,7 @@ export class UserService {
     const data = await redis.hgetall(key)
 
     if (!data || Object.keys(data).length === 0) {
-      logger.warn({ token }, 'Token not found or expired in Redis')
-      return null
+      throw new Exception('Token not found or expired in Redis', { status: 404 })
     }
 
     const createdAt = DateTime.fromISO(data.createdAt)
@@ -195,14 +193,11 @@ export class UserService {
     const user = await User.find(Number(data.userId))
     if (!user) {
       await redis.del(key)
-      logger.warn({ token, userId: data.userId }, 'User not found')
-      return null
+      throw new Exception('User not found', { status: 404 })
     }
 
     if (user.email !== data.oldEmail) {
-      await redis.del(key)
-      logger.warn({ token }, 'Email mismatch during verification, token deleted')
-      return null
+      throw new Exception('Email mismatch during verification', { status: 400 })
     }
 
     user.email = data.newEmail

@@ -140,7 +140,11 @@ onMounted(async () => {
   }
 
   const { $api } = useNuxtApp()
-  const result = await $api(`/user/verify-email?token=${token}`, { method: 'get' })
+  const result = await $api(`/user/verify-email?token=${token}`, { method: 'get' }).catch(() => {
+    success.value = false
+    lastPath.value = null
+    error.value = '验证链接无效或已过期'
+  })
 
   if (result) {
     success.value = true
