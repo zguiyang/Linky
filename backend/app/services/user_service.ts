@@ -105,7 +105,7 @@ export class UserService {
 
     const isValidPassword = await hash.verify(user.password, password)
     if (!isValidPassword) {
-      throw new Exception('Invalid password', { status: 401 })
+      throw new Exception('Invalid password', { status: 403 })
     }
 
     if (user.email === newEmail) {
