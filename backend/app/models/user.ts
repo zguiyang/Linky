@@ -28,12 +28,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare isEmailVerified: boolean
 
-  @column()
-  declare resetPasswordExpiresAt: DateTime | null
-
-  @column()
-  declare resetPasswordToken: string | null
-
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

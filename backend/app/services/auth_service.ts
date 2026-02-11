@@ -1,6 +1,5 @@
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
-import { Exception } from '@adonisjs/core/exceptions'
 import User from '#models/user'
 import { UserService } from '#services/user_service'
 
@@ -35,15 +34,7 @@ export class AuthService {
   async requestPasswordReset(email: string): Promise<void> {
     logger.info({ email }, 'Password reset request')
 
-    const user = await this.userService.findByEmail(email)
-
-    if (!user) {
-      throw new Exception('User not found with this email', { status: 422 })
-    }
-
-    if (!user.isEmailVerified) {
-      throw new Exception('Please verify your email address first', { status: 422 })
-    }
+    await this.userService.sendPasswordResetEmail(email)
   }
 
   async resetPassword(token: string, newPassword: string) {

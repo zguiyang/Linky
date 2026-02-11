@@ -1,6 +1,5 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { Exception } from '@adonisjs/core/exceptions'
 import {
   loginValidator,
   registerValidator,
@@ -44,10 +43,6 @@ export default class AuthController {
 
   async resetPassword({ request }: HttpContext) {
     const data = await request.validateUsing(resetPasswordValidator)
-    const user = await this.authService.resetPassword(data.token, data.password)
-
-    if (!user) {
-      throw new Exception('Reset token is invalid or expired', { status: 422 })
-    }
+    await this.authService.resetPassword(data.token, data.password)
   }
 }
