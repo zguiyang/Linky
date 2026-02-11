@@ -2,8 +2,6 @@ import { useAuthStore } from '@/stores/auth'
 import { useTagsStore } from '@/stores/tags'
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (import.meta.server) return
-
   const publicRoutes = ['/', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/auth/reset-password']
 
   if (publicRoutes.includes(to.path)) {
@@ -16,11 +14,21 @@ export default defineNuxtRouteMiddleware(async (to) => {
     lastPath.value = to.path
     return navigateTo('/auth/sign-in')
   }
+
   const authStore = useAuthStore()
   const tagsStore = useTagsStore()
 
   if (!authStore.user) {
-    await authStore.fetchUser()
+    try {
+      await authStore.fetchUser()
+    } catch {
+      token.value = null
+      authStore.setUser(null)
+      const lastPath = useCookie('lastPath', { maxAge: 60 * 60 })
+      lastPath.value = to.path
+      return navigateTo('/auth/sign-in')
+    }
   }
+
   await tagsStore.fetchTags()
 })

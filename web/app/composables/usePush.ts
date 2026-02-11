@@ -8,12 +8,17 @@ export function usePush() {
   const { events, subscribe } = useTransmit()
   const authStore = useAuthStore()
 
-  if (!authStore.user) {
-    throw new Error('User not authenticated')
+  const ensureAuth = async () => {
+    if (!authStore.user) {
+      await authStore.fetchUser()
+    }
   }
 
   const onBookmarkUpdated = (callback: (bookmark: TransmitEvent['data']) => void) => {
-    subscribe(`${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:${authStore.user?.id}`)
+    const channel = authStore.user ? `${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:${authStore.user.id}` : null
+    if (!channel) return
+
+    subscribe(channel)
 
     watch(
       () => events.value,
@@ -28,7 +33,10 @@ export function usePush() {
   }
 
   const onImportProgress = (callback: (data: ImportProgressData) => void) => {
-    subscribe(`${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:${authStore.user?.id}`)
+    const channel = authStore.user ? `${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:${authStore.user.id}` : null
+    if (!channel) return
+
+    subscribe(channel)
 
     watch(
       () => events.value,
@@ -42,5 +50,5 @@ export function usePush() {
     )
   }
 
-  return { onBookmarkUpdated, onImportProgress }
+  return { onBookmarkUpdated, onImportProgress, ensureAuth }
 }

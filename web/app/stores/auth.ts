@@ -83,5 +83,5 @@ export const useAuthStore = defineStore('auth', () => {
     setToken
   }
 }, {
-  persist: true
+  persist: false
 })
