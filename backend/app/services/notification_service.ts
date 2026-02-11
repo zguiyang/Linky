@@ -13,10 +13,14 @@ function generateToken(): string {
 
 @inject()
 export class NotificationService {
-  async sendVerificationEmail(email: string, name: string | null, token: string): Promise<void> {
+  async sendVerificationEmail(
+    email: string,
+    name: string | null,
+    emailToken: string
+  ): Promise<void> {
     logger.info({ email }, 'Sending verification email')
 
-    await mail.send(new VerifyEmailNotification(email, name, token))
+    await mail.send(new VerifyEmailNotification(email, name, emailToken))
 
     logger.info({ email }, 'Verification email sent')
   }

@@ -103,7 +103,7 @@ const success = ref(false)
 const error = ref('')
 const resending = ref(false)
 
-const token = (route.query.token as string) || ''
+const emailToken = (route.query.emailToken as string) || ''
 
 const resendVerification = async () => {
   const { $api } = useNuxtApp()
@@ -133,14 +133,20 @@ onMounted(async () => {
   const lastPath = useCookie('lastPath')
   const redirectPath = lastPath.value || '/workspace/bookmarks'
 
-  if (!token) {
+  if (!emailToken) {
     error.value = '验证链接无效，缺少验证令牌'
+    toast.add({
+      title: '验证失败',
+      description: '验证链接无效，缺少验证令牌',
+      color: 'error',
+      icon: 'i-heroicons-x-circle'
+    })
     loading.value = false
     return
   }
 
   const { $api } = useNuxtApp()
-  const result = await $api(`/user/verify-email?token=${token}`, { method: 'get' }).catch(() => {
+  const result = await $api(`/user/verify-email?emailToken=${emailToken}`, { method: 'get' }).catch(() => {
     success.value = false
     lastPath.value = null
     error.value = '验证链接无效或已过期'

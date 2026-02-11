@@ -26,10 +26,10 @@ export class UserService {
     return user
   }
 
-  async verifyEmail(token: string) {
-    logger.info({ token }, 'Verifying email via Redis')
+  async verifyEmail(emailToken: string) {
+    logger.info({ emailToken }, 'Verifying email via Redis')
 
-    const email = await this.getEmailFromToken(token)
+    const email = await this.getEmailFromToken(emailToken)
     if (!email) {
       return null
     }
@@ -47,8 +47,8 @@ export class UserService {
     return user
   }
 
-  async getEmailFromToken(token: string): Promise<string | null> {
-    const key = `verify:${token}`
+  async getEmailFromToken(emailToken: string): Promise<string | null> {
+    const key = `verify:${emailToken}`
     const email = await redis.get(key)
     if (!email) {
       return null
@@ -57,8 +57,8 @@ export class UserService {
     return email
   }
 
-  async verifyEmailByUser(userId: number, token: string) {
-    const email = await this.getEmailFromToken(token)
+  async verifyEmailByUser(userId: number, emailToken: string) {
+    const email = await this.getEmailFromToken(emailToken)
     if (!email) {
       throw new Exception('Invalid or expired verification token', { status: 403 })
     }
@@ -68,7 +68,7 @@ export class UserService {
       throw new Exception('Email mismatch', { status: 403 })
     }
 
-    return await this.verifyEmail(token)
+    return await this.verifyEmail(emailToken)
   }
 
   async resetPassword(token: string, newPassword: string) {
@@ -147,9 +147,9 @@ export class UserService {
 
     logger.info({ userId, newEmail }, 'Changing email')
 
-    const token = await this.storeEmailVerificationToken(newEmail)
+    const emailToken = await this.storeEmailVerificationToken(newEmail)
 
-    await this.notificationService.sendVerificationEmail(newEmail, user.fullName, token)
+    await this.notificationService.sendVerificationEmail(newEmail, user.fullName, emailToken)
 
     await this.setSendRate(newEmail)
 
@@ -172,9 +172,9 @@ export class UserService {
       })
     }
 
-    const token = await this.storeEmailVerificationToken(user.email)
+    const emailToken = await this.storeEmailVerificationToken(user.email)
 
-    await this.notificationService.sendVerificationEmail(user.email, user.fullName, token)
+    await this.notificationService.sendVerificationEmail(user.email, user.fullName, emailToken)
 
     await this.setSendRate(user.email)
 
@@ -182,14 +182,14 @@ export class UserService {
   }
 
   async storeEmailVerificationToken(email: string): Promise<string> {
-    const token = randomUUID()
-    const key = `verify:${token}`
+    const emailToken = randomUUID()
+    const key = `verify:${emailToken}`
 
     await redis.set(key, email, 'EX', EMAIL_VERIFICATION.EXPIRY_MINUTES * 60)
 
-    logger.info({ email, token }, 'Email verification token stored in Redis')
+    logger.info({ email, emailToken }, 'Email verification token stored in Redis')
 
-    return token
+    return emailToken
   }
 
   private async checkCanSend(email: string): Promise<boolean> {
