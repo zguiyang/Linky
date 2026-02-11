@@ -13,7 +13,6 @@
 
 export default defineNuxtPlugin((_nuxtApp) => {
   const config = useRuntimeConfig()
-  const tokenCookie = useCookie('auth_token')
 
   const $api = $fetch.create({
     baseURL: `${config.public.apiBaseUrl}${config.public.apiPrefix}`,
@@ -21,15 +20,15 @@ export default defineNuxtPlugin((_nuxtApp) => {
     credentials: 'include',
 
     onRequest({ options }) {
+      const tokenCookie = useCookie('auth_token')
       if (tokenCookie.value) {
         options.headers = options.headers || {}
         options.headers.set('Authorization', `Bearer ${tokenCookie.value}`)
       }
     },
 
-    onResponse() {
-      // do something with response
-    },
+    onResponse() {},
+
     onResponseError({ response }) {
       const { handle401, handleError } = useHttpError()
 

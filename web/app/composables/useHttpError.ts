@@ -14,22 +14,30 @@ export const useHttpError = () => {
     return '操作失败，请稍后重试'
   }
 
+  const showToast = (title: string, message: string, color: 'error' | 'success' | 'info', icon?: string) => {
+    if (import.meta.client) {
+      const toast = useToast()
+      toast.add({
+        title,
+        description: message,
+        color,
+        icon: icon || 'i-heroicons-x-mark'
+      })
+    }
+  }
+
   const handle401 = () => {
     if (isLoggingOut.value) return
     isLoggingOut.value = true
 
-    const toast = useToast()
-    toast.add({
-      title: '未登录或登录已过期',
-      description: getErrorMessage(currentError.value),
-      color: 'error',
-      icon: 'i-heroicons-lock-closed'
-    })
+    showToast('未登录或登录已过期', getErrorMessage(currentError.value), 'error', 'i-heroicons-lock-closed')
 
     const tokenCookie = useCookie('auth_token')
     tokenCookie.value = null
 
-    navigateTo('/auth/sign-in')
+    if (import.meta.client) {
+      navigateTo('/auth/sign-in')
+    }
 
     setTimeout(() => {
       isLoggingOut.value = false
@@ -38,13 +46,7 @@ export const useHttpError = () => {
 
   const handleError = (error: unknown) => {
     currentError.value = error
-    const toast = useToast()
-    toast.add({
-      title: '请求失败',
-      description: getErrorMessage(error),
-      color: 'error',
-      icon: 'i-heroicons-x-mark'
-    })
+    showToast('请求失败', getErrorMessage(error), 'error')
   }
 
   return {
