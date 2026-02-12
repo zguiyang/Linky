@@ -29,7 +29,9 @@ auto-imports.d.ts
 components.d.ts
 
 # ai generated files
-.opencode/
+.opencode/*
+!.opencode/rules/
+!.opencode/skills/
 openspec/
 .roo/
 .junie/
