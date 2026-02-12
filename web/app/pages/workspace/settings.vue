@@ -1,11 +1,11 @@
 <template>
-  <div class="h-full flex flex-col bg-[var(--bg-canvas)]">
+  <div class="h-full flex flex-col bg-(--bg-canvas)">
     <!-- Header Area -->
-    <div class="px-8 py-6 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-      <h1 class="text-2xl font-bold text-[var(--text-primary)]">
+    <div class="px-8 py-6 border-b border-(--border-subtle) bg-(--bg-surface)">
+      <h1 class="text-2xl font-bold text-(--text-primary)">
         系统设置
       </h1>
-      <p class="text-[var(--text-secondary)] mt-1">
+      <p class="text-(--text-secondary) mt-1">
         管理您的个性化配置与 AI 接口集成
       </p>
     </div>
@@ -13,14 +13,14 @@
     <!-- Main Content Area with Sidebar -->
     <div class="flex-1 flex overflow-hidden">
       <!-- Settings Sidebar -->
-      <aside class="w-64 border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 flex flex-col gap-1">
+      <aside class="w-64 border-r border-(--border-subtle) bg-(--bg-surface) p-4 flex flex-col gap-1">
         <u-button
           v-for="item in menuItems"
           :key="item.id"
           variant="ghost"
           color="neutral"
           class="justify-start gap-3 px-3 py-2.5"
-          :class="[activeTab === item.id ? 'bg-[var(--bg-secondary)] text-[var(--text-primary)] font-medium' : 'text-[var(--text-secondary)]']"
+          :class="[activeTab === item.id ? 'bg-(--bg-secondary) text-(--text-primary) font-medium' : 'text-(--text-secondary)']"
           @click="navigateTo({ query: { tab: item.id } })"
         >
           <u-icon
@@ -32,7 +32,7 @@
       </aside>
 
       <!-- Settings Content -->
-      <main class="flex-1 overflow-y-auto p-8 bg-[var(--bg-canvas)]">
+      <main class="flex-1 overflow-y-auto p-8 bg-(--bg-canvas)">
         <div class="max-w-4xl">
           <!-- AI Settings Section -->
           <div
@@ -41,21 +41,21 @@
           >
             <section>
               <div class="mb-6">
-                <h2 class="text-xl font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                <h2 class="text-xl font-semibold text-(--text-primary) flex items-center gap-2">
                   <u-icon
                     name="i-heroicons-sparkles"
                     class="text-primary-500"
                   />
                   AI 配置
                 </h2>
-                <p class="text-sm text-[var(--text-secondary)] mt-1">
+                <p class="text-sm text-(--text-secondary) mt-1">
                   配置您的 AI 服务接口，开启智能摘要、标签建议等高级功能。
                 </p>
               </div>
 
               <div class="space-y-8">
                 <!-- AI Enable Toggle Section -->
-                <div class="flex items-center justify-between p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
+                <div class="flex items-center justify-between p-4 rounded-xl bg-(--bg-surface) border border-(--border-subtle)">
                   <div class="flex items-center gap-4">
                     <div class="p-2 rounded-lg bg-primary-500/10">
                       <u-icon
@@ -64,10 +64,10 @@
                       />
                     </div>
                     <div>
-                      <p class="font-semibold text-[var(--text-primary)]">
+                      <p class="font-semibold text-(--text-primary)">
                         启用 AI 服务
                       </p>
-                      <p class="text-xs text-[var(--text-secondary)]">
+                      <p class="text-xs text-(--text-secondary)">
                         开启后系统将允许调用第三方模型接口
                       </p>
                     </div>
@@ -119,10 +119,10 @@
                   />
                 </u-form-field>
 
-                <div class="pt-4 border-t border-[var(--border-subtle)] flex justify-end items-center gap-4">
+                <div class="pt-4 border-t border-(--border-subtle) flex justify-end items-center gap-4">
                   <span
                     v-if="lastSaved"
-                    class="text-xs text-[var(--text-muted)]"
+                    class="text-xs text-(--text-muted)"
                   >
                     最后保存于: {{ lastSaved }}
                   </span>
@@ -147,14 +147,14 @@
           >
             <section>
               <div class="mb-8">
-                <h2 class="text-xl font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                <h2 class="text-xl font-semibold text-(--text-primary) flex items-center gap-2">
                   <u-icon
                     name="i-heroicons-user-circle"
                     class="text-primary-500"
                   />
                   个人资料
                 </h2>
-                <p class="text-sm text-[var(--text-secondary)] mt-1">
+                <p class="text-sm text-(--text-secondary) mt-1">
                   管理您的个人信息、头像及账号安全。
                 </p>
               </div>
@@ -225,7 +225,7 @@
                   </div>
                 </div>
 
-                <div class="pt-4 border-t border-[var(--border-subtle)] flex justify-end items-center gap-4">
+                <div class="pt-4 border-t border-(--border-subtle) flex justify-end items-center gap-4">
                   <u-button
                     color="primary"
                     size="lg"

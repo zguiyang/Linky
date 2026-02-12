@@ -1,7 +1,7 @@
 <template>
   <div class="w-full p-4 h-screen flex items-center justify-center">
     <u-card
-      class=" min-w-3/12 bg-white/95 dark:bg-gray-900/95 backdrop-blur-[40px] border border-gray-200 dark:border-gray-700"
+      class=" min-w-3/12 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl border border-gray-200 dark:border-gray-700"
       variant="outline"
     >
       <template #header>
@@ -15,7 +15,7 @@
         class="flex flex-col items-center justify-center py-8"
       >
         <div
-          class="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary-500)]"
+          class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"
         />
         <p class="mt-4 text-gray-600 dark:text-gray-400">
           正在验证您的邮箱...
@@ -77,7 +77,7 @@
           </u-button>
           <nuxt-link
             to="/workspace/bookmarks"
-            class="text-center text-[var(--color-primary-500)] dark:text-[var(--color-primary-300)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-primary-200)] hover:underline"
+            class="text-center text-primary-500 dark:text-primary-300 font-medium transition-all duration-200 ease hover:text-primary-600 dark:hover:text-primary-200 hover:underline"
           >
             返回工作台
           </nuxt-link>

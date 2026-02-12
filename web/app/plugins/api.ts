@@ -15,7 +15,6 @@
 /* eslint-disable vue-composable/composable-placement */
 export default defineNuxtPlugin((_nuxtApp) => {
   const config = useRuntimeConfig()
-  const tokenCookie = useCookie('auth_token')
   const { handle401, handleError } = useHttpError()
 
   const $api = $fetch.create({
@@ -24,6 +23,7 @@ export default defineNuxtPlugin((_nuxtApp) => {
     credentials: 'include',
 
     onRequest({ options }) {
+      const tokenCookie = useCookie('auth_token')
       if (tokenCookie.value) {
         options.headers = options.headers || {}
         options.headers.set('Authorization', `Bearer ${tokenCookie.value}`)

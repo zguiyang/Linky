@@ -15,7 +15,7 @@
           />
         </div>
 
-        <div class="flex justify-center gap-2 mt-4 pt-3 border-t border-[var(--border-subtle)]">
+        <div class="flex justify-center gap-2 mt-4 pt-3 border-t border-(--border-subtle)">
           <u-button
             color="neutral"
             variant="ghost"
@@ -66,7 +66,7 @@
           />
           <div
             v-else
-            class="text-[var(--text-tertiary)]"
+            class="text-(--text-tertiary)"
           >
             ✏️ 点击编辑内容...
           </div>
@@ -173,21 +173,21 @@ const cardClasses = computed(() => {
   if (isPinned) {
     switch (props.viewMode) {
       case 'masonry':
-        return 'bg-[var(--bg-surface)] border border-warning-300 dark:border-warning-700 rounded-xl p-5 break-inside-avoid border-l-4 border-l-warning-500'
+        return 'bg-(--bg-surface) border border-warning-300 dark:border-warning-700 rounded-xl p-5 break-inside-avoid border-l-4 border-l-warning-500'
       case 'list':
-        return 'bg-[var(--bg-surface)] border border-warning-300 dark:border-warning-700 rounded-lg p-4 border-l-4 border-l-warning-500'
+        return 'bg-(--bg-surface) border border-warning-300 dark:border-warning-700 rounded-lg p-4 border-l-4 border-l-warning-500'
       default:
-        return 'bg-[var(--bg-surface)] border border-warning-300 dark:border-warning-700 rounded-xl p-5 break-inside-avoid border-l-4 border-l-warning-500'
+        return 'bg-(--bg-surface) border border-warning-300 dark:border-warning-700 rounded-xl p-5 break-inside-avoid border-l-4 border-l-warning-500'
     }
   }
 
   switch (props.viewMode) {
     case 'masonry':
-      return 'bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-xl p-5 break-inside-avoid'
+      return 'bg-(--bg-surface) border-(--border-subtle) rounded-xl p-5 break-inside-avoid'
     case 'list':
-      return 'flex items-center gap-3 p-4 bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-lg'
+      return 'flex items-center gap-3 p-4 bg-(--bg-surface) border-(--border-subtle) rounded-lg'
     default:
-      return 'bg-[var(--bg-surface)] border-[var(--border-subtle)] rounded-xl p-5 break-inside-avoid'
+      return 'bg-(--bg-surface) border-(--border-subtle) rounded-xl p-5 break-inside-avoid'
   }
 })
 
@@ -203,27 +203,27 @@ const contentPaddingClass = computed(() => {
 const titleClass = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'text-[var(--text-primary)] text-base mb-2 line-clamp-2'
+      return 'text-(--text-primary) text-base mb-2 line-clamp-2'
     case 'list':
-      return 'text-[var(--text-primary)] text-base mb-1 truncate'
+      return 'text-(--text-primary) text-base mb-1 truncate'
     default:
-      return 'text-[var(--text-primary)] text-base mb-2 line-clamp-2'
+      return 'text-(--text-primary) text-base mb-2 line-clamp-2'
   }
 })
 
 const contentClass = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'text-[var(--text-secondary)] mb-3'
+      return 'text-(--text-secondary) mb-3'
     case 'list':
-      return 'text-[var(--text-secondary)] mb-2 line-clamp-1'
+      return 'text-(--text-secondary) mb-2 line-clamp-1'
     default:
-      return 'text-[var(--text-secondary)] mb-3'
+      return 'text-(--text-secondary) mb-3'
   }
 })
 
 const dateClass = computed(() => {
-  return 'text-[var(--text-secondary)]'
+  return 'text-(--text-secondary)'
 })
 
 const formatDate = (date: string | null) => {

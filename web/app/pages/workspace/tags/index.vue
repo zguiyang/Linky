@@ -2,10 +2,10 @@
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-[var(--text-primary)]">
+        <h1 class="text-2xl font-bold text-(--text-primary)">
           标签管理
         </h1>
-        <p class="text-sm text-[var(--text-secondary)] mt-1">
+        <p class="text-sm text-(--text-secondary) mt-1">
           共 {{ tagsStore.tags.length }} 个标签
         </p>
       </div>
@@ -31,13 +31,13 @@
 
     <div
       v-if="!tagsStore.tags || tagsStore.tags.length === 0"
-      class="flex flex-col items-center justify-center py-20 bg-[var(--bg-surface)] rounded-2xl border border-dashed border-[var(--border-subtle)]"
+      class="flex flex-col items-center justify-center py-20 bg-(--bg-surface) rounded-2xl border border-dashed border-(--border-subtle)"
     >
       <u-icon
         name="i-heroicons-tag"
-        class="w-12 h-12 text-[var(--text-secondary)]"
+        class="w-12 h-12 text-(--text-secondary)"
       />
-      <p class="text-[var(--text-secondary)] mt-4">
+      <p class="text-(--text-secondary) mt-4">
         暂无标签，创建您的第一个标签吧
       </p>
     </div>
@@ -100,7 +100,7 @@
                 size="xs"
                 variant="ghost"
                 color="neutral"
-                class="!p-1 h-6 w-6"
+                class="p-1! h-6 w-6"
                 @click.stop="openEditModal(tag)"
               />
               <u-button
@@ -108,7 +108,7 @@
                 size="xs"
                 variant="ghost"
                 color="error"
-                class="!p-1 h-6 w-6"
+                class="p-1! h-6 w-6"
                 @click.stop="openDeleteConfirm(tag)"
               />
             </div>
@@ -170,7 +170,7 @@
                 size="xs"
                 variant="ghost"
                 color="neutral"
-                class="!p-1 h-6 w-6"
+                class="p-1! h-6 w-6"
                 @click.stop="openEditModal(tag)"
               />
               <u-button
@@ -178,7 +178,7 @@
                 size="xs"
                 variant="ghost"
                 color="error"
-                class="!p-1 h-6 w-6"
+                class="p-1! h-6 w-6"
                 @click.stop="openDeleteConfirm(tag)"
               />
             </div>

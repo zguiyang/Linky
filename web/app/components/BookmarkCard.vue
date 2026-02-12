@@ -6,7 +6,7 @@
   >
     <!-- 图标区域 -->
     <div
-      class="flex items-center justify-center flex-shrink-0"
+      class="flex items-center justify-center shrink-0"
       :class="iconContainerClasses"
     >
       <img
@@ -179,9 +179,9 @@ const menuItems = computed(() => [
 const cardClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'bg-[var(--bg-surface)] border-[var(--border-subtle)] p-5 break-inside-avoid h-full'
+      return 'bg-(--bg-surface) border-(--border-subtle) p-5 break-inside-avoid h-full'
     case 'list':
-      return 'flex items-center gap-3 p-4 bg-[var(--bg-surface)] border-[var(--border-subtle)]'
+      return 'flex items-center gap-3 p-4 bg-(--bg-surface) border-(--border-subtle)'
     default:
       return ''
   }
@@ -190,9 +190,9 @@ const cardClasses = computed(() => {
 const iconContainerClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'w-12 h-12 bg-[var(--bg-surface)] rounded-xl'
+      return 'w-12 h-12 bg-(--bg-surface) rounded-xl'
     case 'list':
-      return 'w-10 h-10 bg-[var(--bg-surface)] rounded-lg'
+      return 'w-10 h-10 bg-(--bg-surface) rounded-lg'
     default:
       return ''
   }
@@ -223,9 +223,9 @@ const contentClasses = computed(() => {
 const titleClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'text-[var(--text-primary)] text-base line-clamp-2'
+      return 'text-(--text-primary) text-base line-clamp-2'
     case 'list':
-      return 'text-[var(--text-primary)] text-base truncate'
+      return 'text-(--text-primary) text-base truncate'
     default:
       return ''
   }
@@ -234,9 +234,9 @@ const titleClasses = computed(() => {
 const descriptionClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'text-[var(--text-secondary)] mt-2'
+      return 'text-(--text-secondary) mt-2'
     case 'list':
-      return 'text-[var(--text-secondary)] mt-1'
+      return 'text-(--text-secondary) mt-1'
     default:
       return ''
   }
@@ -245,9 +245,9 @@ const descriptionClasses = computed(() => {
 const visitCountClasses = computed(() => {
   switch (props.viewMode) {
     case 'masonry':
-      return 'text-[var(--text-secondary)] mt-2'
+      return 'text-(--text-secondary) mt-2'
     case 'list':
-      return 'text-[var(--text-secondary)] mt-2'
+      return 'text-(--text-secondary) mt-2'
     default:
       return ''
   }

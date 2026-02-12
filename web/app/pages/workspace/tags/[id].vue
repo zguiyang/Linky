@@ -17,18 +17,18 @@
         </div>
         <div
           v-else
-          class="w-10 h-10 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center"
+          class="w-10 h-10 rounded-full bg-(--bg-tertiary) flex items-center justify-center"
         >
           <u-icon
             name="i-heroicons-tag"
-            class="w-5 h-5 text-[var(--text-secondary)]"
+            class="w-5 h-5 text-(--text-secondary)"
           />
         </div>
         <div>
-          <h1 class="text-xl font-bold text-[var(--text-primary)]">
+          <h1 class="text-xl font-bold text-(--text-primary)">
             {{ tag.name }}
           </h1>
-          <p class="text-sm text-[var(--text-secondary)]">
+          <p class="text-sm text-(--text-secondary)">
             {{ tag.bookmarksCount }} 个书签 · {{ tag.memosCount }} 个备忘录
           </p>
           <div class="flex items-center gap-2 mt-2">
@@ -37,19 +37,19 @@
                 'text-sm px-3 py-1 rounded-full transition-colors',
                 currentType === 'bookmark'
                   ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
-                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]'
+                  : 'text-(--text-secondary) hover:bg-(--bg-secondary)'
               ]"
               @click="currentType = 'bookmark'"
             >
               {{ tag.bookmarksCount }} 个书签
             </button>
-            <span class="text-[var(--text-muted)]">·</span>
+            <span class="text-(--text-muted)">·</span>
             <button
               :class="[
                 'text-sm px-3 py-1 rounded-full transition-colors',
                 currentType === 'memo'
                   ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
-                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]'
+                  : 'text-(--text-secondary) hover:bg-(--bg-secondary)'
               ]"
               @click="currentType = 'memo'"
             >
@@ -62,10 +62,10 @@
         v-else
         class="flex items-center gap-3"
       >
-        <div class="w-10 h-10 rounded-full bg-[var(--bg-tertiary)] animate-pulse" />
+        <div class="w-10 h-10 rounded-full bg-(--bg-tertiary) animate-pulse" />
         <div class="space-y-2">
-          <div class="w-24 h-5 bg-[var(--bg-tertiary)] rounded animate-pulse" />
-          <div class="w-32 h-4 bg-[var(--bg-tertiary)] rounded animate-pulse" />
+          <div class="w-24 h-5 bg-(--bg-tertiary) rounded animate-pulse" />
+          <div class="w-32 h-4 bg-(--bg-tertiary) rounded animate-pulse" />
         </div>
       </div>
       <u-dropdown-menu
@@ -87,7 +87,7 @@
       >
         <u-icon
           name="i-heroicons-arrow-path"
-          class="w-8 h-8 animate-spin text-[var(--text-secondary)]"
+          class="w-8 h-8 animate-spin text-(--text-secondary)"
         />
       </div>
       <div
@@ -96,9 +96,9 @@
       >
         <u-icon
           name="i-heroicons-inbox"
-          class="w-16 h-16 text-[var(--text-muted)]"
+          class="w-16 h-16 text-(--text-muted)"
         />
-        <p class="text-sm text-[var(--text-secondary)] mt-4">
+        <p class="text-sm text-(--text-secondary) mt-4">
           此标签下暂无内容
         </p>
       </div>
@@ -132,7 +132,7 @@
 
     <div
       v-if="!pending && total > 0"
-      class="flex justify-center py-4 flex-shrink-0"
+      class="flex justify-center py-4 shrink-0"
     >
       <u-pagination
         v-model:page="page"
@@ -173,7 +173,7 @@
               <input
                 v-model="tagForm.color"
                 type="color"
-                class="w-10 h-10 rounded cursor-pointer border border-[var(--border-subtle)]"
+                class="w-10 h-10 rounded cursor-pointer border border-(--border-subtle)"
               >
               <u-input
                 v-model="tagForm.color"
@@ -218,10 +218,10 @@
             </div>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-[var(--text-primary)]">
+            <h3 class="text-lg font-semibold text-(--text-primary)">
               确定要删除这个标签吗？
             </h3>
-            <p class="text-sm text-[var(--text-secondary)] mt-1">
+            <p class="text-sm text-(--text-secondary) mt-1">
               标签名称: <strong>{{ tag?.name }}</strong>
             </p>
           </div>

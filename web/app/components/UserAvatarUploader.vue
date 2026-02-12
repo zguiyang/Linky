@@ -84,7 +84,7 @@ watch(() => props.currentAvatar, () => {
 </script>
 
 <template>
-  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-8 p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-8 p-6 rounded-2xl bg-(--bg-surface) border border-(--border-subtle)">
     <div class="relative">
       <u-avatar
         :src="previewUrl || currentAvatar || undefined"
@@ -166,7 +166,7 @@ watch(() => props.currentAvatar, () => {
         </u-button>
       </div>
 
-      <p class="text-xs text-[var(--text-muted)]">
+      <p class="text-xs text-(--text-muted)">
         支持 JPG、PNG 或 GIF。最大文件大小 200KB。
       </p>
     </div>
