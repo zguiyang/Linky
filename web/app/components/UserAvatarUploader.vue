@@ -66,6 +66,7 @@ const handleRemove = () => {
   if (previewUrl.value) {
     cancelPreview()
   }
+  isUploading.value = false
   emit('remove')
 }
 
@@ -80,6 +81,7 @@ watch(() => props.currentAvatar, () => {
   if (previewUrl.value) {
     cancelPreview()
   }
+  isUploading.value = false
 })
 </script>
 
