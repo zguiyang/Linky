@@ -39,7 +39,6 @@ export default class UsersController {
   async verifyEmail({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
     const emailToken = request.input('emailToken')
-    console.log('🚀 ~ verifyEmail ~ emailToken: ', emailToken)
 
     const result = await this.userService.verifyEmailByUser(user.id, emailToken)
     return result.serialize()

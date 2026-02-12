@@ -101,7 +101,10 @@ watch(() => props.currentAvatar, () => {
         v-if="isUploading"
         class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full"
       >
-        <u-icon name="i-heroicons-arrow-path" class="animate-spin text-white size-8" />
+        <u-icon
+          name="i-heroicons-arrow-path"
+          class="animate-spin text-white size-8"
+        />
       </div>
     </div>
 

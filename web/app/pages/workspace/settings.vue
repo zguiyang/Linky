@@ -161,7 +161,7 @@
 
               <div class="space-y-10">
                 <!-- Avatar Section -->
-                <UserAvatarUploader
+                <user-avatar-uploader
                   :current-avatar="avatarUrl"
                   :user-name="authStore.user?.fullName || authStore.user?.email || ''"
                   @upload="handleAvatarUpload"

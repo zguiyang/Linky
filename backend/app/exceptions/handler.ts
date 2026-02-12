@@ -30,8 +30,12 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       })
     }
 
-    const status = (error as any).status || 500
-    const message = (error as any).message || 'Internal Server Error'
+    const status =
+      error && typeof error === 'object' && 'status' in error ? (error as any).status : 500
+    const message =
+      error && typeof error === 'object' && 'message' in error
+        ? (error as any).message
+        : 'Internal Server Error'
 
     if (app.inProduction) {
       return ctx.response.status(status).send({

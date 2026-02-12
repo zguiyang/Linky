@@ -2,6 +2,7 @@ import { inject } from '@adonisjs/core'
 import { Exception } from '@adonisjs/core/exceptions'
 import hash from '@adonisjs/core/services/hash'
 import logger from '@adonisjs/core/services/logger'
+import { MultipartFile } from '@adonisjs/core/bodyparser'
 import { randomUUID } from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -229,7 +230,7 @@ export class UserService {
     await redis.set(rateKey, '1', 'EX', EMAIL_VERIFICATION.COOLDOWN_MINUTES * 60)
   }
 
-  async uploadAvatar(userId: number, file: any): Promise<string> {
+  async uploadAvatar(userId: number, file: MultipartFile): Promise<string> {
     if (!file.tmpPath) {
       throw new Exception('文件上传失败', { status: 400 })
     }

@@ -15,9 +15,7 @@ export default withNuxt(
         ignores: []
       }],
 
-      'vue-composable/composable-placement': ['error', {
-        ignorePatterns: ['app/middleware/**']
-      }],
+      'vue-composable/composable-placement': 'error',
 
       'vue-composable/lifecycle-placement': 'error',
 
@@ -26,6 +24,12 @@ export default withNuxt(
       }],
 
       'vue/define-props-destructuring': 'off'
+    }
+  },
+  {
+    files: ['app/middleware/**'],
+    rules: {
+      'vue-composable/composable-placement': 'off'
     }
   }
   // Your custom configs here
