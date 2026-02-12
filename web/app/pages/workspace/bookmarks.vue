@@ -175,95 +175,6 @@
     </div>
 
     <u-modal
-      v-model:open="showBookmarkModal"
-      :title="isEditing ? '编辑书签' : '添加新书签'"
-    >
-      <template #body>
-        <u-form
-          :state="bookmarkForm"
-          class="space-y-4"
-          @submit="handleSaveBookmark(() => showBookmarkModal = false)"
-        >
-          <template v-if="!isEditing">
-            <u-form-field
-              label="自动使用 AI 生成标签"
-              direction="row"
-            >
-              <u-switch v-model="autoAiTag" />
-            </u-form-field>
-          </template>
-
-          <u-form-field
-            label="URL"
-            name="url"
-            required
-          >
-            <u-input
-              v-model="bookmarkForm.url"
-              type="url"
-              placeholder="https://example.com"
-              icon="i-heroicons-globe-alt"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field
-            label="标题"
-            name="title"
-          >
-            <u-input
-              v-model="bookmarkForm.title"
-              placeholder="留空将自动从网页获取"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field
-            label="描述"
-            name="description"
-          >
-            <u-textarea
-              v-model="bookmarkForm.description"
-              placeholder="留空将自动从网页获取"
-              :rows="3"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field
-            label="标签"
-            name="tagIds"
-          >
-            <u-select-menu
-              v-model="bookmarkForm.tagIds"
-              :items="tagSelectItems"
-              multiple
-              value-key="value"
-              label-key="label"
-              placeholder="选择标签"
-              class="w-full"
-            />
-          </u-form-field>
-        </u-form>
-      </template>
-      <template #footer="{ close }">
-        <div class="flex justify-end gap-2 w-full">
-          <u-button
-            label="取消"
-            color="neutral"
-            variant="outline"
-            @click="close"
-          />
-          <u-button
-            :label="isEditing ? '保存' : '添加'"
-            color="primary"
-            @click="handleSaveBookmark(close)"
-          />
-        </div>
-      </template>
-    </u-modal>
-
-    <u-modal
       v-model:open="showDeleteConfirm"
       title="确认删除"
     >
@@ -309,13 +220,19 @@
       v-model="showImportModal"
       @imported="handleImportComplete"
     />
+
+    <bookmark-editor-modal
+      v-model="showBookmarkModal"
+      :bookmark="contextBookmark"
+      @save="handleSaveSuccess"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useTagsStore } from '~/stores/tags'
-import type { Bookmark, Tag } from '~/api/types'
+import type { Bookmark } from '~/api/types'
 import { SORT_BY_OPTIONS, SORT_ORDER_OPTIONS, VIEW_MODE, type ViewMode } from '~/constants'
 import { useAuthStore } from '~/stores/auth'
 
@@ -364,22 +281,9 @@ const { items: bookmarks, total, pending, page, perPage, setPage } = pagination
 await pagination.execute()
 
 const showBookmarkModal = ref(false)
-const isEditing = ref(false)
-const editingBookmarkId = ref<number | null>(null)
 const showDeleteConfirm = ref(false)
 const contextBookmark = ref<Bookmark | null>(null)
 const isDeleting = ref(false)
-
-const bookmarkForm = ref({
-  title: '',
-  url: '',
-  description: '',
-  tagIds: [] as number[]
-})
-
-const autoAiTag = ref(true)
-
-const tagSelectItems = computed(() => tagsStore.tagSelectItems)
 
 const setViewMode = (mode: ViewMode) => {
   viewMode.value = mode
@@ -390,28 +294,12 @@ const openBookmark = (bookmark: Bookmark) => {
 }
 
 const openAddModal = () => {
-  isEditing.value = false
-  editingBookmarkId.value = null
-  autoAiTag.value = true
-  bookmarkForm.value = {
-    title: '',
-    url: '',
-    description: '',
-    tagIds: []
-  }
+  contextBookmark.value = null
   showBookmarkModal.value = true
 }
 
 const openEditModal = (bookmark: Bookmark) => {
-  isEditing.value = true
-  editingBookmarkId.value = bookmark.id
-  autoAiTag.value = false
-  bookmarkForm.value = {
-    title: bookmark.title,
-    url: bookmark.url,
-    description: bookmark.description || '',
-    tagIds: bookmark.tags.map((t: Tag) => t.id)
-  }
+  contextBookmark.value = bookmark
   showBookmarkModal.value = true
 }
 
@@ -420,33 +308,10 @@ const openDeleteConfirm = (bookmark: Bookmark) => {
   showDeleteConfirm.value = true
 }
 
-const handleSaveBookmark = async (close?: () => void) => {
-  if (!bookmarkForm.value.url) {
-    return
-  }
-
-  if (isEditing.value && editingBookmarkId.value) {
-    await $api(`/bookmarks/${editingBookmarkId.value}`, {
-      method: 'put',
-      body: bookmarkForm.value
-    })
-  } else {
-    await $api('/bookmarks', {
-      method: 'post',
-      body: { url: bookmarkForm.value.url, autoAiTag: autoAiTag.value }
-    })
-  }
-
+const handleSaveSuccess = async () => {
   await pagination.execute()
-  close?.()
   showBookmarkModal.value = false
-  autoAiTag.value = true
-  bookmarkForm.value = {
-    title: '',
-    url: '',
-    description: '',
-    tagIds: []
-  }
+  contextBookmark.value = null
 }
 
 const handleDeleteBookmark = async (close?: () => void) => {
