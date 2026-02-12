@@ -1,7 +1,6 @@
 import { useAuthStore } from '@/stores/auth'
 import { useTagsStore } from '@/stores/tags'
 
-/* eslint-disable vue-composable/composable-placement */
 export default defineNuxtRouteMiddleware(async (to) => {
   const publicRoutes = ['/', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/auth/reset-password']
 
@@ -33,4 +32,3 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   await tagsStore.fetchTags()
 })
-/* eslint-enable vue-composable/composable-placement */
