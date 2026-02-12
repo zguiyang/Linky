@@ -349,11 +349,8 @@ const isEmailFormValid = computed(() => {
   return emailRegex.test(emailForm.newEmail) && emailForm.password.length >= 8
 })
 
-const config = useRuntimeConfig()
-const avatarUrl = computed(() => {
-  if (!authStore.user?.avatar) return null
-  return `${config.public.apiBaseUrl}${authStore.user.avatar.startsWith('/') ? '' : '/'}${authStore.user.avatar}`
-})
+const getAvatarUrl = useAvatarUrl()
+const avatarUrl = computed(() => getAvatarUrl(authStore.user?.avatar))
 
 const loadProfile = async () => {
   const user = await authStore.fetchUser()

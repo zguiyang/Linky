@@ -239,7 +239,8 @@ export class UserService {
 
     const user = await User.findOrFail(userId)
     if (user.avatar) {
-      const oldPath = path.join(storageDir, user.avatar)
+      const oldFilename = path.basename(user.avatar)
+      const oldPath = path.join(storageDir, oldFilename)
       try {
         await fs.unlink(oldPath)
       } catch {
@@ -255,7 +256,7 @@ export class UserService {
     await fs.copyFile(file.tmpPath, filepath)
     await fs.unlink(file.tmpPath)
 
-    user.avatar = filename
+    user.avatar = `${AVATAR.URL_PREFIX}/${filename}`
     await user.save()
 
     logger.info({ userId, filename }, 'Avatar uploaded')
@@ -270,7 +271,8 @@ export class UserService {
       return
     }
 
-    const filepath = path.resolve(process.cwd(), AVATAR.STORAGE_DIR, user.avatar)
+    const filename = path.basename(user.avatar)
+    const filepath = path.resolve(process.cwd(), AVATAR.STORAGE_DIR, filename)
     try {
       await fs.unlink(filepath)
     } catch {

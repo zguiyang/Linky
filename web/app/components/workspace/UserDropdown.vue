@@ -5,6 +5,7 @@
   >
     <template #default>
       <u-avatar
+        :src="avatarUrl || undefined"
         :alt="user?.fullName || user?.email || 'User'"
         size="md"
         class="cursor-pointer ring-2 ring-transparent hover:ring-primary-500 transition-all"
@@ -25,9 +26,12 @@ import { useAuthStore } from '~/stores/auth'
 const authStore = useAuthStore()
 const colorMode = useColorMode()
 const toast = useToast()
+const getAvatarUrl = useAvatarUrl()
 
 const user = computed(() => authStore.user)
 const isDark = computed(() => colorMode.value === 'dark')
+
+const avatarUrl = computed(() => getAvatarUrl(user.value?.avatar))
 
 const menuItems = computed<DropdownMenuItem[][]>(() => [
   [
@@ -35,6 +39,7 @@ const menuItems = computed<DropdownMenuItem[][]>(() => [
       type: 'label',
       label: user.value?.email || user.value?.fullName || '用户',
       avatar: {
+        src: avatarUrl.value || undefined,
         alt: user.value?.email || user.value?.fullName || 'User'
       }
     }
