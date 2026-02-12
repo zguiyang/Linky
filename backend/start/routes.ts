@@ -43,6 +43,8 @@ router
     // 用户 API
     router.get('/user/me', [UsersController, 'me'])
     router.put('/user', [UsersController, 'update'])
+    router.post('/user/avatar', [UsersController, 'uploadAvatar'])
+    router.delete('/user/avatar', [UsersController, 'removeAvatar'])
     router.post('/user/change-email', [UsersController, 'changeEmail'])
     router.get('/user/verify-email', [UsersController, 'verifyEmail'])
     router.post('/user/resend-verification', [UsersController, 'resendVerification'])
@@ -123,4 +125,22 @@ transmit.authorize(`${TRANSMIT_CHANNEL_NAMES.BOOKMARKS}:userId`, (ctx, { userId 
     return false
   }
   return Number(ctx.auth.user?.id) === Number(userId)
+})
+
+import fs from 'node:fs/promises'
+import path from 'node:path'
+
+router.get('/avatars/:filename', async ({ params, response }) => {
+  const filename = params.filename
+  const filepath = path.resolve(process.cwd(), 'storage', 'avatars', filename)
+
+  try {
+    const stat = await fs.stat(filepath)
+    if (!stat.isFile()) {
+      return response.notFound({ error: 'Avatar not found' })
+    }
+    return response.download(filepath)
+  } catch {
+    return response.notFound({ error: 'Avatar not found' })
+  }
 })

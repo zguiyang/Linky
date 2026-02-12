@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 import { Infer } from '@vinejs/vine/types'
-import { VALIDATION } from '#constants/index'
+import { VALIDATION, AVATAR } from '#constants'
 
 export const updateProfileValidator = vine.compile(
   vine.object({
@@ -18,3 +18,14 @@ export const changeEmailValidator = vine.compile(
 )
 
 export type ChangeEmailValidator = Infer<typeof changeEmailValidator>
+
+export const avatarUploadValidator = vine.compile(
+  vine.object({
+    avatar: vine.file({
+      size: AVATAR.MAX_SIZE,
+      extnames: ['jpg', 'jpeg', 'png', 'gif'],
+    }),
+  })
+)
+
+export type AvatarUploadValidator = Infer<typeof avatarUploadValidator>

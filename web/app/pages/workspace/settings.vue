@@ -161,43 +161,12 @@
 
               <div class="space-y-10">
                 <!-- Avatar Section -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-8 p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
-                  <u-avatar
-                    :alt="authStore.user?.fullName || authStore.user?.email || 'User'"
-                    size="xl"
-                    class="ring-4 ring-primary-500/10"
-                  >
-                    <template #fallback>
-                      {{ (authStore.user?.fullName || authStore.user?.email || 'U').charAt(0).toUpperCase() }}
-                    </template>
-                  </u-avatar>
-
-                  <div class="space-y-3">
-                    <div class="flex flex-wrap gap-3">
-                      <u-button
-                        color="primary"
-                        variant="soft"
-                        icon="i-heroicons-cloud-arrow-up"
-                        size="sm"
-                        disabled
-                      >
-                        更换头像
-                      </u-button>
-                      <u-button
-                        color="neutral"
-                        variant="ghost"
-                        icon="i-heroicons-trash"
-                        size="sm"
-                        disabled
-                      >
-                        移除
-                      </u-button>
-                    </div>
-                    <p class="text-xs text-[var(--text-muted)]">
-                      支持 JPG、PNG 或 GIF。最大文件大小 2MB。
-                    </p>
-                  </div>
-                </div>
+                <UserAvatarUploader
+                  :current-avatar="avatarUrl"
+                  :user-name="authStore.user?.fullName || authStore.user?.email || ''"
+                  @upload="handleAvatarUpload"
+                  @remove="handleAvatarRemove"
+                />
 
                 <!-- Basic Info Form -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -380,6 +349,12 @@ const isEmailFormValid = computed(() => {
   return emailRegex.test(emailForm.newEmail) && emailForm.password.length >= 8
 })
 
+const config = useRuntimeConfig()
+const avatarUrl = computed(() => {
+  if (!authStore.user?.avatar) return null
+  return `${config.public.apiBaseUrl}${authStore.user.avatar.startsWith('/') ? '' : '/'}${authStore.user.avatar}`
+})
+
 const loadProfile = async () => {
   const user = await authStore.fetchUser()
   if (!user) return
@@ -504,6 +479,58 @@ const changeEmail = async () => {
     })
   } finally {
     changingEmail.value = false
+  }
+}
+
+const handleAvatarUpload = async (file: File) => {
+  try {
+    const formData = new FormData()
+    formData.append('avatar', file)
+
+    await $api('/user/avatar', {
+      method: 'post',
+      body: formData
+    })
+
+    toast.add({
+      title: '上传成功',
+      description: '头像已成功更新',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
+
+    await authStore.fetchUser()
+  } catch (err: any) {
+    toast.add({
+      title: '上传失败',
+      description: err.message || '请检查文件后重试',
+      color: 'error',
+      icon: 'i-heroicons-x-circle'
+    })
+  }
+}
+
+const handleAvatarRemove = async () => {
+  try {
+    await $api('/user/avatar', {
+      method: 'delete'
+    })
+
+    toast.add({
+      title: '移除成功',
+      description: '头像已成功移除',
+      color: 'success',
+      icon: 'i-heroicons-check-circle'
+    })
+
+    await authStore.fetchUser()
+  } catch (err: any) {
+    toast.add({
+      title: '移除失败',
+      description: err.message || '请稍后重试',
+      color: 'error',
+      icon: 'i-heroicons-x-circle'
+    })
   }
 }
 </script>

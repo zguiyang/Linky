@@ -3,6 +3,7 @@ export interface User {
   fullName: string | null
   email: string
   isEmailVerified: boolean
+  avatar: string | null
   resetPasswordToken: string | null
   resetPasswordExpiresAt: string | null
   createdAt: string

@@ -121,6 +121,15 @@ const SEARCH = {
 
 type Search = (typeof SEARCH)[keyof typeof SEARCH]
 
+const AVATAR = {
+  MAX_SIZE: 200 * 1024,
+  ALLOWED_TYPES: ['image/jpeg', 'image/png', 'image/gif'],
+  STORAGE_DIR: 'storage/avatars',
+  URL_PREFIX: '/avatars',
+} as const
+
+type Avatar = (typeof AVATAR)[keyof typeof AVATAR]
+
 export {
   ORDER_BY,
   PAGINATION,
@@ -136,6 +145,7 @@ export {
   TAG_ITEM_TYPE,
   SEARCH,
   EMAIL_VERIFICATION,
+  AVATAR,
 }
 export type {
   OrderBy,
@@ -152,4 +162,5 @@ export type {
   TagItemType,
   Search,
   EmailVerification,
+  Avatar,
 }

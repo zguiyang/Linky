@@ -3,9 +3,11 @@ import { Exception } from '@adonisjs/core/exceptions'
 import hash from '@adonisjs/core/services/hash'
 import logger from '@adonisjs/core/services/logger'
 import { randomUUID } from 'node:crypto'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 import redis from '@adonisjs/redis/services/main'
 import User from '#models/user'
-import { EMAIL_VERIFICATION } from '#constants'
+import { EMAIL_VERIFICATION, AVATAR } from '#constants'
 import { NotificationService } from '#services/notification_service'
 
 @inject()
@@ -225,5 +227,59 @@ export class UserService {
   private async setSendRate(email: string): Promise<void> {
     const rateKey = `verify:rate:${email}`
     await redis.set(rateKey, '1', 'EX', EMAIL_VERIFICATION.COOLDOWN_MINUTES * 60)
+  }
+
+  async uploadAvatar(userId: number, file: any): Promise<string> {
+    if (!file.tmpPath) {
+      throw new Exception('文件上传失败', { status: 400 })
+    }
+
+    const storageDir = path.resolve(process.cwd(), AVATAR.STORAGE_DIR)
+    await fs.mkdir(storageDir, { recursive: true })
+
+    const user = await User.findOrFail(userId)
+    if (user.avatar) {
+      const oldPath = path.join(storageDir, user.avatar)
+      try {
+        await fs.unlink(oldPath)
+      } catch {
+        logger.warn({ userId, oldAvatar: user.avatar }, 'Failed to delete old avatar')
+      }
+    }
+
+    const timestamp = Date.now()
+    const ext = path.extname(file.clientName).toLowerCase()
+    const filename = `${userId}-${timestamp}${ext}`
+    const filepath = path.join(storageDir, filename)
+
+    await fs.copyFile(file.tmpPath, filepath)
+    await fs.unlink(file.tmpPath)
+
+    user.avatar = filename
+    await user.save()
+
+    logger.info({ userId, filename }, 'Avatar uploaded')
+
+    return filename
+  }
+
+  async removeAvatar(userId: number): Promise<void> {
+    const user = await User.findOrFail(userId)
+
+    if (!user.avatar) {
+      return
+    }
+
+    const filepath = path.resolve(process.cwd(), AVATAR.STORAGE_DIR, user.avatar)
+    try {
+      await fs.unlink(filepath)
+    } catch {
+      logger.warn({ userId, avatar: user.avatar }, 'Failed to delete avatar file')
+    }
+
+    user.avatar = null
+    await user.save()
+
+    logger.info({ userId }, 'Avatar removed')
   }
 }
