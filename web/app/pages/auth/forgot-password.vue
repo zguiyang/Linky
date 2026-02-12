@@ -67,6 +67,8 @@ import { reactive, ref } from 'vue'
 definePageMeta({ layout: 'auth' })
 
 const loading = ref(false)
+const toast = useToast()
+const { $api } = useNuxtApp()
 
 const state = reactive({
   email: ''
@@ -75,11 +77,9 @@ const state = reactive({
 const success = ref(false)
 
 const onSubmit = async () => {
-  const toast = useToast()
   loading.value = true
   success.value = false
 
-  const { $api } = useNuxtApp()
   const result = await $api('/auth/forgot-password', {
     method: 'post',
     body: { email: state.email }

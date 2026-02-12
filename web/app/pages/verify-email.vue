@@ -97,16 +97,17 @@ definePageMeta({ layout: 'default' })
 const route = useRoute()
 const authStore = useAuthStore()
 const toast = useToast()
+const { $api } = useNuxtApp()
 
 const loading = ref(true)
 const success = ref(false)
 const error = ref('')
 const resending = ref(false)
+const lastPath = useCookie('lastPath')
 
 const emailToken = (route.query.emailToken as string) || ''
 
 const resendVerification = async () => {
-  const { $api } = useNuxtApp()
   resending.value = true
 
   try {
@@ -130,7 +131,6 @@ const resendVerification = async () => {
 }
 
 onMounted(async () => {
-  const lastPath = useCookie('lastPath')
   const redirectPath = lastPath.value || '/workspace/bookmarks'
 
   if (!emailToken) {
@@ -145,7 +145,6 @@ onMounted(async () => {
     return
   }
 
-  const { $api } = useNuxtApp()
   const result = await $api(`/user/verify-email?emailToken=${emailToken}`, { method: 'get' }).catch(() => {
     success.value = false
     lastPath.value = null

@@ -29,6 +29,8 @@ export function usePagination<T>(
   url: string | (() => string),
   options?: UsePaginationOptions
 ): UsePaginationReturn<T> {
+  const { $api } = useNuxtApp()
+
   const page = ref<number>(PAGINATION.DEFAULT_PAGE)
   const perPage = ref<number>(options?.perPage ?? PAGINATION.DEFAULT_PER_PAGE)
   const pending = ref(false)
@@ -58,7 +60,6 @@ export function usePagination<T>(
   const lastPage = computed(() => data.value?.meta.lastPage ?? 1)
 
   const execute = async () => {
-    const { $api } = useNuxtApp()
     const requestUrl = typeof url === 'function' ? url() : url
     pending.value = true
     error.value = null

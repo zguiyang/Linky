@@ -5,6 +5,7 @@ import type { User, AuthResponse } from '~/api/types'
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const loading = ref(false)
+  const { $api } = useNuxtApp()
 
   const tokenCookie = useCookie('auth_token', {
     httpOnly: false,
@@ -15,7 +16,6 @@ export const useAuthStore = defineStore('auth', () => {
   const isEmailVerified = computed(() => user.value?.isEmailVerified === true)
 
   const fetchUser = async () => {
-    const { $api } = useNuxtApp()
     const data = await $api<User>('/user/me')
     if (data) {
       user.value = data
@@ -24,7 +24,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const login = async (email: string, password: string, rememberMe?: boolean) => {
-    const { $api } = useNuxtApp()
     loading.value = true
     const data = await $api<AuthResponse>('/auth/login', {
       method: 'post',
@@ -39,7 +38,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const register = async (email: string, password: string, fullName: string) => {
-    const { $api } = useNuxtApp()
     loading.value = true
     const data = await $api<AuthResponse>('/auth/register', {
       method: 'post',
@@ -54,7 +52,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = async () => {
-    const { $api } = useNuxtApp()
     loading.value = true
     await $api('/auth/logout', { method: 'post' })
     user.value = null

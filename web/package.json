@@ -30,6 +30,7 @@
     "@iconify/json": "^2.2.431",
     "@nuxt/eslint": "^1.12.1",
     "eslint": "^9.39.2",
+    "eslint-plugin-vue-composable": "^1.0.0",
     "typescript": "^5.9.3",
     "vue-tsc": "^3.2.1"
   },

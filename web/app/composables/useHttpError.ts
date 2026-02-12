@@ -3,6 +3,8 @@ import { navigateTo } from '#app'
 export const useHttpError = () => {
   const currentError = useState<unknown | null>('currentError', () => null)
   const isLoggingOut = useState('isLoggingOut', () => false)
+  const toast = useToast()
+  const tokenCookie = useCookie('auth_token')
 
   const getErrorMessage = (error: unknown): string => {
     if ((error as any)?.data?.message) {
@@ -16,7 +18,6 @@ export const useHttpError = () => {
 
   const showToast = (title: string, message: string, color: 'error' | 'success' | 'info', icon?: string) => {
     if (import.meta.client) {
-      const toast = useToast()
       toast.add({
         title,
         description: message,
@@ -32,7 +33,6 @@ export const useHttpError = () => {
 
     showToast('未登录或登录已过期', getErrorMessage(currentError.value), 'error', 'i-heroicons-lock-closed')
 
-    const tokenCookie = useCookie('auth_token')
     tokenCookie.value = null
 
     if (import.meta.client) {

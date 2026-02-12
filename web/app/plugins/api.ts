@@ -11,8 +11,12 @@
  * - Global error handling (401 redirect, error toasts)
  */
 
+// Composables in Nuxt plugin callbacks are safe and expected
+/* eslint-disable vue-composable/composable-placement */
 export default defineNuxtPlugin((_nuxtApp) => {
   const config = useRuntimeConfig()
+  const tokenCookie = useCookie('auth_token')
+  const { handle401, handleError } = useHttpError()
 
   const $api = $fetch.create({
     baseURL: `${config.public.apiBaseUrl}${config.public.apiPrefix}`,
@@ -20,7 +24,6 @@ export default defineNuxtPlugin((_nuxtApp) => {
     credentials: 'include',
 
     onRequest({ options }) {
-      const tokenCookie = useCookie('auth_token')
       if (tokenCookie.value) {
         options.headers = options.headers || {}
         options.headers.set('Authorization', `Bearer ${tokenCookie.value}`)
@@ -30,8 +33,6 @@ export default defineNuxtPlugin((_nuxtApp) => {
     onResponse() {},
 
     onResponseError({ response }) {
-      const { handle401, handleError } = useHttpError()
-
       if (response.status === 401) {
         handle401()
       } else {

@@ -24,6 +24,7 @@ import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
 const colorMode = useColorMode()
+const toast = useToast()
 
 const user = computed(() => authStore.user)
 const isDark = computed(() => colorMode.value === 'dark')
@@ -67,7 +68,6 @@ const menuItems = computed<DropdownMenuItem[][]>(() => [
 
 const handleLogout = async () => {
   await authStore.logout()
-  const toast = useToast()
   toast.add({
     title: '已退出登录',
     color: 'neutral',

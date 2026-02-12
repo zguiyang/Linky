@@ -32,6 +32,8 @@ interface CommandPaletteItem {
 }
 
 export function useGlobalSearch() {
+  const { $api } = useNuxtApp()
+
   const isOpen = ref(false)
   const searchQuery = ref('')
   const results = ref<SearchResults | null>(null)
@@ -66,7 +68,6 @@ export function useGlobalSearch() {
     abortController = new AbortController()
 
     const loadingStartTime = Date.now()
-    const { $api } = useNuxtApp()
     isLoading.value = true
 
     try {

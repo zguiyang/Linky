@@ -82,6 +82,8 @@ definePageMeta({ layout: 'auth' })
 
 const authStore = useAuthStore()
 const loading = computed(() => authStore.loading)
+const toast = useToast()
+const lastPath = useCookie('lastPath')
 
 const state = reactive({
   email: '',
@@ -90,8 +92,6 @@ const state = reactive({
 })
 
 const onSubmit = async () => {
-  const toast = useToast()
-  const lastPath = useCookie('lastPath')
   const redirectPath = lastPath.value || '/workspace/bookmarks'
 
   const result = await authStore.register(state.email, state.password, state.name)

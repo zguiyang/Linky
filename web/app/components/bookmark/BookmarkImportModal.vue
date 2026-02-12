@@ -219,18 +219,16 @@ import { computed, onMounted, ref } from 'vue'
 import type { AsyncImportResponseData, ImportProgressData, ImportResultData } from '~/api/types'
 import { useAuthStore } from '~/stores/auth'
 
-const { $api } = useNuxtApp()
-const { onImportProgress } = usePush()
-const authStore = useAuthStore()
-
 const props = defineProps<{
   modelValue: boolean
 }>()
-
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   'imported': []
 }>()
+const { $api } = useNuxtApp()
+const { onImportProgress } = usePush()
+const authStore = useAuthStore()
 
 const open = computed({
   get: () => props.modelValue,

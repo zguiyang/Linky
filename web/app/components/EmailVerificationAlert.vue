@@ -28,6 +28,8 @@ import { ref, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
+const { $api } = useNuxtApp()
+const toast = useToast()
 
 const shouldShow = computed(() =>
   authStore.isAuthenticated && !authStore.isEmailVerified
@@ -40,12 +42,10 @@ const handleResend = async () => {
 
   sending.value = true
 
-  const { $api } = useNuxtApp()
   await $api('/user/resend-verification', { method: 'post' })
 
   await authStore.fetchUser()
 
-  const toast = useToast()
   toast.add({
     title: '验证邮件已发送',
     description: '请检查您的邮箱',

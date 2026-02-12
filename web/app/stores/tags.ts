@@ -5,6 +5,7 @@ import type { Tag, CreateTagRequest, UpdateTagRequest } from '~/api/types'
 export const useTagsStore = defineStore('tags', () => {
   const tags = ref<Tag[]>([])
   const selectedTags = ref<number[]>([])
+  const { $api } = useNuxtApp()
 
   const tagMap = computed(() => {
     const map = new Map<number, Tag>()
@@ -30,7 +31,6 @@ export const useTagsStore = defineStore('tags', () => {
 
   const fetchTags = async (): Promise<Tag[]> => {
     if (tags.value.length > 0) return tags.value
-    const { $api } = useNuxtApp()
     const response = await $api<Tag[]>('/tags')
     if (response) {
       tags.value = response
@@ -39,33 +39,29 @@ export const useTagsStore = defineStore('tags', () => {
   }
 
   const refreshTags = async (): Promise<Tag[]> => {
-    const { data } = await useApi<Tag[]>('/tags')
-    if (data.value) {
-      tags.value = data.value
+    const response = await $api<Tag[]>('/tags')
+    if (response) {
+      tags.value = response
     }
     return tags.value
   }
 
   const createTag = async (data: CreateTagRequest) => {
-    const { $api } = useNuxtApp()
     await $api('/tags', { method: 'post', body: data })
     await refreshTags()
   }
 
   const updateTag = async (id: number, data: UpdateTagRequest) => {
-    const { $api } = useNuxtApp()
     await $api(`/tags/${id}`, { method: 'put', body: data })
     await refreshTags()
   }
 
   const deleteTag = async (id: number) => {
-    const { $api } = useNuxtApp()
     await $api(`/tags/${id}`, { method: 'delete' })
     await refreshTags()
   }
 
   const batchDelete = async (ids: number[]) => {
-    const { $api } = useNuxtApp()
     await Promise.all(ids.map(id => $api(`/tags/${id}`, { method: 'delete' })))
     await refreshTags()
   }

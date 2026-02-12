@@ -452,7 +452,6 @@ const handleSaveBookmark = async (close?: () => void) => {
 const handleDeleteBookmark = async (close?: () => void) => {
   if (!contextBookmark.value) return
 
-  const { $api } = useNuxtApp()
   isDeleting.value = true
   await $api(`/bookmarks/${contextBookmark.value.id}`, { method: 'delete' })
 
@@ -480,7 +479,6 @@ const handleRefresh = async (bookmark: Bookmark) => {
     bookmarks.value[index].status = 'fetching'
   }
 
-  const { $api } = useNuxtApp()
   await $api(`/bookmarks/${bookmark.id}/refresh-metadata`, { method: 'post' })
 }
 

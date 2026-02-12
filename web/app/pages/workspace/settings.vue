@@ -338,6 +338,7 @@ definePageMeta({ layout: 'workspace' })
 
 const route = useRoute()
 const toast = useToast()
+const { $api } = useNuxtApp()
 const authStore = useAuthStore()
 const saving = ref(false)
 const lastSaved = ref('')
@@ -387,7 +388,6 @@ const loadProfile = async () => {
 }
 
 const loadSettings = async () => {
-  const { $api } = useNuxtApp()
   try {
     const data = await $api<{ aiEnabled: boolean, aiBaseUrl: string | null, aiModelName: string | null }>('/settings/ai', { method: 'get' })
     if (data) {
@@ -408,7 +408,6 @@ onMounted(async () => {
 })
 
 const saveSettings = async () => {
-  const { $api } = useNuxtApp()
   saving.value = true
 
   try {
@@ -444,7 +443,6 @@ const saveSettings = async () => {
 }
 
 const saveProfile = async () => {
-  const { $api } = useNuxtApp()
   saving.value = true
 
   try {
@@ -475,7 +473,6 @@ const saveProfile = async () => {
 }
 
 const changeEmail = async () => {
-  const { $api } = useNuxtApp()
   changingEmail.value = true
 
   try {

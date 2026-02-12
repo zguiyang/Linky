@@ -9,13 +9,24 @@ export interface TransmitEvent {
 
 let transmitInstance: Transmit | null = null
 
-function getTransmitClient(): Transmit | null {
+/* eslint-disable vue-composable/composable-placement */
+let configCache: { public: { apiBaseUrl: string } } | null = null
+
+function getConfig() {
+  if (!configCache) {
+    configCache = useRuntimeConfig()
+  }
+  return configCache
+}
+/* eslint-enable vue-composable/composable-placement */
+
+function createTransmitClient(): Transmit | null {
   if (typeof window === 'undefined') {
     return null
   }
 
   if (!transmitInstance) {
-    const config = useRuntimeConfig()
+    const config = getConfig()
     const baseUrl = config.public.apiBaseUrl
 
     transmitInstance = new Transmit({
@@ -45,7 +56,7 @@ function getTransmitClient(): Transmit | null {
 }
 
 export function useTransmit() {
-  const client = getTransmitClient()
+  const client = createTransmitClient()
   const events = ref<TransmitEvent[]>([])
   const subscriptions = shallowRef<Map<string, ReturnType<Transmit['subscription']>>>(new Map())
   const isCleanedUp = ref(false)

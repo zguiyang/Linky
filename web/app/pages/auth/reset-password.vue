@@ -108,6 +108,8 @@ definePageMeta({ layout: 'auth' })
 const route = useRoute()
 const authStore = useAuthStore()
 const loading = computed(() => authStore.loading)
+const toast = useToast()
+const { $api } = useNuxtApp()
 
 const success = ref(false)
 const error = ref('')
@@ -122,7 +124,6 @@ const state = reactive({
 })
 
 const onSubmit = async () => {
-  const toast = useToast()
   error.value = ''
   success.value = false
   showRetryLink.value = false
@@ -132,26 +133,16 @@ const onSubmit = async () => {
     return
   }
 
-  const { data, error: apiError } = await useApi<AuthResponse>('/auth/reset-password', {
-    method: 'post',
-    body: {
-      token: state.token,
-      password: state.password,
-      passwordConfirmation: state.passwordConfirmation
-    }
-  })
+  try {
+    const authData = await $api<AuthResponse>('/auth/reset-password', {
+      method: 'post',
+      body: {
+        token: state.token,
+        password: state.password,
+        passwordConfirmation: state.passwordConfirmation
+      }
+    })
 
-  if (apiError.value) {
-    const errorMessage = apiError.value.message || ''
-    error.value = errorMessage
-    if (errorMessage.includes('过期') || errorMessage.includes('无效')) {
-      showRetryLink.value = true
-    }
-    return
-  }
-
-  if (data.value) {
-    const authData = data.value as AuthResponse
     authStore.setUser(authData.user)
     authStore.setToken(authData.token)
 
@@ -165,6 +156,12 @@ const onSubmit = async () => {
     setTimeout(() => {
       navigateTo('/workspace/bookmarks')
     }, 2000)
+  } catch (err: any) {
+    const errorMessage = err.message || ''
+    error.value = errorMessage
+    if (errorMessage.includes('过期') || errorMessage.includes('无效')) {
+      showRetryLink.value = true
+    }
   }
 }
 </script>
