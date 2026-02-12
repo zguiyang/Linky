@@ -1,7 +1,7 @@
 <template>
   <div class="w-full max-w-[400px] p-4">
     <u-card
-      class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-[40px] border border-gray-200 dark:border-gray-700"
+      class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl border border-gray-200 dark:border-gray-700"
       variant="outline"
     >
       <template #header>
@@ -50,7 +50,7 @@
           type="submit"
           block
           :loading="loading"
-          class="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-white"
+          class="bg-primary-500 hover:bg-primary-600 text-white"
         >
           重置密码
         </u-button>
@@ -82,13 +82,13 @@
         <nuxt-link
           v-if="showRetryLink"
           to="/auth/forgot-password"
-          class="text-[var(--color-primary-500)] dark:text-[var(--color-primary-300)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-primary-200)] hover:underline"
+          class="text-primary-500 dark:text-primary-300 font-medium transition-all duration-200 ease hover:text-primary-600 dark:hover:text-primary-200 hover:underline"
         >
           重新发送重置链接
         </nuxt-link>
         <nuxt-link
           to="/auth/sign-in"
-          class="text-[var(--color-primary-500)] dark:text-[var(--color-primary-300)] font-medium transition-all duration-200 ease hover:text-[var(--color-primary-600)] dark:hover:text-[var(--color-primary-200)] hover:underline"
+          class="text-primary-500 dark:text-primary-300 font-medium transition-all duration-200 ease hover:text-primary-600 dark:hover:text-primary-200 hover:underline"
         >
           ← 返回登录
         </nuxt-link>

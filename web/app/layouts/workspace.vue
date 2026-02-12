@@ -1,8 +1,8 @@
 <template>
-  <div class="flex h-screen overflow-hidden bg-[var(--bg-canvas)]">
-    <aside class="flex flex-col flex-shrink-0 w-64 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)] overflow-y-auto">
+  <div class="flex h-screen overflow-hidden bg-(--bg-canvas)">
+    <aside class="flex flex-col shrink-0 w-64 bg-(--bg-surface) border-r border-(--border-subtle) overflow-y-auto">
       <div class="flex items-center gap-2 px-4 py-4">
-        <span class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">
+        <span class="text-2xl font-bold bg-linear-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">
           Linky
         </span>
       </div>
@@ -16,8 +16,8 @@
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors"
           :class="[
             $route.path === item.to
-              ? 'bg-[var(--bg-secondary)] text-[var(--text-primary)] font-medium shadow-sm'
-              : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
+              ? 'bg-(--bg-secondary) text-(--text-primary) font-medium shadow-sm'
+              : 'text-(--text-secondary) hover:bg-(--bg-secondary) hover:text-(--text-primary)'
           ]"
         >
           <u-icon
@@ -32,14 +32,14 @@
         </u-link>
       </nav>
 
-      <div class="mx-3 my-2 border-t border-[var(--border-subtle)]" />
+      <div class="mx-3 my-2 border-t border-(--border-subtle)" />
 
-      <div class="border-t border-[var(--border-subtle)] w-full mt-auto">
+      <div class="border-t border-(--border-subtle) w-full mt-auto">
         <div class="flex flex-col items-center gap-1 px-4 py-4">
-          <span class="text-xs text-[var(--text-secondary)] font-medium">
+          <span class="text-xs text-(--text-secondary) font-medium">
             版本号: {{ APP_INFO.VERSION }}
           </span>
-          <span class="text-xs text-[var(--text-muted)]">
+          <span class="text-xs text-(--text-muted)">
             © {{ APP_INFO.COPYRIGHT_YEAR }} {{ APP_INFO.NAME }}
           </span>
         </div>
@@ -47,7 +47,7 @@
     </aside>
 
     <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-      <header class="flex items-center gap-3 px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+      <header class="flex items-center gap-3 px-4 py-3 border-b border-(--border-subtle) bg-(--bg-surface)">
         <email-verification-alert v-if="authStore.isAuthenticated && !authStore.isEmailVerified" />
         <div class="flex items-center gap-2 ml-auto">
           <u-dashboard-search-button

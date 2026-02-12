@@ -1,11 +1,11 @@
 <template>
   <div class="flex flex-col gap-6 h-full min-h-0 p-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shrink-0">
       <div>
-        <h1 class="text-2xl font-bold text-[var(--text-primary)]">
+        <h1 class="text-2xl font-bold text-(--text-primary)">
           我的备忘录
         </h1>
-        <p class="text-sm text-[var(--text-secondary)] mt-1">
+        <p class="text-sm text-(--text-secondary) mt-1">
           共 {{ total }} 个备忘录
         </p>
       </div>
@@ -18,7 +18,7 @@
           size="md"
           class="w-full sm:w-64"
         />
-        <div class="hidden sm:block w-px h-6 bg-[var(--border-subtle)]" />
+        <div class="hidden sm:block w-px h-6 bg-(--border-subtle)" />
         <u-select-menu
           v-model="selectedSortBy"
           :items="sortByOptions"
@@ -51,10 +51,10 @@
 
     <div
       v-if="tagsStore.selectedTags.length > 0"
-      class="px-2 py-3 bg-[var(--bg-surface)] rounded-lg border border-[var(--border-subtle)]"
+      class="px-2 py-3 bg-(--bg-surface) rounded-lg border border-(--border-subtle)"
     >
       <div class="flex items-center gap-3">
-        <span class="text-sm text-[var(--text-secondary)]">已选标签：</span>
+        <span class="text-sm text-(--text-secondary)">已选标签：</span>
         <div class="flex items-center gap-2">
           <u-badge
             v-for="tagId in tagsStore.selectedTags"
@@ -125,17 +125,17 @@
           />
         </template>
         <template #title>
-          <span class="text-lg font-semibold text-[var(--text-primary)]">暂无备忘录</span>
+          <span class="text-lg font-semibold text-(--text-primary)">暂无备忘录</span>
         </template>
         <template #description>
-          <span class="text-sm text-[var(--text-secondary)]">开始创建您的第一个备忘录吧</span>
+          <span class="text-sm text-(--text-secondary)">开始创建您的第一个备忘录吧</span>
         </template>
       </u-empty>
     </u-scroll-area>
 
     <div
       v-if="!pending && total > 0"
-      class="flex justify-center py-4 flex-shrink-0"
+      class="flex justify-center py-4 shrink-0"
     >
       <u-pagination
         v-model:page="page"
@@ -175,10 +175,10 @@
             </div>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-[var(--text-primary)]">
+            <h3 class="text-lg font-semibold text-(--text-primary)">
               确定要删除这条备忘录吗？
             </h3>
-            <p class="text-sm text-[var(--text-secondary)] mt-1">
+            <p class="text-sm text-(--text-secondary) mt-1">
               此操作无法撤销
             </p>
           </div>
