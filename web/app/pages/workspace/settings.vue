@@ -505,12 +505,6 @@ const handleAvatarUpload = async (file: File) => {
       color: 'error',
       icon: 'i-heroicons-x-circle'
     })
-    // 强制触发子组件状态重置
-    const currentAvatar = authStore.user?.avatar
-    authStore.user!.avatar = undefined
-    nextTick(() => {
-      authStore.user!.avatar = currentAvatar
-    })
   }
 }
 
