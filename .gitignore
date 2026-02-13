@@ -37,6 +37,7 @@ openspec/
 .sisyphus/
 AGENTS.md
 
+docs/
 # docker files
 docker-compose.dev.yml
 
