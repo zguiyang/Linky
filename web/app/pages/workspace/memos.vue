@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col gap-6 h-full min-h-0 p-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shrink-0">
+  <div class="flex flex-col gap-4 md:gap-6 h-full min-h-0 p-4 md:p-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4 shrink-0">
       <div>
-        <h1 class="text-2xl font-bold text-(--text-primary)">
+        <h1 class="text-xl md:text-2xl font-bold text-(--text-primary)">
           我的备忘录
         </h1>
         <p class="text-sm text-(--text-secondary) mt-1">
@@ -43,6 +43,7 @@
           icon="i-heroicons-plus"
           color="primary"
           size="md"
+          class="min-h-11"
           title="新建备忘录"
           @click="handleCreate"
         />

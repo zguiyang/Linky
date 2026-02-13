@@ -6,6 +6,7 @@
       :min-size="16"
       :max-size="30"
       :default-size="20"
+      :drawer="true"
     >
       <template #header="{ collapsed }">
         <span
@@ -121,7 +122,7 @@
           </template>
         </u-dashboard-search>
 
-        <div class="flex-1 overflow-y-auto p-4">
+        <div class="flex-1 overflow-y-auto p-4 md:p-6">
           <nuxt-page />
         </div>
 

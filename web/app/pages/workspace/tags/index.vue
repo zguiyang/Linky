@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col gap-6 h-full min-h-0 p-6">
-    <div class="flex items-center justify-between">
+  <div class="flex flex-col gap-4 md:gap-6 h-full min-h-0 p-4 md:p-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-(--text-primary)">
+        <h1 class="text-xl md:text-2xl font-bold text-(--text-primary)">
           标签管理
         </h1>
         <p class="text-sm text-(--text-secondary) mt-1">
@@ -10,21 +10,23 @@
         </p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3">
         <u-button
           :color="batchMode ? 'primary' : 'neutral'"
           variant="ghost"
           icon="i-heroicons-check-circle"
+          class="min-h-11"
           @click="toggleBatchMode"
         >
-          批量操作
+          <span class="hidden sm:inline">批量操作</span>
         </u-button>
         <u-button
           icon="i-heroicons-plus"
           color="primary"
           @click="openAddModal"
         >
-          新增标签
+          <span class="hidden sm:inline">新增标签</span>
+          <span class="sm:hidden">新增</span>
         </u-button>
       </div>
     </div>
