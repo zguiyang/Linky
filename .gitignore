@@ -49,6 +49,9 @@ docker-compose.dev.yml
 dist
 !.env.example
 
+# Worktrees
+.worktrees/
+
 # Logs
 logs/
 *.log
