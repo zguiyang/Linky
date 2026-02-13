@@ -36,6 +36,7 @@ openspec/
 .roo/
 .junie/
 .ai/
+.sisyphus/
 AGENTS.md
 
 # docker files
