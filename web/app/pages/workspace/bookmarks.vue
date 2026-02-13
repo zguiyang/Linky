@@ -165,7 +165,7 @@
 
     <div
       v-if="!pending && total > 0"
-      class="flex justify-center py-4 shrink-0"
+      class="flex justify-center py-2 shrink-0"
     >
       <u-pagination
         v-model:page="page"
