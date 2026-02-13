@@ -30,8 +30,6 @@ components.d.ts
 
 # ai generated files
 .opencode/*
-!.opencode/rules/
-!.opencode/skills/
 openspec/
 .roo/
 .junie/
