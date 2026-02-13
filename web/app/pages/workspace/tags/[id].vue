@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4 h-full min-h-0 p-4 md:p-5">
+  <div class="flex flex-col gap-4 h-full min-h-0">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div
         v-if="tag"
@@ -7,7 +7,7 @@
       >
         <div
           v-if="tag.color"
-          class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center"
+          class="w-10 h-10 rounded-full shrink-0 flex items-center justify-center"
           :style="{ backgroundColor: tag.color }"
         >
           <u-icon
@@ -17,7 +17,7 @@
         </div>
         <div
           v-else
-          class="w-10 h-10 rounded-full flex-shrink-0 bg-(--bg-tertiary) flex items-center justify-center"
+          class="w-10 h-10 rounded-full shrink-0 bg-(--bg-tertiary) flex items-center justify-center"
         >
           <u-icon
             name="i-heroicons-tag"
@@ -70,7 +70,7 @@
       </div>
       <u-dropdown-menu
         v-if="tag"
-        class="flex-shrink-0"
+        class="shrink-0"
         :items="menuItems"
       >
         <u-button

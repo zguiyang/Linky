@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4 h-full min-h-0 p-4 md:p-5">
+  <div class="flex flex-col gap-4 h-full min-h-0">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4 shrink-0">
       <div>
         <h1 class="text-xl md:text-2xl font-bold text-(--text-primary)">
