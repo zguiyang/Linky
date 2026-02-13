@@ -1,7 +1,7 @@
 <template>
   <div class="h-full flex flex-col bg-(--bg-canvas)">
     <!-- Header Area -->
-    <div class="px-4 md:px-8 py-4 md:py-6 border-b border-(--border-subtle) bg-(--bg-surface)">
+    <div class="px-4 md:px-6 py-3 md:py-4 border-b border-(--border-subtle) bg-(--bg-surface)">
       <h1 class="text-xl md:text-2xl font-bold text-(--text-primary)">
         系统设置
       </h1>
@@ -13,7 +13,7 @@
     <!-- Main Content Area with Sidebar -->
     <div class="flex-1 flex flex-col sm:flex-row overflow-hidden">
       <!-- Settings Sidebar -->
-      <aside class="w-full sm:w-64 border-r border-(--border-subtle) bg-(--bg-surface) p-2 md:p-4 flex flex-row sm:flex-col gap-1 overflow-x-auto sm:overflow-visible">
+      <aside class="w-full sm:w-56 border-r border-(--border-subtle) bg-(--bg-surface) p-2 md:p-3 flex flex-row sm:flex-col gap-1 overflow-x-auto sm:overflow-visible">
         <u-button
           v-for="item in menuItems"
           :key="item.id"
@@ -32,7 +32,7 @@
       </aside>
 
       <!-- Settings Content -->
-      <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-(--bg-canvas)">
+      <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-(--bg-canvas)">
         <div class="max-w-4xl">
           <!-- AI Settings Section -->
           <div

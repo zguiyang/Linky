@@ -122,7 +122,7 @@
           </template>
         </u-dashboard-search>
 
-        <div class="flex-1 overflow-y-auto p-4 md:p-6">
+        <div class="flex-1 overflow-y-auto">
           <nuxt-page />
         </div>
 

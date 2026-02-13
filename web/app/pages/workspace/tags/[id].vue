@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4 md:gap-6 h-full min-h-0 p-4 md:p-6">
+  <div class="flex flex-col gap-4 h-full min-h-0 p-4 md:p-5">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div
         v-if="tag"
