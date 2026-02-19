@@ -22,9 +22,11 @@ const loggerConfig = defineConfig({
             level: 'info',
             options: {
               file: './logs/app.log',
-              frequency: '7d',
+              frequency: 'daily',
               mkdir: true,
-              limit: 1,
+              limit: {
+                count: 10,
+              },
             },
           })
           .toArray(),
