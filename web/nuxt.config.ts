@@ -18,9 +18,9 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:3333',
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
       apiPrefix: process.env.NUXT_PUBLIC_API_PREFIX || '/api',
-      staticFileUrl: process.env.NUXT_PUBLIC_STATIC_FILE_URL || 'http://localhost:3333',
+      staticFileUrl: process.env.NUXT_PUBLIC_STATIC_FILE_URL,
       appName: process.env.NUXT_PUBLIC_APP_NAME || 'Linky'
     }
   },
