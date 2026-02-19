@@ -14,7 +14,7 @@ export default class VerifyEmailNotification extends BaseMail {
   subject = 'Verify Your Email Address - Linky'
 
   prepare() {
-    const verifyUrl = `${env.get('CLIENT_URL', env.get('APP_URL'))}/verify-email?emailToken=${this.emailToken}`
+    const verifyUrl = `${env.get('CLIENT_URL')}/verify-email?emailToken=${this.emailToken}`
 
     this.message.to(this.email).htmlView('emails/verify_email', {
       email: this.email,
