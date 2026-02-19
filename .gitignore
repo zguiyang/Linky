@@ -55,3 +55,6 @@ dist
 # Logs
 logs/
 *.log
+
+# deploy
+deploy.sh
