@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({ layout: 'auth' })
@@ -85,7 +85,7 @@ definePageMeta({ layout: 'auth' })
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
-const loading = computed(() => authStore.loading)
+const loading = ref(false)
 const toast = useToast()
 
 const redirectPath = computed(() => {
@@ -100,10 +100,17 @@ const state = reactive({
 })
 
 const onSubmit = async () => {
-  const result = await authStore.login(state.email, state.password, state.rememberMe)
-  if (!result) return
+  loading.value = true
+  try {
+    const result = await authStore.login(state.email, state.password, state.rememberMe)
+    if (!result) return
 
-  toast.add({ title: '登录成功', color: 'success' })
-  await router.replace(redirectPath.value)
+    toast.add({ title: '登录成功', color: 'success' })
+    await router.replace(redirectPath.value)
+  } catch {
+    // 错误由 API 插件统一处理
+  } finally {
+    loading.value = false
+  }
 }
 </script>

@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRoute } from '#app'
 import { useAuthStore } from '~/stores/auth'
 import type { AuthResponse } from '~/api/types'
@@ -107,7 +107,7 @@ definePageMeta({ layout: 'auth' })
 
 const route = useRoute()
 const authStore = useAuthStore()
-const loading = computed(() => authStore.loading)
+const loading = ref(false)
 const toast = useToast()
 const { $api } = useNuxtApp()
 
@@ -133,6 +133,7 @@ const onSubmit = async () => {
     return
   }
 
+  loading.value = true
   try {
     const authData = await $api<AuthResponse>('/auth/reset-password', {
       method: 'post',
@@ -162,6 +163,8 @@ const onSubmit = async () => {
     if (errorMessage.includes('过期') || errorMessage.includes('无效')) {
       showRetryLink.value = true
     }
+  } finally {
+    loading.value = false
   }
 }
 </script>
