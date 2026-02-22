@@ -5,6 +5,7 @@
   "license": "GPL-3.0-or-later OR Commercial",
   "scripts": {
     "build": "nuxt build",
+    "build:local": "nuxt build --dotenv .env.local --envName=local",
     "dev": "nuxt dev",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
