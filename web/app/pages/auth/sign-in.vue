@@ -44,7 +44,7 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <u-checkbox v-model="state.rememberMe" />
-            <span class="text-sm text-neutral-700 dark:text-neutral-300">记住我</span>
+            <span class="text-sm text-neutral-700 dark:text-neutral-300">30天免登录</span>
           </div>
           <nuxt-link
             to="/auth/forgot-password"

@@ -23,7 +23,7 @@ export default class AuthController {
 
   async login({ request }: HttpContext) {
     const data = await request.validateUsing(loginValidator)
-    const { user, token } = await this.authService.login(data.email, data.password)
+    const { user, token } = await this.authService.login(data.email, data.password, data.rememberMe)
 
     return {
       user: user.serialize(),

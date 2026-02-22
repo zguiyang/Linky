@@ -20,13 +20,16 @@ export class AuthService {
     return { user, token }
   }
 
-  async login(email: string, password: string) {
-    logger.info({ email }, 'Login attempt')
+  async login(email: string, password: string, rememberMe: boolean = false) {
+    logger.info({ email, rememberMe }, 'Login attempt')
 
     const user = await User.verifyCredentials(email, password)
-    const token = await User.accessTokens.create(user)
 
-    logger.info({ userId: user.id }, 'Login successful')
+    const expiresIn = rememberMe ? '30 days' : '7 days'
+
+    const token = await User.accessTokens.create(user, ['*'], { expiresIn })
+
+    logger.info({ userId: user.id, rememberMe }, 'Login successful')
 
     return { user, token }
   }
