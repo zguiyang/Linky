@@ -360,4 +360,17 @@ export class BookmarkService {
       visitCount: data.visitCount ?? 0,
     })
   }
+
+  async recordVisit(userId: number, bookmarkId: number): Promise<Bookmark> {
+    const bookmark = await Bookmark.query().where('id', bookmarkId).where('user_id', userId).first()
+
+    if (!bookmark) {
+      throw new Exception('书签不存在', { status: 404 })
+    }
+
+    bookmark.visitCount = (bookmark.visitCount || 0) + 1
+    await bookmark.save()
+
+    return bookmark
+  }
 }

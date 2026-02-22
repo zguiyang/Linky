@@ -291,8 +291,19 @@ const setViewMode = (mode: ViewMode) => {
   viewMode.value = mode
 }
 
-const openBookmark = (bookmark: Bookmark) => {
+const openBookmark = async (bookmark: Bookmark) => {
   window.open(bookmark.url, '_blank')
+  if (bookmark.id) {
+    try {
+      await $api(`/bookmarks/${bookmark.id}/visit`, { method: 'post' })
+      const index = bookmarks.value.findIndex(b => b.id === bookmark.id)
+      if (index !== -1 && bookmarks.value[index]) {
+        bookmarks.value[index].visitCount = (bookmarks.value[index].visitCount || 0) + 1
+      }
+    } catch (e) {
+      console.error('Failed to record visit:', e)
+    }
+  }
 }
 
 const openAddModal = () => {

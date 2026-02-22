@@ -4,9 +4,9 @@
   "type": "module",
   "license": "GPL-3.0-or-later OR Commercial",
   "scripts": {
-    "build": "nuxt build",
+    "build": "nuxt build --dotenv .env.production --envName=production",
     "build:local": "nuxt build --dotenv .env.local --envName=local",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --dotenv .env.local --envName=local",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",

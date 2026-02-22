@@ -90,6 +90,11 @@ export default class BookmarksController {
     return await this.bookmarkService.getFetchingCount(user.id)
   }
 
+  async recordVisit({ auth, params }: HttpContext) {
+    const user = auth.getUserOrFail()
+    return await this.bookmarkService.recordVisit(user.id, params.id)
+  }
+
   async import({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
     const { file, createTags, autoAiTag } = await request.validateUsing(importBookmarkValidator)

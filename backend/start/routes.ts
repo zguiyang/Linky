@@ -65,6 +65,7 @@ router
     router.post('/bookmarks', [BookmarksController, 'store'])
     router.post('/bookmarks/by-url', [BookmarksController, 'createByUrl'])
     router.post('/bookmarks/:id/refresh-metadata', [BookmarksController, 'refreshMetadata'])
+    router.post('/bookmarks/:id/visit', [BookmarksController, 'recordVisit'])
     router.post('/bookmarks/import', [BookmarksController, 'import'])
     router.get('/bookmarks/import/:jobId/status', [BookmarksController, 'importStatus'])
     router.put('/bookmarks/:id', [BookmarksController, 'update'])
