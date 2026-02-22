@@ -2,18 +2,21 @@ import { useAuthStore } from '@/stores/auth'
 import { useTagsStore } from '@/stores/tags'
 
 export default defineNuxtRouteMiddleware(async (to) => {
+  if (import.meta.server) {
+    return
+  }
+
   const publicRoutes = ['/', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/auth/reset-password']
 
   const token = useCookie('auth_token')
-  const lastPathCookie = useCookie('lastPath', { maxAge: 60 * 60 })
 
   if (publicRoutes.includes(to.path)) {
     return
   }
 
   if (!token.value) {
-    lastPathCookie.value = to.path
-    return navigateTo('/auth/sign-in')
+    const redirectUrl = encodeURIComponent(to.path)
+    return navigateTo(`/auth/sign-in?redirect=${redirectUrl}`)
   }
 
   const authStore = useAuthStore()
@@ -25,8 +28,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
     } catch {
       token.value = null
       authStore.setUser(null)
-      lastPathCookie.value = to.path
-      return navigateTo('/auth/sign-in')
+      const redirectUrl = encodeURIComponent(to.path)
+      return navigateTo(`/auth/sign-in?redirect=${redirectUrl}`)
     }
   }
 

@@ -82,10 +82,16 @@ import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({ layout: 'auth' })
 
+const route = useRoute()
+const router = useRouter()
 const authStore = useAuthStore()
 const loading = computed(() => authStore.loading)
 const toast = useToast()
-const lastPath = useCookie('lastPath')
+
+const redirectPath = computed(() => {
+  const redirect = route.query.redirect as string
+  return redirect && redirect.startsWith('/') ? redirect : '/workspace/bookmarks'
+})
 
 const state = reactive({
   email: '',
@@ -94,13 +100,10 @@ const state = reactive({
 })
 
 const onSubmit = async () => {
-  const redirectPath = lastPath.value || '/workspace/bookmarks'
-
   const result = await authStore.login(state.email, state.password, state.rememberMe)
   if (!result) return
 
-  lastPath.value = null
   toast.add({ title: '登录成功', color: 'success' })
-  await navigateTo(redirectPath)
+  await router.replace(redirectPath.value)
 }
 </script>

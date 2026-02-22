@@ -58,7 +58,9 @@
           </template>
 
           <template #right>
-            <email-verification-alert v-if="authStore.isAuthenticated && !authStore.isEmailVerified" />
+            <email-verification-alert
+              v-if="authStore.isAuthenticated && !authStore.isEmailVerified"
+            />
             <u-dashboard-search-button
               variant="subtle"
               @click="openSearch"

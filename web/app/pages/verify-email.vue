@@ -88,13 +88,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from '#app'
 import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({ layout: 'default' })
 
 const route = useRoute()
+const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
 const { $api } = useNuxtApp()
@@ -103,7 +104,11 @@ const loading = ref(true)
 const success = ref(false)
 const error = ref('')
 const resending = ref(false)
-const lastPath = useCookie('lastPath')
+
+const redirectPath = computed(() => {
+  const redirect = route.query.redirect as string
+  return redirect && redirect.startsWith('/') ? redirect : '/workspace/bookmarks'
+})
 
 const emailToken = (route.query.emailToken as string) || ''
 
@@ -131,8 +136,6 @@ const resendVerification = async () => {
 }
 
 onMounted(async () => {
-  const redirectPath = lastPath.value || '/workspace/bookmarks'
-
   if (!emailToken) {
     error.value = '验证链接无效，缺少验证令牌'
     toast.add({
@@ -147,16 +150,14 @@ onMounted(async () => {
 
   const result = await $api(`/user/verify-email?emailToken=${emailToken}`, { method: 'get' }).catch(() => {
     success.value = false
-    lastPath.value = null
     error.value = '验证链接无效或已过期'
   })
 
   if (result) {
     success.value = true
-    lastPath.value = null
     await authStore.fetchUser()
     setTimeout(() => {
-      navigateTo(redirectPath)
+      router.replace(redirectPath.value)
     }, 2000)
   } else {
     error.value = '验证失败，请稍后重试'
