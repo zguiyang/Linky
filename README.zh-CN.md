@@ -239,7 +239,7 @@ node ace migration:rollback
 
 ## TODO（想做但还没做的）
 
-- [ ] AI对话、搜索
+- [ ] AI对话（前端聊天界面）
 - [ ] 导出数据
 - [ ] 浏览器扩展
 
