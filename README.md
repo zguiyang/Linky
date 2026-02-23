@@ -43,54 +43,111 @@ Personal Knowledge Management System
 
 ---
 
-## Tech Stack
+## Screenshots
 
-### Backend
-- AdonisJS 6.x
-- TypeScript
-- PostgreSQL
-- Lucid ORM
+| Home | Workspace |
+|------|-----------|
+| ![Home](./screenshots/home.png) | ![Workspace](./screenshots/workspace.png) |
 
-### Frontend
-- Nuxt 4.x
-- TypeScript
-- Nuxt UI 4.x (Tailwind CSS)
-- Nitro for API calls
+| Memos | Tags |
+|-------|------|
+| ![Memos](./screenshots/memos.png) | ![Tags](./screenshots/tags.png) |
 
 ---
 
-## Quick Start
+## Deployment
 
 ### Requirements
 - Node.js >= 20.0.0
 - pnpm >= 10.26.1
 - PostgreSQL
+- PM2
 
-### Install
+### Quick Deploy
 
 ```bash
+# 1. Clone repository
+git clone https://github.com/zguiyang/Linky.git
+cd Linky
+
+# 2. Install dependencies
 pnpm install
-```
 
-### Setup
+# 3. Copy and configure environment files
+cp backend/.env.example backend/.env
+cp web/.env.example web/.env
 
-1. Copy env files and fill in your config:
-   - `backend/.env`
-   - `web/.env`
+# Edit backend/.env with your PostgreSQL credentials and other settings
 
-2. Run migrations:
-```bash
+# 4. Run database migrations
 cd backend
 node ace migration:run
+cd ..
+
+# 5. Build both backend and frontend
+pnpm run build
+
+# 6. Start with PM2
+pm2 start ecosystem.config.js
 ```
 
-3. Start servers:
-```bash
-# Backend :3333
-pnpm run dev:backend
+### Configuration
 
-# Frontend :3000
-pnpm run dev:web
+Edit `backend/.env`:
+```env
+# Database
+PG_HOST=127.0.0.1
+PG_PORT=5432
+PG_USER=root
+PG_PASSWORD=your_password
+PG_DATABASE=linky
+
+# App
+PORT=3333
+APP_URL=http://your-domain.com
+
+# Frontend (web/.env)
+NUXT_PUBLIC_API_BASE_URL=http://localhost:3333
+```
+
+### PM2 Commands
+
+```bash
+# Start
+pm2 start ecosystem.config.js
+
+# Restart
+pm2 restart linky-backend
+pm2 restart linky-web
+
+# Stop
+pm2 stop ecosystem.config.js
+
+# View logs
+pm2 logs
+
+# Monitor
+pm2 monit
+```
+
+---
+
+## Quick Start (Development)
+
+```bash
+# Install dependencies
+pnpm install
+
+# Setup environment
+cp backend/.env.example backend/.env
+cp web/.env.example web/.env
+
+# Run migrations
+cd backend && node ace migration:run && cd ..
+
+# Start development servers
+pnpm run dev:backend   # Backend :3333
+pnpm run dev:web       # Frontend :3000
 ```
 
 Visit http://localhost:3000
@@ -118,109 +175,6 @@ Linky/
 
 ---
 
-## API Endpoints
-
-### Auth (Public)
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/forgot-password`
-- `POST /api/auth/reset-password`
-
-### Auth (Protected)
-- `POST /api/auth/logout`
-
-### User
-- `GET /api/user/me`
-- `PUT /api/user`
-- `POST /api/user/avatar`
-- `DELETE /api/user/avatar`
-- `POST /api/user/change-email`
-- `GET /api/user/verify-email`
-- `POST /api/user/resend-verification`
-
-### Bookmarks
-- `GET /api/bookmarks`
-- `GET /api/bookmarks/paginate`
-- `POST /api/bookmarks`
-- `POST /api/bookmarks/by-url` (auto-fetch metadata)
-- `PUT /api/bookmarks/:id`
-- `DELETE /api/bookmarks/:id`
-- `POST /api/bookmarks/import` (HTML import)
-- `GET /api/bookmarks/import/:jobId/status`
-- `POST /api/bookmarks/:id/refresh-metadata`
-- `GET /api/bookmarks/fetching-count`
-
-### Memos
-- `GET /api/memos`
-- `GET /api/memos/paginate`
-- `POST /api/memos`
-- `PUT /api/memos/:id`
-- `DELETE /api/memos/:id`
-
-### Tags
-- `GET /api/tags`
-- `POST /api/tags`
-- `GET /api/tags/:id`
-- `PUT /api/tags/:id`
-- `DELETE /api/tags/:id`
-- `GET /api/tags/:id/items`
-
-### Settings
-- `GET /api/settings/ai`
-- `PUT /api/settings/ai`
-
-### AI
-- `GET /api/ai/config`
-- `POST /api/ai/chat`
-- `POST /api/ai/chat/stream` (SSE streaming)
-
-### Search
-- `GET /api/search`
-
----
-
-## Frontend Pages
-
-- `/` - Home
-- `/auth/sign-in` - Sign in
-- `/auth/sign-up` - Sign up
-- `/auth/forgot-password` - Forgot password
-- `/auth/reset-password` - Reset password
-- `/verify-email` - Email verification
-- `/workspace/bookmarks` - Bookmarks
-- `/workspace/memos` - Memos
-- `/workspace/tags` - Tags list
-- `/workspace/tags/[id]` - Tag detail
-- `/workspace/settings` - Settings
-
----
-
-## Development
-
-### Lint & Type Check
-
-```bash
-pnpm run lint
-pnpm run typecheck
-```
-
-### Backend CLI
-
-```bash
-cd backend
-
-# Make stuff
-node ace make:controller User
-node ace make:model Bookmark
-node ace make:service BookmarkService
-
-# Migrations
-node ace migration:run
-node ace migration:rollback
-```
-
----
-
 ## License
 
 Dual licensed:
@@ -237,14 +191,6 @@ I wanted a simple, self-hosted tool to organize bookmarks and write notes. No co
 
 ---
 
-## TODO
-
-- [ ] Add more view customization
-- [ ] Export data
-- [ ] Browser extension (maybe)
-
----
-
 ## Contact
 
-Issues welcome: https://github.com/anomalyco/Linky/issues
+Issues welcome: https://github.com/zguiyang/Linky/issues

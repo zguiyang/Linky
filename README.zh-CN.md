@@ -45,54 +45,99 @@
 
 ---
 
-## 技术栈
-
-### 后端
-- AdonisJS 6.x
-- TypeScript
-- PostgreSQL
-- Lucid ORM
-
-### 前端
-- Nuxt 4.x
-- TypeScript
-- Nuxt UI 4.x (Tailwind CSS)
-- Nitro 发请求
-
----
-
-## 快速开始
+## 部署
 
 ### 环境要求
 - Node.js >= 20.0.0
 - pnpm >= 10.26.1
 - PostgreSQL
+- PM2
 
-### 安装
+### 快速部署
 
 ```bash
+# 1. 拉取代码
+git clone https://github.com/zguiyang/Linky.git
+cd Linky
+
+# 2. 安装依赖
 pnpm install
+
+# 3. 复制并配置 env 文件
+cp backend/.env.example backend/.env
+cp web/.env.example web/.env
+
+# 编辑 backend/.env 配置数据库等信息
+
+# 4. 运行数据库迁移
+cd backend
+node ace migration:run
+cd ..
+
+# 5. 打包前后端
+pnpm run build
+
+# 6. 用 PM2 启动
+pm2 start ecosystem.config.js
 ```
 
 ### 配置
 
-1. 复制并配置 env 文件：
-   - `backend/.env`
-   - `web/.env`
+编辑 `backend/.env`：
+```env
+# 数据库
+PG_HOST=127.0.0.1
+PG_PORT=5432
+PG_USER=root
+PG_PASSWORD=你的密码
+PG_DATABASE=linky
 
-2. 运行数据库迁移：
-```bash
-cd backend
-node ace migration:run
+# 应用
+PORT=3333
+APP_URL=http://你的域名.com
+
+# 前端 (web/.env)
+NUXT_PUBLIC_API_BASE_URL=http://localhost:3333
 ```
 
-3. 启动服务：
-```bash
-# 后端 :3333
-pnpm run dev:backend
+### PM2 命令
 
-# 前端 :3000
-pnpm run dev:web
+```bash
+# 启动
+pm2 start ecosystem.config.js
+
+# 重启
+pm2 restart linky-backend
+pm2 restart linky-web
+
+# 停止
+pm2 stop ecosystem.config.js
+
+# 查看日志
+pm2 logs
+
+# 监控
+pm2 monit
+```
+
+---
+
+## 快速开始（开发）
+
+```bash
+# 安装依赖
+pnpm install
+
+# 配置环境
+cp backend/.env.example backend/.env
+cp web/.env.example web/.env
+
+# 运行数据库迁移
+cd backend && node ace migration:run && cd ..
+
+# 启动开发服务
+pnpm run dev:backend   # 后端 :3333
+pnpm run dev:web       # 前端 :3000
 ```
 
 访问 http://localhost:3000
@@ -120,109 +165,6 @@ Linky/
 
 ---
 
-## API 端点
-
-### 认证（公开）
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/forgot-password`
-- `POST /api/auth/reset-password`
-
-### 认证（需登录）
-- `POST /api/auth/logout`
-
-### 用户
-- `GET /api/user/me`
-- `PUT /api/user`
-- `POST /api/user/avatar`
-- `DELETE /api/user/avatar`
-- `POST /api/user/change-email`
-- `GET /api/user/verify-email`
-- `POST /api/user/resend-verification`
-
-### 书签
-- `GET /api/bookmarks`
-- `GET /api/bookmarks/paginate`
-- `POST /api/bookmarks`
-- `POST /api/bookmarks/by-url`（自动抓取元数据）
-- `PUT /api/bookmarks/:id`
-- `DELETE /api/bookmarks/:id`
-- `POST /api/bookmarks/import`（HTML 导入）
-- `GET /api/bookmarks/import/:jobId/status`
-- `POST /api/bookmarks/:id/refresh-metadata`
-- `GET /api/bookmarks/fetching-count`
-
-### 备忘录
-- `GET /api/memos`
-- `GET /api/memos/paginate`
-- `POST /api/memos`
-- `PUT /api/memos/:id`
-- `DELETE /api/memos/:id`
-
-### 标签
-- `GET /api/tags`
-- `POST /api/tags`
-- `GET /api/tags/:id`
-- `PUT /api/tags/:id`
-- `DELETE /api/tags/:id`
-- `GET /api/tags/:id/items`
-
-### 设置
-- `GET /api/settings/ai`
-- `PUT /api/settings/ai`
-
-### AI
-- `GET /api/ai/config`
-- `POST /api/ai/chat`
-- `POST /api/ai/chat/stream`（SSE 流式）
-
-### 搜索
-- `GET /api/search`
-
----
-
-## 前端页面
-
-- `/` - 首页
-- `/auth/sign-in` - 登录
-- `/auth/sign-up` - 注册
-- `/auth/forgot-password` - 忘记密码
-- `/auth/reset-password` - 重置密码
-- `/verify-email` - 邮箱验证
-- `/workspace/bookmarks` - 书签
-- `/workspace/memos` - 备忘录
-- `/workspace/tags` - 标签列表
-- `/workspace/tags/[id]` - 标签详情
-- `/workspace/settings` - 设置
-
----
-
-## 开发
-
-### 代码检查
-
-```bash
-pnpm run lint
-pnpm run typecheck
-```
-
-### 后端 CLI
-
-```bash
-cd backend
-
-# 创建文件
-node ace make:controller User
-node ace make:model Bookmark
-node ace make:service BookmarkService
-
-# 数据库迁移
-node ace migration:run
-node ace migration:rollback
-```
-
----
-
 ## 许可证
 
 双许可证：
@@ -234,14 +176,6 @@ node ace migration:rollback
 ## 为什么做这个
 
 我就是想找个简单、能自托管的工具来整理书签和写笔记。不要多复杂的功能，不要依赖云服务。自己能掌控数据，够用就行。
-
----
-
-## TODO（想做但还没做的）
-
-- [ ] AI对话（前端聊天界面）
-- [ ] 导出数据
-- [ ] 浏览器扩展
 
 ---
 
