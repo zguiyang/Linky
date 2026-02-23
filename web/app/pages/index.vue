@@ -76,20 +76,37 @@
         </u-page-grid>
       </u-page-section>
 
-      <u-page-c-t-a
-        title="准备好开始整理您的知识了吗？"
-        description="立即登录，开始使用 Linky 打造属于您的个人知识管理空间。免费开始，随时随地访问。"
-        :links="ctaLinks"
-        class="bg-gray-900 dark:bg-primary-950 text-white sm:rounded-3xl sm:mx-8 lg:mx-16 my-16 overflow-hidden relative isolate"
-        :ui="{
-          title: 'text-white',
-          description: 'text-gray-300'
-        }"
+      <u-page-section
+        title="开启您的知识探索之旅"
+        description="立即加入 Linky，构建您的数字第二大脑，让灵感与知识不再流失。"
+        align="center"
+        class="pb-24"
       >
+        <div class="flex flex-col items-center gap-6">
+          <div class="flex flex-wrap justify-center gap-4">
+            <u-button
+              v-bind="entryButton"
+              size="xl"
+              class="px-8 py-3 rounded-full shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-all duration-300"
+            />
+            <u-button
+              label="给个star"
+              to="https://github.com/zguiyang/Linky"
+              target="_blank"
+              size="xl"
+              variant="outline"
+              color="neutral"
+              icon="i-simple-icons-github"
+              class="px-8 py-3 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300"
+            />
+          </div>
+        </div>
+
         <template #top>
-          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary-500/20 blur-[120px] rounded-full -z-10" />
+          <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-800 to-transparent" />
+          <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary-500/5 blur-[120px] rounded-full -z-10" />
         </template>
-      </u-page-c-t-a>
+      </u-page-section>
     </u-main>
 
     <u-footer>
@@ -111,13 +128,8 @@
           icon="i-simple-icons-github"
           color="neutral"
           variant="ghost"
-          to="https://github.com"
+          to="https://github.com/zguiyang/Linky"
           target="_blank"
-        />
-        <u-button
-          icon="i-simple-icons-twitter"
-          color="neutral"
-          variant="ghost"
         />
       </template>
 
@@ -168,24 +180,6 @@ const heroLinks = computed(() => [
     variant: 'outline',
     color: 'neutral',
     icon: 'i-heroicons-arrow-down-circle'
-  }
-])
-
-const ctaLinks = computed(() => [
-  {
-    ...entryButton.value,
-    size: 'xl',
-    color: 'white',
-    variant: 'solid',
-    class: '!text-gray-900 font-bold'
-  },
-  {
-    label: '查看演示',
-    to: '#features',
-    size: 'xl',
-    variant: 'link',
-    color: 'white',
-    trailingIcon: 'i-heroicons-arrow-right'
   }
 ])
 
