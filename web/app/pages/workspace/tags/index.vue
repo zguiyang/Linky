@@ -6,7 +6,7 @@
           标签管理
         </h1>
         <p class="text-sm text-(--text-secondary) mt-1">
-          共 {{ tagsStore.tags.length }} 个标签
+          共 {{ tags?.length || 0 }} 个标签
         </p>
       </div>
 
@@ -31,8 +31,9 @@
       </div>
     </div>
 
+    <!-- 空状态 -->
     <div
-      v-if="!tagsStore.tags || tagsStore.tags.length === 0"
+      v-if="!pending && (!tags || tags.length === 0)"
       class="flex flex-col items-center justify-center py-20 bg-(--bg-surface) rounded-2xl border border-dashed border-(--border-subtle)"
     >
       <u-icon
@@ -44,8 +45,9 @@
       </p>
     </div>
 
+    <!-- 标签列表 -->
     <div
-      v-else
+      v-if="!pending && tags && tags.length > 0"
       class="flex flex-col gap-8"
     >
       <!-- 用户标签 -->
@@ -364,7 +366,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import type { Tag } from '~/api/types'
 import { useTagsStore } from '~/stores/tags'
 
@@ -372,12 +374,14 @@ definePageMeta({ layout: 'workspace' })
 
 const tagsStore = useTagsStore()
 
-const userTags = computed(() => tagsStore.tags.filter(tag => !tag.isAiGenerated))
-const aiTags = computed(() => tagsStore.tags.filter(tag => tag.isAiGenerated))
+const { data: tags, pending } = await useAsyncData(
+  'tags',
+  () => tagsStore.fetchTags(),
+  { default: () => [] as Tag[] }
+)
 
-onMounted(async () => {
-  await tagsStore.fetchTags()
-})
+const userTags = computed(() => (tags.value || []).filter(tag => !tag.isAiGenerated))
+const aiTags = computed(() => (tags.value || []).filter(tag => tag.isAiGenerated))
 
 const batchMode = ref(false)
 const selectedTagsForBatch = ref<number[]>([])
@@ -401,15 +405,15 @@ const clearBatchSelection = () => {
 }
 
 const isAllSelected = computed(() =>
-  tagsStore.tags.length > 0
-  && selectedTagsForBatch.value.length === tagsStore.tags.length
+  (tags.value || []).length > 0
+  && selectedTagsForBatch.value.length === (tags.value || []).length
 )
 
 const toggleSelectAll = () => {
   if (isAllSelected.value) {
     selectedTagsForBatch.value = []
   } else {
-    selectedTagsForBatch.value = tagsStore.tags.map(t => t.id)
+    selectedTagsForBatch.value = (tags.value || []).map(t => t.id)
   }
 }
 
