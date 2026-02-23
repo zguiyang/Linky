@@ -45,7 +45,7 @@ export const useHttpError = () => {
   }
 
   const handleError = (error: unknown) => {
-    currentError.value = error
+    currentError.value = getErrorMessage(error)
     showToast('请求失败', getErrorMessage(error), 'error')
   }
 
