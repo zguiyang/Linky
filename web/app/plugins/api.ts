@@ -17,8 +17,17 @@ export default defineNuxtPlugin((_nuxtApp) => {
   const config = useRuntimeConfig()
   const { handle401, handleError } = useHttpError()
 
+  const getBaseUrl = () => {
+    const baseUrl = config.public.apiBaseUrl
+    const prefix = config.public.apiPrefix
+    if (!baseUrl) {
+      return prefix
+    }
+    return `${baseUrl}${prefix}`
+  }
+
   const $api = $fetch.create({
-    baseURL: `${config.public.apiBaseUrl}${config.public.apiPrefix}`,
+    baseURL: getBaseUrl(),
     timeout: 10000,
     credentials: 'include',
 
