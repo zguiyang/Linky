@@ -1,5 +1,18 @@
 <template>
   <div class="min-h-screen flex flex-col">
+    <div class="bg-primary-500 dark:bg-primary-400 py-2 px-4 text-center">
+      <p class="text-xs sm:text-sm font-medium text-white dark:text-gray-900">
+        Linky 目前处于 Beta 测试阶段，如有任何问题或建议，欢迎
+        <a
+          href="https://github.com/zguiyang/Linky/issues"
+          target="_blank"
+          class="underline decoration-2 underline-offset-2 hover:opacity-80 transition-opacity"
+        >
+          提交 Issue
+        </a>
+      </p>
+    </div>
+
     <u-header
       to="/"
       title="Linky"
