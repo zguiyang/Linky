@@ -55,7 +55,7 @@ const TRANSMIT_CHANNEL_NAMES = {
 const APP_INFO = {
   NAME: 'Linky',
   VERSION: '0.0.0',
-  COPYRIGHT_YEAR: '2024-2026'
+  COPYRIGHT_YEAR: '2026'
 } as const
 
 const TAG_ITEM_TYPE = {
