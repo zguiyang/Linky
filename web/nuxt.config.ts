@@ -11,7 +11,6 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true
   },
-
   css: ['~/assets/css/main.css'],
   ui: {
     fonts: false
@@ -45,6 +44,7 @@ export default defineNuxtConfig({
     }
   },
   icon: {
+    localApiEndpoint: '/_nuxt_icon',
     serverBundle: {
       collections: ['lucide', 'heroicons']
     }
